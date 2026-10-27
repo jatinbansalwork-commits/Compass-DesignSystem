@@ -108,20 +108,20 @@ export const getUniqueIdentifier = (): string => {
       hash.update(macAddresses.join('-'));
 
       // Generate deterministic machine ID
-      const machineId = `blade-${hash.digest('hex').substring(0, 16)}`;
+      const machineId = `compass-${hash.digest('hex').substring(0, 16)}`;
 
       cachedMachineId = machineId;
       return machineId;
     }
 
     // Fallback to hostname if no MAC addresses available
-    const fallbackId = `blade-host-${createHashFromString(os.hostname())}`;
+    const fallbackId = `compass-host-${createHashFromString(os.hostname())}`;
     cachedMachineId = fallbackId;
     return fallbackId;
   } catch (error: unknown) {
     Sentry.captureException(error);
     // Ultimate fallback if any errors occur
-    const fallbackId = `blade-fallback-${Date.now()}`;
+    const fallbackId = `compass-fallback-${Date.now()}`;
     cachedMachineId = fallbackId;
     return fallbackId;
   }
@@ -135,7 +135,7 @@ const sendAnalytics = ({
   properties: object;
 }): void => {
   try {
-    const analytics = new Analytics({ writeKey: process.env.BLADE_SEGMENT_KEY ?? '' });
+    const analytics = new Analytics({ writeKey: process.env.COMPASS_SEGMENT_KEY ?? '' });
     // Get or create machine ID
     const projectRootDirectory = (properties as { currentProjectRootDirectory: string })
       ?.currentProjectRootDirectory;

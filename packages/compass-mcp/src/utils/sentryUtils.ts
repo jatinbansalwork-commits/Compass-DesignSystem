@@ -3,7 +3,7 @@ import { getPackageJSONVersion } from './generalUtils.js';
 
 const initSentry = (): void => {
   Sentry.init({
-    dsn: process.env.BLADE_MCP_SENTRY_DSN,
+    dsn: process.env.COMPASS_MCP_SENTRY_DSN,
     environment: process.env.NODE_ENV ?? 'development',
     release: getPackageJSONVersion(),
     sendDefaultPii: false,

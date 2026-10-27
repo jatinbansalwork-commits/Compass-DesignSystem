@@ -14,7 +14,7 @@ import { getCompassDocsResponseText } from '../utils/getCompassDocsResponseText.
 import { shouldCreateOrUpdateSkill } from '../utils/skillUtils.js';
 import type { McpToolResponse } from '../utils/types.js';
 
-const bladeGeneralDocsList = getCompassDocsList('general');
+const compassGeneralDocsList = getCompassDocsList('general');
 
 const getCompassGeneralDocsToolName = 'get_compass_general_docs';
 
@@ -30,7 +30,7 @@ const getCompassGeneralDocsStdioSchema = {
   topicsList: z
     .string()
     .describe(
-      `Comma separated list of general documentation topics. E.g. "Installation, Theming". Possible values: ${bladeGeneralDocsList.join(
+      `Comma separated list of general documentation topics. E.g. "Installation, Theming". Possible values: ${compassGeneralDocsList.join(
         ', ',
       )}. Here is guide on how to decide which general docs you might need:\n ${whichGeneralDocsToUse}`,
     ),
@@ -58,13 +58,13 @@ const getCompassGeneralDocsCore = ({
   clientName: 'claude' | 'cursor' | 'unknown';
 }): McpToolResponse => {
   const topics = topicsList.split(',').map((s) => s.trim());
-  const invalidTopics = topics.filter((topic) => !bladeGeneralDocsList.includes(topic));
+  const invalidTopics = topics.filter((topic) => !compassGeneralDocsList.includes(topic));
   if (invalidTopics.length > 0) {
     return handleError({
       toolName: getCompassGeneralDocsToolName,
       mcpErrorMessage: `Invalid argument topicsList. Invalid values: ${invalidTopics.join(
         ', ',
-      )}. Valid general docs values: ${bladeGeneralDocsList.join(', ')}`,
+      )}. Valid general docs values: ${compassGeneralDocsList.join(', ')}`,
     });
   }
 

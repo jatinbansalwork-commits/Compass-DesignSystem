@@ -18,7 +18,7 @@ dotenv.config();
 
 // Use environment variables with defaults
 const NODE_ENV = process.env.NODE_ENV;
-const BLADE_MCP_SENTRY_DSN = process.env.BLADE_MCP_SENTRY_DSN || '';
+const COMPASS_MCP_SENTRY_DSN = process.env.COMPASS_MCP_SENTRY_DSN || '';
 
 // TODO: we should run this recursively for all files in dist folder
 function replaceInFileSync(filePath, replacements) {
@@ -45,17 +45,17 @@ async function replaceEnvironmentVariables() {
         to: `'${NODE_ENV}'`,
       },
       {
-        from: /process\.env\.BLADE_MCP_SENTRY_DSN/g,
-        to: `'${BLADE_MCP_SENTRY_DSN}'`,
+        from: /process\.env\.COMPASS_MCP_SENTRY_DSN/g,
+        to: `'${COMPASS_MCP_SENTRY_DSN}'`,
       },
     ]);
 
-    // Replace BLADE_SEGMENT_KEY in analytics utils
-    const BLADE_SEGMENT_KEY = process.env.BLADE_SEGMENT_KEY || '';
+    // Replace COMPASS_SEGMENT_KEY in analytics utils
+    const COMPASS_SEGMENT_KEY = process.env.COMPASS_SEGMENT_KEY || '';
     replaceInFileSync(ANALYTICS_UTILS_JS_PATH, [
       {
-        from: /process\.env\.BLADE_SEGMENT_KEY/g,
-        to: `'${BLADE_SEGMENT_KEY}'`,
+        from: /process\.env\.COMPASS_SEGMENT_KEY/g,
+        to: `'${COMPASS_SEGMENT_KEY}'`,
       },
     ]);
 

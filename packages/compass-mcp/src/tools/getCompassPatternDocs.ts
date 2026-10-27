@@ -15,7 +15,7 @@ import {
 } from '../utils/getCommonSchema.js';
 import { getCompassComponentDocsToolName } from './getCompassComponentDocs.js';
 
-const bladePatternsList = getCompassDocsList('patterns');
+const compassPatternsList = getCompassDocsList('patterns');
 const whichPatternToUseGuide = readFileSync(
   join(PATTERNS_KNOWLEDGEBASE_DIRECTORY, 'index.md'),
   'utf8',
@@ -30,7 +30,7 @@ const getCompassPatternDocsStdioSchema = {
   patternsList: z
     .string()
     .describe(
-      `Comma separated list of Compass pattern names. E.g. "ListView, DetailedView". Possible values: ${bladePatternsList.join(
+      `Comma separated list of Compass pattern names. E.g. "ListView, DetailedView". Possible values: ${compassPatternsList.join(
         ', ',
       )}. Here is guide on how to decide which pattern to use: ${whichPatternToUseGuide}`,
     ),
@@ -58,13 +58,13 @@ const getCompassPatternDocsCore = ({
   clientName: 'claude' | 'cursor' | 'unknown';
 }): McpToolResponse => {
   const components = patternsList.split(',').map((s) => s.trim());
-  const invalidComponents = components.filter((comp) => !bladePatternsList.includes(comp));
+  const invalidComponents = components.filter((comp) => !compassPatternsList.includes(comp));
   if (invalidComponents.length > 0) {
     return handleError({
       toolName: getCompassPatternDocsToolName,
       mcpErrorMessage: `Invalid argument componentsList. Invalid values: ${invalidComponents.join(
         ', ',
-      )}. Valid component docs values: ${bladePatternsList.join(
+      )}. Valid component docs values: ${compassPatternsList.join(
         ', ',
       )}. Make sure to call the parent component name (e.g. instead of calling ListViewFilters, call ListView)`,
     });

@@ -63,8 +63,8 @@ After completing all code edits, and **just before** drafting your final summary
     "linesRemovedTotal": 3,
 
     // Aggregated optional buckets
-    "bladeUiLinesAddedTotal": 10,
-    "bladeUiLinesRemovedTotal": 2,
+    "compassUiLinesAddedTotal": 10,
+    "compassUiLinesRemovedTotal": 2,
     "nonCompassUiLinesAddedTotal": 3,
     "nonCompassUiLinesRemovedTotal": 1,
     "nonUiLinesAddedTotal": 0,
@@ -107,7 +107,7 @@ const publishLinesOfCodeMetricToolSchema = {
       "The working root directory of the consumer's project. Do not use root directory, do not use '.', only use absolute path to current directory",
     ),
   // New aggregated metrics for code categorization
-  bladeUiLinesAddedTotal: z
+  compassUiLinesAddedTotal: z
     .number()
     .int()
     .nonnegative()
@@ -115,7 +115,7 @@ const publishLinesOfCodeMetricToolSchema = {
     .describe(
       'Total lines of UI code that import or reference Compass components (e.g., <Button />, <TextInput />) that were added across all files.',
     ),
-  bladeUiLinesRemovedTotal: z
+  compassUiLinesRemovedTotal: z
     .number()
     .int()
     .nonnegative()
@@ -166,8 +166,8 @@ const publishLinesOfCodeMetricToolCallback: ToolCallback<
   linesRemovedTotal,
   toolsUsed,
   currentProjectRootDirectory,
-  bladeUiLinesAddedTotal,
-  bladeUiLinesRemovedTotal,
+  compassUiLinesAddedTotal,
+  compassUiLinesRemovedTotal,
   nonCompassUiLinesAddedTotal,
   nonCompassUiLinesRemovedTotal,
   nonUiLinesAddedTotal,
@@ -185,8 +185,8 @@ const publishLinesOfCodeMetricToolCallback: ToolCallback<
         toolName: publishLinesOfCodeMetricToolName,
         linesAddedTotal,
         linesRemovedTotal,
-        bladeUiLinesAddedTotal: bladeUiLinesAddedTotal ?? 0,
-        bladeUiLinesRemovedTotal: bladeUiLinesRemovedTotal ?? 0,
+        compassUiLinesAddedTotal: compassUiLinesAddedTotal ?? 0,
+        compassUiLinesRemovedTotal: compassUiLinesRemovedTotal ?? 0,
         nonCompassUiLinesAddedTotal: nonCompassUiLinesAddedTotal ?? 0,
         nonCompassUiLinesRemovedTotal: nonCompassUiLinesRemovedTotal ?? 0,
         nonUiLinesAddedTotal: nonUiLinesAddedTotal ?? 0,

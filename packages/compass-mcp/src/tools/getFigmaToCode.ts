@@ -8,7 +8,7 @@ import { getCompassComponentDocsToolName } from './getCompassComponentDocs.js';
 const URLS = {
   FIGMA_TO_CODE_URL: {
     DEV: 'http://localhost:8888',
-    PROD: 'https://blade-chat.dev.razorpay.in',
+    PROD: 'https://compass-chat.dev.razorpay.in',
   },
 } as const;
 

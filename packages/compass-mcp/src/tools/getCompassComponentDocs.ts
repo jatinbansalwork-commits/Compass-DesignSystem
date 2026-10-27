@@ -12,8 +12,8 @@ import {
   httpTransportSkillVersionSchema,
 } from '../utils/getCommonSchema.js';
 
-const bladeComponentsList = getCompassDocsList('components');
-const bladeComponentsListString = bladeComponentsList.join(', ');
+const compassComponentsList = getCompassDocsList('components');
+const compassComponentsListString = compassComponentsList.join(', ');
 
 const getCompassComponentDocsToolName = 'get_compass_component_docs';
 const getCompassComponentDocsToolDescription = `Fetch the Compass Design System docs for the given list of components. Use this to get information about the components and their props while adding or changing a component.`;
@@ -23,7 +23,7 @@ const getCompassComponentDocsStdioSchema = {
   componentsList: z
     .string()
     .describe(
-      `Comma separated list of Compass component names. E.g. "Button, Accordion". Use semantic components (like PasswordInput for passwords). Possible values: ${bladeComponentsListString}`,
+      `Comma separated list of Compass component names. E.g. "Button, Accordion". Use semantic components (like PasswordInput for passwords). Possible values: ${compassComponentsListString}`,
     ),
   ...commonCompassMCPToolSchema,
 };
@@ -49,12 +49,12 @@ const getCompassComponentDocsCore = ({
   clientName: 'claude' | 'cursor' | 'unknown';
 }): McpToolResponse => {
   const components = componentsList.split(',').map((s) => s.trim());
-  const invalidComponents = components.filter((comp) => !bladeComponentsList.includes(comp));
+  const invalidComponents = components.filter((comp) => !compassComponentsList.includes(comp));
   const invalidComponentsString = invalidComponents.join(', ');
   if (invalidComponents.length > 0) {
     return handleError({
       toolName: getCompassComponentDocsToolName,
-      mcpErrorMessage: `Invalid argument componentsList. Invalid values: ${invalidComponentsString}. Valid component docs values: ${bladeComponentsListString}. Make sure to call the parent component name (e.g. instead of calling ListViewFilters, call ListView)`,
+      mcpErrorMessage: `Invalid argument componentsList. Invalid values: ${invalidComponentsString}. Valid component docs values: ${compassComponentsListString}. Make sure to call the parent component name (e.g. instead of calling ListViewFilters, call ListView)`,
     });
   }
 

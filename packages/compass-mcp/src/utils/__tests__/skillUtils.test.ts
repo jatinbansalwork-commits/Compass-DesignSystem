@@ -8,7 +8,7 @@ import {
   shouldCreateOrUpdateSkill,
   skillCreationInstructions,
 } from '../skillUtils.js';
-import { SKILL_VERSION, BLADE_SKILL_FILE_PATH, SKILL_VERSION_STRING } from '../tokens.js';
+import { SKILL_VERSION, COMPASS_SKILL_FILE_PATH, SKILL_VERSION_STRING } from '../tokens.js';
 
 describe('skillUtils', () => {
   describe('shouldCreateOrUpdateSkill (file-system path, skipLocalSkillChecks = false)', () => {
@@ -27,7 +27,7 @@ describe('skillUtils', () => {
     };
 
     it('should return undefined when skill file exists and is up to date', () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'blade-skill-test-'));
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'compass-skill-test-'));
       makeSkillFile(tmpDir, `metadata:\n  ${SKILL_VERSION_STRING}`);
 
       const result = shouldCreateOrUpdateSkill('0', tmpDir, false, 'get_compass_component_docs');
@@ -36,7 +36,7 @@ describe('skillUtils', () => {
     });
 
     it('should return outdated error when skill file exists but version string does not match', () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'blade-skill-test-'));
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'compass-skill-test-'));
       makeSkillFile(tmpDir, 'version: "0.0.1"');
 
       const result = shouldCreateOrUpdateSkill('0', tmpDir, false, 'get_compass_component_docs');
@@ -48,7 +48,7 @@ describe('skillUtils', () => {
     });
 
     it('should return missing error when skill file does not exist', () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'blade-skill-test-'));
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'compass-skill-test-'));
 
       const result = shouldCreateOrUpdateSkill('0', tmpDir, false, 'get_compass_component_docs');
 
@@ -59,9 +59,9 @@ describe('skillUtils', () => {
     });
 
     it('should return undefined when skill file contains the actual SKILL.md template content (regression: quote mismatch)', () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'blade-skill-test-'));
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'compass-skill-test-'));
       // Simulate what createCompassSkill writes — the real template content
-      makeSkillFile(tmpDir, fs.readFileSync(BLADE_SKILL_FILE_PATH, 'utf8'));
+      makeSkillFile(tmpDir, fs.readFileSync(COMPASS_SKILL_FILE_PATH, 'utf8'));
 
       const result = shouldCreateOrUpdateSkill('0', tmpDir, false, 'get_compass_component_docs');
 

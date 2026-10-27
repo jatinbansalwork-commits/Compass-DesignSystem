@@ -27,7 +27,7 @@ describe('createCompassSkill HTTP callback', () => {
 
   it('should return skill creation instructions', () => {
     const mockCurrentProjectRootDirectory = '/Users/test/project';
-    const mockInstructions = 'Mock instructions for creating blade skill';
+    const mockInstructions = 'Mock instructions for creating compass skill';
 
     vi.spyOn(skillUtils, 'skillCreationInstructions').mockReturnValue(mockInstructions);
 
@@ -58,7 +58,7 @@ describe('createCompassSkill stdio callback', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'blade-skill-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'compass-skill-test-'));
   });
 
   afterEach(() => {

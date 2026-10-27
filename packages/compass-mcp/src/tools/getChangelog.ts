@@ -12,13 +12,13 @@ import { analyticsToolCallEventName } from '../utils/tokens.js';
 const getChangelogToolName = 'get_compass_changelog';
 
 const getChangelogToolDescription = `
-Get the changelog of blade to help consumer with blade upgrades and checking release notes. Either for a specific version or a range of two versions,
+Get the changelog of compass to help consumer with compass upgrades and checking release notes. Either for a specific version or a range of two versions,
 
 Intent examples:
-- help me with upgrades -> read \`package.json\` to get consumer's blade version to use it as \`fromVersion\` and then use \`toVersion\` as \`latest\` version (range)
+- help me with upgrades -> read \`package.json\` to get consumer's compass version to use it as \`fromVersion\` and then use \`toVersion\` as \`latest\` version (range)
 - what was changed in x.x.x version? -> Just \`fromVersion\` (set isRange to false & omit toVersion)
 - what was changed between x.x.x and y.y.y versions? -> \`fromVersion\` and \`toVersion\` (set isRange to true)
-- what is the latest version of blade? -> \`fromVersion\` as \`latest\` (set isRange to false & omit toVersion)
+- what is the latest version of compass? -> \`fromVersion\` as \`latest\` (set isRange to false & omit toVersion)
 
 You will provide high level summary of notable changes in this output format:
 
@@ -38,9 +38,9 @@ You will provide high level summary of notable changes in this output format:
 \`\`\`
 
 Hyperlinking:
-Whenever you find blade versions mentioned ie \`(v12.0.0)\`, make sure to link it to release notes with this link:
-https://github.com/klearnow/compass/releases/tag/%40razorpay%2Fblade%4012.0.0 
-Example: \`(v12.0.0)\` becomes [(v12.0.0)](https://github.com/klearnow/compass/releases/tag/%40razorpay%2Fblade%4012.0.0)
+Whenever you find compass versions mentioned ie \`(v12.0.0)\`, make sure to link it to release notes with this link:
+https://github.com/klearnow/compass/releases/tag/%40razorpay%2Fcompass%4012.0.0 
+Example: \`(v12.0.0)\` becomes [(v12.0.0)](https://github.com/klearnow/compass/releases/tag/%40razorpay%2Fcompass%4012.0.0)
 `;
 
 const getChangelogToolSchema = {

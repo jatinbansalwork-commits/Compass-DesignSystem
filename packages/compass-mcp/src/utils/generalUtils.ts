@@ -18,16 +18,16 @@ const getPackageJSONVersion = (): string => {
 type DocumentationType = 'components' | 'patterns' | 'general';
 
 /**
- * Reads the given documentation type directory and returns a list of available blade docs
+ * Reads the given documentation type directory and returns a list of available compass docs
  */
 const getCompassDocsList = (documentationType: DocumentationType): string[] => {
-  const bladeDocsList: string[] = [];
+  const compassDocsList: string[] = [];
   try {
     // Read all markdown files and strip the .md extension
     const files = readdirSync(join(KNOWLEDGEBASE_DIRECTORY, documentationType));
     for (const file of files) {
       if (file.endsWith('.md') && !file.includes('index.md')) {
-        bladeDocsList.push(file.replace('.md', '').trim());
+        compassDocsList.push(file.replace('.md', '').trim());
       }
     }
   } catch (error: unknown) {
@@ -36,7 +36,7 @@ const getCompassDocsList = (documentationType: DocumentationType): string[] => {
     return [];
   }
 
-  return bladeDocsList;
+  return compassDocsList;
 };
 
 export { hasOutdatedSkill, getPackageJSONVersion, getCompassDocsList };

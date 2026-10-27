@@ -11,7 +11,7 @@ import {
 import type { ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import {
-  BLADE_SKILL_FILE_PATH,
+  COMPASS_SKILL_FILE_PATH,
   SKILL_VERSION,
   SKILL_DIRECTORY_NAME,
   SKILL_REFERENCES_DIRECTORY,
@@ -83,7 +83,7 @@ const createCompassSkillCore = ({
       }
     }
 
-    const skillFileTemplateContent = readFileSync(BLADE_SKILL_FILE_PATH, 'utf8');
+    const skillFileTemplateContent = readFileSync(COMPASS_SKILL_FILE_PATH, 'utf8');
 
     if (!existsSync(skillDir)) {
       mkdirSync(skillDir, { recursive: true });

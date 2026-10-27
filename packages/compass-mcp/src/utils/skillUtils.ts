@@ -71,7 +71,7 @@ function isSkillOutdated(skillVersion: string): boolean {
 }
 
 /**
- * Checks if the blade skill should be created or updated. Returns instructions if needed.
+ * Checks if the compass skill should be created or updated. Returns instructions if needed.
  * This function checks both the file system and version numbers to determine if the skill needs attention.
  * @param skillVersion - The version of the skill
  * @param currentProjectRootDirectory - The working root directory of the consumer's project
