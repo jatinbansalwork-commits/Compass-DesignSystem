@@ -13,8 +13,8 @@ import {
   CardHeaderBadge,
   Text,
   Heading,
-} from '@klearnow/klear360/components';
-import { CheckCircleIcon, UsersIcon } from '@klearnow/klear360/components';
+} from '@klearnow/compass/components';
+import { CheckCircleIcon, UsersIcon } from '@klearnow/compass/components';
 
 export const Default = () => (
   <Card>

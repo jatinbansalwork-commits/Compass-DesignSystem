@@ -26,27 +26,27 @@ Assemble the outputs from all critique agents into a single JSON object matching
           "name": "Run Tests (1)",
           "description": "Description field from gh pr checks output",
           "state": "SUCCESS",
-          "link": "https://github.com/klearnow/klear360/actions/runs/1234567890"
+          "link": "https://github.com/klearnow/compass/actions/runs/1234567890"
         },
         {
           "name": "Run Tests (2)",
           "description": "Description field from gh pr checks output",
           "state": "FAILURE",
-          "link": "https://github.com/klearnow/klear360/actions/runs/1234567890",
+          "link": "https://github.com/klearnow/compass/actions/runs/1234567890",
           "problem": "Shard timed out after 6 minutes",
           "suggestion": "Re-run the failed job"
         }
       ],
       "issues": [
         {
-          "problem": "Missing changeset bump for @klearnow/klear360 (packages/klear360 was modified)"
+          "problem": "Missing changeset bump for @klearnow/compass (packages/compass was modified)"
         }
       ]
     }
   },
   "inlined-comments": [
     {
-      "file": "packages/klear360/src/components/Foo/Foo.tsx",
+      "file": "packages/compass/src/components/Foo/Foo.tsx",
       "line": 42,
       "side": "RIGHT",
       "severity": "critical",
@@ -55,7 +55,7 @@ Assemble the outputs from all critique agents into a single JSON object matching
       "suggestion": "How to fix it."
     },
     {
-      "file": "packages/klear360/src/components/Bar/Bar.tsx",
+      "file": "packages/compass/src/components/Bar/Bar.tsx",
       "line": 17,
       "side": "LEFT",
       "severity": "minor",

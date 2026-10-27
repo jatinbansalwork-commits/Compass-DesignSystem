@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["src"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~utils": ["src/utils"],
+      "~utils/*": ["src/utils/*"],
+      // Audit: TS 5.6+ allows only one '*' per path pattern; a single ~components/* entry
+      // still resolves nested imports (e.g. ~components/Button/BaseButton/types).
+      "~components/*": ["src/components/*"],
+      "~tokens/*": ["src/tokens/*"],
+      "~src/*": ["src/*"]
+    },
+    // In Compass side we are targeting `.web` types
+    // We can't add both `.native` & `.web` at once.
+    "moduleSuffixes": [".all", ".web", ""]
+    // Path aliases will be resolved by tsc-alias after compilation
+  }
+}

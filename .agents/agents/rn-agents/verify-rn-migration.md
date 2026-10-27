@@ -64,7 +64,7 @@ Write to absolute paths under `{Worktree}`:
 
 ## Step 0: Pre-flight — Ensure Simulator & Metro Are Ready
 
-Klear360 Storybook is a dev build — it requires Metro bundler to serve the JS bundle. In a parallel batch, each verify agent has its own dedicated Metro port, simulator device, and session. **Do NOT use hardcoded port 8081 or a generic `boot` command** — always use `{MetroPort}`, `{iOSDevice}`, and `{SessionName}` from your prompt.
+Compass Storybook is a dev build — it requires Metro bundler to serve the JS bundle. In a parallel batch, each verify agent has its own dedicated Metro port, simulator device, and session. **Do NOT use hardcoded port 8081 or a generic `boot` command** — always use `{MetroPort}`, `{iOSDevice}`, and `{SessionName}` from your prompt.
 
 > **Tooling note:** `agent-device` and `agent-browser` must be **global** on PATH — call them directly, never via `npx`. If either is missing, install it before continuing (orchestrator should have caught this in pre-flight).
 
@@ -75,7 +75,7 @@ Klear360 Storybook is a dev build — it requires Metro bundler to serve the JS 
 
 2. **If Metro is DOWN, patch Hermes and start it on your assigned port (background):**
    ```bash
-   cd {Worktree}/packages/klear360 && node scripts/patch-storybook-hermes.js && cross-env FRAMEWORK=REACT_NATIVE react-native start --port {MetroPort} --reset-cache &
+   cd {Worktree}/packages/compass && node scripts/patch-storybook-hermes.js && cross-env FRAMEWORK=REACT_NATIVE react-native start --port {MetroPort} --reset-cache &
    ```
    The patch script fixes regex patterns in dependencies (e.g., `es-toolkit`) that use syntax unsupported by Hermes. Without it, the app crashes on launch with "Invalid RegExp" errors.
 
@@ -95,7 +95,7 @@ Klear360 Storybook is a dev build — it requires Metro bundler to serve the JS 
 4. **If the app is not installed** (open reports "app not found"):
    Build and install from this worktree:
    ```bash
-   cd {Worktree}/packages/klear360 && yarn start:ios
+   cd {Worktree}/packages/compass && yarn start:ios
    ```
    Then re-open with session/device/port flags (step 3 above).
 
@@ -132,7 +132,7 @@ iteration = 1
 ### Step 1: TypeScript Compilation (max 3 retries)
 
 ```bash
-cd {Worktree}/packages/klear360 && yarn types:typecheck:native 2>&1 | grep -B 1 -A 3 "src/components/{Name}"
+cd {Worktree}/packages/compass && yarn types:typecheck:native 2>&1 | grep -B 1 -A 3 "src/components/{Name}"
 ```
 
 **On pass (no output or only warnings):** Continue to Step 2.
@@ -152,14 +152,14 @@ cd {Worktree}/packages/klear360 && yarn types:typecheck:native 2>&1 | grep -B 1 
 ### Step 2: Native Test Execution
 
 ```bash
-cd {Worktree}/packages/klear360 && yarn test:react-native {Name} 2>&1
+cd {Worktree}/packages/compass && yarn test:react-native {Name} 2>&1
 ```
 
 **On pass:** Continue to Step 3.
 
 **On snapshot mismatch only:**
 ```bash
-cd {Worktree}/packages/klear360 && yarn test:react-native {Name} -u
+cd {Worktree}/packages/compass && yarn test:react-native {Name} -u
 ```
 Re-run to confirm clean pass, continue to Step 3.
 
@@ -178,12 +178,12 @@ Re-run to confirm clean pass, continue to Step 3.
 Verify the native build can resolve all imports:
 
 ```bash
-cd {Worktree}/packages/klear360 && FRAMEWORK=REACT_NATIVE npx rollup -c --configPlugin @rollup/plugin-typescript 2>&1 | grep -i "error\|cannot\|unresolved" | grep "{Name}" | head -20
+cd {Worktree}/packages/compass && FRAMEWORK=REACT_NATIVE npx rollup -c --configPlugin @rollup/plugin-typescript 2>&1 | grep -i "error\|cannot\|unresolved" | grep "{Name}" | head -20
 ```
 
 Alternative (faster check):
 ```bash
-cd {Worktree}/packages/klear360 && grep -r "from '\.\/" src/components/{Name}/ --include="*.native.tsx" | while read line; do
+cd {Worktree}/packages/compass && grep -r "from '\.\/" src/components/{Name}/ --include="*.native.tsx" | while read line; do
   file=$(echo "$line" | sed "s/:.*from '\.\/\(.*\)'.*/\1/")
   dir=$(echo "$line" | cut -d: -f1 | xargs dirname)
   if [ ! -f "$dir/$file.native.tsx" ] && [ ! -f "$dir/$file.tsx" ] && [ ! -f "$dir/$file.ts" ]; then
@@ -197,7 +197,7 @@ done
 
 ### Step 4: Visual Verification via agent-device
 
-**Pre-check:** Klear360 Storybook MUST be running at this point. If Step 0 failed to get it running, this is already a FAIL — do not proceed to Step 6 with INCOMPLETE status.
+**Pre-check:** Compass Storybook MUST be running at this point. If Step 0 failed to get it running, this is already a FAIL — do not proceed to Step 6 with INCOMPLETE status.
 
 > ⚠️ **Session isolation:** Append `--session {SessionName}` to **every** `agent-device` command in Steps 4a–4e. This routes each command to YOUR dedicated simulator, preventing cross-talk with other verify agents running in parallel on different simulators.
 
@@ -365,7 +365,7 @@ From the accessibility tree output, verify:
 **This step is MANDATORY. Never skip it — even if the native screenshot from agent-device looks perfectly fine on its own.** A native render can look "fine" in isolation while still diverging from the web reference (wrong token color, missing element, different spacing scale). Parity can only be judged against the web screenshot. The only valid skip is when the component has no story at all (visual already marked INCOMPLETE in 4a).
 
 Use agent-browser to capture the web Storybook in a mobile viewport for side-by-side comparison
-with the native screenshot from agent-device. This uses the production Klear360 Storybook as reference.
+with the native screenshot from agent-device. This uses the production Compass Storybook as reference.
 
 **Reference URL pattern:** `https://design.klearnow.com/iframe.html?id=components-{name}--{story}&viewMode=story`
 

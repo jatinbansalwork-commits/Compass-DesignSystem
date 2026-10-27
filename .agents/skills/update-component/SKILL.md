@@ -1,11 +1,11 @@
 ---
 name: update-component
-description: Update an existing Klear360 component (web only) using Figma designs and knowledgebase documentation
+description: Update an existing Compass component (web only) using Figma designs and knowledgebase documentation
 disable-model-invocation: true
 ---
 # Update Component
 
-Update an existing Klear360 component (web only) using Figma designs and knowledgebase documentation.
+Update an existing Compass component (web only) using Figma designs and knowledgebase documentation.
 
 ## Usage
 
@@ -15,7 +15,7 @@ Update an existing Klear360 component (web only) using Figma designs and knowled
 
 **Example:**
 ```
-/update-component Popover https://www.figma.com/design/jubmQL9Z8V7881ayUD95ps/Klear360-DSL?node-id=115756-259386
+/update-component Popover https://www.figma.com/design/jubmQL9Z8V7881ayUD95ps/Compass-DSL?node-id=115756-259386
 ```
 
 ## Instructions
@@ -23,11 +23,11 @@ Update an existing Klear360 component (web only) using Figma designs and knowled
 ### Step 1: Gather Component Information
 
 1. **Read the knowledgebase documentation**:
-   - Path: `packages/klear360-plugin/skills/klear360/references/components/<ComponentName>.md`
+   - Path: `packages/compass-plugin/skills/compass/references/components/<ComponentName>.md`
    - Contains: TypeScript types, props, and usage examples
 
 2. **Read the existing component implementation**:
-   - Path: `packages/klear360/src/components/<ComponentName>/`
+   - Path: `packages/compass/src/components/<ComponentName>/`
    - Key files: `types.ts`, `<ComponentName>.web.tsx`, `index.ts`, `constants.ts`
    - **Skip native files** - Only update `.web.tsx` files
 
@@ -85,7 +85,7 @@ Returns a visual screenshot of the component for reference.
 
 Compare the Figma design with the current implementation:
 
-1. **Compare design tokens**: Match Figma variable values with existing Klear360 constants
+1. **Compare design tokens**: Match Figma variable values with existing Compass constants
 2. **Identify new props or variants**: Check if new configurations are needed
 3. **Check types**: Determine if TypeScript types need updating
 4. **Plan implementation**: Focus on web only (`.web.tsx` files)
@@ -99,7 +99,7 @@ Follow this order:
 2. **Update constants** (`constants.ts`) - Add new defaults or constants
 3. **Update web implementation** (`*.web.tsx`) - Implement the changes
 4. **Update exports** (`index.ts`) - Export new types/components if needed
-5. **Update knowledgebase** (`packages/klear360-plugin/skills/klear360/references/components/<ComponentName>.md`)
+5. **Update knowledgebase** (`packages/compass-plugin/skills/compass/references/components/<ComponentName>.md`)
 6. **Update stories** (`*.stories.tsx`) - Add Storybook examples for new features
 
 ### Step 5: Check for Errors
@@ -109,7 +109,7 @@ Use `ReadLints` tool on modified files to check for linter errors and fix them.
 ## Component File Structure
 
 ```
-packages/klear360/src/components/<ComponentName>/
+packages/compass/src/components/<ComponentName>/
 ├── __tests__/
 ├── _decisions/
 │   └── decisions.md

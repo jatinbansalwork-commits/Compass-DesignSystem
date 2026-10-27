@@ -24,8 +24,8 @@ if [[ $(git status --porcelain) ]]; then
   git status --short
   echo ""
   echo "Consider reverting temporary changes:"
-  echo "  git checkout packages/klear360/.storybook/react/main.ts"
-  echo "  git checkout packages/klear360/package.json  # CRITICAL if modified"
+  echo "  git checkout packages/compass/.storybook/react/main.ts"
+  echo "  git checkout packages/compass/package.json  # CRITICAL if modified"
 fi
 
 echo ""

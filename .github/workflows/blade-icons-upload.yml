@@ -1,4 +1,4 @@
-name: Klear360 Icons Upload
+name: Compass Icons Upload
 
 on:
   workflow_dispatch:
@@ -27,14 +27,14 @@ jobs:
       - name: Setup Cache & Install Dependencies
         uses: ./.github/actions/install-dependencies
       - name: Upload Icons
-        working-directory: packages/klear360
+        working-directory: packages/compass
         # the payload is read from the environment, never interpolated into the shell command
         run: node ./scripts/uploadIcons.mjs
         env:
           ICONS_PAYLOAD: ${{ github.event.inputs.icons }}
           ICONS_TARGETS: ${{ github.event.inputs.targets }}
           GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
-      # klear360-svelte's icons are made from React's components. uploadIcons.mjs
+      # compass-svelte's icons are made from React's components. uploadIcons.mjs
       # leaves the runner on the branch it pushed (with the bot as git user), so
       # the svelte icons follow on that branch, in the same PR.
       - name: Add Svelte Icons
@@ -46,14 +46,14 @@ jobs:
             echo "No icon branch was pushed: nothing to add."
             exit 0
           fi
-          yarn workspace @klearnow/klear360-svelte icons:generate
-          paths="packages/klear360-svelte/src/icons packages/klear360-plugin/skills/klear360-svelte"
+          yarn workspace @klearnow/compass-svelte icons:generate
+          paths="packages/compass-svelte/src/icons packages/compass-plugin/skills/compass-svelte"
           if [ -z "$(git status --porcelain -- $paths)" ]; then
-            echo "klear360-svelte's icons already match."
+            echo "compass-svelte's icons already match."
             exit 0
           fi
           changeset=".changeset/${branch}-svelte.md"
-          printf -- "---\n'@klearnow/klear360-svelte': patch\n'@klearnow/klear360-plugin': patch\n---\n\nfeat(klear360-svelte): add the new icons from Klear360 React\n" > "$changeset"
+          printf -- "---\n'@klearnow/compass-svelte': patch\n'@klearnow/compass-plugin': patch\n---\n\nfeat(compass-svelte): add the new icons from Compass React\n" > "$changeset"
           git add -- $paths "$changeset"
-          HUSKY_SKIP_HOOKS=1 git commit -m "feat(klear360-svelte): add the new icons from Klear360 React"
+          HUSKY_SKIP_HOOKS=1 git commit -m "feat(compass-svelte): add the new icons from Compass React"
           git push origin "$branch"

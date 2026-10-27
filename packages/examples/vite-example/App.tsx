@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@klearnow/klear360/components';
+import { Button } from '@klearnow/compass/components';
 
 function App(): React.ReactElement {
   return <Button>Hello world</Button>;

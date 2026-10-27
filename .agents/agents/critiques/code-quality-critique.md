@@ -10,7 +10,7 @@ You are a subagent. Return structured data only — no commentary.
 
 ## Inputs (passed in prompt)
 
-- `PR_NUMBER`: the PR number in klearnow/klear360
+- `PR_NUMBER`: the PR number in klearnow/compass
 - `DIFF`: pre-fetched diff (lock files already excluded)
 - `PR_TITLE`: title of the PR
 - `PR_BODY`: body/description of the PR
@@ -60,7 +60,7 @@ Confidence should be between 1 and 10 based on average of the two questions abov
   "critique_name": "code-quality-critique",
   "issues": [
     {
-      "file": "packages/klear360/src/Foo.tsx",
+      "file": "packages/compass/src/Foo.tsx",
       "line": 42,
       "side": "RIGHT",
       "severity": "critical" | "major" | "minor",
@@ -69,7 +69,7 @@ Confidence should be between 1 and 10 based on average of the two questions abov
       "suggestion": "small concise suggestion for the fix"
     },
     {
-      "file": "packages/klear360/src/Foo.tsx",
+      "file": "packages/compass/src/Foo.tsx",
       "line": 17,
       "side": "RIGHT",
       "severity": "minor",

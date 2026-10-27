@@ -1,6 +1,6 @@
 import React from 'react';
-import { Popover, PopoverInteractiveWrapper, Button, Box, Text, Amount, Divider, Checkbox } from '@klearnow/klear360/components';
-import { SettlementsIcon, InfoIcon } from '@klearnow/klear360/components';
+import { Popover, PopoverInteractiveWrapper, Button, Box, Text, Amount, Divider, Checkbox } from '@klearnow/compass/components';
+import { SettlementsIcon, InfoIcon } from '@klearnow/compass/components';
 
 const SettlementBreakup = () => (
   <Box>

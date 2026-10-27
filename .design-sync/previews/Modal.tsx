@@ -1,6 +1,6 @@
 import React from 'react';
-import { Modal, ModalHeader, ModalBody, ModalFooter } from '@klearnow/klear360/components';
-import { Button, Text, Box } from '@klearnow/klear360/components';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from '@klearnow/compass/components';
+import { Button, Text, Box } from '@klearnow/compass/components';
 
 export const Basic = () => {
   const [isOpen, setIsOpen] = React.useState(true);

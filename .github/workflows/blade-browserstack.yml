@@ -1,16 +1,16 @@
-name: Klear360 Svelte BrowserStack Tests
+name: Compass Svelte BrowserStack Tests
 
 on:
   workflow_dispatch:
     inputs:
       chromatic_url:
-        description: 'Chromatic build URL (from a completed Klear360 Chromatic run) to test against'
+        description: 'Chromatic build URL (from a completed Compass Chromatic run) to test against'
         required: true
         type: string
   workflow_call:
     inputs:
       chromatic_url:
-        description: 'Chromatic build URL (from a completed Klear360 Chromatic run) to test against'
+        description: 'Chromatic build URL (from a completed Compass Chromatic run) to test against'
         required: true
         type: string
 
@@ -31,7 +31,7 @@ jobs:
       # (desktop Chrome and WebKit, a Pixel, an iPhone), against the Svelte
       # Storybook Chromatic deployed beside the React one.
       - name: Run BrowserStack Tests
-        working-directory: packages/klear360-svelte
+        working-directory: packages/compass-svelte
         run: STORYBOOK_URL="${CHROMATIC_URL%/}/svelte" yarn test:e2e:browserstack
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}

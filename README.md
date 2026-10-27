@@ -1,4 +1,4 @@
-# Klear360
+# Compass
 
 Cross-platform design system for [Klearnow](https://klearnow.ai/) — React web and React Native.
 
@@ -11,10 +11,10 @@ Cross-platform design system for [Klearnow](https://klearnow.ai/) — React web 
 
 | Package | Description |
 | --- | --- |
-| [`packages/klear360`](./packages/klear360/) | Core component library |
-| [`packages/klear360-plugin`](./packages/klear360-plugin/) | Agent skills and component knowledgebase |
-| [`packages/klear360-mcp`](./packages/klear360-mcp/) | MCP server (maintenance mode) |
-| [`packages/eslint-plugin-klear360`](./packages/eslint-plugin-klear360/) | ESLint rules for Klear360 conventions |
+| [`packages/compass`](./packages/compass/) | Core component library |
+| [`packages/compass-plugin`](./packages/compass-plugin/) | Agent skills and component knowledgebase |
+| [`packages/compass-mcp`](./packages/compass-mcp/) | MCP server (maintenance mode) |
+| [`packages/eslint-plugin-compass`](./packages/eslint-plugin-compass/) | ESLint rules for Compass conventions |
 
 Additional tooling packages (Figma plugins, coverage extensions) live under `packages/`.
 
@@ -22,4 +22,4 @@ Additional tooling packages (Figma plugins, coverage extensions) live under `pac
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-Engineering audit status: [`packages/klear360/docs/checklist-completion-report.md`](./packages/klear360/docs/checklist-completion-report.md).
+Engineering audit status: [`packages/compass/docs/checklist-completion-report.md`](./packages/compass/docs/checklist-completion-report.md).

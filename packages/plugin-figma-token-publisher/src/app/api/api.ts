@@ -8,7 +8,7 @@ const WORKFLOW_INPUT_LIMIT = 65535;
 
 type ColorTokens = Record<string, any>;
 export type ExportedIcons = Record<string, string>[];
-/** `react` is `@klearnow/klear360`, one component for web and native. */
+/** `react` is `@klearnow/compass`, one component for web and native. */
 export type IconTarget = 'react';
 
 // GitHub's workflow_dispatch inputs are capped at 65,535 characters. The token payload can
@@ -126,6 +126,6 @@ export const uploadIcons = async ({
     inputs: { icons: payload, targets: targets.join(',') },
     successText: `🎉 Icon PR requested for ${icons.length} icon${
       icons.length === 1 ? '' : 's'
-    }. It opens on klearnow/klear360 in a few minutes.`,
+    }. It opens on klearnow/compass in a few minutes.`,
   });
 };

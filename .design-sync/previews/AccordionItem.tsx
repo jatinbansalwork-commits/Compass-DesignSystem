@@ -1,5 +1,5 @@
 import React from 'react';
-import { Accordion, AccordionItem, AccordionItemHeader, AccordionItemBody } from '@klearnow/klear360/components';
+import { Accordion, AccordionItem, AccordionItemHeader, AccordionItemBody } from '@klearnow/compass/components';
 
 export const Default = () => (
   <Accordion>

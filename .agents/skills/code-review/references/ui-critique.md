@@ -7,7 +7,7 @@ Visually verify changed components in Storybook using `agent-browser`.
 ### 1. Get the Storybook URL
 
 ```bash
-gh pr checks {PR_NUMBER} --repo klearnow/klear360 --json name,description,link --jq '.[] | select(.name == "Storybook Publish: blade") | .link'
+gh pr checks {PR_NUMBER} --repo klearnow/compass --json name,description,link --jq '.[] | select(.name == "Storybook Publish: blade") | .link'
 ```
 
 ### 2. Determine stories to test

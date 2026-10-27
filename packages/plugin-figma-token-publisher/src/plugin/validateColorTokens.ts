@@ -83,8 +83,8 @@ const checkCompleteness = (
 
 /**
  * Both themes are typed `ColorsWithModes`, so a token present in one and absent from the other is
- * a compile error waiting to happen — which is exactly how `onNeutral` landed in `klear360Theme` but
- * not in `klear360-core`'s copy on the last push.
+ * a compile error waiting to happen — which is exactly how `onNeutral` landed in `compassTheme` but
+ * not in `compass-core`'s copy on the last push.
  */
 const checkPathParity = (
   themeColorTokens: Record<string, ThemeModes>,

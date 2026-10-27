@@ -26,7 +26,7 @@ Create `.design-sync/previews/NewComponent.tsx`:
 
 ```tsx
 import React from 'react';
-import { NewComponent } from '@klearnow/klear360/components';
+import { NewComponent } from '@klearnow/compass/components';
 
 export const Default = () => (
   <NewComponent prop="value">Content</NewComponent>
@@ -52,7 +52,7 @@ If you deleted `.ds-sync/` after previous session:
 ```bash
 node .ds-sync/lib/preview-rebuild.mjs \
   --config .design-sync/config.json \
-  --node-modules packages/klear360/node_modules \
+  --node-modules packages/compass/node_modules \
   --out ds-bundle \
   --components NewComponent
 ```
@@ -83,13 +83,13 @@ git push
 
 ## Full Rebuild (All Components)
 
-If you need to rebuild all 29 components (e.g., after Klear360 version upgrade):
+If you need to rebuild all 29 components (e.g., after Compass version upgrade):
 
 ```bash
 # Rebuild all previews
 node .ds-sync/lib/preview-rebuild.mjs \
   --config .design-sync/config.json \
-  --node-modules packages/klear360/node_modules \
+  --node-modules packages/compass/node_modules \
   --out ds-bundle \
   --components $(cat .design-sync/core-components.md | grep "^-" | sed 's/^- //' | tr '\n' ',' | sed 's/,$//')
 
@@ -97,8 +97,8 @@ node .ds-sync/lib/preview-rebuild.mjs \
 cd .ds-sync
 node package-build.mjs \
   --config ../.design-sync/config.json \
-  --node-modules ../packages/klear360/node_modules \
-  --entry ../packages/klear360/components.js \
+  --node-modules ../packages/compass/node_modules \
+  --entry ../packages/compass/components.js \
   --out ../ds-bundle
 ```
 
@@ -188,16 +188,16 @@ ds-bundle/                   # Build output (7+ MB)
 
 ### Modified During Session (revert after)
 ```
-packages/klear360/.storybook/react/main.ts  # May have temporary patches
-packages/klear360/package.json              # Should be reverted (CRITICAL)
+packages/compass/.storybook/react/main.ts  # May have temporary patches
+packages/compass/package.json              # Should be reverted (CRITICAL)
 ```
 
 ## Version Compatibility
 
-**Klear360 version used**: 12.107.1  
+**Compass version used**: 12.107.1  
 **Converter version**: design-sync non-storybook converter (2026-06-19)
 
-If Klear360 is upgraded significantly:
+If Compass is upgraded significantly:
 1. Test rebuild with existing previews
 2. Check for breaking API changes in components
 3. Update affected preview files
@@ -214,4 +214,4 @@ Refer to:
 ---
 
 **Last Updated**: 2026-06-19  
-**Maintainer**: Klear360 team
+**Maintainer**: Compass team

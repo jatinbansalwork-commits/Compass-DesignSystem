@@ -1,4 +1,4 @@
-name: Klear360 Chromatic
+name: Compass Chromatic
 
 on:
   push:
@@ -27,39 +27,39 @@ jobs:
       - name: Setup Cache & Install Dependencies
         uses: ./.github/actions/install-dependencies
       - name: Install Dashboard Playground Dependencies
-        working-directory: packages/klear360/klear360-dashboard-template
+        working-directory: packages/compass/compass-dashboard-template
         run: yarn install
       - name: Build Dashboard Playground
-        working-directory: packages/klear360/klear360-dashboard-template
+        working-directory: packages/compass/compass-dashboard-template
         run: yarn run build
       - name: Copy Dashboard to Storybook Site
-        working-directory: packages/klear360
+        working-directory: packages/compass
         run: |
           if [ -d "storybook-site/dashboard" ]; then
             rm -rf storybook-site/dashboard
           fi
           mkdir -p storybook-site/dashboard
-          if [ -d "klear360-dashboard-template/dist" ]; then
-            cp -r klear360-dashboard-template/dist/* storybook-site/dashboard/
+          if [ -d "compass-dashboard-template/dist" ]; then
+            cp -r compass-dashboard-template/dist/* storybook-site/dashboard/
             echo "✓ Dashboard build output copied to storybook-site/dashboard/"
           else
             echo "✗ Dashboard dist directory not found"
             exit 1
           fi
-      - name: Build klear360-core
-        run: yarn build:klear360-core
+      - name: Build compass-core
+        run: yarn build:compass-core
       - name: Build Svelte Storybook
-        working-directory: packages/klear360-svelte
+        working-directory: packages/compass-svelte
         run: yarn build-storybook
       - name: Copy Svelte Storybook to Storybook Site
-        working-directory: packages/klear360
+        working-directory: packages/compass
         run: |
           if [ -d "storybook-site/svelte" ]; then
             rm -rf storybook-site/svelte
           fi
           mkdir -p storybook-site/svelte
-          if [ -d "../klear360-svelte/storybook-static" ]; then
-            cp -r ../klear360-svelte/storybook-static/* storybook-site/svelte/
+          if [ -d "../compass-svelte/storybook-static" ]; then
+            cp -r ../compass-svelte/storybook-static/* storybook-site/svelte/
             echo "✓ Svelte Storybook copied to storybook-site/svelte/"
           else
             echo "✗ Svelte Storybook not found"
@@ -71,8 +71,8 @@ jobs:
         with:
           token: ${{ env.GITHUB_ACCESS_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          workingDir: packages/klear360
-          storybookBaseDir: packages/klear360
+          workingDir: packages/compass
+          storybookBaseDir: packages/compass
           buildScriptName: react:storybook:build
           exitOnceUploaded: true
           onlyChanged: true

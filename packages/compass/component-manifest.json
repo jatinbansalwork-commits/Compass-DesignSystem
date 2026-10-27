@@ -1,0 +1,688 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-10-27T14:26:03.024Z",
+  "components": [
+    {
+      "name": "Accordion",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 8,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Accordion/types.ts"
+      ]
+    },
+    {
+      "name": "ActionList",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 15,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/ActionList/ActionListItem.types.ts"
+      ]
+    },
+    {
+      "name": "Alert",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": [
+        "src/components/Alert/types.ts"
+      ]
+    },
+    {
+      "name": "AnimateInteractions",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 1,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/AnimateInteractions/types.ts"
+      ]
+    },
+    {
+      "name": "AnnouncementBanner",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 4,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/AnnouncementBanner/types.ts"
+      ]
+    },
+    {
+      "name": "AppBar",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 11,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/AppBar/types.ts"
+      ]
+    },
+    {
+      "name": "Avatar",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 20,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Avatar/types.ts"
+      ]
+    },
+    {
+      "name": "BaseAnimatedValue",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 4,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/BaseAnimatedValue/types.ts"
+      ]
+    },
+    {
+      "name": "BaseMenu",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": [
+        "src/components/BaseMenu/types.ts"
+      ]
+    },
+    {
+      "name": "BaseMotion",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 10,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/BaseMotion/types.ts"
+      ]
+    },
+    {
+      "name": "BottomBar",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 3,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/BottomBar/types.ts"
+      ]
+    },
+    {
+      "name": "BottomDock",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 6,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/BottomDock/types.ts"
+      ]
+    },
+    {
+      "name": "BottomNav",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 10,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/BottomNav/types.ts"
+      ]
+    },
+    {
+      "name": "BottomSheet",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 12,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/BottomSheet/types.ts"
+      ]
+    },
+    {
+      "name": "Box",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "Breadcrumb",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 11,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Breadcrumb/types.ts"
+      ]
+    },
+    {
+      "name": "Button",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "ButtonGroup",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 13,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/ButtonGroup/types.ts"
+      ]
+    },
+    {
+      "name": "Card",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 29,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Card/types.ts",
+        "src/components/Card/cardProps.types.ts"
+      ]
+    },
+    {
+      "name": "Carousel",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 20,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Carousel/types.ts"
+      ]
+    },
+    {
+      "name": "Charts",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "ChatInput",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 24,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/ChatInput/types.ts"
+      ]
+    },
+    {
+      "name": "ChatMessage",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 24,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/ChatMessage/types.ts"
+      ]
+    },
+    {
+      "name": "Checkbox",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "Chip",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 27,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Chip/types.ts"
+      ]
+    },
+    {
+      "name": "Collapsible",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 14,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Collapsible/types.ts"
+      ]
+    },
+    {
+      "name": "CounterInput",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 17,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/CounterInput/types.ts"
+      ]
+    },
+    {
+      "name": "DatePicker",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 40,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/DatePicker/types.ts"
+      ]
+    },
+    {
+      "name": "Divider",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "DotLoader",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 3,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/DotLoader/types.ts"
+      ]
+    },
+    {
+      "name": "Drawer",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 18,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Drawer/types.ts"
+      ]
+    },
+    {
+      "name": "Dropdown",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 18,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Dropdown/types.ts"
+      ]
+    },
+    {
+      "name": "Elevate",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 1,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Elevate/types.ts"
+      ]
+    },
+    {
+      "name": "EmptyState",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 5,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/EmptyState/types.ts"
+      ]
+    },
+    {
+      "name": "Fade",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": [
+        "src/components/Fade/types.ts"
+      ]
+    },
+    {
+      "name": "FileUpload",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 32,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/FileUpload/types.ts"
+      ]
+    },
+    {
+      "name": "FloatingActionButton",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 11,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/FloatingActionButton/types.ts"
+      ]
+    },
+    {
+      "name": "Form",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "GenUI",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 4,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/GenUI/types.ts"
+      ]
+    },
+    {
+      "name": "Icons",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 1,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Icons/types.ts"
+      ]
+    },
+    {
+      "name": "Indicator",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "InfoGroup",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 14,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/InfoGroup/types.ts"
+      ]
+    },
+    {
+      "name": "InputGroup",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 13,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/InputGroup/types.ts"
+      ]
+    },
+    {
+      "name": "CompassProvider",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": [
+        "src/components/CompassProvider/types.ts"
+      ]
+    },
+    {
+      "name": "LightBox",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 14,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/LightBox/types.ts"
+      ]
+    },
+    {
+      "name": "Link",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "List",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "ListView",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 16,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/ListView/types.ts"
+      ]
+    },
+    {
+      "name": "Menu",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 24,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Menu/types.ts"
+      ]
+    },
+    {
+      "name": "Morph",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": [
+        "src/components/Morph/types.ts"
+      ]
+    },
+    {
+      "name": "Move",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": [
+        "src/components/Move/types.ts"
+      ]
+    },
+    {
+      "name": "OverlayContextReset",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "Pagination",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 13,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Pagination/types.ts"
+      ]
+    },
+    {
+      "name": "Popover",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 18,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Popover/types.ts"
+      ]
+    },
+    {
+      "name": "PopupArrow",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 7,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/PopupArrow/types.ts"
+      ]
+    },
+    {
+      "name": "Preview",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 13,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Preview/types.ts"
+      ]
+    },
+    {
+      "name": "ProgressBar",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": [
+        "src/components/ProgressBar/types.ts"
+      ]
+    },
+    {
+      "name": "Radio",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "RollingText",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "Scale",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 2,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Scale/types.ts"
+      ]
+    },
+    {
+      "name": "SegmentedControl",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 28,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/SegmentedControl/types.ts"
+      ]
+    },
+    {
+      "name": "SideNav",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 30,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/SideNav/types.ts"
+      ]
+    },
+    {
+      "name": "Skeleton",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": [
+        "src/components/Skeleton/types.ts"
+      ]
+    },
+    {
+      "name": "Slide",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 2,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Slide/types.ts"
+      ]
+    },
+    {
+      "name": "Spark",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "Spinner",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "SpotlightPopoverTour",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 19,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/SpotlightPopoverTour/types.ts"
+      ]
+    },
+    {
+      "name": "Stagger",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": [
+        "src/components/Stagger/types.ts"
+      ]
+    },
+    {
+      "name": "StepGroup",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 21,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/StepGroup/types.ts"
+      ]
+    },
+    {
+      "name": "Switch",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 9,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Switch/types.ts"
+      ]
+    },
+    {
+      "name": "Table",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 69,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Table/types.ts"
+      ]
+    },
+    {
+      "name": "Tabs",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 20,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Tabs/types.ts"
+      ]
+    },
+    {
+      "name": "Tag",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 7,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Tag/types.ts"
+      ]
+    },
+    {
+      "name": "TimePicker",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 27,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/TimePicker/types.ts"
+      ]
+    },
+    {
+      "name": "Toast",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 9,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Toast/types.ts"
+      ]
+    },
+    {
+      "name": "Tooltip",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 9,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/Tooltip/types.ts"
+      ]
+    },
+    {
+      "name": "TopNav",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    },
+    {
+      "name": "TrustBadge",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 2,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/TrustBadge/types.ts"
+      ]
+    },
+    {
+      "name": "Typography",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 0,
+      "hasJSDoc": false,
+      "typesFiles": []
+    }
+  ],
+  "name": "Compass Design System",
+  "package": "@klearnow/compass"
+}

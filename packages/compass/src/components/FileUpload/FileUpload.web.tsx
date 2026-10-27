@@ -1,0 +1,539 @@
+import { useState, useCallback, useMemo, useRef, forwardRef } from 'react';
+import type {
+  FileUploadProps,
+  CompassFile,
+  CompassFileList,
+  FileUploadVariableSizeProps,
+} from './types';
+import { StyledFileUploadWrapper } from './StyledFileUploadWrapper';
+import {
+  fileUploadColorTokens,
+  fileUploadHeightTokens,
+  fileUploadBorderRadiusTokens,
+  fileUploadDropAreaTextSizeTokens,
+  fileUploadLinkIconSizeTokens,
+  getFileUploadInputHoverTokens,
+} from './fileUploadTokens';
+import { FileUploadItem } from './FileUploadItem';
+import { isFileAccepted } from './isFileAccepted';
+import { FileUploadDropAreaIcon } from './FileUploadItemIcon';
+import { UploadIcon } from '~components/Icons';
+import BaseBox from '~components/Box/BaseBox';
+import { Box } from '~components/Box';
+import { SelectorLabel } from '~components/Form/Selector/SelectorLabel';
+import { SelectorInput } from '~components/Form/Selector/SelectorInput';
+import { screenReaderStyles } from '~components/VisuallyHidden';
+import { FormHint, FormLabel } from '~components/Form';
+import { useFormId } from '~components/Form/useFormId';
+import { assignWithoutSideEffects } from '~utils/assignWithoutSideEffects';
+import { metaAttribute, MetaConstants } from '~utils/metaAttribute';
+import { getStyledProps } from '~components/Box/styledProps';
+import { makeSize, useTheme } from '~utils';
+import { Text } from '~components/Typography';
+import type { CompassElementRef } from '~utils/types';
+import { getHintType } from '~components/Input/BaseInput/BaseInput';
+import { makeAccessible } from '~utils/makeAccessible';
+import { formHintLeftLabelMarginLeft } from '~components/Input/BaseInput/baseInputTokens';
+import { useMergeRefs } from '~utils/useMergeRefs';
+import { useControllableState } from '~utils/useControllable';
+import { getInnerMotionRef, getOuterMotionRef } from '~utils/getMotionRefs';
+import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
+import { throwCompassError } from '~utils/logger';
+
+const _FileUpload: React.ForwardRefRenderFunction<CompassElementRef, FileUploadProps> = (
+  {
+    name,
+    accept,
+    uploadType = 'single',
+    onChange,
+    onPreview,
+    onRemove,
+    onReupload,
+    onDismiss,
+    onDrop,
+    isDisabled,
+    isRequired,
+    necessityIndicator,
+    fileList,
+    testID,
+    label,
+    labelPosition = 'top',
+    accessibilityLabel,
+    validationState,
+    helpText,
+    errorText,
+    maxCount,
+    maxSize,
+    size = 'medium',
+    dropAreaText,
+    _motionMeta,
+    ...rest
+  },
+  ref,
+): React.ReactElement => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  const { actionButtonText, height, width } = rest as FileUploadVariableSizeProps;
+  const isSizeVariable = size === 'variable';
+  // An empty string hides the drop area text and leaves only the upload action
+  const shouldShowDropAreaText = dropAreaText !== '';
+  // 'actionButtonText', 'height', 'width' are only valid when size is 'variable'
+  if (__DEV__) {
+    if (!isSizeVariable && actionButtonText) {
+      throwCompassError({
+        message: 'actionButtonText can only be used when size is "variable"',
+        moduleName: 'FileUpload',
+      });
+    }
+
+    if (!isSizeVariable && (height || width)) {
+      const propName = height && width ? 'height and width' : height ? 'height' : 'width';
+
+      throwCompassError({
+        message: `${propName} can only be used when size is "variable"`,
+        moduleName: 'FileUpload',
+      });
+    }
+  }
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const mergedRef = useMergeRefs(ref, inputRef);
+  const { platform } = useTheme();
+  const [selectedFiles, setSelectedFiles] = useControllableState({
+    value: fileList,
+    defaultValue: fileList ?? [],
+  });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [internalValidationState, setInternalValidationState] = useState('none');
+  const [isActive, setIsActive] = useState(false);
+  const [isDragActive, setIsDragActive] = useState(false);
+
+  const isMultiple = uploadType === 'multiple';
+  const isOneFileSelectedWithSingleUpload = !isMultiple && selectedFiles.length === 1;
+  const inputLabelPosition = platform === 'onMobile' ? 'top' : labelPosition;
+  const isLabelLeftPositioned = inputLabelPosition === 'left';
+  const showError = validationState === 'error' || internalValidationState === 'error';
+  const showHelpText = !showError && helpText;
+  // Internal validation errors (file type, count, size) take priority over the consumer's errorText
+  const displayedErrorText = errorMessage ?? errorText;
+  const willRenderHintText = Boolean(helpText) || (showError && Boolean(displayedErrorText));
+  const accessibilityText =
+    accessibilityLabel ??
+    `,${showError ? displayedErrorText ?? '' : ''} ${showHelpText ? helpText : ''}`;
+  const { inputId, labelId, helpTextId, errorTextId } = useFormId('fileuploadinput');
+
+  const accessibilityProps = makeAccessible({
+    required: Boolean(isRequired),
+    invalid: Boolean(showError),
+    disabled: Boolean(isDisabled),
+    describedBy: labelId,
+  });
+
+  // In control mode attach a unique id to each file if not provided
+  useMemo(() => {
+    for (const file of selectedFiles) {
+      if (!file.id) {
+        file.id = `${new Date().getTime().toString()}${Math.floor(Math.random() * 1000000)}`;
+      }
+    }
+  }, [selectedFiles]);
+
+  const handleFilesChange = useCallback((inputFiles: CompassFileList) => {
+    setSelectedFiles((prevFiles) => {
+      if (prevFiles.length > 0) {
+        const allFiles = [...prevFiles, ...inputFiles];
+        return allFiles;
+      }
+
+      return inputFiles;
+    });
+  }, []);
+
+  const validateFiles = (inputFiles: CompassFileList, allFiles: CompassFileList): boolean => {
+    if (accept && inputFiles.some((file) => !isFileAccepted(file, accept))) {
+      setErrorMessage(`You provided an unsupported file type. Supported file types are: ${accept}`);
+      setInternalValidationState('error');
+      return true;
+    }
+
+    if (uploadType === 'single' && inputFiles.length > 1) {
+      setErrorMessage('You can upload only one file.');
+      setInternalValidationState('error');
+      return true;
+    }
+
+    if (maxCount && allFiles.length > maxCount) {
+      setErrorMessage(`You can't upload more than ${maxCount} files.`);
+      setInternalValidationState('error');
+      return true;
+    }
+
+    if (maxSize && inputFiles.some((file) => file.size > maxSize)) {
+      setErrorMessage('File size exceeded.');
+      setInternalValidationState('error');
+      return true;
+    }
+
+    setInternalValidationState('none');
+    setErrorMessage(null);
+    return false;
+  };
+
+  const handleDragOver = (event: React.DragEvent): void => {
+    event.preventDefault();
+    setIsActive(true);
+    setIsDragActive(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent): void => {
+    event.preventDefault();
+    setIsActive(false);
+    setIsDragActive(false);
+  };
+
+  const handleDrop = (event: React.DragEvent): void => {
+    event.preventDefault();
+    setIsActive(false);
+    setIsDragActive(false);
+
+    const droppedFiles = Array.from(event.dataTransfer.files);
+    const allFiles = selectedFiles.length > 0 ? [...selectedFiles, ...droppedFiles] : droppedFiles;
+
+    const hasValidationErrors = validateFiles(droppedFiles, allFiles);
+
+    if (!hasValidationErrors) {
+      handleFilesChange(droppedFiles);
+      onDrop?.({ name, fileList: allFiles });
+    }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const inputFiles = Array.from(event.target.files ?? []);
+    const allFiles = selectedFiles.length > 0 ? [...selectedFiles, ...inputFiles] : inputFiles;
+
+    const hasValidationErrors = validateFiles(inputFiles, allFiles);
+
+    if (!hasValidationErrors) {
+      handleFilesChange(inputFiles);
+      onChange?.({ name, fileList: allFiles });
+    }
+
+    // Reset the input value to allow re-selecting the same file
+    event.target.value = '';
+  };
+
+  const computedHeight = isSizeVariable ? height ?? '100%' : makeSize(fileUploadHeightTokens[size]);
+  const computedWidth = isSizeVariable ? width ?? '100%' : '100%';
+
+  return (
+    <BaseBox
+      ref={getOuterMotionRef({ _motionMeta, ref })}
+      display="flex"
+      flexDirection="column"
+      width="100%"
+      {...metaAttribute({ name: MetaConstants.FileUpload, testID })}
+      {...getStyledProps(rest)}
+    >
+      <BaseBox
+        display="flex"
+        flexDirection={isLabelLeftPositioned ? 'row' : 'column'}
+        alignItems={isLabelLeftPositioned ? 'center' : undefined}
+        position="relative"
+        width="100%"
+      >
+        {label ? (
+          <FormLabel
+            size={isSizeVariable ? 'large' : size}
+            as="span"
+            necessityIndicator={necessityIndicator}
+            position={labelPosition}
+            id={labelId}
+            accessibilityText={accessibilityText}
+          >
+            {label}
+          </FormLabel>
+        ) : null}
+
+        <SelectorLabel
+          componentName={MetaConstants.FileUploadLabel}
+          inputProps={{}}
+          style={{
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
+            width: isOneFileSelectedWithSingleUpload && isLabelLeftPositioned ? undefined : '100%',
+          }}
+        >
+          <BaseBox display="flex" flexDirection="column" width="100%">
+            <StyledFileUploadWrapper
+              size={size}
+              isDisabled={isDisabled}
+              isActive={isActive}
+              isDragActive={isDragActive}
+              display="flex"
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              height={computedHeight}
+              width={computedWidth}
+              borderRadius={fileUploadBorderRadiusTokens[size]}
+              borderWidth="thin"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => setIsActive(true)}
+              data-comp="f"
+              style={{
+                ...(isOneFileSelectedWithSingleUpload ? screenReaderStyles : {}),
+              }}
+            >
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                flexDirection={{ base: 'column', s: `${isSizeVariable ? 'column' : 'row'}` }}
+                gap={isSizeVariable ? 'spacing.2' : makeSize(6)}
+                // The 32px small area can't fit the default 8px vertical padding around a text line
+                padding={size === 'small' ? ['spacing.2', 'spacing.3'] : 'spacing.3'}
+              >
+                {isSizeVariable && (
+                  // 8px margin plus the 4px gap keeps 12px between the icon and the text below it
+                  <BaseBox marginBottom="spacing.3">
+                    <FileUploadDropAreaIcon isDisabled={isDisabled} />
+                  </BaseBox>
+                )}
+
+                {shouldShowDropAreaText ? (
+                  <Text
+                    size={fileUploadDropAreaTextSizeTokens[size]}
+                    color={
+                      isDisabled
+                        ? fileUploadColorTokens.text.disabled
+                        : fileUploadColorTokens.text.default
+                    }
+                  >
+                    {dropAreaText ??
+                      (isSizeVariable
+                        ? 'Drag and drop your files here'
+                        : 'Drag files here or')}{' '}
+                  </Text>
+                ) : null}
+                <SelectorInput
+                  id={inputId}
+                  hoverTokens={getFileUploadInputHoverTokens()}
+                  isChecked={false}
+                  isDisabled={isDisabled}
+                  inputProps={{
+                    name,
+                    type: 'file',
+                    onChange: handleInputChange,
+                    multiple: isMultiple,
+                    required: isRequired,
+                    disabled: isDisabled,
+                    accept,
+                    onBlur: () => setIsActive(false),
+                    ...accessibilityProps,
+                  }}
+                  ref={getInnerMotionRef({ _motionMeta, ref: mergedRef })}
+                  {...makeAnalyticsAttribute(rest)}
+                />
+
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  flexDirection={{ base: 'column', s: 'row' }}
+                  borderRadius="small"
+                >
+                  {/* Upload action: neutral link colors with a leading icon */}
+                  <Box display="flex" flexDirection="row" alignItems="center" gap="spacing.2">
+                    <UploadIcon
+                      size={fileUploadLinkIconSizeTokens[size]}
+                      color={
+                        isDisabled
+                          ? fileUploadColorTokens.linkIcon.disabled
+                          : fileUploadColorTokens.linkIcon.default
+                      }
+                    />
+                    <Text
+                      size={fileUploadDropAreaTextSizeTokens[size]}
+                      weight="medium"
+                      color={
+                        isDisabled
+                          ? fileUploadColorTokens.link.disabled
+                          : fileUploadColorTokens.link.default
+                      }
+                    >
+                      {actionButtonText ?? 'Upload'}
+                    </Text>
+                  </Box>
+                </Box>
+              </Box>
+            </StyledFileUploadWrapper>
+          </BaseBox>
+        </SelectorLabel>
+        {isOneFileSelectedWithSingleUpload && (
+          <FileUploadItem
+            file={selectedFiles[0]}
+            size={size}
+            // Failed files only offer Reupload, which already removes the file before reopening the picker
+            onRemove={
+              selectedFiles[0].status === 'error'
+                ? undefined
+                : () => {
+                    const newFiles = selectedFiles.filter(({ id }) => id !== selectedFiles[0].id);
+                    setSelectedFiles(() => newFiles);
+
+                    onRemove?.({ file: selectedFiles[0] });
+                  }
+            }
+            onReupload={() => {
+              const newFiles = selectedFiles.filter(({ id }) => id !== selectedFiles[0].id);
+              setSelectedFiles(() => newFiles);
+              inputRef.current?.click();
+
+              // TODO - Remove this in the next major release
+              // Fallback to onRemove if onReupload isn't provided to avoid breaking changes in the API
+              if (onReupload) {
+                onReupload({ file: selectedFiles[0] });
+              } else {
+                onRemove?.({ file: selectedFiles[0] });
+              }
+              setIsActive(false);
+            }}
+            onDismiss={() => {
+              const newFiles = selectedFiles.filter(({ id }) => id !== selectedFiles[0].id);
+              setSelectedFiles(() => newFiles);
+              onDismiss?.({ file: selectedFiles[0] });
+            }}
+            onPreview={onPreview}
+          />
+        )}
+      </BaseBox>
+      {willRenderHintText && (
+        <BaseBox
+          marginLeft={makeSize(
+            label && isLabelLeftPositioned
+              ? formHintLeftLabelMarginLeft[isSizeVariable ? 'large' : size]
+              : 0,
+          )}
+        >
+          <BaseBox display="flex" flexDirection="row" justifyContent="'space-between">
+            <FormHint
+              size={isSizeVariable ? 'large' : size}
+              type={getHintType({
+                validationState: showError ? 'error' : validationState,
+                hasHelpText: Boolean(helpText),
+              })}
+              helpText={helpText}
+              errorText={displayedErrorText}
+              helpTextId={helpTextId}
+              errorTextId={errorTextId}
+            />
+          </BaseBox>
+        </BaseBox>
+      )}
+      {!isOneFileSelectedWithSingleUpload &&
+        selectedFiles.map((file, index) => (
+          <BaseBox
+            key={file.id}
+            marginLeft={makeSize(
+              label && isLabelLeftPositioned
+                ? formHintLeftLabelMarginLeft[isSizeVariable ? 'large' : size]
+                : 0,
+            )}
+            marginTop={index === 0 ? 'spacing.5' : 'spacing.3'}
+          >
+            <FileUploadItem
+              file={file}
+              size={size}
+              // Failed files only offer Reupload, which already removes the file before reopening the picker
+              onRemove={
+                file.status === 'error'
+                  ? undefined
+                  : () => {
+                      const newFiles = selectedFiles.filter(({ id }) => id !== file.id);
+                      setSelectedFiles(() => newFiles);
+                      onRemove?.({ file });
+                    }
+              }
+              onReupload={() => {
+                const newFiles = selectedFiles.filter(({ id }) => id !== file.id);
+                setSelectedFiles(() => newFiles);
+                inputRef.current?.click();
+                // TODO - Remove this in the next major release
+                // Fallback to onRemove if onReupload isn't provided to avoid breaking changes in the API
+                if (onReupload) {
+                  onReupload({ file });
+                } else {
+                  onRemove?.({ file });
+                }
+                setIsActive(false);
+              }}
+              onDismiss={() => {
+                const newFiles = selectedFiles.filter(({ id }) => id !== file.id);
+                setSelectedFiles(() => newFiles);
+                onDismiss?.({ file });
+              }}
+              onPreview={onPreview}
+            />
+          </BaseBox>
+        ))}
+    </BaseBox>
+  );
+};
+
+/**
+ * ### FileUpload Component
+ * 
+ * The FileUpload component is used to handle file attachments, including the drag-and-drop interaction.
+ * Primarily, it is used to upload files to a server or to display a list of uploaded files.
+ * 
+ * ---
+ * 
+ * #### Usage
+ * 
+ * ```jsx
+  const GSTForm = () => {
+   const [selectedFile, setSelectedFile] = useState<CompassFile>();
+   const [isLoading, setIsLoading] = useState(false);
+ 
+   return (
+    <Box>
+      <Heading marginBottom="spacing.4">Add GST Details</Heading>
+      <form encType="multipart/form-data" onSubmit={handleSubmit}>
+          <FileUpload
+            uploadType="single"
+            label="Upload GST"
+            helpText="Upload .jpg, .jpeg, or .png file only"
+            accept=".jpg, .jpeg, .png"
+            onChange={({ fileList }) => {
+              setSelectedFile(fileList[0]);
+            }}
+            onDrop={({ fileList }) => {
+              setSelectedFile(fileList[0]);
+            }}
+            isRequired
+            necessityIndicator="required"
+          />
+          <Button type="submit" variant="primary">
+            Submit
+          </Button>
+          {isLoading && (
+            <ProgressBar isIndeterminate label="Uploading your GST Certificate..." />
+          )}
+      </form>
+    </Box>
+   );
+  }
+ * ```
+ *
+ *  ---
+ *
+ * Checkout {@link https://design.klearnow.com/?path=/docs/components-fileupload FileUpload Documentation}
+ * 
+ */
+const FileUpload = assignWithoutSideEffects(forwardRef(_FileUpload), {
+  displayName: 'FileUpload',
+  componentId: 'FileUpload',
+});
+
+export { FileUpload };
+export type { CompassFile, CompassFileList, FileUploadProps };

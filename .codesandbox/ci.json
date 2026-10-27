@@ -1,8 +1,8 @@
 {
   "node": "20",
   "installCommand": "ci:codesandbox:install",
-  "packages": ["packages/klear360", "packages/klear360-core", "packages/klear360-svelte"],
-  "//": "build packages explicitly in dependency order (klear360-core before klear360-svelte) since prepare scripts can fail in CI",
+  "packages": ["packages/compass", "packages/compass-core", "packages/compass-svelte"],
+  "//": "build packages explicitly in dependency order (compass-core before compass-svelte) since prepare scripts can fail in CI",
   "buildCommand": "ci:codesandbox:build",
   "sandboxes": ["/packages/examples/basic/"],
   "silent": true

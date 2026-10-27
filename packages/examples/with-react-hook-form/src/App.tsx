@@ -1,13 +1,13 @@
 import { useController, useForm } from 'react-hook-form';
 import {
-  Klear360Provider,
+  CompassProvider,
   Button,
   PasswordInput,
   TextArea,
   TextInput,
-} from '@klearnow/klear360/components';
-import { klear360Theme } from '@klearnow/klear360/tokens';
-import '@klearnow/klear360/fonts.css';
+} from '@klearnow/compass/components';
+import { compassTheme } from '@klearnow/compass/tokens';
+import '@klearnow/compass/fonts.css';
 
 type FormFields = {
   firstName: string;
@@ -51,7 +51,7 @@ function App(): JSX.Element {
   });
 
   return (
-    <Klear360Provider themeTokens={klear360Theme} colorScheme="light">
+    <CompassProvider themeTokens={compassTheme} colorScheme="light">
       <form onSubmit={handleSubmit((data) => console.log(data))}>
         <TextInput
           {...firstName.field}
@@ -103,7 +103,7 @@ function App(): JSX.Element {
 
         <Button type="submit">submit</Button>
       </form>
-    </Klear360Provider>
+    </CompassProvider>
   );
 }
 

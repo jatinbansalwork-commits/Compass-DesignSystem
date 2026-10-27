@@ -1,6 +1,6 @@
 import React from 'react';
-import { List, ListItem, ListItemLink, ListItemText, ListItemCode } from '@klearnow/klear360/components';
-import { BookmarkIcon } from '@klearnow/klear360/components';
+import { List, ListItem, ListItemLink, ListItemText, ListItemCode } from '@klearnow/compass/components';
+import { BookmarkIcon } from '@klearnow/compass/components';
 
 export const Unordered = () => (
   <List variant="unordered">

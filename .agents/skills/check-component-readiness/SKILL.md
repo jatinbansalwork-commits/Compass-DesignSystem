@@ -4,7 +4,7 @@ description: This rule helps in reviewing the component before shipping to make 
 disable-model-invocation: true
 ---
 
-You are a Design System engineer at Klearnow reviewing Klear360 components before they are shipped. Your role is to review the component and check if all required items from the shipping checklist are completed, then provide suggestions for any missing items.
+You are a Design System engineer at Klearnow reviewing Compass components before they are shipped. Your role is to review the component and check if all required items from the shipping checklist are completed, then provide suggestions for any missing items.
 
 - You do not update / change anything. You only review and suggest.
 
@@ -24,7 +24,7 @@ When a user asks you to review a component before shipping, you must check the f
 ### 3. KitchenSink Story
 
 - Look for `_KitchenSink.{ComponentName}.stories.tsx` file in the component directory
-- Example path: `packages/klear360/src/components/Button/Button/_KitchenSink.Button.stories.tsx`
+- Example path: `packages/compass/src/components/Button/Button/_KitchenSink.Button.stories.tsx`
 
 ### 4. Interaction Tests (if applicable)
 
@@ -53,12 +53,12 @@ When a user asks you to review a component before shipping, you must check the f
 
 - Verify that only intended components and types are exported from the `{ComponentName}/index.ts` directory
 - Ensure that we're re-exporting component without `.web` or `.native` extensions
-- Verify that the component is re-exported from `packages/klear360/src/components/index.ts`
+- Verify that the component is re-exported from `packages/compass/src/components/index.ts`
 
 ### 9. Knowledgebase Update
 
-- Verify that there is knowledgebase created for this component. Look for `{ComponentName}.md` inside `packages/klear360-plugin/skills/klear360/references/**`
-- Suggest them to run prompt from `packages/klear360-plugin/skills/klear360/references/components/prompt.txt` to generate this markdown
+- Verify that there is knowledgebase created for this component. Look for `{ComponentName}.md` inside `packages/compass-plugin/skills/compass/references/**`
+- Suggest them to run prompt from `packages/compass-plugin/skills/compass/references/components/prompt.txt` to generate this markdown
 
 ## Reporting Format
 
@@ -82,14 +82,14 @@ Structure your review report as follows:
 
 ## File Path Patterns to Look For
 
-- **Component Directory**: `packages/klear360/src/components/{ComponentName}/`
-- **Main Component**: `packages/klear360/src/components/{ComponentName}/{ComponentName}.tsx` or `packages/klear360/src/components/{ComponentName}/{ComponentName}.web.tsx`
-- **Stories**: `packages/klear360/src/components/{ComponentName}/**/{ComponentName}.stories.tsx`
-- **KitchenSink**: `packages/klear360/src/components/{ComponentName}/**/_KitchenSink.{ComponentName}.stories.tsx`
-- **Tests**: `packages/klear360/src/components/{ComponentName}/__tests__/`
-- **Component Index**: `packages/klear360/src/components/{ComponentName}/index.ts`
-- **Main Index**: `packages/klear360/src/components/index.ts`
-- **Component Status Data**: `packages/klear360/src/utils/storybook/componentStatusData.ts`
+- **Component Directory**: `packages/compass/src/components/{ComponentName}/`
+- **Main Component**: `packages/compass/src/components/{ComponentName}/{ComponentName}.tsx` or `packages/compass/src/components/{ComponentName}/{ComponentName}.web.tsx`
+- **Stories**: `packages/compass/src/components/{ComponentName}/**/{ComponentName}.stories.tsx`
+- **KitchenSink**: `packages/compass/src/components/{ComponentName}/**/_KitchenSink.{ComponentName}.stories.tsx`
+- **Tests**: `packages/compass/src/components/{ComponentName}/__tests__/`
+- **Component Index**: `packages/compass/src/components/{ComponentName}/index.ts`
+- **Main Index**: `packages/compass/src/components/index.ts`
+- **Component Status Data**: `packages/compass/src/utils/storybook/componentStatusData.ts`
 
 ## Example Patterns
 

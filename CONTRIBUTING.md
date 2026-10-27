@@ -6,7 +6,7 @@ These steps should get you up and started for local development setup. Please en
 
 ### Prerequisites
 
-- `cd` into `packages/klear360`
+- `cd` into `packages/compass`
 
 - Install dependencies:
 
@@ -69,7 +69,7 @@ You can skip it if you're contributing to web only component. Our [Component Sta
   >
   > Follow the note [here](https://reactnative.dev/docs/environment-setup#cocoapods) if you're using M1
 
-- `cd` back to `packages/klear360`. Start storybook dev-server for ios:
+- `cd` back to `packages/compass`. Start storybook dev-server for ios:
 
   ```sh
   yarn start:ios
@@ -96,7 +96,7 @@ _The storybook can take some time to open after simulator starts. Don't worry, i
   >
   > At times, you might run into some weird issues during installation. Sometimes restarting your computer does the trick. You can also `cd` into the `android` directory and run `./gradlew clean` to clean up cache and built files when retrying installation or running the app.
 
-- `cd` back to `packages/klear360`. Start the storybook dev-server for android:
+- `cd` back to `packages/compass`. Start the storybook dev-server for android:
 
   ```sh
   yarn start:android
@@ -138,7 +138,7 @@ You will see files with `.web.tsx` or `.native.tsx` syntax. The `.web.tsx` files
 
 #### Cross Platform TypeScript Guide
 
-[Writing Cross-Platform TypeScript In Klear360](./rfcs/writing-cross-platform-typescript.md)
+[Writing Cross-Platform TypeScript In Compass](./rfcs/writing-cross-platform-typescript.md)
 
 ## Testing Changes
 
@@ -147,7 +147,7 @@ You will see files with `.web.tsx` or `.native.tsx` syntax. The `.web.tsx` files
 We have unit tests which you can run by running following commands
 
 ```sh
-cd packages/klear360
+cd packages/compass
 yarn test:react # web tests
 yarn test:react-native # native tests
 ```
@@ -160,7 +160,7 @@ We also have visual tests that run on every PR. So if your PR changes / breaks a
 
 ### Interaction Tests
 
-We support writing interaction tests using playwright. You can check example interaction tests of toast at [Toast.test.stories.tsx](./packages/klear360/src/components/Toast/__tests__/Toast.test.stories.tsx). You can run these tests by visiting the Interaction Tests section in blade documentation E.g. [Toast Stacking Interaction Test on Documentation](https://design.klearnow.com/?path=/story/components-interaction-tests-toast--toast-stacking)
+We support writing interaction tests using playwright. You can check example interaction tests of toast at [Toast.test.stories.tsx](./packages/compass/src/components/Toast/__tests__/Toast.test.stories.tsx). You can run these tests by visiting the Interaction Tests section in blade documentation E.g. [Toast Stacking Interaction Test on Documentation](https://design.klearnow.com/?path=/story/components-interaction-tests-toast--toast-stacking)
 
 ## Editor Setup
 
@@ -193,7 +193,7 @@ We support writing interaction tests using playwright. You can check example int
 - Ensure you're not using any `.web`, `.native` files directly in respective imports in `.web` / `.native` modules. For example, if you end up importing a `.web` module accidentally in a `.native` module, you might see a blank component being rendered or module not found error
 - If you forget to import types inside a `.d.ts` file, sometimes TS won't complain and it can throw the typecheck logic in other modules off
 
-- `Klear360 requires "FRAMEWORK" environment variable to be set. Valid values are "REACT" and "REACT_NATIVE". Instead, received: undefined`
+- `Compass requires "FRAMEWORK" environment variable to be set. Valid values are "REACT" and "REACT_NATIVE". Instead, received: undefined`
 
   **Issue:** This is an issue that happens mostly if you run `yarn android` directly. For some reason `FRAMEWORK` doesn't gets passed to React Native application
 

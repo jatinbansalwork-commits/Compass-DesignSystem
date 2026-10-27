@@ -1,7 +1,7 @@
 /* eslint-disable no-control-regex */
 const targetIndex = process.argv.indexOf('--target');
 if (targetIndex !== -1 && process.argv[targetIndex + 1] === 'svelte') {
-  // A process of its own (it loads Klear360's class lint, an ES module), waited
+  // A process of its own (it loads Compass's class lint, an ES module), waited
   // for here, so the React lint below never runs.
   const { status } = require('child_process').spawnSync(
     process.execPath,
@@ -16,7 +16,7 @@ const path = require('path');
 const { glob } = require('glob');
 const { Project, ts } = require('ts-morph');
 
-const knowledgebasePath = path.join(__dirname, '../packages/klear360-plugin/skills/klear360/references');
+const knowledgebasePath = path.join(__dirname, '../packages/compass-plugin/skills/compass/references');
 const files = glob.sync(`${knowledgebasePath}/**/*.md`);
 
 const filesToLint = files.filter((file) => file.endsWith('.md'));

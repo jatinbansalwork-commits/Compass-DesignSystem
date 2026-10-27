@@ -1,19 +1,19 @@
 ---
 name: write-biweekly-announcement
-description: Generate bi-weekly announcement posts for Klear360 Design System updates by analyzing changelog entries from the past two weeks
+description: Generate bi-weekly announcement posts for Compass Design System updates by analyzing changelog entries from the past two weeks
 disable-model-invocation: true
 ---
 
 # Bi-Weekly Announcement Rule
 
 ## Purpose
-Generate bi-weekly announcement posts for Klear360 Design System updates by analyzing changelog entries from the past two weeks.
+Generate bi-weekly announcement posts for Compass Design System updates by analyzing changelog entries from the past two weeks.
 
 ## Instructions
 
 ### 1. Data Collection
 - **Source**: Use ```git diff``` command to get the changes we shipped in last 2 week or n weeks.
-- **Scope**: Include   `packages/klear360/` and `packages/klear360-mcp/`
+- **Scope**: Include   `packages/compass/` and `packages/compass-mcp/`
 - **Time Period**: Calculate the date range for the past two weeks from the current date
 
 ### 2. Content Structure
@@ -39,7 +39,7 @@ for example -
 12.14.0 - QuickFilter: Add QuickFilters component
 
 
-:github: Check out Klear360 Releases for the Full Changelog
+:github: Check out Compass Releases for the Full Changelog
 ```
 
 ### 3. Content Guidelines
@@ -59,7 +59,7 @@ for example -
 ### 4. Analysis Process
 1. Calculate the two-week period from current date.
   you can use this git command ```  git diff HEAD@{2.weeks.ago} HEAD -- CHANGELOG.md ``` to get the diff. of changes. make sure you get all the diff from the bottom. and use these diff only to write the annoucement. 
-  make sure you run this command only on `changelog.md` for blade and klear360-mcp projects
+  make sure you run this command only on `changelog.md` for blade and compass-mcp projects
 2. **Categorize Changes**: 
    - New components/features
    - Bug fixes
@@ -95,21 +95,21 @@ Promotional Toast Flexibility: Made leading prop optional for better component c
 12.47.0 - Carousel: A new navigation button position has been added that allows the buttons to overlap with the carousel for a cleaner look.
 12.46.2 - ListView: We've improved the desktop experience for ListView by adding horizontal scrolling for filters and removing the distracting gradient overlay for a cleaner, more focused view.
 12.46.1 - Need more flexibility with your notifications? The leading prop for promotional toasts is now optional, giving you more control over your designs.
-:mcp: Klear360 MCP Updates -
-1.4.1 - Klear360 MCP: add constraints to component knowledgebase.
-:github: Check out Klear360 Releases for the Full Changelog
+:mcp: Compass MCP Updates -
+1.4.1 - Compass MCP: add constraints to component knowledgebase.
+:github: Check out Compass Releases for the Full Changelog
 
 ```
 
 ### 7. Tools to Use
 - **File Reading & Date Calculation**: 
-  For now just use klear360-mcp and blade.
+  For now just use compass-mcp and blade.
   Calculate the two-week period from current date.
-  you can use this git command ```  git diff HEAD@{2.weeks.ago} HEAD -- CHANGELOG.md ``` to get the diff. of changes. make sure you get all the diff from the bottom. and use these diff only to write the annoucement. use this command only on blade and klear360-mcp project
+  you can use this git command ```  git diff HEAD@{2.weeks.ago} HEAD -- CHANGELOG.md ``` to get the diff. of changes. make sure you get all the diff from the bottom. and use these diff only to write the annoucement. use this command only on blade and compass-mcp project
   make sure you only include changes that are done in given timeline
 - **Content Analysis**: Parse and categorize diff changes and include these only
 - **Formatting**: Follow the example given to you. it's going to be a slack message. so don't use markdown. just use txt format.
-- **Release link** Add link for github release in https://github.com/klearnow/klear360/releases at the end of message
+- **Release link** Add link for github release in https://github.com/klearnow/compass/releases at the end of message
 - **Final File Creation** Create a file `announcement.md` in main repo. so it would be easy to copy paste for developers.
 
 ### 8. Special Considerations

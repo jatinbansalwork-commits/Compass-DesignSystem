@@ -1,8 +1,8 @@
 ---
-description: Guidelines and patterns for adding React Native support (.native.tsx) to Klear360 components that currently only have web implementations.
+description: Guidelines and patterns for adding React Native support (.native.tsx) to Compass components that currently only have web implementations.
 ---
 
-# Klear360 React Native Migration — Critical Rules
+# Compass React Native Migration — Critical Rules
 
 > Include this file at the start of every agent prompt.
 
@@ -36,7 +36,7 @@ description: Guidelines and patterns for adding React Native support (.native.ts
 - Use `styled-components/native`: `import styled from 'styled-components/native'`
 - Styled components wrap RN primitives: `styled(View)`, `styled(Pressable)`, `styled(Animated.View)`
 - Style values are NUMBERS for dimensions: `width: 24` not `width: '24px'`
-- Use `useTheme()` from `~components/Klear360Provider` for runtime token access
+- Use `useTheme()` from `~components/CompassProvider` for runtime token access
 - Use `getIn(theme, 'path.to.token')` for deep token lookups
 - Use `useStyledProps(props)` for handling styled prop overrides (margin, padding, etc.)
 - `flexDirection` defaults to `'column'` in RN (not `'row'` like web CSS)
@@ -75,7 +75,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import getIn from '~utils/lodashButBetter/get';
-import { useTheme } from '~components/Klear360Provider';
+import { useTheme } from '~components/CompassProvider';
 
 const AnimatedX = ({ isActive, children }) => {
   const { theme } = useTheme();
@@ -129,7 +129,7 @@ type ComponentProps = {
 import { castNativeType } from '~utils';
 ```
 
-## Klear360 Components Available on Native (DO NOT reimplement)
+## Compass Components Available on Native (DO NOT reimplement)
 
 These already work cross-platform — import directly:
 - Box, BaseBox, View primitives
@@ -144,7 +144,7 @@ These already work cross-platform — import directly:
 - Modal, BottomSheet, Tooltip, Popover
 - Tabs, BottomNav, Carousel
 - Avatar, AvatarGroup
-- Icons (all from `@klearnow/klear360/components`)
+- Icons (all from `@klearnow/compass/components`)
 
 ## Native Dependencies (common)
 
@@ -189,11 +189,11 @@ describe('<ComponentName />', () => {
 
 | Task | Command |
 |------|---------|
-| Native typecheck | `cd packages/klear360 && yarn types:typecheck:native` |
-| Native tests (all) | `cd packages/klear360 && yarn test:react-native` |
-| Native tests (one) | `cd packages/klear360 && yarn test:react-native {Name}` |
-| Update snapshots | `cd packages/klear360 && yarn test:react-native {Name} -u` |
-| Build native | `cd packages/klear360 && FRAMEWORK=REACT_NATIVE yarn build` |
+| Native typecheck | `cd packages/compass && yarn types:typecheck:native` |
+| Native tests (all) | `cd packages/compass && yarn test:react-native` |
+| Native tests (one) | `cd packages/compass && yarn test:react-native {Name}` |
+| Update snapshots | `cd packages/compass && yarn test:react-native {Name} -u` |
+| Build native | `cd packages/compass && FRAMEWORK=REACT_NATIVE yarn build` |
 
 ## Known Platform Gotchas (from past sessions)
 
@@ -209,9 +209,9 @@ describe('<ComponentName />', () => {
 
 ## Key References
 
-- Existing native patterns: `packages/klear360/src/components/Button/BaseButton/StyledBaseButton.native.tsx`
-- Animation reference: `packages/klear360/src/components/Switch/AnimatedThumb.native.tsx`
-- Test utility: `packages/klear360/src/utils/testing/renderWithTheme.native.tsx`
-- Platform types: `packages/klear360/src/utils/platform/platform.all.ts`
-- Theme access: `useTheme()` from `~components/Klear360Provider`
-- Stub pattern: grep for `throwKlear360Error` in `.native.tsx` files
+- Existing native patterns: `packages/compass/src/components/Button/BaseButton/StyledBaseButton.native.tsx`
+- Animation reference: `packages/compass/src/components/Switch/AnimatedThumb.native.tsx`
+- Test utility: `packages/compass/src/utils/testing/renderWithTheme.native.tsx`
+- Platform types: `packages/compass/src/utils/platform/platform.all.ts`
+- Theme access: `useTheme()` from `~components/CompassProvider`
+- Stub pattern: grep for `throwCompassError` in `.native.tsx` files

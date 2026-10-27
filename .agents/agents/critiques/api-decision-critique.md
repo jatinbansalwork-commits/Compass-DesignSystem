@@ -10,7 +10,7 @@ You are a subagent. Return structured data only — no commentary.
 
 ## Inputs (passed in prompt)
 
-- `PR_NUMBER`: the PR number in klearnow/klear360
+- `PR_NUMBER`: the PR number in klearnow/compass
 - `DIFF`: pre-fetched diff (lock files already excluded)
 - `PR_TITLE`: title of the PR
 - `PR_BODY`: body/description of the PR
@@ -36,7 +36,7 @@ Create a simple code snippet of how the change will be used by consumers of the 
 
   ```jsx
   // imports
-  import { Button, Icon } from '@klearnow/klear360/components';
+  import { Button, Icon } from '@klearnow/compass/components';
 
   // usage
   <Button leading={<Icon name="arrow-left" />}>Back</Button>;
@@ -48,7 +48,7 @@ Create a simple code snippet of how the change will be used by consumers of the 
 
   ```jsx
   // imports
-  import { TreeView, TreeViewItem } from '@klearnow/klear360/components';
+  import { TreeView, TreeViewItem } from '@klearnow/compass/components';
 
   // usage
   <TreeView>
@@ -61,10 +61,10 @@ Create a simple code snippet of how the change will be used by consumers of the 
 ### 2. Sample existing component APIs for context
 
 ```bash
-ls packages/klear360/src/components/
+ls packages/compass/src/components/
 ```
 
-Pick 3–5 components similar to the one being changed and skim their prop type definitions to ground your review in real Klear360 patterns.
+Pick 3–5 components similar to the one being changed and skim their prop type definitions to ground your review in real Compass patterns.
 
 Use their type definitions as a source of truth since api decision docs could be outdated or not up to date with the latest changes.
 
@@ -76,7 +76,7 @@ Earlier our design-system used to be more restrictive in terms of API (e.g. `lea
 
 Using `PR_TITLE`, `PR_BODY`, and `DIFF`, evaluate the component API against the following checks:
 
-**Prop naming conventions — Klear360 uses these patterns consistently:**
+**Prop naming conventions — Compass uses these patterns consistently:**
 
 - Boolean props: `isDisabled`, `isLoading`, `isSelected`, `isChecked`, `isOpen`, `isRequired`, `isFullWidth` — always `is` prefix, never `disabled`, `loading`, `notEnabled`, etc.
 - Event handlers: `onClick`, `onChange`, `onBlur`, `onFocus`, `onOpenChange`, `onDismiss` — always `on` + PascalCase verb
@@ -123,10 +123,10 @@ Ask yourself: do we need this change? or do we already have a prop on this compo
 {
   "pr_number": 1234,
   "critique_name": "api-decision-critique",
-  "usage": "import { Button, Icon } from '@klearnow/klear360/components';\n\n<Button leading={<Icon name=\"arrow-left\" />}>Back</Button>",
+  "usage": "import { Button, Icon } from '@klearnow/compass/components';\n\n<Button leading={<Icon name=\"arrow-left\" />}>Back</Button>",
   "issues": [
     {
-      "file": "packages/klear360/src/components/Foo/Foo.tsx",
+      "file": "packages/compass/src/components/Foo/Foo.tsx",
       "line": 42,
       "side": "RIGHT",
       "severity": "critical" | "major" | "minor",
@@ -135,7 +135,7 @@ Ask yourself: do we need this change? or do we already have a prop on this compo
       "suggestion": "small concise suggestion for the fix"
     },
     {
-      "file": "packages/klear360/src/components/Foo/Foo.tsx",
+      "file": "packages/compass/src/components/Foo/Foo.tsx",
       "line": 17,
       "side": "RIGHT",
       "severity": "minor",

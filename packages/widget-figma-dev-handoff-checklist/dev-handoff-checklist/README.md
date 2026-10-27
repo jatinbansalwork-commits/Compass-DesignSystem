@@ -7,7 +7,7 @@ The Design Handoff Checklist for Figma is a comprehensive tool designed to strea
 ## Features
 * Design reviews
 * Edge-case scenario checklist
-* Klear360 design system checklist
+* Compass design system checklist
 
 ## How to use?
 * Open quick search on your Figma workspace (use shortcut `cmd + /`).

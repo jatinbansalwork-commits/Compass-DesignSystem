@@ -1,10 +1,10 @@
 /**
- * Finds drift between klear360-svelte's components (source of truth) and the
- * prop types written in the klear360-svelte knowledgebase docs.
+ * Finds drift between compass-svelte's components (source of truth) and the
+ * prop types written in the compass-svelte knowledgebase docs.
  *
- * Every public component (`@klearnow/klear360-svelte/components`) must have a
+ * Every public component (`@klearnow/compass-svelte/components`) must have a
  * `{Name}Props` interface (or type) in a ```typescript block of some doc in
- * `skills/klear360-svelte/references/components/` (sub-components in their
+ * `skills/compass-svelte/references/components/` (sub-components in their
  * parent's doc), listing its props one by one. Reported:
  * - components with no `{Name}Props` in any doc
  * - props the component takes that the doc leaves out
@@ -114,7 +114,7 @@ for (const name of components) {
 fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf-8');
 console.log('--------------------------------');
 if (report.length) {
-  console.log(`⚠️  ${report.length} klear360-svelte components drift from the knowledgebase\n`);
+  console.log(`⚠️  ${report.length} compass-svelte components drift from the knowledgebase\n`);
   for (const entry of report) {
     if (entry.issue) {
       console.log(`${entry.component}: ${entry.issue}`);
@@ -128,5 +128,5 @@ if (report.length) {
   console.log('--------------------------------');
   process.exit(shouldFail ? 1 : 0);
 }
-console.log(`✅ ${checked} klear360-svelte components match their docs`);
+console.log(`✅ ${checked} compass-svelte components match their docs`);
 console.log('--------------------------------');

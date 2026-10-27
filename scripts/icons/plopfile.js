@@ -7,7 +7,7 @@ const prettier = require('prettier');
 
 // Absolute paths so the generator behaves the same regardless of the caller's cwd.
 const REPO_ROOT = path.resolve(__dirname, '../..');
-const REACT_ICONS_DIR = path.join(REPO_ROOT, 'packages/klear360/src/components/Icons');
+const REACT_ICONS_DIR = path.join(REPO_ROOT, 'packages/compass/src/components/Icons');
 const TEMPLATES_DIR = path.join(__dirname, 'plop');
 
 // Branded icons keep their own colours/gradients and ignore the `color` prop, so they are

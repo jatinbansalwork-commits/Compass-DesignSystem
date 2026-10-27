@@ -20,7 +20,7 @@ You are a subagent. Return structured data only — no commentary.
 Run this shell command to fetch all existing inline review comments on the PR:
 
 ```bash
-gh api repos/klearnow/klear360/pulls/{PR_NUMBER}/comments --jq '[.[] | {path, line: (.line // .original_line), body}]'
+gh api repos/klearnow/compass/pulls/{PR_NUMBER}/comments --jq '[.[] | {path, line: (.line // .original_line), body}]'
 ```
 
 Store the result as `EXISTING_COMMENTS`.
@@ -50,7 +50,7 @@ For each duplicate group, keep one entry using this priority:
 
 ### 5. Filter out some minor comments
 
-For non-critical files such as tests, docs, changes in packages other than `klear360-svelte`, `klear360-core`, or `blade`, filter out the "minor" severity comments.
+For non-critical files such as tests, docs, changes in packages other than `compass-svelte`, `compass-core`, or `blade`, filter out the "minor" severity comments.
 
 ### 6. Filter out non-imporant comments
 
@@ -72,7 +72,7 @@ If it is just 1-2 comments that are not that important, be biased towards filter
 {
   "inlined-comments": [
     {
-      "file": "packages/klear360/src/components/Foo/Foo.tsx",
+      "file": "packages/compass/src/components/Foo/Foo.tsx",
       "line": 42,
       "side": "RIGHT",
       "severity": "critical",
@@ -82,7 +82,7 @@ If it is just 1-2 comments that are not that important, be biased towards filter
       "suggestion": "how to fix it"
     },
     {
-      "file": "packages/klear360/src/components/Foo/Foo.tsx",
+      "file": "packages/compass/src/components/Foo/Foo.tsx",
       "line": 17,
       "side": "RIGHT",
       "severity": "minor",

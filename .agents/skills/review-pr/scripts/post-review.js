@@ -6,7 +6,7 @@
  *   node post-review.js <review-json-file> <pr-number> [repo] [--pending]
  *   cat review.json | node post-review.js - <pr-number> [repo] [--pending]
  *
- * Repo defaults to klearnow/klear360.
+ * Repo defaults to klearnow/compass.
  * Pass --pending to save as a draft review (not visible until submitted).
  */
 
@@ -19,7 +19,7 @@ const args = process.argv.slice(4);
 const pendingFlagIndex = args.indexOf('--pending');
 const isPending = pendingFlagIndex !== -1;
 const repoArgs = args.filter((_, i) => i !== pendingFlagIndex);
-const repo = repoArgs[0] || 'klearnow/klear360';
+const repo = repoArgs[0] || 'klearnow/compass';
 
 if (!inputArg || !prNumber) {
   console.error('Usage: node post-review.js <review-json-file|-> <pr-number> [repo]');
@@ -113,7 +113,7 @@ function formatOverviewComment(
 
   if (isSelfReview && reviewStatus === 'approved') {
     parts.push(
-      '<img src="https://raw.githubusercontent.com/klearnow/klear360/refs/heads/__ci_artifacts/artifacts/review-assets/Obama-giving-Obama-award.png" alt="obama giving obama medal" width="300px" />',
+      '<img src="https://raw.githubusercontent.com/klearnow/compass/refs/heads/__ci_artifacts/artifacts/review-assets/Obama-giving-Obama-award.png" alt="obama giving obama medal" width="300px" />',
     );
   }
 

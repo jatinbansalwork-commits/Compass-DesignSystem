@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.env
+.env.local
+# copied from packages/compass-plugin/skills/compass/references by scripts/copyKnowledgebase.mjs
+knowledgebase/

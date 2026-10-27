@@ -1,0 +1,53 @@
+# compass-plugin — Agent Context
+
+Claude Code plugin and cross-agent skills for the Compass Design System. Source of truth for the Compass knowledgebases (React and Svelte).
+
+## Package Structure
+
+```
+.claude-plugin/plugin.json   # Claude Code manifest (name "compass"); version mirrors package.json
+.codex-plugin/plugin.json    # Codex manifest, byte-identical to the Claude one
+hooks/                       # SessionStart framework detection + skill nudge (plain Node, no deps)
+skills/
+  blade/                     # React knowledgebase (@klearnow/compass). SKILL.md stays small; docs live in references/
+    references/components/   # One <Component>.md per component + index.md
+    references/patterns/
+    references/general/
+    references/upgrade.md, new-project.md, figma-to-code.md # Workflows, ported from the MCP tools
+    scripts/publish-metric.mjs # Port of the MCP publish_lines_of_code_metric tool
+    scripts/changelog.mjs      # Changelog slicing for references/upgrade.md
+    scripts/figma-to-code.mjs  # Klearnow-internal figma-to-code backend
+  compass-svelte/              # Svelte knowledgebase (@klearnow/compass-svelte)
+    references/components/   # One <Component>.md per component family + index.md
+    references/general/      # Usage, Styling, Theming, Adapters, AvailableIcons
+    scripts/                 # Identical copies of blade's analytics.mjs and publish-metric.mjs
+authoring/                   # Prompts used to generate component/pattern docs
+```
+
+Structural checks run in CI live in the repo-root `scripts/validateCompassPlugin.mjs`.
+
+## Rules
+
+- Knowledgebase edits happen here. `packages/compass-mcp` copies `skills/compass/references` into its gitignored `knowledgebase/` at build time; never edit it there. Only the docs are shared: `SKILL.md`, scripts and analytics here never reach MCP users.
+- When adding a component doc, also add it to the `## Available components` list in that skill's `SKILL.md` and regenerate `references/components/index.md` (one line from the doc's Description). `yarn validate:compass-plugin` fails otherwise.
+- Svelte docs follow `authoring/svelte-components.prompt.txt`: props from each component's `$props()` type (the drift check reads the same), examples as ```svelte blocks using runes, imports from `@klearnow/compass-svelte/components`, `/icons` or `/runes`, icons as sources, and classes that pass Compass's class lint (`yarn tsc:knowledgebase --target svelte` checks all of it).
+- The compass-svelte general docs are its own (Usage, Styling, Theming, Adapters, AvailableIcons), not copies of the React ones: compass-svelte styles with token classes and themes through CSS variables. `AvailableIcons.md` lists exactly the package's icon exports; the Svelte lint checks this.
+- `@klearnow/compass-plugin` versions independently of `@klearnow/compass-mcp`. Every changeset that touches this package uses `'@klearnow/compass-plugin': patch|minor`; also add `'@klearnow/compass-mcp'` when the change is in `skills/compass/references`, because compass-mcp ships those docs.
+- Do not bump versions by hand. `scripts/syncPluginManifestVersion.js` stamps plugin.json files and `SKILL.md` `metadata.version` from `package.json` during release.
+- Everything in this directory ships to Claude Code plugin users. Put repo tooling in the root `scripts/`, not here, so it does not clash with `skills/compass/scripts/`.
+- No symlinks, no `bin/`, forward slashes only. The plugin is installed by git checkout on macOS, Linux and Windows and by `npx skills add`, which copies only the skill directory.
+- Keep workflows as `references/*.md` in the `blade` skill rather than separate skills. Any new skill that sends analytics keeps an identical copy of `scripts/analytics.mjs` (a port of the MCP analytics utils) in its own directory; the validator fails if the copies differ.
+- No `.mcp.json` here. Consumers of the MCP keep configuring it themselves during the overlap period.
+
+## Quick Commands
+
+| Task                              | Command (repo root)                                     |
+| --------------------------------- | ------------------------------------------------------- |
+| Validate plugin structure + hooks | `yarn validate:compass-plugin`                            |
+| Run script and hook tests         | `yarn --cwd packages/compass-plugin test`                 |
+| Typecheck React knowledgebase     | `yarn tsc:knowledgebase`                                |
+| Compile Svelte knowledgebase      | `yarn tsc:knowledgebase --target svelte`                |
+| Check React docs drift vs source  | `yarn check:knowledgebase-drift --fail`                 |
+| Check Svelte docs drift vs source | `yarn check:knowledgebase-drift --target svelte --fail` |
+| Try locally in Claude Code        | `claude --plugin-dir packages/compass-plugin`             |
+| Sync manifest versions            | `node scripts/syncPluginManifestVersion.js`             |

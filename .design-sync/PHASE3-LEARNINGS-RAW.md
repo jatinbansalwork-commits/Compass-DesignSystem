@@ -123,13 +123,13 @@
 ## Grading Against Rubric
 
 ### ✅ Styled
-All components render with Klear360 design tokens:
+All components render with Compass design tokens:
 - Typography uses DS font families (not browser defaults)
 - Colors match DS palette (interactive states, validation colors)
 - Spacing uses DS tokens (consistent gaps, padding)
 - Form controls styled with DS borders, focus rings, disabled states
 
-**Verification**: Visual inspection shows Klear360 styling, not native browser form controls.
+**Verification**: Visual inspection shows Compass styling, not native browser form controls.
 
 ### ✅ Complete
 All preview exports render without warnings:
@@ -513,7 +513,7 @@ Total: 23 preview exports across 4 components
 ```bash
 node .ds-sync/lib/preview-rebuild.mjs \
   --config .design-sync/config.json \
-  --node-modules packages/klear360/node_modules \
+  --node-modules packages/compass/node_modules \
   --out ds-bundle \
   --components ProgressBar,Card,Box,Divider
 ```
@@ -641,7 +641,7 @@ All components built successfully in `ds-bundle/components/general/`:
 ## Grading Self-Assessment (Absolute Rubric)
 
 ### ✅ Styled
-- All components use Klear360 design tokens
+- All components use Compass design tokens
 - Proper spacing, typography, and colors applied
 - No browser default styling visible
 
@@ -757,7 +757,7 @@ All components built successfully in `ds-bundle/components/general/`:
 ## Grading Assessment
 
 ### ✅ Styled
-All components use Klear360 design tokens:
+All components use Compass design tokens:
 - BottomNav: Navigation bar with proper spacing and icons
 - TopNav: App header with logo, tabs, search, avatar
 - Table: Structured data grid with headers, cells, badges
@@ -961,7 +961,7 @@ For components requiring similar patterns:
 ```bash
 node .ds-sync/lib/preview-rebuild.mjs \
   --config .design-sync/config.json \
-  --node-modules packages/klear360/node_modules \
+  --node-modules packages/compass/node_modules \
   --out ds-bundle \
   --components Amount,List,AccordionItem,Tooltip,Popover,Menu
 ```

@@ -2,17 +2,17 @@ export interface BaseNode {
   layerName: string;
   id: string;
   type: SceneNode['type'];
-  parent: Klear360Node | null;
+  parent: CompassNode | null;
 }
 
-type Klear360ComponentProperties = {
+type CompassComponentProperties = {
   [key: string]: { type: ComponentPropertyType; value: string | boolean } | undefined;
 };
 
-export interface Klear360ComponentInstanceNode extends BaseNode {
-  componentProperties: Klear360ComponentProperties;
+export interface CompassComponentInstanceNode extends BaseNode {
+  componentProperties: CompassComponentProperties;
   type: InstanceNode['type'];
-  children: Klear360Node[];
+  children: CompassNode[];
   name: string | null;
   fills: InstanceNode['fills'];
   fillStyleId: InstanceNode['fillStyleId'];
@@ -20,18 +20,18 @@ export interface Klear360ComponentInstanceNode extends BaseNode {
   height: InstanceNode['height'];
 }
 
-export type Klear360Node =
-  | Klear360ComponentInstanceNode
-  | Klear360FrameNode
-  | Klear360TextNode
-  | Klear360GroupNode
-  | Klear360VectorNode
-  | Klear360RectangleNode
+export type CompassNode =
+  | CompassComponentInstanceNode
+  | CompassFrameNode
+  | CompassTextNode
+  | CompassGroupNode
+  | CompassVectorNode
+  | CompassRectangleNode
   | BaseNode;
 
-export interface Klear360FrameNode extends BaseNode {
+export interface CompassFrameNode extends BaseNode {
   type: FrameNode['type'];
-  children: Klear360Node[];
+  children: CompassNode[];
   layoutMode: FrameNode['layoutMode'];
   primaryAxisAlignItems: FrameNode['primaryAxisAlignItems'];
   primaryAxisSizingMode: FrameNode['primaryAxisSizingMode'];
@@ -53,28 +53,28 @@ export interface Klear360FrameNode extends BaseNode {
   maxHeight: FrameNode['maxHeight'];
 }
 
-export interface Klear360TextNode extends BaseNode {
+export interface CompassTextNode extends BaseNode {
   characters: TextNode['characters'];
   type: TextNode['type'];
   textStyleId: TextNode['textStyleId'];
 }
 
-export interface Klear360GroupNode extends BaseNode {
+export interface CompassGroupNode extends BaseNode {
   type: 'GROUP';
-  children: Klear360Node[];
+  children: CompassNode[];
   rotation: GroupNode['rotation'];
   layoutAlign: GroupNode['layoutAlign'];
   layoutGrow: GroupNode['layoutGrow'];
   layoutPositioning: GroupNode['layoutPositioning'];
 }
 
-export interface Klear360VectorNode extends BaseNode {
+export interface CompassVectorNode extends BaseNode {
   type: VectorNode['type'];
   fillStyleId: VectorNode['fillStyleId'];
   fills: VectorNode['fills'];
 }
 
-export interface Klear360RectangleNode extends BaseNode {
+export interface CompassRectangleNode extends BaseNode {
   type: RectangleNode['type'];
 }
 
@@ -87,6 +87,6 @@ export type JSXValue = {
   comment?: string;
 };
 
-export type Klear360Props = Record<string, JSXValue>;
+export type CompassProps = Record<string, JSXValue>;
 
-export type Klear360HelperProps = Record<string, JSXType>;
+export type CompassHelperProps = Record<string, JSXType>;

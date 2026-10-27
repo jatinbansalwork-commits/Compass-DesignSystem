@@ -8,7 +8,7 @@ on:
         required: true
         type: string
   workflow_run:
-    workflows: ['Klear360 Validate']
+    workflows: ['Compass Validate']
     types: [completed]
 
 concurrency:

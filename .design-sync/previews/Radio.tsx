@@ -1,5 +1,5 @@
 import React from 'react';
-import { RadioGroup, Radio } from '@klearnow/klear360/components';
+import { RadioGroup, Radio } from '@klearnow/compass/components';
 
 export const Default = () => (
   <RadioGroup label="Payment Method" name="paymentMethod">

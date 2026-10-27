@@ -1,6 +1,6 @@
-# Klear360 with `styled-components`
+# Compass with `styled-components`
 
-When using Klear360 along with multiple theme providers (for example with `blade-old` or your own custom theming) you should namespace your own theme so it doesn't conflict with blade's theme tokens.
+When using Compass along with multiple theme providers (for example with `blade-old` or your own custom theming) you should namespace your own theme so it doesn't conflict with blade's theme tokens.
 
 Check [`App.tsx`](./src/App.tsx) for example.
 
@@ -10,10 +10,10 @@ When a `ThemeProvider` is nested inside another `ThemeProvider`, `styled-compone
 
 ```tsx
 /**
- * klear360Theme
+ * compassTheme
  * {
  *  ...
- *  colors { // 👈 Klear360 components need this token
+ *  colors { // 👈 Compass components need this token
  *      ...
  *  }
  *  ...
@@ -31,12 +31,12 @@ const myCustomTheme = {
 const App = () => {
   // ...
   return (
-    <Klear360Provider themeTokens={klear360Theme}>
-      {/* The theme provider below will merge and replace any top level keys from `klear360Theme` above */}
+    <CompassProvider themeTokens={compassTheme}>
+      {/* The theme provider below will merge and replace any top level keys from `compassTheme` above */}
       <ThemeProvider theme={myCustomTheme}>
         <Button>Hello</Button>
       </ThemeProvider>
-    </Klear360Provider>
+    </CompassProvider>
   );
 };
 ```
@@ -47,6 +47,6 @@ There are some open issues and references on `styled-components` repo. Eg:
 - https://github.com/styled-components/styled-components/issues/244
 - https://github.com/styled-components/styled-components/issues/2417
 
-At the moment, best solution is to namespace your custom theme tokens so it doesn't conflict with Klear360's.
+At the moment, best solution is to namespace your custom theme tokens so it doesn't conflict with Compass's.
 
 > This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from '@klearnow/klear360/components';
-import { ExternalLinkIcon, DownloadIcon } from '@klearnow/klear360/components';
-import { Box } from '@klearnow/klear360/components';
+import { Link } from '@klearnow/compass/components';
+import { ExternalLinkIcon, DownloadIcon } from '@klearnow/compass/components';
+import { Box } from '@klearnow/compass/components';
 
 export const Default = () => (
   <Link href="https://klearnow.ai/docs" target="_blank" rel="noopener noreferrer">

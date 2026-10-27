@@ -24,9 +24,9 @@
 | File | Current State | Action |
 |------|--------------|--------|
 | `Styled{X}.web.tsx` | web-only | create `.native.tsx` counterpart |
-| `Styled{Y}.native.tsx` | stub (throwKlear360Error) | replace with real implementation |
+| `Styled{Y}.native.tsx` | stub (throwCompassError) | replace with real implementation |
 | `Animated{X}.web.tsx` | web-only | create `.native.tsx` with reanimated |
-| `{Name}.native.tsx` | stub (throwKlear360Error) | replace with real implementation |
+| `{Name}.native.tsx` | stub (throwCompassError) | replace with real implementation |
 | `{Unsuffixed}.tsx` | unsuffixed web-only | rename → `.web.tsx` + create `.native.tsx` |
 | `get{X}Styles.ts` | shared (platform-agnostic) | skip |
 | `types.ts` | shared | modify (add Platform.Select) |
@@ -34,7 +34,7 @@
 
 ## Sub-Components
 
-<!-- Compound components are mostly sub-component files. List every {SubName} that is NOT Styled*/Animated* and NOT the main {Name}. Native Status uses genuine-stub detection (not bare throwKlear360Error). -->
+<!-- Compound components are mostly sub-component files. List every {SubName} that is NOT Styled*/Animated* and NOT the main {Name}. Native Status uses genuine-stub detection (not bare throwCompassError). -->
 
 | Sub-Component | Web File | Native Status | Action |
 |--------------|----------|--------------|--------|
@@ -106,7 +106,7 @@
 
 **Default variant:**
 ```
-<View> (data-klear360-component="{name}")
+<View> (data-compass-component="{name}")
   └── <StyledX> (styled Pressable/View)
       ├── <View> (content wrapper)
       │   └── <Text> "label"

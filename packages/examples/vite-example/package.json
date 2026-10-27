@@ -10,7 +10,7 @@
     "installDependencies": false
   },
   "dependencies": {
-    "@klearnow/klear360": "../../blade/build",
+    "@klearnow/compass": "../../blade/build",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "styled-components": "5.3.5",

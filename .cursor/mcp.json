@@ -1,10 +1,9 @@
 {
   "mcpServers": {
-    "klear360-mcp": {
+    "compass": {
       "command": "node",
-      "args": [
-        "/Users/jatinbansal/Downloads/Klear360-Master/packages/blade-mcp/dist/server.js"
-      ]
+      "args": ["/Users/jatinbansal/Downloads/Klear360-Master/packages/compass-mcp/dist/server.js"],
+      "description": "Compass Design System MCP — component/pattern docs, Figma-to-code, project scaffolding (@klearnow/compass-mcp)"
     }
   }
 }

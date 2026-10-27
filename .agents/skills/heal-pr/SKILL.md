@@ -1,10 +1,10 @@
 ---
 name: heal-pr
-description: Heal a Klear360 PR by fixing CI failures, missing changesets, and sanity issues. Use when a PR has failing CI or other sanity problems that need to be auto-fixed.
+description: Heal a Compass PR by fixing CI failures, missing changesets, and sanity issues. Use when a PR has failing CI or other sanity problems that need to be auto-fixed.
 disable-model-invocation: true
 ---
 
-# Heal Klear360 PR
+# Heal Compass PR
 
 ## Arguments
 
@@ -26,10 +26,10 @@ prompt: "PR_NUMBER={PR_NUMBER}"
 Checkout the PR branch and fix each reported issue:
 
 ```bash
-gh pr checkout {PR_NUMBER} --repo klearnow/klear360
+gh pr checkout {PR_NUMBER} --repo klearnow/compass
 ```
 
-- **Failing CI**: investigate with `gh run view --job {JOB_ID} --repo klearnow/klear360`, then fix the root cause (code, tests, config)
+- **Failing CI**: investigate with `gh run view --job {JOB_ID} --repo klearnow/compass`, then fix the root cause (code, tests, config)
 - **Missing changeset**: create the `.changeset` file with appropriate bump type — **only if the PR contains actual source code changes**. Skip changeset creation for PRs with purely test file changes (e.g. `*.test.ts`, `*.spec.tsx`) or documentation-only changes (e.g. `*.md`, `docs/`).
 - **Any other issue**: follow the critique's suggestion
 
@@ -40,7 +40,7 @@ For test or lint failures, verify the fix locally by re-running the failing chec
 If any issue cannot be fixed (infra outage, external service downtime, flaky environment), post a comment:
 
 ```bash
-gh pr comment {PR_NUMBER} --repo klearnow/klear360 --body ":sparkles: Agentic PR Healer :sparkles:
+gh pr comment {PR_NUMBER} --repo klearnow/compass --body ":sparkles: Agentic PR Healer :sparkles:
 
 **Could not auto-fix the following issues:**
 

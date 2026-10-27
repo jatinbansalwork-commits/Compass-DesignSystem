@@ -15,7 +15,7 @@ The Design Handoff Checklist for Figma is a comprehensive tool designed to strea
 * Insert Snowflake handoff checklist widget to your workspace (inside `Snowflake` file, next to your component on a specific page wrapped into a section).
 * Complete the checklist along with the reviews before handing it off to designers/developers.
 
-*PS: Klear360 team will not accept designs until the checklist is completed*
+*PS: Compass team will not accept designs until the checklist is completed*
 
 ##
 For more information on Figma widgets, check here

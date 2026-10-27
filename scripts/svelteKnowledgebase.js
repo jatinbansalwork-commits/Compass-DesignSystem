@@ -1,5 +1,5 @@
 /**
- * What the klear360-svelte knowledgebase is checked against: the package's
+ * What the compass-svelte knowledgebase is checked against: the package's
  * public names and each component's props. Shared by the example lint
  * (`lintKnowledgebaseSvelte.js`) and the drift check
  * (`checkKnowledgebaseDriftSvelte.js`).
@@ -12,22 +12,22 @@
 const fs = require('fs');
 const path = require('path');
 const { Project } = require('ts-morph');
-// Hoisted from klear360-svelte's dependencies in the workspace.
+// Hoisted from compass-svelte's dependencies in the workspace.
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { parse } = require('svelte/compiler');
 
 const rootDir = path.join(__dirname, '..');
-const svelteDir = path.join(rootDir, 'packages/klear360-svelte');
+const svelteDir = path.join(rootDir, 'packages/compass-svelte');
 const componentsDir = path.join(svelteDir, 'src/components');
 const knowledgebasePath = path.join(
   rootDir,
-  'packages/klear360-plugin/skills/klear360-svelte/references',
+  'packages/compass-plugin/skills/compass-svelte/references',
 );
 
 const ENTRIES = {
-  components: '@klearnow/klear360-svelte/components',
-  runes: '@klearnow/klear360-svelte/runes',
-  icons: '@klearnow/klear360-svelte/icons',
+  components: '@klearnow/compass-svelte/components',
+  runes: '@klearnow/compass-svelte/runes',
+  icons: '@klearnow/compass-svelte/icons',
 };
 
 const project = new Project({

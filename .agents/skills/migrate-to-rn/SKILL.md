@@ -1,6 +1,6 @@
 ---
 name: "migrate-to-rn"
-description: "Add React Native support (.native.tsx files) to Klear360 components that currently only have web implementations. Use when user says \"add native support to {Component}\", \"migrate {Component} to native\", or \"/migrate-to-rn\"."
+description: "Add React Native support (.native.tsx files) to Compass components that currently only have web implementations. Use when user says \"add native support to {Component}\", \"migrate {Component} to native\", or \"/migrate-to-rn\"."
 ---
 
 # migrate-to-rn
@@ -32,7 +32,7 @@ Use the Read tool to load:
 
 ## Pre-flight: Skill extras
 
-Assumes Klear360 dev already works (`yarn install`, Xcode, `pod install`, `yarn start:ios`, etc.).
+Assumes Compass dev already works (`yarn install`, Xcode, `pod install`, `yarn start:ios`, etc.).
 
 **Before Step 0**, verify these skill-only tools are on PATH:
 
@@ -74,19 +74,19 @@ Extract component name(s). If multiple, process as a batch.
 
 For each component:
 ```bash
-ls packages/klear360/src/components/{Name}/ > /dev/null 2>&1 && echo "EXISTS" || echo "NOT FOUND"
+ls packages/compass/src/components/{Name}/ > /dev/null 2>&1 && echo "EXISTS" || echo "NOT FOUND"
 ```
 
 If not found → report error, skip that component.
 
 ### 0.3 Check Native Status
 
-> Don't classify on bare `throwKlear360Error` — validation-only files (`Tabs`, `Avatar`, `AccordionButton`) are REAL. Use the Plan agent's genuine-stub detection so the gate and Plan phase agree.
+> Don't classify on bare `throwCompassError` — validation-only files (`Tabs`, `Avatar`, `AccordionButton`) are REAL. Use the Plan agent's genuine-stub detection so the gate and Plan phase agree.
 
 ```bash
-# Genuine stub = small file whose body is essentially just a throwKlear360Error (no real render tree/hooks).
-# Validation-only files that use throwKlear360Error are large, so a line-count threshold separates them.
-grep -rl "throwKlear360Error" packages/klear360/src/components/{Name}/ --include="*.native.tsx" | while read -r f; do
+# Genuine stub = small file whose body is essentially just a throwCompassError (no real render tree/hooks).
+# Validation-only files that use throwCompassError are large, so a line-count threshold separates them.
+grep -rl "throwCompassError" packages/compass/src/components/{Name}/ --include="*.native.tsx" | while read -r f; do
   if [ "$(wc -l < "$f")" -lt 40 ]; then echo "STUB: $f"; else echo "REAL: $f"; fi
 done
 ```
@@ -134,7 +134,7 @@ cp -Rc node_modules .claude/worktrees/{Name}/node_modules 2>/dev/null || (cd .cl
 The Storybook `.app` binary only needs to be built **once** — all worktrees share the same native code; only JS differs (served by each worktree's own Metro). Build from the first slot's worktree:
 
 ```bash
-cd .claude/worktrees/{Name1}/packages/klear360 && yarn start:ios
+cd .claude/worktrees/{Name1}/packages/compass && yarn start:ios
 ```
 
 This builds, installs, and launches the app on the first simulator (slot 1's device). Run via Bash tool with `run_in_background: true`.
@@ -216,7 +216,7 @@ Agent(
     ALWAYS use absolute paths prefixed with the worktree.
     Read .claude/rules/rn-migration.md and .claude/rules/agent-base-directory.md first.
     
-    React source: {Worktree}/packages/klear360/src/components/{Name}/
+    React source: {Worktree}/packages/compass/src/components/{Name}/
     Output artifacts to: {Worktree}/.claude/artifacts/{Name}/
     Templates at: {Worktree}/.claude/templates/
   "
@@ -279,7 +279,7 @@ Agent(
     Read .claude/rules/rn-migration.md and .claude/rules/agent-base-directory.md first.
     
     Migration plan: {Worktree}/.claude/artifacts/{Name}/rn-migration-plan.md
-    Web source: {Worktree}/packages/klear360/src/components/{Name}/
+    Web source: {Worktree}/packages/compass/src/components/{Name}/
   "
 )
 ```
@@ -374,7 +374,7 @@ For each component that passed:
 
 ```bash
 # Stage only the component source — NOT the migration artifacts/screenshots in .claude/artifacts/.
-cd {Worktree} && git add packages/klear360/src/components/{Name}
+cd {Worktree} && git add packages/compass/src/components/{Name}
 # Add any other intentionally-changed source files explicitly (e.g. storybook registration) — never `git add -A`.
 cd {Worktree} && git commit -m "feat(native): Add React Native support for {Name}
 
@@ -392,7 +392,7 @@ cd {Worktree} && gh pr create \
 ## Summary
 
 - Adds native implementation (.native.tsx) for {Name} component
-- Replaces throwKlear360Error stubs with real platform-specific rendering
+- Replaces throwCompassError stubs with real platform-specific rendering
 - Uses styled-components/native + react-native-reanimated
 
 ## Changes

@@ -10,20 +10,20 @@ You are a subagent. Return the JSON output. No commentary.
 
 ## Inputs (passed in prompt)
 
-- `PR_NUMBER`: the PR number in klearnow/klear360
+- `PR_NUMBER`: the PR number in klearnow/compass
 
 ## Steps
 
 ### 1. Fetch CI checks
 
 ```bash
-gh pr checks {PR_NUMBER} --repo klearnow/klear360 --json name,description,link,state,startedAt,completedAt,workflow
+gh pr checks {PR_NUMBER} --repo klearnow/compass --json name,description,link,state,startedAt,completedAt,workflow
 ```
 
 For any failing checks, get details:
 
 ```bash
-gh run view --job {JOB_ID} --repo klearnow/klear360
+gh run view --job {JOB_ID} --repo klearnow/compass
 ```
 
 ### 2. Check for changeset coverage
@@ -37,7 +37,7 @@ const REPO_ROOT = execSync('git rev-parse --show-toplevel', {encoding:'utf8'}).t
 const rootPkg = require(REPO_ROOT + '/package.json');
 const workspaces = rootPkg.workspaces.packages;
 
-const files = JSON.parse(execSync('gh pr view ' + PR + ' --repo klearnow/klear360 --json files --jq \".files\"', {encoding:'utf8'}));
+const files = JSON.parse(execSync('gh pr view ' + PR + ' --repo klearnow/compass --json files --jq \".files\"', {encoding:'utf8'}));
 const changedPaths = files.map(f => f.path);
 
 const touchedPackages = workspaces.filter(pkg => changedPaths.some(p => p.startsWith(pkg + '/')));
@@ -45,7 +45,7 @@ const touchedPackages = workspaces.filter(pkg => changedPaths.some(p => p.starts
 let bumpedPackages = {};
 const changesetFiles = changedPaths.filter(p => p.startsWith('.changeset/') && p.endsWith('.md'));
 if (changesetFiles.length) {
-  const patches = JSON.parse(execSync('gh api repos/klearnow/klear360/pulls/' + PR + '/files --jq \'[.[] | select(.filename | startswith(\".changeset/\")) | {file:.filename,patch:.patch}]\'', {encoding:'utf8'}));
+  const patches = JSON.parse(execSync('gh api repos/klearnow/compass/pulls/' + PR + '/files --jq \'[.[] | select(.filename | startswith(\".changeset/\")) | {file:.filename,patch:.patch}]\'', {encoding:'utf8'}));
   patches.forEach(({patch}) => {
     for (const [, name, bump] of (patch?.matchAll(/^\+\"(@[^\"]+)\":\s*(patch|minor|major)/gm) ?? []))
       bumpedPackages[name] = bump;
@@ -76,20 +76,20 @@ Add any `issues` from the output to `issues` as entries with only a `problem` fi
       "name": "Check 1 name",
       "description": "Description field from gh pr checks output",
       "state": "SUCCESS",
-      "link": "https://github.com/klearnow/klear360/actions/runs/1234567890"
+      "link": "https://github.com/klearnow/compass/actions/runs/1234567890"
     },
     {
       "name": "Check 2 name",
       "description": "Description field from gh pr checks output",
       "state": "FAILURE",
-      "link": "https://github.com/klearnow/klear360/actions/runs/1234567890",
+      "link": "https://github.com/klearnow/compass/actions/runs/1234567890",
       "problem": "<detailed reason for failure after debugging the failed job>",
       "suggestion": "<what to do to fix or unblock this>"
     }
   ],
   "issues": [
     {
-      "problem": "Missing changeset bump for @klearnow/klear360 (packages/klear360 was modified)"
+      "problem": "Missing changeset bump for @klearnow/compass (packages/compass was modified)"
     }
   ]
 }

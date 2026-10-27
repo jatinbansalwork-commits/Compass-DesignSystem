@@ -1,6 +1,6 @@
 import React from 'react';
-import { Menu, MenuItem, MenuOverlay, MenuHeader, MenuDivider, MenuFooter, Button, Box, Text, Link } from '@klearnow/klear360/components';
-import { UserIcon, TestIcon, TicketIcon, ShareIcon, LogOutIcon, CopyIcon } from '@klearnow/klear360/components';
+import { Menu, MenuItem, MenuOverlay, MenuHeader, MenuDivider, MenuFooter, Button, Box, Text, Link } from '@klearnow/compass/components';
+import { UserIcon, TestIcon, TicketIcon, ShareIcon, LogOutIcon, CopyIcon } from '@klearnow/compass/components';
 
 export const Default = () => (
   <Menu>

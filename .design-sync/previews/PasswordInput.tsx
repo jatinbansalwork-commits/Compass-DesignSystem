@@ -1,5 +1,5 @@
 import React from 'react';
-import { PasswordInput } from '@klearnow/klear360/components';
+import { PasswordInput } from '@klearnow/compass/components';
 
 export const Default = () => (
   <PasswordInput

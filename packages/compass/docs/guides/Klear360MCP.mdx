@@ -1,0 +1,182 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { Box, List, ListItem, ListItemText, Heading, Code, Text } from '../../src/components';
+
+<Meta title="Guides/Klear for AI Agents" />
+
+<Box maxWidth="960px">
+<Heading size="xlarge">Klear for AI Agents</Heading>
+<Text marginTop="spacing.4" marginBottom="spacing.6">
+  Compass ships its component, pattern and token documentation for AI coding agents in two forms: the{' '}
+  <Text as="span" weight="semibold">Compass plugin</Text> (a Claude Code plugin whose skills also load in
+  Cursor, Codex, Copilot and Gemini CLI) and the older{' '}
+  <Text as="span" weight="semibold">Compass MCP</Text> server. Prefer the plugin; the MCP is in maintenance
+  mode.
+</Text>
+
+<Heading size="large">Compass Plugin (recommended)</Heading>
+
+<Heading size="medium">Claude Code</Heading>
+
+From a checkout of the compass repository:
+
+```sh
+claude --plugin-dir packages/compass-plugin
+```
+
+Marketplace install commands will be published here once the plugin marketplace is live.
+
+<Heading size="medium">Cursor, Codex, Copilot, Gemini CLI</Heading>
+
+```sh
+npx skills add klearnow/compass --skill compass
+```
+
+The skill lands in `.agents/skills/compass` (with a `.claude/skills/compass` symlink). Ask your agent to build UI and it reads the component docs it needs.
+
+The **compass** skill bundles the docs and guidelines plus workflows for upgrading Compass (changelog summaries), scaffolding a Vite + React app and Figma-to-code (klearnow-internal).
+
+<Heading size="large" marginTop="spacing.8">Compass MCP (maintenance mode)</Heading>
+<Text marginTop="spacing.3" marginBottom="spacing.6">
+  Compass MCP is a{' '}
+  <a href="https://modelcontextprotocol.io/introduction" target="_blank" rel="noreferrer">
+    Model Context Protocol (MCP)
+  </a>{' '}
+  server that exposes the same documentation as tools. Use it only where your agent cannot load skills.
+</Text>
+
+<Heading size="large">Available Tools</Heading>
+
+export const toolsData = [
+  {
+    name: 'hi_compass',
+    description:
+      'Welcome message and overview of Compass MCP when the user greets with "hi compass", "hey compass", etc.',
+  },
+  {
+    name: 'create_new_compass_project',
+    description:
+      'Creates a new project using Compass with Vite, React, and TypeScript. Use only when starting a project from scratch.',
+  },
+  {
+    name: 'create_compass_skill',
+    description:
+      'Installs the compass skill (docs included) in the project. Runs automatically before doc tools when the skill is missing or outdated.',
+  },
+  {
+    name: 'get_compass_component_docs',
+    description:
+      'Fetches Compass component documentation. Use when adding or changing components in your app.',
+  },
+  {
+    name: 'get_compass_pattern_docs',
+    description: 'Fetches Compass pattern docs (forms, list views, dashboards, and more).',
+  },
+  {
+    name: 'get_compass_general_docs',
+    description: 'Fetches setup, theming, tokens, and icon documentation.',
+  },
+  {
+    name: 'get_compass_changelog',
+    description: 'Returns changelog entries for a version or range to help with upgrades.',
+  },
+  {
+    name: 'get_figma_to_code',
+    description: 'Converts a Figma frame into Compass code (klearnow team only).',
+  },
+];
+
+<Box
+  borderWidth="thin"
+  borderColor="surface.border.gray.subtle"
+  borderRadius="medium"
+  overflow="hidden"
+  marginBottom="spacing.6"
+>
+  <Box
+    display="grid"
+    gridTemplateColumns="minmax(220px, 1fr) 2fr"
+    backgroundColor="surface.background.gray.moderate"
+    paddingX="spacing.4"
+    paddingY="spacing.3"
+    borderBottomWidth="thin"
+    borderColor="surface.border.gray.subtle"
+  >
+    <Text size="small" weight="semibold" color="surface.text.gray.normal">
+      Tool name
+    </Text>
+    <Text size="small" weight="semibold" color="surface.text.gray.normal">
+      Description
+    </Text>
+  </Box>
+  {toolsData.map((tool) => (
+    <Box
+      key={tool.name}
+      display="grid"
+      gridTemplateColumns="minmax(220px, 1fr) 2fr"
+      paddingX="spacing.4"
+      paddingY="spacing.3"
+      borderBottomWidth="thin"
+      borderColor="surface.border.gray.subtle"
+      gap="spacing.4"
+    >
+      <Code size="small" color="interactive.text.primary.normal" isHighlighted={false}>
+        {tool.name}
+      </Code>
+      <Text size="medium" color="surface.text.gray.subtle">
+        {tool.description}
+      </Text>
+    </Box>
+  ))}
+</Box>
+
+<Heading size="large">Setup</Heading>
+
+<Heading size="medium">Cursor</Heading>
+
+Add to `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "compass": {
+      "command": "npx",
+      "args": ["-y", "@klearnow/compass-mcp@latest"]
+    }
+  }
+}
+```
+
+<Heading size="medium">Claude Desktop</Heading>
+
+Add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "compass": {
+      "command": "npx",
+      "args": ["-y", "@klearnow/compass-mcp@latest"]
+    }
+  }
+}
+```
+
+<Heading size="large">Usage</Heading>
+
+Once configured, ask your agent to use Compass components. Example prompts:
+
+<List>
+  <ListItem>
+    <ListItemText>
+      Add a shipment status table using Compass Table with columns for tracking ID, carrier, and ETA
+    </ListItemText>
+  </ListItem>
+  <ListItem>
+    <ListItemText>Build a booking form with Compass TextInput, SelectInput, and Button</ListItemText>
+  </ListItem>
+  <ListItem>
+    <ListItemText>Show me how to theme Compass for a partner carrier brand color</ListItemText>
+  </ListItem>
+</List>
+
+</Box>

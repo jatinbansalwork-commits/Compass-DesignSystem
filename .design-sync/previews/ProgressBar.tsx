@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProgressBar } from '@klearnow/klear360/components';
+import { ProgressBar } from '@klearnow/compass/components';
 
 export const Default = () => (
   <ProgressBar label="Uploading document" value={30} />

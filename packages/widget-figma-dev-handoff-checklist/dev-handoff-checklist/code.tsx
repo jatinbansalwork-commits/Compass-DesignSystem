@@ -17,7 +17,7 @@ function Widget() {
       // send analytics
       waitForTask(
         sendAnalytics({
-          eventName: 'Klear360 Dev Handoff Checklist Used',
+          eventName: 'Compass Dev Handoff Checklist Used',
         }),
       );
       setIsAnalyticsLoadEventSent(true);
@@ -100,7 +100,7 @@ function Widget() {
         <AutoLayout direction="vertical" spacing={4} width="fill-parent">
           <Checkbox
             id="ds1"
-            optionText="Added Klear360 coverage card showing over 90% coverage on the 'Handoff' page"
+            optionText="Added Compass coverage card showing over 90% coverage on the 'Handoff' page"
             onCheckboxClick={updateChecklist}
           />
           <Checkbox
@@ -120,7 +120,7 @@ function Widget() {
           />
           <Checkbox
             id="ds5"
-            optionText="All the non-Klear360 components are approved from the Klear360 team and are part of Klear360 Snowflake file"
+            optionText="All the non-Compass components are approved from the Compass team and are part of Compass Snowflake file"
             onCheckboxClick={updateChecklist}
           />
         </AutoLayout>
@@ -160,7 +160,7 @@ function Widget() {
           />
           <Checkbox
             id="state7"
-            optionText="Ensure all copy has been reviewed using 'ToneKlear360' plugin & updated as needed"
+            optionText="Ensure all copy has been reviewed using 'ToneCompass' plugin & updated as needed"
             onCheckboxClick={updateChecklist}
           />
           <Checkbox

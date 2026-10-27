@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider, Box, Text, Heading } from '@klearnow/klear360/components';
+import { Divider, Box, Text, Heading } from '@klearnow/compass/components';
 
 export const Horizontal = () => (
   <Box>

@@ -2,7 +2,7 @@
 
 ## ✅ Completed Preparation
 
-All 29 core Klear360 components have been authored and are ready for upload to Claude Design.
+All 29 core Compass components have been authored and are ready for upload to Claude Design.
 
 ### Components Delivered (29 total)
 
@@ -50,7 +50,7 @@ Option A: **Via DesignSync Tool (if available)**
 
 Option B: **Manual Creation**
 1. Log in to Claude Design (claude.ai/design or design platform)
-2. Create new project: "Klear360 Design System - Klearnow"
+2. Create new project: "Compass Design System - Klearnow"
 3. Note the project ID for upload reference
 
 ### 2. Upload Bundle
@@ -88,7 +88,7 @@ git add .design-sync/previews/*.tsx
 # Commit the design-sync work
 git commit -m "feat(design-sync): Add Claude Design previews for 29 core components
 
-- Authored 29 Klear360 components for Claude Design integration
+- Authored 29 Compass components for Claude Design integration
 - 93 preview exports across forms, feedback, layout, navigation, data, and interactive components
 - All components graded against absolute rubric (styled, complete, plausible)
 - Realistic Klearnow domain content throughout (payments, KYC, settlements, transactions)
@@ -107,7 +107,7 @@ If team review is desired before merging:
 ```bash
 gh pr create \
   --title "feat(design-sync): Claude Design previews for 29 core components" \
-  --body "Adds Claude Design integration for 29 core Klear360 components. See .design-sync/READY-FOR-UPLOAD.md for details." \
+  --body "Adds Claude Design integration for 29 core Compass components. See .design-sync/READY-FOR-UPLOAD.md for details." \
   --base master
 ```
 
@@ -176,7 +176,7 @@ Before marking complete, verify:
 ```bash
 node .ds-sync/lib/preview-rebuild.mjs \
   --config .design-sync/config.json \
-  --node-modules packages/klear360/node_modules \
+  --node-modules packages/compass/node_modules \
   --out ds-bundle \
   --components ComponentName1,ComponentName2
 ```

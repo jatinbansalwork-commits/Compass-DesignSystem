@@ -1,6 +1,6 @@
 import React from 'react';
-import { Badge } from '@klearnow/klear360/components';
-import { InfoIcon } from '@klearnow/klear360/components';
+import { Badge } from '@klearnow/compass/components';
+import { InfoIcon } from '@klearnow/compass/components';
 
 export const Neutral = () => (
   <Badge color="neutral">Pending</Badge>

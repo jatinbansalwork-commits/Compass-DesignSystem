@@ -5,13 +5,13 @@
 Fetch all CI checks and report their status:
 
 ```bash
-gh pr checks {PR_NUMBER} --repo klearnow/klear360 --json name,description,link,state,startedAt,completedAt,workflow
+gh pr checks {PR_NUMBER} --repo klearnow/compass --json name,description,link,state,startedAt,completedAt,workflow
 ```
 
 For any failing checks, get details to explain the root cause:
 
 ```bash
-gh run view --job {JOB_ID} --repo klearnow/klear360
+gh run view --job {JOB_ID} --repo klearnow/compass
 ```
 
 Report every check — passing, failing, pending, skipped. For non-SUCCESS checks include the root cause and a suggestion to fix or unblock.
@@ -29,7 +29,7 @@ const REPO_ROOT = execSync('git rev-parse --show-toplevel', {encoding:'utf8'}).t
 const rootPkg = require(REPO_ROOT + '/package.json');
 const workspaces = rootPkg.workspaces.packages;
 
-const files = JSON.parse(execSync('gh pr view ' + PR + ' --repo klearnow/klear360 --json files --jq \".files\"', {encoding:'utf8'}));
+const files = JSON.parse(execSync('gh pr view ' + PR + ' --repo klearnow/compass --json files --jq \".files\"', {encoding:'utf8'}));
 const changedPaths = files.map(f => f.path);
 
 const touchedPackages = workspaces.filter(pkg => changedPaths.some(p => p.startsWith(pkg + '/')));
@@ -37,7 +37,7 @@ const touchedPackages = workspaces.filter(pkg => changedPaths.some(p => p.starts
 let bumpedPackages = {};
 const changesetFiles = changedPaths.filter(p => p.startsWith('.changeset/') && p.endsWith('.md'));
 if (changesetFiles.length) {
-  const patches = JSON.parse(execSync('gh api repos/klearnow/klear360/pulls/' + PR + '/files --jq \'[.[] | select(.filename | startswith(\".changeset/\")) | {file:.filename,patch:.patch}]\'', {encoding:'utf8'}));
+  const patches = JSON.parse(execSync('gh api repos/klearnow/compass/pulls/' + PR + '/files --jq \'[.[] | select(.filename | startswith(\".changeset/\")) | {file:.filename,patch:.patch}]\'', {encoding:'utf8'}));
   patches.forEach(({patch}) => {
     for (const [, name, bump] of (patch?.matchAll(/^\+\"(@[^\"]+)\":\s*(patch|minor|major)/gm) ?? []))
       bumpedPackages[name] = bump;

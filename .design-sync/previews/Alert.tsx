@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert } from '@klearnow/klear360/components';
+import { Alert } from '@klearnow/compass/components';
 
 export const Information = () => (
   <Alert

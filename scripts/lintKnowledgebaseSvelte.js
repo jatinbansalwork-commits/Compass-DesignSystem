@@ -1,19 +1,19 @@
 /**
- * Lints the ```svelte examples in the klear360-svelte knowledgebase.
+ * Lints the ```svelte examples in the compass-svelte knowledgebase.
  *
  * `tsc` can't check Svelte markup, so each example is instead:
  * - compiled with `svelte/compiler` in runes mode (syntax errors, Svelte 4
  *   leftovers like `export let` / `on:click`, a11y warnings);
- * - checked so every name imported from `@klearnow/klear360-svelte/components`,
+ * - checked so every name imported from `@klearnow/compass-svelte/components`,
  *   `/runes` or `/icons` is a real export of that entry, every `<PascalCase>`
  *   tag is imported or declared, and no icon is used as a tag (icons are
  *   sources: `<Icon source={InfoIcon} />`, or a component's `icon` prop);
- * - checked so every attribute, binding and snippet passed to a Klear360
+ * - checked so every attribute, binding and snippet passed to a Compass
  *   component is one of its props (read from the component's `$props()`);
- * - run through Klear360's class lint (`@klearnow/klear360-svelte/configs/lint`):
- *   no conflicting, interpolated or misspelled classes, and a Klear360
+ * - run through Compass's class lint (`@klearnow/compass-svelte/configs/lint`):
+ *   no conflicting, interpolated or misspelled classes, and a Compass
  *   component's `class` places it, never restyles it.
- * Every `*Icon` named anywhere in a doc must be a klear360-svelte icon, and
+ * Every `*Icon` named anywhere in a doc must be a compass-svelte icon, and
  * general/AvailableIcons.md must list exactly the icons the package exports.
  *
  * Usage: yarn tsc:knowledgebase --target svelte
@@ -21,7 +21,7 @@
 const fs = require('fs');
 const path = require('path');
 const { glob } = require('glob');
-// Hoisted from klear360-svelte's dependencies in the workspace.
+// Hoisted from compass-svelte's dependencies in the workspace.
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { compile, parse } = require('svelte/compiler');
 const {
@@ -54,7 +54,7 @@ function* walk(node) {
 }
 
 /**
- * Attributes, bindings and snippets passed to Klear360 components must be props.
+ * Attributes, bindings and snippets passed to Compass components must be props.
  * @param {any} ast
  * @param {Map<string, string>} bladeComponents local name -> exported name
  * @returns {string[]}
@@ -128,9 +128,9 @@ const lintBlock = (code) => {
   const bladeComponents = new Map();
   for (const [, , names, source] of code.matchAll(importRegex)) {
     const entry = entryOf.get(source);
-    if (source.startsWith('@klearnow/klear360/') || source === '@klearnow/klear360') {
+    if (source.startsWith('@klearnow/compass/') || source === '@klearnow/compass') {
       problems.push(`imports from the React package "${source}"`);
-    } else if (source.startsWith('@klearnow/klear360-svelte') && !entry) {
+    } else if (source.startsWith('@klearnow/compass-svelte') && !entry) {
       problems.push(`"${source}" is not an entry: use ${Object.values(ENTRIES).join(', ')}`);
     }
     for (const part of names
@@ -188,7 +188,7 @@ async function main() {
         .filter((name) => !exportedNames.icons.has(name)),
     );
     for (const name of unknownIcons) {
-      fileErrors.push({ error: `"${name}" is not a klear360-svelte icon`, markdownLineNumber: 0 });
+      fileErrors.push({ error: `"${name}" is not a compass-svelte icon`, markdownLineNumber: 0 });
     }
     for (const match of content.matchAll(codeBlockRegex)) {
       blockCount += 1;
@@ -198,7 +198,7 @@ async function main() {
     if (fileErrors.length) errors.push({ file: path.relative(rootDir, file), errors: fileErrors });
   }
 
-  // AvailableIcons.md lists exactly the icons klear360-svelte exports.
+  // AvailableIcons.md lists exactly the icons compass-svelte exports.
   const iconsDocPath = path.join(knowledgebasePath, 'general/AvailableIcons.md');
   const listedIcons = new Set(
     fs.existsSync(iconsDocPath)
@@ -220,7 +220,7 @@ async function main() {
   fs.writeFileSync(reportPath, JSON.stringify(errors, null, 2), 'utf-8');
   console.log('--------------------------------');
   if (errors.length > 0) {
-    console.log(`❌ ${errors.length} files have errors in the klear360-svelte knowledgebase\n`);
+    console.log(`❌ ${errors.length} files have errors in the compass-svelte knowledgebase\n`);
     for (const { file, errors: fileErrors } of errors) {
       console.log(file);
       for (const { error, markdownLineNumber } of fileErrors) {
@@ -230,7 +230,7 @@ async function main() {
     console.log('--------------------------------');
     process.exit(1);
   }
-  console.log(`✅ ${blockCount} svelte examples pass in the klear360-svelte knowledgebase`);
+  console.log(`✅ ${blockCount} svelte examples pass in the compass-svelte knowledgebase`);
   console.log('--------------------------------');
   process.exit(0);
 }

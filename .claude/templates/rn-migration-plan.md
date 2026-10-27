@@ -25,7 +25,7 @@
 | 2 | `Styled{X}.native.tsx` | create | `styled(View)` / `styled(Pressable)` | Replaces web styled-component |
 | 3 | `Animated{X}.native.tsx` | create | `Animated.View` | react-native-reanimated |
 | 3b | `{SubName}.native.tsx` (one row per sub-component) | create / replace stub / **skip if real** | `View` / `Pressable` | create before main; skip any that already exist as real impls |
-| 4 | `{Name}.native.tsx` | replace stub / skip if real | — | Remove throwKlear360Error, add real impl (skip if already real) |
+| 4 | `{Name}.native.tsx` | replace stub / skip if real | — | Remove throwCompassError, add real impl (skip if already real) |
 | 5 | `__tests__/{Name}.native.test.tsx` | create | — | Mirror web tests |
 
 ## Style Translation
@@ -118,7 +118,7 @@ pointerEvents: isDisabled ? 'none' : 'auto',
 | # | Decision | Choice | Rationale |
 |---|----------|--------|-----------|
 | 1 | Unsuffixed file handling | rename → .web.tsx | Preserves git history, Rollup resolves correctly |
-| 2 | Animation library | react-native-reanimated | Consistent with all other Klear360 native components |
+| 2 | Animation library | react-native-reanimated | Consistent with all other Compass native components |
 | 3 | {component-specific decision} | {choice} | {reason} |
 
 ## Risk Factors

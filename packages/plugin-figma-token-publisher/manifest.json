@@ -1,5 +1,5 @@
 {
-  "name": "Klear360 Token Publisher",
+  "name": "Compass Token Publisher",
   "id": "1661423237412340803",
   "api": "1.0.0",
   "main": "dist/plugin.js",
@@ -16,7 +16,7 @@
       "command": "devTokenNames"
     },
     {
-      "name": "Export Klear360 Icons",
+      "name": "Export Compass Icons",
       "command": "exportIcons"
     }
   ]

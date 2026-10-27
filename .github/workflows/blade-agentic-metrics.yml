@@ -1,4 +1,4 @@
-name: Agentic Klear360 Metrics
+name: Agentic Compass Metrics
 
 on:
   schedule:
@@ -34,7 +34,7 @@ jobs:
 
       - name: Combine reports
         run: |
-          echo "# Agentic Klear360 Metrics" > /tmp/metrics-combined.md
+          echo "# Agentic Compass Metrics" > /tmp/metrics-combined.md
           echo "" >> /tmp/metrics-combined.md
           echo "---" >> /tmp/metrics-combined.md
           echo "" >> /tmp/metrics-combined.md

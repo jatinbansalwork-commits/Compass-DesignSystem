@@ -10,7 +10,7 @@ You are a subagent. Return structured data only — no commentary.
 
 ## Inputs (passed in prompt)
 
-- `PR_NUMBER`: the PR number in klearnow/klear360
+- `PR_NUMBER`: the PR number in klearnow/compass
 - `HEADED`: `true` or `false`
 - `DIFF`: pre-fetched diff (lock files already excluded)
 - `PR_TITLE`: title of the PR
@@ -18,7 +18,7 @@ You are a subagent. Return structured data only — no commentary.
 
 ## Instructions
 
-- **Scope**: UI changes in `packages/klear360` (test the {STORYBOOK_URL} for changes), and UI changes in `packages/klear360-svelte` (test the {STORYBOOK_URL}/svelte for changes). React native components cannot be verified with agent-browser — skip UI review for react native only changes.
+- **Scope**: UI changes in `packages/compass` (test the {STORYBOOK_URL} for changes), and UI changes in `packages/compass-svelte` (test the {STORYBOOK_URL}/svelte for changes). React native components cannot be verified with agent-browser — skip UI review for react native only changes.
 - **Goals**:
   - Verify if the PR does what it claims to do in PR diff
   - Verify if no existing functionality is broken in parts that PR touches
@@ -26,14 +26,14 @@ You are a subagent. Return structured data only — no commentary.
 ## Steps
 
 > [!NOTE]
-> If the PR is for changes in react native components of `packages/klear360` only, skip the UI review entirely (return an empty `statuses` array). agent-browser cannot test react native components.
+> If the PR is for changes in react native components of `packages/compass` only, skip the UI review entirely (return an empty `statuses` array). agent-browser cannot test react native components.
 >
 > If change impacts both react native and web components, only verify the web components using the agent-browser steps below.
 
 ### 1. Fetch Storybook URL
 
 ```bash
-gh pr checks {PR_NUMBER} --repo klearnow/klear360 --json name,description,link --jq '.[] | select(.name == "Storybook Publish: blade") | .link'
+gh pr checks {PR_NUMBER} --repo klearnow/compass --json name,description,link --jq '.[] | select(.name == "Storybook Publish: blade") | .link'
 ```
 
 ### 2. Close any existing browser
@@ -67,8 +67,8 @@ If relevant and needed, compare it with same story in master storybook.
 
 Storybook URL for master:
 
-- For packages/klear360 changes: https://design.klearnow.com/
-- For packages/klear360-svelte changes: https://design.klearnow.com/svelte
+- For packages/compass changes: https://design.klearnow.com/
+- For packages/compass-svelte changes: https://design.klearnow.com/svelte
 
 ### 4. Close browser
 

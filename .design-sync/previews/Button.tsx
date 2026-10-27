@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from '@klearnow/klear360/components';
-import { CreditCardIcon, ArrowRightIcon, UserIcon } from '@klearnow/klear360/components';
+import { Button } from '@klearnow/compass/components';
+import { CreditCardIcon, ArrowRightIcon, UserIcon } from '@klearnow/compass/components';
 
 export const Primary = () => (
   <Button variant="primary">Pay Now</Button>

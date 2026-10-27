@@ -1,0 +1,15 @@
+{
+  "name": "compass",
+  "version": "1.33.0",
+  "description": "Klearnow Compass Design System: component, pattern and token docs plus upgrade, new-project and Figma-to-code workflows.",
+  "author": {
+    "name": "Klearnow",
+    "email": "support@klearnow.ai",
+    "url": "https://klearnow.ai"
+  },
+  "keywords": ["compass", "klearnow", "design-system", "react", "ui", "skills"],
+  "homepage": "https://klearnow.ai",
+  "repository": "https://github.com/klearnow/compass",
+  "license": "MIT",
+  "hooks": "./hooks/hooks.json"
+}

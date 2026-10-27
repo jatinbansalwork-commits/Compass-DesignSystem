@@ -1,4 +1,4 @@
-name: Klear360 Validate
+name: Compass Validate
 
 on: [pull_request]
 
@@ -25,45 +25,45 @@ jobs:
         run: yarn generate-docs-lockfile
       - name: Setup Cache & Install Dependencies
         uses: ./.github/actions/install-dependencies
-      - name: Build Klear360 Core
+      - name: Build Compass Core
         run: yarn build
-        working-directory: packages/klear360-core
-      - name: Build Klear360
+        working-directory: packages/compass-core
+      - name: Build Compass
         run: yarn build
-        working-directory: packages/klear360
-      - name: Lint Klear360
-        run: yarn lint:klear360
-      - name: Check klear360 version bump when components or tokens change
+        working-directory: packages/compass
+      - name: Lint Compass
+        run: yarn lint:compass
+      - name: Check compass version bump when components or tokens change
         run: |
-          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '^packages/klear360/src/(components|tokens)/' | wc -l | tr -d ' ')
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '^packages/compass/src/(components|tokens)/' | wc -l | tr -d ' ')
           if [ "$CHANGED" -gt 0 ]; then
-            VERSION_BUMPED=$(git diff origin/${{ github.base_ref }}...HEAD -- packages/klear360/package.json | grep -E '^\+.*"version"' | wc -l | tr -d ' ')
+            VERSION_BUMPED=$(git diff origin/${{ github.base_ref }}...HEAD -- packages/compass/package.json | grep -E '^\+.*"version"' | wc -l | tr -d ' ')
             if [ "$VERSION_BUMPED" -eq 0 ]; then
-              echo "ERROR: Component or token files changed in packages/klear360 — a version bump in package.json is required"
+              echo "ERROR: Component or token files changed in packages/compass — a version bump in package.json is required"
               exit 1
             fi
           fi
-      - name: Prettier check klear360 source
-        run: yarn prettier --check "packages/klear360/src/**/*.{ts,tsx}" --ignore-path packages/klear360/.prettierignore
-      - name: Lint Klear360 Core
-        run: yarn lint:klear360-core
-      - name: Lint Klear360 Svelte
-        run: yarn lint:klear360-svelte
-      - name: Lint Klear360 MCP
-        run: yarn lint:klear360-mcp
+      - name: Prettier check compass source
+        run: yarn prettier --check "packages/compass/src/**/*.{ts,tsx}" --ignore-path packages/compass/.prettierignore
+      - name: Lint Compass Core
+        run: yarn lint:compass-core
+      - name: Lint Compass Svelte
+        run: yarn lint:compass-svelte
+      - name: Lint Compass MCP
+        run: yarn lint:compass-mcp
       - name: Lint ESLint Plugin
         run: yarn lint:eslint-plugin
       - name: Lint Stylelint
         run: yarn lint:stylelint
-      - name: Run TypeScript Checks (Klear360)
+      - name: Run TypeScript Checks (Compass)
         run: yarn typecheck
-        working-directory: packages/klear360
-      - name: Run TypeScript Checks (Klear360 Core)
+        working-directory: packages/compass
+      - name: Run TypeScript Checks (Compass Core)
         run: yarn typecheck
-        working-directory: packages/klear360-core
-      - name: Run Svelte Checks (Klear360 Svelte)
+        working-directory: packages/compass-core
+      - name: Run Svelte Checks (Compass Svelte)
         run: yarn svelte-check
-        working-directory: packages/klear360-svelte
+        working-directory: packages/compass-svelte
 
   test:
     name: Run Tests (${{ matrix.shard }})
@@ -84,14 +84,14 @@ jobs:
         uses: ./.github/actions/install-dependencies
       - name: Run Unit Tests
         run: yarn test
-        working-directory: packages/klear360
+        working-directory: packages/compass
         env:
           SHARD: ${{ matrix.shard }}/${{ matrix.totalShards }}
       - name: Upload Coverage Report
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-report-${{ matrix.shard }}
-          path: packages/klear360/coverage
+          path: packages/compass/coverage
           retention-days: 1
 
   svelte-test:
@@ -108,18 +108,18 @@ jobs:
         uses: ./.github/actions/install-dependencies
       - name: Run Unit Tests
         run: yarn test
-        working-directory: packages/klear360-svelte
-      # klear360-svelte's icons are made from Klear360 React's: an icon added or changed
+        working-directory: packages/compass-svelte
+      # compass-svelte's icons are made from Compass React's: an icon added or changed
       # in React without `yarn icons:generate` leaves them behind.
       # Optional: the step fails with a warning, the job does not.
       - name: Check Svelte Icons Match React
         # Runs even when the tests fail, so the warning is never hidden
         if: ${{ !cancelled() }}
         continue-on-error: true
-        working-directory: packages/klear360-svelte
+        working-directory: packages/compass-svelte
         run: |
           yarn icons:check || {
-            echo "::warning title=klear360-svelte icons out of date::Run 'yarn workspace @klearnow/klear360-svelte icons:generate' and commit the result."
+            echo "::warning title=compass-svelte icons out of date::Run 'yarn workspace @klearnow/compass-svelte icons:generate' and commit the result."
             exit 1
           }
 
@@ -132,38 +132,38 @@ jobs:
         with:
           fetch-depth: 2 # PR merge commit + its first parent (base branch tip)
       # HEAD is the PR merge commit, so diffing against its first parent gives the PR's changed files.
-      - name: Detect klear360-svelte Changes
+      - name: Detect compass-svelte Changes
         id: changes
         run: |
-          git diff --name-only HEAD^1 HEAD | grep -q '^packages/klear360-svelte/' \
-            && echo "klear360-svelte=true" >> "$GITHUB_OUTPUT" \
-            || echo "No changes under packages/klear360-svelte, skipping E2E tests"
+          git diff --name-only HEAD^1 HEAD | grep -q '^packages/compass-svelte/' \
+            && echo "compass-svelte=true" >> "$GITHUB_OUTPUT" \
+            || echo "No changes under packages/compass-svelte, skipping E2E tests"
       - name: Use Node v22
-        if: steps.changes.outputs.klear360-svelte == 'true'
+        if: steps.changes.outputs.compass-svelte == 'true'
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
       - name: Setup Cache & Install Dependencies
-        if: steps.changes.outputs.klear360-svelte == 'true'
+        if: steps.changes.outputs.compass-svelte == 'true'
         uses: ./.github/actions/install-dependencies
       # Playwright's own browsers against the built Storybook: no credentials.
       # The same specs run on real devices with `yarn test:e2e:browserstack`.
       - name: Build & Run E2E Tests
-        if: steps.changes.outputs.klear360-svelte == 'true'
+        if: steps.changes.outputs.compass-svelte == 'true'
         run: |
-          yarn --cwd ../klear360-core build
+          yarn --cwd ../compass-core build
           npx playwright install --with-deps chromium webkit
           yarn build-storybook
           yarn test:e2e
-        working-directory: packages/klear360-svelte
+        working-directory: packages/compass-svelte
       - name: Upload E2E Report
-        if: failure() && steps.changes.outputs.klear360-svelte == 'true'
+        if: failure() && steps.changes.outputs.compass-svelte == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: svelte-cx-e2e-report
           path: |
-            packages/klear360-svelte/playwright-report
-            packages/klear360-svelte/test-results
+            packages/compass-svelte/playwright-report
+            packages/compass-svelte/test-results
           retention-days: 7
 
   coverage-report:
@@ -218,11 +218,11 @@ jobs:
           yarn --silent nyc report --reporter=json --reporter=text > coverage-full.txt
 
           # Ensure output directory exists
-          mkdir -p packages/klear360/coverage
+          mkdir -p packages/compass/coverage
 
           # Copy the merged report to expected location
           if [ -f "coverage/coverage-final.json" ]; then
-            cp coverage/coverage-final.json packages/klear360/coverage/
+            cp coverage/coverage-final.json packages/compass/coverage/
             echo "Coverage file copied successfully"
           else
             echo "Error: coverage/coverage-final.json not found"

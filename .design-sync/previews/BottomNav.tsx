@@ -1,12 +1,12 @@
 import React from 'react';
-import { BottomNav, BottomNavItem } from '@klearnow/klear360/components';
+import { BottomNav, BottomNavItem } from '@klearnow/compass/components';
 import {
   HomeIcon,
   TransactionsIcon,
   PaymentLinkIcon,
   PaymentPagesIcon,
   MenuDotsIcon,
-} from '@klearnow/klear360/components';
+} from '@klearnow/compass/components';
 
 export const Default = () => (
   <BottomNav position="relative">

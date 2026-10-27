@@ -13,10 +13,10 @@ cat .design-sync/RESUME.md
 
 # 2. Start with Button preview
 # Author: .design-sync/previews/Button.tsx
-# Examples in: packages/klear360/src/components/Button/Button/Button.stories.tsx
+# Examples in: packages/compass/src/components/Button/Button/Button.stories.tsx
 
 # 3. Rebuild just Button
-cd .ds-sync && node lib/preview-rebuild.mjs --config ../.design-sync/config.json --node-modules ../packages/klear360/node_modules --out ../ds-bundle --components Button
+cd .ds-sync && node lib/preview-rebuild.mjs --config ../.design-sync/config.json --node-modules ../packages/compass/node_modules --out ../ds-bundle --components Button
 
 # 4. Capture & grade
 node package-capture.mjs --out ../ds-bundle --components Button

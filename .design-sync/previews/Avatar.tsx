@@ -1,6 +1,6 @@
 import React from 'react';
-import { Avatar, AvatarGroup, Indicator } from '@klearnow/klear360/components';
-import { BuildingIcon } from '@klearnow/klear360/components';
+import { Avatar, AvatarGroup, Indicator } from '@klearnow/compass/components';
+import { BuildingIcon } from '@klearnow/compass/components';
 
 export const WithImage = () => (
   <Avatar

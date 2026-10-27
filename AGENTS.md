@@ -1,6 +1,6 @@
-# Klear360 Monorepo — Agent Context
+# Compass Monorepo — Agent Context
 
-This is the monorepo for the Klear360 Design System. It contains different packages related to the Klear360 Design System of Klearnow.
+This is the monorepo for the Compass Design System. It contains different packages related to the Compass Design System of Klearnow.
 
 ## Packages
 
@@ -8,13 +8,13 @@ Load the Agents Context File in your context whenever change is being made to th
 
 | Package                                  | Agents Context File                            | Description                                                                                                                       |
 | ---------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| [klear360](./packages/klear360/)               | ./packages/klear360/CLAUDE.md or AGENTS.md        | The core Klear360 Design System package with cross-platform UI components for React Web and React Native                             |
-| [klear360-plugin](./packages/klear360-plugin/) | ./packages/klear360-plugin/CLAUDE.md or AGENTS.md | Claude Code plugin + cross-agent skills. Owns the Klear360 React knowledgebase (component/pattern/general docs for AI agents)        |
-| [klear360-mcp](./packages/klear360-mcp/)       | ./packages/klear360-mcp/CLAUDE.md or AGENTS.md    | Model Context Protocol (MCP) server for AI-assisted development using Klear360 components (maintenance mode)                         |
-| [klear360-core](./packages/klear360-core/)     | ./packages/klear360-core/CLAUDE.md or AGENTS.md   | Core utilities for Klear360 Design System (Only used in klear360-svelte as of now and not in the core klear360 package)                             |
-| [klear360-svelte](./packages/klear360-svelte/) | ./packages/klear360-svelte/CLAUDE.md or AGENTS.md | Svelte components for Klear360 Design System (changes here should only be made when explicitly asked by the user for svelte changes) |
+| [compass](./packages/compass/)               | ./packages/compass/CLAUDE.md or AGENTS.md        | The core Compass Design System package with cross-platform UI components for React Web and React Native                             |
+| [compass-plugin](./packages/compass-plugin/) | ./packages/compass-plugin/CLAUDE.md or AGENTS.md | Claude Code plugin + cross-agent skills. Owns the Compass React knowledgebase (component/pattern/general docs for AI agents)        |
+| [compass-mcp](./packages/compass-mcp/)       | ./packages/compass-mcp/CLAUDE.md or AGENTS.md    | Model Context Protocol (MCP) server for AI-assisted development using Compass components (maintenance mode)                         |
+| [compass-core](./packages/compass-core/)     | ./packages/compass-core/CLAUDE.md or AGENTS.md   | Core utilities for Compass Design System (Only used in compass-svelte as of now and not in the core compass package)                             |
+| [compass-svelte](./packages/compass-svelte/) | ./packages/compass-svelte/CLAUDE.md or AGENTS.md | Svelte components for Compass Design System (changes here should only be made when explicitly asked by the user for svelte changes) |
 
-.. And few other smaller packages related to Klear360
+.. And few other smaller packages related to Compass
 
 ## Finding Task Intent
 

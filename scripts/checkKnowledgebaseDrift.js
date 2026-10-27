@@ -1,10 +1,10 @@
 /**
- * Finds drift between Klear360 component prop types (source of truth) and the
- * TypeScript types written in klear360-plugin knowledgebase docs.
+ * Finds drift between Compass component prop types (source of truth) and the
+ * TypeScript types written in compass-plugin knowledgebase docs.
  *
- * For every `packages/klear360-plugin/skills/{skill}/references/components/{Name}.md` it compares
+ * For every `packages/compass-plugin/skills/{skill}/references/components/{Name}.md` it compares
  * `{Name}Props` from the doc with `{Name}Props` exported by the target package's
- * `src/components` (`--target react` = packages/klear360, the default):
+ * `src/components` (`--target react` = packages/compass, the default):
  * - props that exist in code but are missing in the doc
  * - props that exist in the doc but not in code
  * - literal union values (e.g. `size`) that differ between doc and code.
@@ -26,7 +26,7 @@ if (
   process.argv.includes('--target') &&
   process.argv[process.argv.indexOf('--target') + 1] === 'svelte'
 ) {
-  // klear360-svelte declares props on `$props()`, not as exported types: its
+  // compass-svelte declares props on `$props()`, not as exported types: its
   // own check, waited for here, so the React check below never runs.
   const { status } = require('child_process').spawnSync(
     process.execPath,
@@ -55,14 +55,14 @@ const selectedComponents = args.filter(
 // prop; `sharedEntry` imports them from the package source.
 const TARGETS = {
   react: {
-    packageDir: path.join(rootDir, 'packages/klear360'),
-    docsDir: path.join(rootDir, 'packages/klear360-plugin/skills/klear360/references/components'),
+    packageDir: path.join(rootDir, 'packages/compass'),
+    docsDir: path.join(rootDir, 'packages/compass-plugin/skills/compass/references/components'),
     reportPath: path.join(rootDir, 'knowledgebase-drift-report.json'),
     ignoreConfig: './knowledgebaseDriftIgnore.json',
-    shared: ['StyledPropsKlear360', 'DataAnalyticsAttribute', 'TestID'],
-    sharedEntry: `import type { StyledPropsKlear360 } from './components/Box/styledProps';
+    shared: ['StyledPropsCompass', 'DataAnalyticsAttribute', 'TestID'],
+    sharedEntry: `import type { StyledPropsCompass } from './components/Box/styledProps';
 import type { DataAnalyticsAttribute, TestID } from './utils/types';
-export type __Shared = StyledPropsKlear360 & DataAnalyticsAttribute & TestID;`,
+export type __Shared = StyledPropsCompass & DataAnalyticsAttribute & TestID;`,
     docPreamble: `import type React from 'react';`,
     compilerOptions: {},
     componentPropsFallback: (name) => `import type React from 'react';

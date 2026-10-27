@@ -19,4 +19,4 @@ const npmRcContent = `@klearnow:registry=https://npm.pkg.github.com/
 `;
 
 fs.writeFileSync(NPMRC_PATH, npmRcContent);
-console.log('[klear360]: generated .npmrc for publishing to GitHub registry ✅');
+console.log('[compass]: generated .npmrc for publishing to GitHub registry ✅');

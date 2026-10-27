@@ -1,11 +1,11 @@
 ---
 name: code-review
-description: Guidelines for reviewing Klear360 PRs — sanity checks, code quality, API decisions, usecase validity, and UI review.
+description: Guidelines for reviewing Compass PRs — sanity checks, code quality, API decisions, usecase validity, and UI review.
 ---
 
-# Klear360 PR Code Review Guidelines
+# Compass PR Code Review Guidelines
 
-Use these guidelines to review a Klear360 PR. Apply each critique lens based on what the diff touches. No subagents — you perform the review directly.
+Use these guidelines to review a Compass PR. Apply each critique lens based on what the diff touches. No subagents — you perform the review directly.
 
 ## Arguments
 

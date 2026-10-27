@@ -4,14 +4,14 @@
 
 - **Shape**: Package (not Storybook) - due to persistent ES module issues with Storybook CLI and the config
 - Target: React web components only (excluding React Native)
-- Build command: `pnpm -F "@klearnow/klear360..." build`
-- Package location: `packages/klear360`
-- **Entry point**: `packages/klear360/components.js` (re-exports from `build/lib/web/production/components`)
-- **Types entry**: `packages/klear360/build/types/components/index.d.ts` (the bundled types, not the root re-export)
+- Build command: `pnpm -F "@klearnow/compass..." build`
+- Package location: `packages/compass`
+- **Entry point**: `packages/compass/components.js` (re-exports from `build/lib/web/production/components`)
+- **Types entry**: `packages/compass/build/types/components/index.d.ts` (the bundled types, not the root re-export)
 
 ## Current Blocker
 
-**Converter [ZERO_MATCH] Issue** - The package converter cannot detect component exports from Klear360's bundled types:
+**Converter [ZERO_MATCH] Issue** - The package converter cannot detect component exports from Compass's bundled types:
 
 - The build creates a single bundled `.d.ts` file at `build/types/components/index.d.ts`
 - This file has ~29,000 lines with all types defined inline, then one massive `export { AcceptPaymentsFilledIcon, AcceptPaymentsIcon, Accordion, ...}` statement at line 29509
@@ -21,7 +21,7 @@
 **Root cause**: The converter's ts-morph parser may not handle this bundled-types-with-final-export pattern correctly.
 
 **Solution Applied**:
-- Added a root-level `"types": "./build/types/components/index.d.ts"` field to `packages/klear360/package.json`
+- Added a root-level `"types": "./build/types/components/index.d.ts"` field to `packages/compass/package.json`
 - Without this, `findTypesRoot()` couldn't find the types directory and fell back to scanning the package root, where it only found the 16 re-export `.d.ts` files (components.d.ts, tokens.d.ts, etc)
 - Also updated the exports section to point types at the bundled file instead of re-exports
 - **IMPORTANT**: Revert this change before committing! It's a workaround for the converter, not a permanent fix
@@ -48,7 +48,7 @@
 - **42 contact sheets generated** for visual review
 
 ### CSS-in-JS Warnings (Expected & Non-Blocking)
-- `[CSS_RUNTIME]` styles.css has no @imports - Klear360 uses runtime CSS-in-JS styling
+- `[CSS_RUNTIME]` styles.css has no @imports - Compass uses runtime CSS-in-JS styling
 - This is correct behavior for emotion/styled-components based design systems
 
 ## Preview Authoring Plan
@@ -91,7 +91,7 @@ Authored Button, TextInput, Alert end-to-end to establish workflow and grading c
 This design-sync work will be committed to a **separate branch** (`design-sync/claude-design-previews`) rather than directly to master. This allows:
 - Independent iteration on design-sync previews
 - Team review via pull request if desired
-- Clean separation from core Klear360 development
+- Clean separation from core Compass development
 - Easy updates to previews without affecting main branch
 
 **Branch workflow**: See `.design-sync/READY-FOR-UPLOAD.md` Step 4 for exact commands.
@@ -130,7 +130,7 @@ This design-sync work will be committed to a **separate branch** (`design-sync/c
 All 3 components now rebuild successfully using:
 ```bash
 node .ds-sync/lib/preview-rebuild.mjs --config .design-sync/config.json \
-  --node-modules packages/klear360/node_modules --out ds-bundle \
+  --node-modules packages/compass/node_modules --out ds-bundle \
   --components AccordionItem,InfoItemKey,StepItemIcon
 ```
 
@@ -157,8 +157,8 @@ All 29 components graded against 3 criteria:
 ### Preview File Structure Pattern
 ```tsx
 import React from 'react';
-import { ComponentName } from '@klearnow/klear360/components';
-import { Icon1, Icon2 } from '@klearnow/klear360/components';
+import { ComponentName } from '@klearnow/compass/components';
+import { Icon1, Icon2 } from '@klearnow/compass/components';
 
 export const ExportName1 = () => (
   <ComponentName prop="value">Content</ComponentName>
@@ -261,7 +261,7 @@ export const ExportName2 = () => (
 ```bash
 node .ds-sync/lib/preview-rebuild.mjs \
   --config .design-sync/config.json \
-  --node-modules packages/klear360/node_modules \
+  --node-modules packages/compass/node_modules \
   --out ds-bundle \
   --components ComponentName1,ComponentName2
 ```
@@ -294,6 +294,6 @@ node .ds-sync/lib/preview-rebuild.mjs \
 ### Storybook Build
 - The repo's `buildStorybook.sh` script requires `cross-env` which may not be installed
 - The Storybook config's `getAbsolutePath` function uses `require.resolve` which fails with esbuild-register in ES module mode
-- **Workaround**: Temporarily patch `packages/klear360/.storybook/react/main.ts` to return the value directly instead of using `require.resolve`
+- **Workaround**: Temporarily patch `packages/compass/.storybook/react/main.ts` to return the value directly instead of using `require.resolve`
 - After building the reference, restore from `main.ts.backup`
-- Build command: `FRAMEWORK=REACT storybook build -c packages/klear360/.storybook/react -o .design-sync/sb-reference`
+- Build command: `FRAMEWORK=REACT storybook build -c packages/compass/.storybook/react -o .design-sync/sb-reference`

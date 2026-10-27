@@ -1,17 +1,17 @@
 import type {
-  Klear360ComponentInstanceNode,
-  Klear360FrameNode,
-  Klear360GroupNode,
-  Klear360Node,
-  Klear360TextNode,
-  Klear360VectorNode,
-} from '../types/Klear360';
+  CompassComponentInstanceNode,
+  CompassFrameNode,
+  CompassGroupNode,
+  CompassNode,
+  CompassTextNode,
+  CompassVectorNode,
+} from '../types/Compass';
 
 const convertBaseNode = (
   figmaNode: Readonly<SceneNode>,
-  bladeParent: Klear360Node | null,
-): Klear360Node => {
-  const bladeNode: Klear360Node = {
+  bladeParent: CompassNode | null,
+): CompassNode => {
+  const bladeNode: CompassNode = {
     id: figmaNode.id,
     layerName: figmaNode.name,
     type: figmaNode.type,
@@ -22,7 +22,7 @@ const convertBaseNode = (
 };
 
 /**
- * Klear360 component structures aren't simple
+ * Compass component structures aren't simple
  * In case of icons, name of the component can be found in the main component property
  * In case of other components, use the parent's name instead
  * @param figmaNode
@@ -34,14 +34,14 @@ const getComponentName = (figmaNode: Readonly<InstanceNode>): string | null => {
 
 const convertInstanceToNode = (
   figmaNode: Readonly<InstanceNode>,
-  bladeNode: Klear360Node,
-): Klear360ComponentInstanceNode => {
-  const bladeComponentInstance: Klear360ComponentInstanceNode = {
+  bladeNode: CompassNode,
+): CompassComponentInstanceNode => {
+  const bladeComponentInstance: CompassComponentInstanceNode = {
     ...bladeNode,
     componentProperties: figmaNode.componentProperties,
     type: 'INSTANCE',
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    children: convertIntoKlear360Nodes(figmaNode.children, bladeNode),
+    children: convertIntoCompassNodes(figmaNode.children, bladeNode),
     name: getComponentName(figmaNode),
     fills: Array.isArray(figmaNode.fills)
       ? figmaNode.fills.filter((fill) => fill.visible)
@@ -53,8 +53,8 @@ const convertInstanceToNode = (
   return bladeComponentInstance;
 };
 
-const convertTextToNode = (figmaNode: Readonly<TextNode>, bladeNode: Klear360Node): Klear360TextNode => {
-  const bladeTextNode: Klear360TextNode = {
+const convertTextToNode = (figmaNode: Readonly<TextNode>, bladeNode: CompassNode): CompassTextNode => {
+  const bladeTextNode: CompassTextNode = {
     ...bladeNode,
     type: 'TEXT',
     characters: figmaNode.characters,
@@ -66,13 +66,13 @@ const convertTextToNode = (figmaNode: Readonly<TextNode>, bladeNode: Klear360Nod
 
 const convertFrameToNode = (
   figmaNode: Readonly<FrameNode>,
-  bladeNode: Klear360Node,
-): Klear360FrameNode => {
-  const bladeFrame: Klear360FrameNode = {
+  bladeNode: CompassNode,
+): CompassFrameNode => {
+  const bladeFrame: CompassFrameNode = {
     ...bladeNode,
     type: 'FRAME',
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    children: convertIntoKlear360Nodes(figmaNode.children, bladeNode),
+    children: convertIntoCompassNodes(figmaNode.children, bladeNode),
     counterAxisAlignItems: figmaNode.counterAxisAlignItems,
     counterAxisSizingMode: figmaNode.counterAxisSizingMode,
     primaryAxisAlignItems: figmaNode.primaryAxisAlignItems,
@@ -100,13 +100,13 @@ const convertFrameToNode = (
 
 const convertGroupToNode = (
   figmaNode: Readonly<GroupNode>,
-  bladeNode: Klear360Node,
-): Klear360GroupNode => {
-  const bladeGroupNode: Klear360GroupNode = {
+  bladeNode: CompassNode,
+): CompassGroupNode => {
+  const bladeGroupNode: CompassGroupNode = {
     ...bladeNode,
     type: 'GROUP',
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    children: convertIntoKlear360Nodes(figmaNode.children, bladeNode),
+    children: convertIntoCompassNodes(figmaNode.children, bladeNode),
     rotation: figmaNode.rotation,
     layoutAlign: figmaNode.layoutAlign,
     layoutGrow: figmaNode.layoutGrow,
@@ -117,9 +117,9 @@ const convertGroupToNode = (
 
 const convertVectorToNode = (
   figmaNode: Readonly<VectorNode>,
-  bladeNode: Klear360Node,
-): Klear360VectorNode => {
-  const bladeVectorNode: Klear360VectorNode = {
+  bladeNode: CompassNode,
+): CompassVectorNode => {
+  const bladeVectorNode: CompassVectorNode = {
     ...bladeNode,
     type: 'VECTOR',
     fills: Array.isArray(figmaNode.fills)
@@ -130,11 +130,11 @@ const convertVectorToNode = (
   return bladeVectorNode;
 };
 
-export const convertIntoKlear360Nodes = (
+export const convertIntoCompassNodes = (
   figmaNodes: ReadonlyArray<SceneNode>,
-  bladeParent: Klear360Node | null,
-): Array<Klear360Node> => {
-  const bladeNodes: Klear360Node[] = [];
+  bladeParent: CompassNode | null,
+): Array<CompassNode> => {
+  const bladeNodes: CompassNode[] = [];
   figmaNodes.forEach((figmaNode) => {
     if (!figmaNode.visible) {
       return;

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Breadcrumb, BreadcrumbItem } from '@klearnow/klear360/components';
-import { HomeIcon } from '@klearnow/klear360/components';
-import { Box } from '@klearnow/klear360/components';
+import { Breadcrumb, BreadcrumbItem } from '@klearnow/compass/components';
+import { HomeIcon } from '@klearnow/compass/components';
+import { Box } from '@klearnow/compass/components';
 
 export const Default = () => (
   <Breadcrumb>

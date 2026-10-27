@@ -1,6 +1,0 @@
-node_modules/
-dist/
-.env
-.env.local
-# copied from packages/klear360-plugin/skills/klear360/references by scripts/copyKnowledgebase.mjs
-knowledgebase/

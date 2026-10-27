@@ -5,7 +5,7 @@ import type { StorybookConfig } from '@storybook/react-vite';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const bladeRoot = resolve(__dirname, '../packages/klear360');
+const bladeRoot = resolve(__dirname, '../packages/compass');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -25,11 +25,11 @@ const config: StorybookConfig = {
   },
 
   stories: [
-    '../../packages/klear360/docs/**/*.mdx',
-    '../../packages/klear360/docs/**/*.stories.@(ts|tsx|js|jsx)',
-    '../../packages/klear360/src/**/*.mdx',
-    '../../packages/klear360/src/**/*.stories.@(ts|tsx|js|jsx)',
-    '../../packages/klear360/src/**/*.internal.stories.@(ts|tsx|js|jsx)',
+    '../../packages/compass/docs/**/*.mdx',
+    '../../packages/compass/docs/**/*.stories.@(ts|tsx|js|jsx)',
+    '../../packages/compass/src/**/*.mdx',
+    '../../packages/compass/src/**/*.stories.@(ts|tsx|js|jsx)',
+    '../../packages/compass/src/**/*.internal.stories.@(ts|tsx|js|jsx)',
   ],
 
   addons: [
@@ -48,7 +48,7 @@ const config: StorybookConfig = {
     GITHUB_REF: process.env.GITHUB_REF || '',
   }),
 
-  staticDirs: ['../../packages/klear360/public'],
+  staticDirs: ['../../packages/compass/public'],
 
   viteFinal: async (config) => {
     const { mergeConfig } = await import('vite');

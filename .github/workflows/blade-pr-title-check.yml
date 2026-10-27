@@ -1,4 +1,4 @@
-name: Klear360 PR Title Check
+name: Compass PR Title Check
 
 on:
   pull_request_target:

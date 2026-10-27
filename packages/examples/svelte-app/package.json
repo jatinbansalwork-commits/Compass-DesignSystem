@@ -2,7 +2,7 @@
   "name": "svelte-app",
   "private": true,
   "version": "0.0.1",
-  "description": "Example Vite 8 + Svelte 5 app on @klearnow/klear360-svelte, with a bundle size report",
+  "description": "Example Vite 8 + Svelte 5 app on @klearnow/compass-svelte, with a bundle size report",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,7 @@
     "lint": "oxlint src"
   },
   "dependencies": {
-    "@klearnow/klear360-svelte": "file:../../klear360-svelte",
+    "@klearnow/compass-svelte": "file:../../compass-svelte",
     "@klearnow/i18nify-js": "1.12.8",
     "svelte": "5.56.10"
   },

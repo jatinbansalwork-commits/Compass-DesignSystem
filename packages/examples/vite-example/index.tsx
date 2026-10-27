@@ -1,5 +1,5 @@
-import { Klear360Provider } from '@klearnow/klear360/components';
-import { paymentTheme } from '@klearnow/klear360/tokens';
+import { CompassProvider } from '@klearnow/compass/components';
+import { paymentTheme } from '@klearnow/compass/tokens';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
@@ -12,9 +12,9 @@ const root = createRoot(rootElement);
 
 root.render(
   <StrictMode>
-    <Klear360Provider themeTokens={paymentTheme} colorScheme="light">
+    <CompassProvider themeTokens={paymentTheme} colorScheme="light">
       <App />
-    </Klear360Provider>
+    </CompassProvider>
   </StrictMode>,
 );
 

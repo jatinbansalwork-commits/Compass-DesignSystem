@@ -63,7 +63,7 @@
 |-------|-------|
 | **Device** | {iPhone 16 Pro / etc.} |
 | **OS** | {iOS 18.x} |
-| **App** | {Klear360Showcase / unavailable} |
+| **App** | {CompassShowcase / unavailable} |
 | **Component Found** | {yes / no / app unavailable} |
 
 ### Screenshots Captured

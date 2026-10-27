@@ -10,7 +10,7 @@
  * -> `.npmrc` doesn't support multiple registries on one scope.
  *  Internal users may have `@klearnow` scope pointing at GitHub Packages; publish scripts target npmjs.org for public packages.
  *
- * Checkout description of this PR for more context -> https://github.com/klearnow/klear360/pull/757
+ * Checkout description of this PR for more context -> https://github.com/klearnow/compass/pull/757
  *
  */
 
@@ -46,7 +46,7 @@ try {
   // Now you can use the array of objects
   for (const pkg of publishedPackages) {
     const packagePath = getPackagePath(pkg.name);
-    console.log(`[klear360]: Publishing ${pkg.name}@${pkg.version} on NPM ✨`);
+    console.log(`[compass]: Publishing ${pkg.name}@${pkg.version} on NPM ✨`);
 
     execa.commandSync('npm publish', {
       cwd: path.join(MONOREPO_ROOT, packagePath),

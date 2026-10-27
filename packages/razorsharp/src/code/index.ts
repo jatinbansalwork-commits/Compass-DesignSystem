@@ -1,14 +1,14 @@
-import { generateKlear360Code } from './blade/main';
+import { generateCompassCode } from './blade/main';
 import { generateImportsCode } from './blade/utils/imports';
-import { convertIntoKlear360Nodes } from './figmaUtils/convertIntoNodes';
-import type { Klear360Node } from './types/Klear360';
+import { convertIntoCompassNodes } from './figmaUtils/convertIntoNodes';
+import type { CompassNode } from './types/Compass';
 
 if (figma.editorType === 'dev' && figma.mode === 'codegen') {
   // Register a callback to the "generate" event
   figma.codegen.on('generate', ({ node }) => {
-    const convertedSelection: Klear360Node[] = convertIntoKlear360Nodes([node], null);
+    const convertedSelection: CompassNode[] = convertIntoCompassNodes([node], null);
 
-    const { component, imports } = generateKlear360Code({
+    const { component, imports } = generateCompassCode({
       bladeNodes: convertedSelection,
     });
 

@@ -1,13 +1,13 @@
 # API Decision Critique
 
-Evaluate component API decisions against Klear360's established patterns. Surface only real inconsistencies — not stylistic preferences.
+Evaluate component API decisions against Compass's established patterns. Surface only real inconsistencies — not stylistic preferences.
 
 ## Grounding step
 
 Before reviewing, sample 3–5 similar existing components to confirm current conventions:
 
 ```bash
-ls packages/klear360/src/components/
+ls packages/compass/src/components/
 ```
 
 Use their type definitions as the source of truth — API decision docs may be outdated.
@@ -19,7 +19,7 @@ Use their type definitions as the source of truth — API decision docs may be o
 - **Accessibility**: `accessibilityLabel` (not `ariaLabel`, `aria-label`, `a11yLabel`)
 - **Test hooks**: `testID` (not `data-testid`, `dataTestId`)
 - **Size**: `size` prop with token values (`xsmall`, `small`, `medium`, `large`, `xlarge`) — not `isSmall`/`isLarge` booleans
-- **Variant semantics**: `variant` for structural variants; `color` or `intent` only where a well-established Klear360 pattern already exists
+- **Variant semantics**: `variant` for structural variants; `color` or `intent` only where a well-established Compass pattern already exists
 
 ## Component naming conventions
 

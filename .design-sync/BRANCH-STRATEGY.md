@@ -53,7 +53,7 @@ vim .design-sync/previews/Button.tsx
 # Rebuild affected components
 node .ds-sync/lib/preview-rebuild.mjs \
   --config .design-sync/config.json \
-  --node-modules packages/klear360/node_modules \
+  --node-modules packages/compass/node_modules \
   --out ds-bundle \
   --components Button
 
@@ -121,7 +121,7 @@ If the branch is kept long-term:
 
 **Option 2: Minimal CI**
 - Run only linting/formatting checks
-- Skip full test suite since previews don't affect Klear360 runtime
+- Skip full test suite since previews don't affect Compass runtime
 
 **Option 3: Design-sync specific CI**
 - Add workflow to rebuild bundle and validate on push
@@ -170,4 +170,4 @@ Until then, keep as separate branch for independent iteration.
 
 **Created**: 2026-06-19  
 **Status**: Active (awaiting initial branch creation)  
-**Maintainer**: Refer to Klear360 team ownership
+**Maintainer**: Refer to Compass team ownership

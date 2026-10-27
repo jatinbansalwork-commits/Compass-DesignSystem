@@ -13,13 +13,13 @@ This plugin is used to sync the tokens from Figma to Code.
 ## How a token push works
 
 The plugin is only the first half of the pipeline. The second half lives in
-`packages/klear360/scripts` and runs inside the `blade-tokens-upload.yml` workflow.
+`packages/compass/scripts` and runs inside the `blade-tokens-upload.yml` workflow.
 
 | Stage                                      | Where                                                     |
 | ------------------------------------------ | --------------------------------------------------------- |
 | Read Figma variables, validate, tag values | `src/plugin/makeColorTokens.ts`, `validateColorTokens.ts` |
 | gzip + base64, dispatch the workflow       | `src/app/api/api.ts`                                      |
-| Write source files, verify, open the PR    | `packages/klear360/scripts/uploadTokens.js`                  |
+| Write source files, verify, open the PR    | `packages/compass/scripts/uploadTokens.js`                  |
 
 ### The payload is sent in two shapes
 
@@ -52,7 +52,7 @@ Figma variables become one of three things in TypeScript, and the plugin says wh
 | `t`  | a template literal | `` `hsla(0, 0%, 0%, ${opacity[8]})` `` |
 
 An alias is written bare only when it resolves to one of `expressionRoots` in
-`packages/klear360/scripts/tokenTargets.json`. Everything else becomes a string. The write side then
+`packages/compass/scripts/tokenTargets.json`. Everything else becomes a string. The write side then
 re-reads what it produced and fails if any bare value cannot be resolved from the imports of the
 file it landed in.
 
@@ -63,8 +63,8 @@ Two places, both of which will complain if you miss the other:
 1. `FIGMA_MODE_THEME_MAP` in `src/plugin/makeColorTokens.ts` — maps the Figma mode prefix
    (`blade`, `bladeNeutral`) to the code theme name. An unmapped mode is reported as an error
    rather than dropped.
-2. `themes` in `packages/klear360/scripts/tokenTargets.json` — lists every file the theme is written
-   into. `blade` and `klear360-core` keep identical copies, so both belong in the list. A theme in
+2. `themes` in `packages/compass/scripts/tokenTargets.json` — lists every file the theme is written
+   into. `blade` and `compass-core` keep identical copies, so both belong in the list. A theme in
    the payload with no entry here blocks the push.
 
 ### Tokens that live in code, not Figma
@@ -73,7 +73,7 @@ A push regenerates the whole declaration from the payload, so a token Figma has 
 deleted. Deprecated aliases are exactly that — they are kept for consumers, not authored in Figma —
 which is how `popup.[background|border].[subtle|intense]` got dropped from a PR.
 
-`preservedTokenPaths` in `packages/klear360/scripts/tokenTargets.json` lists the paths to carry over
+`preservedTokenPaths` in `packages/compass/scripts/tokenTargets.json` lists the paths to carry over
 verbatim, comments included. `*` matches one segment, so a leading `*` covers both modes:
 
 ```json
@@ -102,20 +102,20 @@ as warnings rather than blocked.
 
 ## How an icon push works
 
-**Export Klear360 Icons** works the same way, through `blade-icons-upload.yml` and
-`packages/klear360/scripts/uploadIcons.mjs`.
+**Export Compass Icons** works the same way, through `blade-icons-upload.yml` and
+`packages/compass/scripts/uploadIcons.mjs`.
 
 | Stage                                         | Where                                    |
 | --------------------------------------------- | ---------------------------------------- |
 | Name and export the selected icons as SVG     | `src/plugin/getIcons.ts`                 |
 | gzip + base64, dispatch the workflow          | `src/app/api/api.ts`                     |
-| Generate components, snapshots, typecheck, PR | `packages/klear360/scripts/uploadIcons.mjs` |
+| Generate components, snapshots, typecheck, PR | `packages/compass/scripts/uploadIcons.mjs` |
 
 Select a frame of icons, a variant set, or the icons themselves. A variant is named after its set
 plus every value that differs from the set's default variant, so `star` / `variant=filled` becomes
 `StarFilledIcon`. Icons whose generated code already matches the repo are left out of the PR.
 
-The PR generates icons in `@klearnow/klear360` and runs a typecheck plus web and native snapshots.
+The PR generates icons in `@klearnow/compass` and runs a typecheck plus web and native snapshots.
 A React icon is one component for web and native, because `Icons/_Svg` has a `.web` and a
 `.native` implementation of every element.
 
@@ -123,7 +123,7 @@ The workflow opens the PR as a draft when an icon is not drawn on a 24×24 frame
 generated, or when a check fails. To generate locally instead, use **Copy JSON** and run:
 
 ```bash
-cd packages/klear360
+cd packages/compass
 node ./scripts/uploadIcons.mjs ./scripts/icons.json --dry-run
 ```
 
@@ -132,7 +132,7 @@ node ./scripts/uploadIcons.mjs ./scripts/icons.json --dry-run
 The plugin logs the payload it posts. Save it, then:
 
 ```bash
-cd packages/klear360
+cd packages/compass
 node ./scripts/uploadTokens.js "$(cat payload.b64)" --dry-run --skip-typecheck --skip-snapshots
 ```
 

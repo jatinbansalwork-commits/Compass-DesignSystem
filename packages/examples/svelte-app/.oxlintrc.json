@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "jsPlugins": ["@klearnow/klear360-svelte/configs/lint"],
+  "jsPlugins": ["@klearnow/compass-svelte/configs/lint"],
   "rules": {
     "blade/no-conflicting-classes": "error",
     "blade/no-interpolated-classes": "error",

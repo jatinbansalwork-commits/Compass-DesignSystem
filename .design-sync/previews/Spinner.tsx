@@ -1,5 +1,5 @@
 import React from 'react';
-import { Spinner } from '@klearnow/klear360/components';
+import { Spinner } from '@klearnow/compass/components';
 
 export const Default = () => (
   <Spinner />

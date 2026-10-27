@@ -1,13 +1,13 @@
-name: Klear360 MCP Validate
+name: Compass MCP Validate
 
 on:
   pull_request:
     paths:
-      - 'packages/klear360-mcp/**'
-      - 'packages/klear360-plugin/**'
+      - 'packages/compass-mcp/**'
+      - 'packages/compass-plugin/**'
       - 'scripts/syncPluginManifestVersion.js'
-      - 'scripts/validateKlear360Plugin.mjs'
-      - '.github/workflows/klear360-mcp-validate.yml'
+      - 'scripts/validateCompassPlugin.mjs'
+      - '.github/workflows/compass-mcp-validate.yml'
 
 permissions:
   checks: write
@@ -27,14 +27,14 @@ jobs:
           node-version: 22
       - name: Setup Cache & Install Dependencies
         uses: ./.github/actions/install-dependencies
-      - name: Validate Klear360 Plugin
-        run: yarn validate:klear360-plugin
+      - name: Validate Compass Plugin
+        run: yarn validate:compass-plugin
       - name: Run Unit Tests
         run: yarn test
-        working-directory: packages/klear360-mcp
+        working-directory: packages/compass-mcp
       - name: Check Knowledgebase Ships In Tarball
         run: |
           rm -rf knowledgebase
           npm pack --dry-run 2>&1 | grep 'knowledgebase/components/Button.md'
-        working-directory: packages/klear360-mcp
+        working-directory: packages/compass-mcp
 

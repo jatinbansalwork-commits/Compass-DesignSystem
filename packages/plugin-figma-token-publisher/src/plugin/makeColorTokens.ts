@@ -15,15 +15,15 @@ import type {
 } from './tokenTypes';
 import { EXPRESSION, STRING, TEMPLATE, toLegacyTokenTree } from './tokenTypes';
 
-const THEME_TOKENS_COLLECTION = 'Klear360 Theme Tokens';
+const THEME_TOKENS_COLLECTION = 'Compass Theme Tokens';
 
 const GLOBAL_TOKENS_COLLECTION = '_global-tokens';
 
 // Figma modes are named `<figmaThemePrefix><separator><scheme>` (eg: blade/onLight,
 // bladeNeutral - onDark). This maps the Figma theme prefix to the corresponding code theme name.
 const FIGMA_MODE_THEME_MAP: Record<string, string> = {
-  blade: 'klear360Theme',
-  bladeNeutral: 'klear360NeutralTheme',
+  blade: 'compassTheme',
+  bladeNeutral: 'compassNeutralTheme',
 };
 
 // Identifiers a token value may be written unquoted against. They correspond to the imports the

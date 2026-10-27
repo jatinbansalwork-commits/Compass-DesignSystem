@@ -8,7 +8,7 @@
 # resolve-comments skill does NOT mark threads resolved — we read reactions.
 #
 # A new commit (pull_request synchronize) drops the label immediately. The
-# label is earned again only when Klear360 Validate completes via workflow_run.
+# label is earned again only when Compass Validate completes via workflow_run.
 #
 # WHY workflow_run and NOT check_suite: GitHub does not fire check_suite for
 # Actions-created suites.
@@ -25,7 +25,7 @@ name: Agentic Repo / Agentic Merge Ready
 on:
   workflow_run:
     workflows:
-      - "Klear360 Validate"
+      - "Compass Validate"
       - "Agentic Repo / Slash Auto-Resolve PR Comments"
     types: [completed]
   pull_request:

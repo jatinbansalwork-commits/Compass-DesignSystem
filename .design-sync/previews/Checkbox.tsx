@@ -1,5 +1,5 @@
 import React from 'react';
-import { Checkbox } from '@klearnow/klear360/components';
+import { Checkbox } from '@klearnow/compass/components';
 
 export const Default = () => (
   <Checkbox>I agree to Terms and Conditions</Checkbox>

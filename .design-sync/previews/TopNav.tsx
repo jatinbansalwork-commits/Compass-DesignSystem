@@ -10,7 +10,7 @@ import {
   Avatar,
   IconButton,
   SearchInput,
-} from '@klearnow/klear360/components';
+} from '@klearnow/compass/components';
 import {
   HomeIcon,
   AcceptPaymentsIcon,
@@ -19,7 +19,7 @@ import {
   MagicCheckoutFilledIcon,
   ActivityIcon,
   AnnouncementIcon,
-} from '@klearnow/klear360/components';
+} from '@klearnow/compass/components';
 
 const KlearnowLogo = () => (
   <svg width="120" height="24" viewBox="0 0 120 24" fill="white">

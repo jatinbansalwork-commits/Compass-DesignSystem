@@ -4,7 +4,7 @@
 >
 > This is alpha software. Things may break and code may not be generated correctly. Please report any issues you find.
 
-Razorsharp is a Figma plugin that generates code for the Klear360 design system.
+Razorsharp is a Figma plugin that generates code for the Compass design system.
 
 ## Watch a demo
 
@@ -22,7 +22,7 @@ Razorsharp is a Figma plugin that generates code for the Klear360 design system.
 
 Do not expect this plugin to generate 100% production ready code. To get the most out of this plugin:
 
-- Ask designers to always use Klear360 components in Figma
+- Ask designers to always use Compass components in Figma
 - Ask designers to use Auto Layout in Figma
 - Generate code per design section instead of the whole page
 

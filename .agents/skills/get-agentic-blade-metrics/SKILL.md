@@ -1,6 +1,6 @@
 ---
 name: get-agentic-blade-metrics
-description: Get agentic metrics for the `klearnow/klear360` repo.
+description: Get agentic metrics for the `klearnow/compass` repo.
 disable-model-invocation: true
 ---
 

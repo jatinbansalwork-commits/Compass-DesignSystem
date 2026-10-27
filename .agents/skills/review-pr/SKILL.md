@@ -1,10 +1,10 @@
 ---
 name: review-pr
-description: Review blade PRs by fetching diff, checking CI status, and getting Storybook URL. Use when reviewing PRs, checking PR status, or getting preview links for klearnow/klear360 PRs.
+description: Review blade PRs by fetching diff, checking CI status, and getting Storybook URL. Use when reviewing PRs, checking PR status, or getting preview links for klearnow/compass PRs.
 disable-model-invocation: true
 ---
 
-# Review Klear360 PR
+# Review Compass PR
 
 ## Arguments / Clarifications
 
@@ -50,11 +50,11 @@ disable-model-invocation: true
 Run these in parallel:
 
 ```bash
-gh api repos/klearnow/klear360/pulls/{PR_NUMBER}/files --jq '[.[] | select(.filename | test("lock$|lock\\.json$|lock\\.yaml$") | not) | {filename, patch}]'
+gh api repos/klearnow/compass/pulls/{PR_NUMBER}/files --jq '[.[] | select(.filename | test("lock$|lock\\.json$|lock\\.yaml$") | not) | {filename, patch}]'
 ```
 
 ```bash
-gh pr view {PR_NUMBER} --repo klearnow/klear360 --json title,body
+gh pr view {PR_NUMBER} --repo klearnow/compass --json title,body
 ```
 
 Store the outputs as `DIFF`, `PR_TITLE`, and `PR_BODY`.
@@ -134,12 +134,12 @@ EOF
 node .agents/skills/review-pr/scripts/post-review.js /tmp/blade-review-{PR_NUMBER}.json {PR_NUMBER}
 
 # If ShouldPostComment is false:
-node .agents/skills/review-pr/scripts/post-review.js /tmp/blade-review-{PR_NUMBER}.json {PR_NUMBER} klearnow/klear360 --pending
+node .agents/skills/review-pr/scripts/post-review.js /tmp/blade-review-{PR_NUMBER}.json {PR_NUMBER} klearnow/compass --pending
 ```
 
 When `--pending` is used, the script prints the review ID and a command to submit it when ready:
 
 ```bash
 # To submit the pending review later:
-gh api repos/klearnow/klear360/pulls/{PR_NUMBER}/reviews/{REVIEW_ID}/events --method POST --field event=COMMENT
+gh api repos/klearnow/compass/pulls/{PR_NUMBER}/reviews/{REVIEW_ID}/events --method POST --field event=COMMENT
 ```

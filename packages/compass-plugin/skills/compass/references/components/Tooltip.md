@@ -1,0 +1,138 @@
+## Component Name
+
+Tooltip
+
+## Description
+
+The Tooltip component provides additional context about elements or their functions. It's triggered by mouse hover on desktop and on tap on mobile devices. Tooltips appear in a small overlay that floats near its target element, offering supplementary information without disrupting the main workflow.
+
+## TypeScript Types
+
+These types represent the props that the Tooltip component and its subcomponents accept.
+
+```typescript
+import type { UseFloatingOptions } from '@floating-ui/react';
+
+// Spacing token string like 'spacing.4', or a CSS length like '200px'
+type SpacingValueType = `spacing.${number}` | `${number}px` | `${number}%`;
+
+// Main Tooltip component props
+type TooltipProps = {
+  /**
+   * Tooltip title
+   */
+  title?: string;
+  /**
+   * Tooltip content
+   */
+  content: string;
+  /**
+   * Placement of tooltip
+   *
+   * @default "top"
+   */
+  placement?: Exclude<
+    UseFloatingOptions['placement'],
+    'left-end' | 'left-start' | 'right-end' | 'right-start'
+  >;
+  children: React.ReactElement;
+  onOpenChange?: ({ isOpen }: { isOpen: boolean }) => void;
+  /**
+   * Sets the z-index of the modal
+   * @default 1100
+   */
+  zIndex?: number;
+  /**
+   * Sets the maximum width of the tooltip content
+   * @default 200px
+   */
+  maxWidth?: SpacingValueType | 'auto' | 'none' | 'initial' | 'fit-content' | 'max-content' | 'min-content';
+} & DataAnalyticsAttribute;
+
+// Props for TooltipInteractiveWrapper - used for non-interactive triggers like icons
+// Accepts children and Box-like layout/styling props (margin, padding, display, etc.)
+type TooltipInteractiveWrapperProps = { children?: React.ReactNode } & StyledPropsCompass;
+```
+
+## Usage Guidelines
+
+**Do**
+
+- Use `Tooltip` for brief, supplementary hover help (icon explanations, abbreviations, feature hints).
+- Pass `content` as a string — Tooltip only accepts plain text, not React elements.
+- Use `TooltipInteractiveWrapper` when the trigger is a non-interactive element (icon, badge).
+- Use sparingly — too many tooltips create a noisy experience.
+
+**Don't**
+
+- Don't put interactive elements (buttons, links) inside Tooltip — it's read-only; use `Popover` for interactive content.
+- Don't use `Tooltip` for critical information — users may not hover to discover it.
+- Don't pass React elements to `content` — only strings are accepted (unlike Popover).
+- Don't use non-interactive triggers without `TooltipInteractiveWrapper`.
+- Don't use `Tooltip` when click-triggered contextual content is needed — use `Popover` instead.
+
+## Example
+
+### Basic Usage
+
+This example shows the simplest implementation of a Tooltip component providing additional information for a button element.
+
+```tsx
+import { Tooltip, Button } from '@klearnow/compass/components';
+
+function BasicTooltipExample() {
+  return (
+    <Tooltip content="Additional information about this action" placement="bottom">
+      <Button>Hover over me</Button>
+    </Tooltip>
+  );
+}
+```
+
+### Tooltip with Title
+
+This example demonstrates a Tooltip with both a title and content, including a callback function that triggers when the tooltip opens or closes.
+
+```tsx
+import { Tooltip, Button } from '@klearnow/compass/components';
+
+function TooltipWithTitleExample() {
+  return (
+    <Tooltip
+      title="Important Information"
+      content="This action will submit your form data"
+      placement="top"
+      onOpenChange={({ isOpen }) => console.log(`Tooltip is ${isOpen ? 'open' : 'closed'}`)}
+    >
+      <Button>Submit Form</Button>
+    </Tooltip>
+  );
+}
+```
+
+### Using with Non-Interactive Elements
+
+This example shows how to properly implement tooltips on non-interactive elements like icons by using the TooltipInteractiveWrapper to ensure accessibility.
+
+```tsx
+import {
+  Tooltip,
+  TooltipInteractiveWrapper,
+  InfoIcon,
+  Box,
+  Text,
+} from '@klearnow/compass/components';
+
+function NonInteractiveTooltipExample() {
+  return (
+    <Box display="flex" alignItems="center" gap="spacing.2">
+      <Text>Transaction Details</Text>
+      <Tooltip content="View detailed information about this transaction" placement="bottom-start">
+        <TooltipInteractiveWrapper>
+          <InfoIcon size="medium" />
+        </TooltipInteractiveWrapper>
+      </Tooltip>
+    </Box>
+  );
+}
+```

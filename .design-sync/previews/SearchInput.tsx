@@ -1,5 +1,5 @@
 import React from 'react';
-import { SearchInput } from '@klearnow/klear360/components';
+import { SearchInput } from '@klearnow/compass/components';
 
 export const Default = () => (
   <SearchInput

@@ -16,11 +16,11 @@ on:
         type: string
   workflow_run:
     workflows:
-      - 'Klear360 Interaction Tests'
-      - 'Klear360 Bundle Size'
-      - 'Klear360 Chromatic'
-      - 'Klear360 Release'
-      - 'Agentic Klear360 Metrics'
+      - 'Compass Interaction Tests'
+      - 'Compass Bundle Size'
+      - 'Compass Chromatic'
+      - 'Compass Release'
+      - 'Agentic Compass Metrics'
     types: [completed]
     branches:
       - master

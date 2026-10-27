@@ -1,4 +1,4 @@
-name: Klear360 Tokens Upload
+name: Compass Tokens Upload
 
 on: 
   workflow_dispatch:
@@ -27,7 +27,7 @@ jobs:
       - name: Setup Cache & Install Dependencies
         uses: ./.github/actions/install-dependencies
       - name: Upload Tokens
-        working-directory: packages/klear360
+        working-directory: packages/compass
         run: node ./scripts/uploadTokens.js '${{ env.TOKEN_DATA }}'
         env: 
           GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}

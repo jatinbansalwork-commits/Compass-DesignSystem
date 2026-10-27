@@ -1,30 +1,30 @@
 blade:
   - changed-files:
-      - any-glob-to-any-file: ['packages/klear360/**']
+      - any-glob-to-any-file: ['packages/compass/**']
 
-klear360-svelte:
+compass-svelte:
   - changed-files:
-      - any-glob-to-any-file: ['packages/klear360-svelte/**']
+      - any-glob-to-any-file: ['packages/compass-svelte/**']
 
-klear360-core:
+compass-core:
   - changed-files:
-      - any-glob-to-any-file: ['packages/klear360-core/**']
+      - any-glob-to-any-file: ['packages/compass-core/**']
 
-klear360-mcp:
+compass-mcp:
   - changed-files:
-      - any-glob-to-any-file: ['packages/klear360-mcp/**']
+      - any-glob-to-any-file: ['packages/compass-mcp/**']
 
-klear360-plugin:
+compass-plugin:
   - changed-files:
-      - any-glob-to-any-file: ['packages/klear360-plugin/**']
+      - any-glob-to-any-file: ['packages/compass-plugin/**']
 
 react-native:
   - changed-files:
       - any-glob-to-any-file:
-          - 'packages/klear360/**/*.native.*'
-          - 'packages/klear360/android/**'
-          - 'packages/klear360/ios/**'
-          - 'packages/klear360/.storybook/react-native/**'
+          - 'packages/compass/**/*.native.*'
+          - 'packages/compass/android/**'
+          - 'packages/compass/ios/**'
+          - 'packages/compass/.storybook/react-native/**'
 
 ci:
   - changed-files:
@@ -37,9 +37,9 @@ figma-plugins:
           - 'packages/plugin-blade-*/**'
           - 'packages/widget-figma-*/**'
 
-eslint-plugin-klear360:
+eslint-plugin-compass:
   - changed-files:
-      - any-glob-to-any-file: ['packages/eslint-plugin-klear360/**']
+      - any-glob-to-any-file: ['packages/eslint-plugin-compass/**']
 
 examples:
   - changed-files:

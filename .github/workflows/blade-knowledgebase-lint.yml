@@ -23,9 +23,9 @@ jobs:
           node-version: 22
       - name: Setup Cache & Install Dependencies
         uses: ./.github/actions/install-dependencies
-      - name: Build Klear360
+      - name: Build Compass
         run: yarn build
-        working-directory: packages/klear360
+        working-directory: packages/compass
       - name: Run Lint Script
         run: yarn tsc:knowledgebase
 
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Cache & Install Dependencies
         uses: ./.github/actions/install-dependencies
       # Compiles every svelte example, checks its imports and props against
-      # the source, and runs Klear360's class lint on it; no build needed.
+      # the source, and runs Compass's class lint on it; no build needed.
       - name: Run Svelte Lint Script
         run: yarn tsc:knowledgebase --target svelte
 
@@ -58,7 +58,7 @@ jobs:
           node-version: 22
       - name: Setup Cache & Install Dependencies
         uses: ./.github/actions/install-dependencies
-      # Compares knowledgebase doc types with Klear360 source types. Exceptions go in
+      # Compares knowledgebase doc types with Compass source types. Exceptions go in
       # scripts/knowledgebaseDriftIgnore.json (react) and
       # scripts/knowledgebaseDriftIgnore.svelte.json (svelte)
       - name: Run Drift Check
