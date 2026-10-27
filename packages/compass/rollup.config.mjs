@@ -135,9 +135,9 @@ const getWebConfig = (inputs) => {
   };
 };
 
-// This is a special config for klear360Coverage.ts
+// This is a special config for compassCoverage.ts
 // We need to bundle it as cjs so that we can use it in playwright tests https://github.com/microsoft/playwright/issues/23662
-const getKlear360CoverageConfig = (inputs) => {
+const getCompassCoverageConfig = (inputs) => {
   const platform = 'web';
   const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development';
 
@@ -260,13 +260,13 @@ const config = () => {
   const components = 'src/components/index.ts';
   const tokens = 'src/tokens/index.ts';
   const utils = 'src/utils/index.ts';
-  const klear360Coverage = 'src/utils/klear360Coverage.ts';
+  const compassCoverage = 'src/utils/compassCoverage.ts';
   if (framework === 'REACT') {
     return [
       getWebConfig(components),
       getWebConfig(tokens),
       getWebConfig(utils),
-      getKlear360CoverageConfig(klear360Coverage),
+      getCompassCoverageConfig(compassCoverage),
       // Unfortunately we cannot just simply copy the tsc emitted declarations and put it on build dir,
       // because moduleSuffixes will cause typescript to resolve the d.ts files based on the user's tsconfig.json
       // which will cause the build to fail because the user's tsconfig.json does not have the moduleSuffixes
