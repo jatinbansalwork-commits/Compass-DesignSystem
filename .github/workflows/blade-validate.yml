@@ -1,0 +1,263 @@
+name: Klear360 Validate
+
+on: [pull_request]
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
+env:
+  GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+
+jobs:
+  validate:
+    name: Validate Source Code
+    runs-on: ubuntu-latest # nosemgrep: non-self-hosted-runner
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v3
+      - name: Use Node v22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - name: Pre-Generate Documentation Lock File
+        run: yarn generate-docs-lockfile
+      - name: Setup Cache & Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Build Klear360 Core
+        run: yarn build
+        working-directory: packages/klear360-core
+      - name: Build Klear360
+        run: yarn build
+        working-directory: packages/klear360
+      - name: Lint Klear360
+        run: yarn lint:klear360
+      - name: Check klear360 version bump when components or tokens change
+        run: |
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '^packages/klear360/src/(components|tokens)/' | wc -l | tr -d ' ')
+          if [ "$CHANGED" -gt 0 ]; then
+            VERSION_BUMPED=$(git diff origin/${{ github.base_ref }}...HEAD -- packages/klear360/package.json | grep -E '^\+.*"version"' | wc -l | tr -d ' ')
+            if [ "$VERSION_BUMPED" -eq 0 ]; then
+              echo "ERROR: Component or token files changed in packages/klear360 — a version bump in package.json is required"
+              exit 1
+            fi
+          fi
+      - name: Prettier check klear360 source
+        run: yarn prettier --check "packages/klear360/src/**/*.{ts,tsx}" --ignore-path packages/klear360/.prettierignore
+      - name: Lint Klear360 Core
+        run: yarn lint:klear360-core
+      - name: Lint Klear360 Svelte
+        run: yarn lint:klear360-svelte
+      - name: Lint Klear360 MCP
+        run: yarn lint:klear360-mcp
+      - name: Lint ESLint Plugin
+        run: yarn lint:eslint-plugin
+      - name: Lint Stylelint
+        run: yarn lint:stylelint
+      - name: Run TypeScript Checks (Klear360)
+        run: yarn typecheck
+        working-directory: packages/klear360
+      - name: Run TypeScript Checks (Klear360 Core)
+        run: yarn typecheck
+        working-directory: packages/klear360-core
+      - name: Run Svelte Checks (Klear360 Svelte)
+        run: yarn svelte-check
+        working-directory: packages/klear360-svelte
+
+  test:
+    name: Run Tests (${{ matrix.shard }})
+    runs-on: ubuntu-latest # nosemgrep: non-self-hosted-runner
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+        totalShards: [4]
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v3
+      - name: Use Node v22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - name: Setup Cache & Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Run Unit Tests
+        run: yarn test
+        working-directory: packages/klear360
+        env:
+          SHARD: ${{ matrix.shard }}/${{ matrix.totalShards }}
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage-report-${{ matrix.shard }}
+          path: packages/klear360/coverage
+          retention-days: 1
+
+  svelte-test:
+    name: Run Svelte Tests
+    runs-on: ubuntu-latest # nosemgrep: non-self-hosted-runner
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v3
+      - name: Use Node v22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - name: Setup Cache & Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Run Unit Tests
+        run: yarn test
+        working-directory: packages/klear360-svelte
+      # klear360-svelte's icons are made from Klear360 React's: an icon added or changed
+      # in React without `yarn icons:generate` leaves them behind.
+      # Optional: the step fails with a warning, the job does not.
+      - name: Check Svelte Icons Match React
+        # Runs even when the tests fail, so the warning is never hidden
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        working-directory: packages/klear360-svelte
+        run: |
+          yarn icons:check || {
+            echo "::warning title=klear360-svelte icons out of date::Run 'yarn workspace @klearnow/klear360-svelte icons:generate' and commit the result."
+            exit 1
+          }
+
+  svelte-e2e:
+    name: Run Svelte E2E Tests
+    runs-on: ubuntu-latest # nosemgrep: non-self-hosted-runner
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2 # PR merge commit + its first parent (base branch tip)
+      # HEAD is the PR merge commit, so diffing against its first parent gives the PR's changed files.
+      - name: Detect klear360-svelte Changes
+        id: changes
+        run: |
+          git diff --name-only HEAD^1 HEAD | grep -q '^packages/klear360-svelte/' \
+            && echo "klear360-svelte=true" >> "$GITHUB_OUTPUT" \
+            || echo "No changes under packages/klear360-svelte, skipping E2E tests"
+      - name: Use Node v22
+        if: steps.changes.outputs.klear360-svelte == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - name: Setup Cache & Install Dependencies
+        if: steps.changes.outputs.klear360-svelte == 'true'
+        uses: ./.github/actions/install-dependencies
+      # Playwright's own browsers against the built Storybook: no credentials.
+      # The same specs run on real devices with `yarn test:e2e:browserstack`.
+      - name: Build & Run E2E Tests
+        if: steps.changes.outputs.klear360-svelte == 'true'
+        run: |
+          yarn --cwd ../klear360-core build
+          npx playwright install --with-deps chromium webkit
+          yarn build-storybook
+          yarn test:e2e
+        working-directory: packages/klear360-svelte
+      - name: Upload E2E Report
+        if: failure() && steps.changes.outputs.klear360-svelte == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: svelte-cx-e2e-report
+          path: |
+            packages/klear360-svelte/playwright-report
+            packages/klear360-svelte/test-results
+          retention-days: 7
+
+  coverage-report:
+    name: Generate Coverage Report
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Use Node v22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - name: Setup Cache & Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Download Coverage Reports
+        uses: actions/download-artifact@v4
+        with:
+          path: coverage-reports
+      - name: Debug Downloaded Artifacts
+        run: |
+          echo "Checking downloaded coverage reports..."
+          find coverage-reports -type f -name "*.json" | head -20
+          ls -la coverage-reports/
+      - name: Create Merged Coverage Report
+        run: |
+          # Create directory for nyc output
+          mkdir -p .nyc_output
+
+          # Find and copy all coverage-final.json files to .nyc_output with unique names
+          counter=1
+          find coverage-reports -name "coverage-final.json" | while read file; do
+            cp "$file" ".nyc_output/coverage-final-${counter}.json"
+            counter=$((counter + 1))
+          done
+
+          # List files in .nyc_output for debugging
+          echo "Files in .nyc_output:"
+          ls -la .nyc_output/
+
+          # Generate merged report and capture text-summary
+          yarn --silent nyc report --reporter=json --reporter=text-summary > coverage-summary.txt
+
+          # Generate full coverage report
+          yarn --silent nyc report --reporter=json --reporter=text > coverage-full.txt
+
+          # Ensure output directory exists
+          mkdir -p packages/klear360/coverage
+
+          # Copy the merged report to expected location
+          if [ -f "coverage/coverage-final.json" ]; then
+            cp coverage/coverage-final.json packages/klear360/coverage/
+            echo "Coverage file copied successfully"
+          else
+            echo "Error: coverage/coverage-final.json not found"
+            exit 1
+          fi
+      - name: Prepare Coverage Comment
+        run: |
+          echo '<!-- coverage-report-comment -->' > coverage-comment.md
+          echo '## 🛡️ Coverage Report' >> coverage-comment.md
+          echo '' >> coverage-comment.md
+          echo '### Summary' >> coverage-comment.md
+          echo '```' >> coverage-comment.md
+          cat coverage-summary.txt >> coverage-comment.md
+          echo '```' >> coverage-comment.md
+          echo '' >> coverage-comment.md
+          echo '<details>' >> coverage-comment.md
+          echo '<summary>Full Coverage Details</summary>' >> coverage-comment.md
+          echo '' >> coverage-comment.md
+          echo '```' >> coverage-comment.md
+          cat coverage-full.txt >> coverage-comment.md
+          echo '```' >> coverage-comment.md
+          echo '' >> coverage-comment.md
+          echo '</details>' >> coverage-comment.md
+      - name: Find existing coverage comment
+        uses: peter-evans/find-comment@v3
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'rzpcibot'
+          body-includes: '<!-- coverage-report-comment -->'
+      - name: Create or update coverage comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-file: coverage-comment.md
+          token: ${{ secrets.CI_BOT_TOKEN }}
+          edit-mode: replace

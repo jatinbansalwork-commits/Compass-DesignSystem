@@ -1,0 +1,43 @@
+name: Klear360 Interaction Tests
+
+# Runs the action when
+# 1. 'Run Interaction Tests' label is added to PR
+# 2. Workflow is trigerred manually
+# 3. PR is merged to master
+# 4. Any commit is pushed or merged
+
+
+on:
+  workflow_dispatch:
+# Interaction tests use Chromatic. Running them on every commit will quickly exhaust limited Chromatic usage.
+  pull_request:
+    types: [labeled]
+  push:
+    branches:
+      - 'master'
+env:
+  GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+
+jobs:
+  interaction-tests:
+    name: Run Interaction Tests
+    runs-on: ubuntu-latest # nosemgrep: non-self-hosted-runner
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.label.name == 'Run Interaction Tests' || github.event_name == 'push' }}
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v3
+      - name: Use Node v22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - name: Setup Cache & Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Install Playwright Dependencies Manually
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2t64 libffi8 libx264-dev
+      - name: Run Interaction Tests
+        run: |
+          node node_modules/@storybook/test-runner/node_modules/.bin/playwright install chromium chromium-headless-shell firefox --with-deps
+          yarn test:react:interaction:ci
+        working-directory: packages/klear360

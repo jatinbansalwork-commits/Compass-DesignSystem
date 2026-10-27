@@ -1,0 +1,9007 @@
+# @klearnow/klear360
+
+## 12.130.0
+
+### Minor Changes
+
+- fde07c801: feat(DotLoader): add `size="small"`
+
+  - `small` is `medium` scaled 0.75x: three 3px dots with 1.5px gaps inside an 18 x 18 box, matching the `Small` size of `_DotLoader` in Figma
+
+- be69e99d4: fix(FileUpload): refresh the uploaded-file row and drop area to match Figma
+
+  Uploaded-file row (`FileUploadItem`):
+
+  - The colour-coded file-type icon is replaced by a 40px tile with a generic file icon. A failed file shows a red info icon instead
+  - File name is 12px medium and the size or error line is 11px. The success check icon is 12px, 4px after the name
+  - Failed rows have a white background and no hover colour change. The red border stays
+  - A failed file inside `FileUpload` now offers only "Reupload", shown with its label. Reupload already removes the file before reopening the picker. When `FileUploadItem` is used directly with both `onReupload` and `onRemove`, it keeps the icon-only reupload button next to the trash button
+  - The reupload button only renders when `onReupload` is passed, and the trash button only renders when `onRemove` is passed
+  - Uploading rows read "Uploading {file name} ...". ChatInput attachments keep the plain file name
+  - Row heights are unchanged: 56px for small and medium, 64px for large and variable
+
+  Drop area:
+
+  - Border uses `interactive.border.gray.highlighted`, and `interactive.border.primary.faded` while a file is dragged over it (web) or it is pressed (native)
+  - Medium size has 8px corners (was 12px). Small stays 8px; large and variable stay 12px
+  - `size="variable"` shows a 56px circle with a generic file icon instead of the file-type icon, with 12px between the icon and the text
+  - The "Upload" link label is no longer underlined
+
+  **Behaviour change:** inside `FileUpload`, failed files (`status: 'error'`) no longer show a trash button, so `onRemove` is not called from a failed row. Clicking Reupload removes the file and reopens the picker, then calls `onReupload`, or `onRemove` when `onReupload` is not passed. In controlled mode, remove or replace the failed file from `fileList` inside `onReupload`.
+
+  No props were added, removed or renamed. The FileUpload knowledgebase doc notes that failed files offer only Reupload.
+
+### Patch Changes
+
+- ad6dc1094: feat(TextInput, SearchInput): show `DotLoader` instead of `Spinner` in the trailing slot when `isLoading` is set
+
+  Small and xsmall inputs use the 18px loader; medium and large use the 24px loader. On web the loader is now exposed with `role="status"` instead of `role="progressbar"`, so tests that query the loading indicator by role need updating.
+
+- 433e79047: fix(InputDropdownButton): update horizontal spacing to match Figma
+
+  - Inner left/right padding is now size-based: large 8/4px, medium 6/4px, small and xsmall 5/2px
+  - Gap between items reduced from 4px to 2px
+  - Chevron is 12px (medium, large) and 8px (small, xsmall); leading icon is 20px on large
+  - Label text is 12px on small and xsmall
+  - PhoneNumberInput flag is 18px wide on small and xsmall
+  - Button height and its gap to the input edge are unchanged
+
+- 6b87f17cd: fix(Input): show a single focus ring when a button inside an input is focused
+
+  The input's outer focus ring now only shows while its own text field is focused. Buttons inside the input, like the clear button, the show password button and the phone number country selector, keep their own focus ring, so the two no longer show together. ColorInput's swatch now has its own focus ring, and the country selector button shows its ring only for keyboard focus.
+
+  **If you pass a custom focusable element to `leading` or `trailing`:** the input's outer ring no longer shows while that element has focus, so the element needs its own visible focus ring. Klear360's `Button`, `IconButton` and `Link` already have one, so nothing changes when you use those. If you pass a hand-built element, such as a `div` with `tabIndex` or an unstyled `button`, give it a `:focus-visible` style so keyboard users can still see where focus is. Component props are unchanged.
+
+- e1580ccfd: fix(PhoneNumberInput): tighten spacing around country selector and dial code
+
+  - Country selector to dial code: 12px → 2px; dial code to number: 8px → 4px
+  - Without dial code, the number sits 2px after the country selector
+  - With a leading icon and no dial code, the number sits 4px after the icon
+  - Country selector to leading icon: 12px → 2px
+  - Country selector has an even gap from the field edge on all sides (2px on small and xsmall, 4px on medium and large)
+  - fix(BaseInput): prefix and suffix text now sit on the same baseline as the input text (fixes a 1px offset at medium size)
+
+## 12.129.0
+
+### Minor Changes
+
+- e38ee57c2: feat(SankeyChart): group small nodes into an expandable "Other" node; Klear360-owned layout on web
+
+  - `groupNodesBelow` folds every node under the given share of the total into one "Other" node per column (never a root, never a node with `isGroupable: false`, never a group of one). Ribbons are re-pointed and summed (a merged ribbon does not fire `onLinkClick`, like the group node and `onNodeClick`; `onExpandChange` covers it), the group is drawn in neutral grey with a chevron, and its tooltip lists the members with their shares
+  - Clicking a group, or pressing Enter/Space on its label, reveals the members in place at the same scale: every other bar and ribbon keeps its size, each revealed node gets room for its label, and the drawing grows below the container. Wrap the chart in a fixed-height `Box` with `overflowY="auto"` to scroll it. Clicking a revealed label folds the group again, and keyboard focus follows the toggle
+  - Expanded state follows the Accordion API: `defaultExpandedGroupDepths`, `expandedGroupDepths`, `onExpandChange`, keyed by zero-based column depth like Accordion's numeric `expandedIndex`, so expanded state can be authored statically. `formatGroupLabel` names the group
+  - The web chart now lays out through Klear360's own engine, a port of the recharts Sankey algorithm pinned by a parity test, and renders its own tooltip. Existing charts keep their exact geometry, tooltip text and callbacks: `onLinkClick` still receives the consumer's own link object for a plain ribbon, a chart whose links are all missing or invalid still renders nothing, and `width` / `height` on `ChartSankey` are still accepted (deprecated and ignored: the chart sizes itself from the wrapper)
+
+- 0e11cfb47: feat(SankeyChart): add `labelDensity` and `showColorIndicator` props; single-line labels on web
+
+  - `labelDensity="compact"` renders 20px label chips (4px vertical padding) instead of 28px, for charts whose columns stack many thin nodes
+  - `showColorIndicator` starts each label with a dot in the node's colour so a label can be matched to its bar and ribbons at a glance
+  - Labels on web are now always a single line: a name that does not fit the 200px label budget is truncated with an ellipsis (the tooltip keeps the full name) instead of wrapping onto a second line
+  - A share between 0 and 1 percent reads `<1%` instead of `0%`
+  - Right margin is reserved only for the last column's labels, measured from their actual text, so the chart no longer shrinks to make room for labels that sit between columns
+
+### Patch Changes
+
+- 332e19fd1: fix(TreeView): drop the empty chevron space when no row can expand
+
+  `TreeViewItem` rows reserve an empty chevron slot so leaves line up with branches. This is now decided once for the whole tree: the slot is kept on every row only when at least one row can expand (it has children or passes `hasChildren`). A fully flat tree drops the slot on every row, so it renders flush like `ActionList`, and `TreeViewLoadMore` drops its matching label offset too.
+
+  The `blade-mcp` knowledgebase doc for TreeView is updated with the rule, and recommends `ActionList` for data that can never nest.
+
+## 12.128.0
+
+### Minor Changes
+
+- 69fee199a: feat(FileUpload): add `size="small"`, allow `dropAreaText` on every size, and show an upload icon on the upload action
+
+  - `size="small"`: a 32px tall drop area with smaller text and corner radius
+  - `dropAreaText` now works with every size, not only `variable`. Pass `dropAreaText=""` to hide the "Drag files here or" text and show only the upload action. With `size="variable"`, `dropAreaText=""` now removes the empty text line instead of leaving a gap
+
+  **Visual change for all existing usages:** the "Upload" action inside the drop area now always shows an upload icon and uses neutral colours (dark text and icon, medium weight, still underlined) instead of the blue link, matching the Figma design. No code changes are needed, but snapshot tests that include FileUpload will need updating.
+
+  **Fix (web):** `errorText` now shows when `validationState="error"` even if `helpText` isn't set, and screen readers no longer hear "null" in place of the error.
+
+- 4e0548cb8: feat(Popover): switch hover popovers and tooltips in place
+
+  Popovers with `openInteraction="hover"` now join the same group as every `Tooltip` (the `FloatingDelayGroup` in `Klear360Provider`). Moving the pointer from one hover overlay to the next switches them in place: opening one closes whichever is showing, the replaced one disappears without fading out, and the new one appears without fading in. Only the first overlay of a hover streak fades in, and only the last one fades out. This works for controlled hover popovers too: being replaced calls `onOpenChange({ isOpen: false })`.
+
+  **Behaviour changes for hover popovers** (click popovers are unchanged). These fix behaviour that was not intended rather than change a designed API, so they ship as a minor release:
+
+  - **Not modal (bug fix).** Hover popovers used to be modal by accident: the `modal` setting was hard-coded for every popover, so a hover popover marked the rest of the page `aria-hidden` while the pointer rested on its trigger, hiding the page from screen readers. A hover popover now neither traps focus nor hides the page. Opening one still never moves focus into it (it already opened with no initial focus); the difference is that if the user clicks into it and presses Tab, focus can now leave it instead of cycling inside it.
+  - **Short close delay.** Leaving the trigger closes the popover after 80ms instead of immediately, which lets the next hover overlay replace it in place. Moving the pointer onto the popover cancels the close, so hover popovers are now easier to reach with the mouse.
+
+  **Tooltip:** tooltips switch the same way, as floating-ui recommends: a tooltip replaced by the next one disappears at once instead of fading out under it.
+
+  The `blade-mcp` Popover doc now describes hover popovers.
+
+- dca708181: feat(TreeView): show a Popover preview when hovering a `TreeViewItem`
+
+  `TreeViewItem` accepts a new `popover` prop (`{ title?, titleLeading?, content, footer?, placement?, maxWidth?, onOpenChange? }`) that shows a Popover when the row is hovered with a mouse, for rich previews such as an image of the screen an item represents. It opens to the right of the row by default. It does not open on keyboard focus or on touch screens, where a tap only selects the row, so its content should never be the only place information lives.
+
+  Moving the pointer from row to row switches previews in place, using the hover-popover switching built into Popover (klearnow/klear360#4044): the replaced preview disappears without fading out, and the new one appears without fading in.
+
+  The `blade-mcp` knowledgebase doc for TreeView is updated with the prop and an example.
+
+### Patch Changes
+
+- f42708331: fix(CounterInput): match Figma container sizes
+
+  Every size was rendering 2px taller and wider than the Figma frames because the 1px border was added on top of the Figma size. Containers are now 28/32/36/48px tall and 76/84/92/120px wide (xsmall/small/medium/large), with the buttons still 4px from each edge. On React web, the buttons now also stay pinned to the edges when the value is shorter than the minimum width.
+
+## 12.127.0
+
+### Minor Changes
+
+- 17337347f: feat(BarChart): compare bars against a min–max reference range
+
+  `ChartBarWrapper` can now show a shaded min–max range behind its bars, in two shapes:
+
+  1. **One range for the whole chart** — drop a `<ChartReferenceBand lowerDataKey upperDataKey>` into a `ChartBarWrapper`. Previously this rendered nothing, since only `ChartLineWrapper` had a band layer. The band is always visible and gets a legend swatch.
+
+  2. **A range per bar** — `<ChartBar>` accepts `rangeLowerDataKey`, `rangeUpperDataKey`, `rangeName`, `rangeColor` and `showRangeLegend`. In a grouped chart each bar can carry its own range; bands are revealed **on hover, one at a time**, so several ranges don't overlap into an unreadable wash. The band is colour-matched to its bar and anchored to that series' own bar centres.
+
+  While a band is declared, hovering a bar also fades the other series and shades the hovered category, so the revealed band reads against its own bar. **This is scoped to charts that declare a band** — a bar chart without one keeps exactly the category-wide hover highlight it has today.
+
+  **Tooltip** — hovering a bar shows its value and, on a second row, the range's min–max at that same data point. A standalone `<ChartReferenceBand>` now contributes its bounds to that row; previously only a series' own `range*` props did, so a chart-level band drew the shaded area but showed no range row. A bar's own `range*` props still win.
+
+  A band that declares no name is now labelled the same in the legend and in the tooltip. The two read the name by different routes, and the default was only applied on one of them — so a `<ChartBar>` with `range*` props but no `rangeName` got a legend swatch reading `Industry range` against a tooltip row reading `Industry`, both on screen at once when `showRangeLegend` was set.
+
+  `ChartReferenceBand` keeps its existing export from the shared chart components barrel — no import changes needed.
+
+  **Scope of the band** (each fails closed, rendering no band rather than one in the wrong place):
+
+  - Horizontal layout only — not drawn under `layout="vertical"`, whose geometry is not yet supported.
+  - Requires a string `dataKey` on the bar; recharts also allows a number or a function, which the band's DOM lookups can't name.
+  - Web only — the `range*` props are accepted but inert on React Native, and marked `@platform web`.
+  - Hover-revealed per-bar bands are a visual enhancement, not the carrier of the data: every value is also in the tooltip, which is reachable without a pointer.
+
+  Also fixes the alignment of the tooltip's range row, which affects **every chart** that shows one, LineChart included. Its indent was a hardcoded `spacing.5` (16px) standing in for the colour swatch plus its gap (`spacing.4` + `spacing.3` = 20px), so the range label sat 4px to the left of the series name above it.
+
+  The `blade-mcp` knowledgebase doc for BarChart is updated too, so AI agents know the band is available: its accepted-children constraint previously omitted `ChartReferenceBand` entirely.
+
+- b554977d3: feat: Button indefinite loading now uses the 3-dot loader from Figma
+
+  `Button`'s indefinite loading state now renders a 3-dot loader matching the `DotLoader` component in Figma on React web, React Native and Svelte: three 4px dots in a 24x24 frame that lift 5px and settle back in a staggered 1.2s wave, never dipping below the rest line. Under `prefers-reduced-motion` the loader holds the static Figma pose instead of animating.
+
+  The loader comes in two sizes. `size="large"` buttons are 48px tall, where the default loader reads as undersized, so they use a 1.5x-scaled loader (6px dots in a 36x36 frame); `xsmall` through `medium` buttons, at 28–36px tall, keep the default.
+
+  On React this replaces the spinner that `Button` rendered while `isLoading`. Loading colors are unchanged for every variant and color, and `FloatingActionButton`'s color override still applies. The standalone `Spinner` component is untouched.
+
+  On Svelte this fixes the existing dot loader, whose dot size, travel, opacity and timing did not match the design. The `--btn-dots-color` custom property continues to work as Button's dot-color hook.
+
+  The loader is available internally as a shared `DotLoader` component in both `@klearnow/klear360` and `@klearnow/klear360-svelte` so other components can reuse it. It is not part of either package's public API.
+
+  One note for tests that reach into the DOM: a React Button in its loading state no longer renders a `data-blade-component="spinner"` element. It renders `data-blade-component="dot-loader"` instead.
+
+### Patch Changes
+
+- 25a4f9448: feat(icons): add StarFilledIcon
+- 4330bbb57: fix(SliderInput): keep the thumb, fill and value indicator in sync while dragging
+
+  The thumb, the fill and the value indicator now read a single eased value, so the fill no longer trails behind the thumb during a fast drag. Dragging stays pinned to the pointer with no lag; when markers are shown, the thumb glides between steps instead of jumping. Browsers without `CSS.registerProperty` fall back to easing each element on its own, so the glide is kept everywhere.
+
+- 9a51379e7: fix(Toast): add missing drop shadow on web
+
+  Toast on web now renders the `midRaised` elevation drop shadow from the Figma design. The toast container gives the shadow room so it isn't clipped, while keeping the backdrop blur over stacked toasts intact.
+
+## 12.126.0
+
+### Minor Changes
+
+- db9ce3e43: feat(TreeView): add `size` prop with a new `small` size
+
+  `<TreeView size="small" />` renders a denser tree for sidebars, file trees and long
+  dropdown overlays, scaling the row height, title typography, chevron, checkbox and
+  indentation.
+  `size` is tree-wide and defaults to `medium`, so existing usage is unchanged.
+
+  `leading` and `trailing` are consumer-provided nodes and are not resized by TreeView. Size
+  them yourself: icons (leading and trailing) follow the tree's `size`, while trailing
+  Counters, Badges and Text stay `size="small"` at both tree sizes.
+
+  This also fixes the item title on `medium` missing its letter-spacing (now `-0.182px`, per
+  the design spec).
+
+### Patch Changes
+
+- 09c4283be: feat(SliderInput): animate the number in the value indicator
+
+  The value indicator now animates between values instead of swapping them outright, so a rising
+  value visibly rises and a falling one falls.
+
+## 12.125.0
+
+### Minor Changes
+
+- 67644e0df: feat: add BottomBar with shared BottomDock surface
+- eae82a35c: feat(CounterInput): add `small` size between `xsmall` and `medium`
+
+### Patch Changes
+
+- 23603710e: fix(ActionList): resolve scroll jitter in virtualized ActionList on initial scroll by replacing useState with useRef for visible indices and removing unnecessary cache resets
+
+## 12.124.0
+
+### Minor Changes
+
+- e914cf6a8: update design tokens from Figma
+
+  Added 18 tokens and removed 0 tokens.
+
+## 12.123.0
+
+### Minor Changes
+
+- 93c64dde1: feat(Input): add `showHelpTextOnFocus` to make help text contextual
+
+  - **TextInput, TextArea, PasswordInput, SearchInput, PhoneNumberInput**: added an opt-in `showHelpTextOnFocus` prop. When set, `helpText` stays collapsed at rest and eases in only while the input is focused, easing back out on blur — so it no longer occupies the row, or pushes content below it, when the user isn't in the field.
+  - `errorText` and `successText` are deliberately unaffected: validation feedback must never depend on focus, so it continues to render persistently and untransitioned.
+  - Defaults to `false`. With the prop unset, help text renders exactly as before — same markup, no transition — so this is fully backwards compatible.
+  - Motion is tokenised as `formHintMotion` in `formTokens.ts` (`duration.moderate` — 280ms — with `easing.entrance` in and `easing.exit` out), matching the shape of `baseInputBorderBackgroundMotion` so the border and the hint below it read as one coordinated focus transition.
+  - The help text is clipped rather than unmounted while collapsed, so the id referenced by `aria-describedby` / `accessibilityDescribedBy` stays resolvable and screen readers still announce it on focus.
+  - Additive and optional, so this is a `minor` bump rather than `major`: no public prop or prop value is removed or narrowed, and no default behaviour changes.
+  - **`@klearnow/klear360-svelte` parity is intentionally deferred, not overlooked.** blade-svelte now ships the same input family (BaseInput, TextInput, PasswordInput, SearchInput, PhoneNumberInput, OTPInput) with its own `helpText`, so this prop is a cross-package API divergence until it lands there too. React is deliberately first so the API is settled here before being mirrored; a follow-up should port `showHelpTextOnFocus` to blade-svelte.
+  - **`OTPInput` and `ColorInput` are out of scope**: both compose their own `FormHint` outside `BaseInput`'s footer, so they need separate wiring rather than inheriting the prop.
+  - **`SelectInput` / `AutoComplete` are out of scope**: their focus semantics are coupled to the dropdown's open state and they already offer `showHintsAsTooltip` as an alternative hint treatment, so gating their help text on focus needs its own design decision.
+  - Rationale for the prop name, the `BaseInput`-over-`FormHint` placement, and why the motion avoids the framer-motion primitives is documented in `BaseInput/_decisions/_decisions.md`.
+
+## 12.122.0
+
+### Minor Changes
+
+- ec066cfee: update design tokens from Figma
+
+  Added 10 tokens and removed 0 tokens.
+
+### Patch Changes
+
+- 1e8e987b3: fix(ActionList/Menu): vertically center `trailing` slot of items so that it aligns with the `title` and `leading` slot
+- 936678fd9: fix(SankeyChart): skip nodes and links with non-finite geometry so a node with no links no longer renders NaN SVG attributes
+
+## 12.121.1
+
+### Patch Changes
+
+- cdd0bf164: fix(ColorInput): align swatch sizing, spacing and radius with the Figma spec
+
+  - Resize the colour swatch to 16px (small), 20px (medium) and 24px (large), down from 24/28/40
+  - Inset the swatch 8px from the field edge, and 12px at large
+  - Reduce the swatch-to-hex gap to 8px at medium and large, so it is consistent across all sizes
+  - Use the 32% disabled opacity token instead of a hardcoded 50%
+  - Round the outer corners at 12px for `size="large"` instead of forcing 8px at every size
+
+- cdd0bf164: fix(ColorInput): align swatch sizing, spacing and radius with Figma spec
+
+## 12.121.0
+
+### Minor Changes
+
+- 4dd93e1a4: feat(FloatingActionButton): rename the dark color from `black` to `neutral` and align it with the neutral button tokens
+
+  `<FloatingActionButton color="black" />` becomes `<FloatingActionButton color="neutral" />`. The dark FAB is now the same treatment as a filled `neutral` button — it reads its surface from `interactive.background.neutral.*` and its label, icon and spinner from `interactive.*.onNeutral.*`, so it inverts with the theme instead of always being black on white. The hover surface is now slightly translucent and the disabled surface is lighter, matching the updated design.
+
+  On focus, the filled `neutral` surface now draws its ring from `interactive.border.neutral.faded` instead of the faded primary blue used everywhere else, matching the design.
+
+  `color="black"` was never exposed on `Button` and has no consumers, so it is removed rather than deprecated.
+
+- 4dd93e1a4: feat(Spinner): add an `onNeutral` color for spinners on a filled neutral surface
+
+  `<Spinner color="onNeutral" />` reads `interactive.icon.onNeutral.normal`, which inverts with the theme. Every other spinner color is either static (`white`) or tracks the page surface (`neutral`, the feedback colors), so none of them stayed visible on a filled `neutral` surface, which is black on light and white on dark.
+
+  A loading `Button color="neutral" variant="primary"` and `FloatingActionButton color="neutral"` now use it. Both previously hardcoded a static white spinner, which disappeared against the white surface in dark mode. Fixes #3915 for the `neutral` surface.
+
+## 12.120.0
+
+### Minor Changes
+
+- 9edbd8f33: update design tokens from Figma
+
+  Added 32 tokens and removed 0 tokens.
+
+## 12.119.1
+
+### Patch Changes
+
+- 83be08d99: feat(tokens): add new tokens - `onNeutral` has been added to `interactive.text` & `interactive.icon`
+
+## 12.119.0
+
+### Minor Changes
+
+- d20559e43: feat(blade): add razorsense dark mode
+
+### Patch Changes
+
+- 15e71cc6b: fix(Button): use `interactive.border.staticBlack.fadedHighlighted` for the white primary button's border shadow
+
+  The white `primary` button's second inner shadow — the 0.5px spread one that draws the button's border — was painted with `interactive.border.staticWhite.default`, an opaque white. Figma's `_components/Button/White/Primary/Default` effect style now resolves both of its inner shadows to `interactive.border.staticBlack.fadedHighlighted`, so the token map is brought in line with the design source.
+
+  This applies to the `default` and `highlighted` states, which between them cover the button's rest, hover, active, and focus-ring appearance. Web and native both read the same `boxShadow` token map, so the change lands on both platforms. The white `secondary` and `tertiary` variants are untouched and keep `interactive.border.staticWhite.highlighted`.
+
+  > **Visual change (no API change):** the border of every white primary button shifts from opaque white to a faded black. `ButtonGroup` renders white buttons too, so its snapshots move with it.
+
+## 12.118.0
+
+### Minor Changes
+
+- 3cd283e97: feat(FloatingActionButton): add FloatingActionButton component
+
+  Adds `FloatingActionButton`, a persistent pill-shaped button anchored to the bottom of the viewport for the single most important action on a screen. It supports `primary`, `white` and `black` colors, anchors via `placement` (`bottom-end`, `bottom-start`, `bottom`) with a configurable `offset` and `zIndex`, and renders either an icon with a short label or an icon on its own, in which case `accessibilityLabel` is required. Positioning is `fixed` on web and `absolute` with safe-area insets on React Native.
+
+### Patch Changes
+
+- 60b8ad0c8: fix(CounterInput): prevent value clipping by reserving two digits minimum and expanding for larger values; add tabular-nums font variant for stable digit widths
+
+## 12.117.0
+
+### Minor Changes
+
+- bb4a9fc1f: fix(SpotlightPopoverTour): match the spotlight to the highlighted component, remove the popover's arrow seam, and even out the arrow-to-spotlight gap
+
+  Three visual fixes. All three apply to light and dark — none introduces a colour-scheme branch.
+
+  **1. `SpotlightPopoverTour` — the spotlight now takes the shape of what it highlights.**
+  `TourMask` hardcoded its corner radius to `theme.spacing[2]` (4px — a _spacing_ token used as a radius), so the spotlight was drawn at 4px around a soft-cornered `Card`, a pill, or a square button alike, and nothing in the public API could change it. The mask now derives its radius from the spotlit element:
+
+  - the element has a corner radius → the spotlight takes **the same radius**;
+  - the element draws no corner at all (e.g. the step highlights plain text) → the spotlight falls back to `border.radius.large`, matching the popover, instead of squaring off to a hard corner.
+
+  Because `SpotlightPopoverTourStep` clones its child to attach a ref, consumers commonly wrap their UI in a layout element just to forward one. Measuring that wrapper is wrong twice over: it has no corner radius to inherit, and a wrapper stretched by its parent's layout (e.g. `alignItems="stretch"` in a flex row) is taller than the component inside it — which left the spotlight's padding uneven, 6px on three sides and 18px at the bottom. So when the step's element paints nothing itself and wraps a single child that fills it on at least one axis, the spotlight traces that child instead, for both geometry and radius. The padding is now even on all four sides. The fill check stops it shrinking onto an inner element that merely happens to be first — a wrapper around narrower content is still measured as the wrapper.
+
+  > **⚠️ Visual change (no API break):** every existing web tour's spotlight will change shape, and will now differ per step depending on what that step highlights. This is the intended behaviour. `SpotlightPopoverTourMaskRect` gains an optional `borderRadius` field (internal to the component).
+  >
+  > React Native is unchanged here — it measures via `measureInWindow`, which reports geometry but no style, so there is no computed radius to read. The native mask keeps its existing radius; matching it there needs an explicit prop and is left as a follow-up.
+
+  **2. `SpotlightPopoverTour` — the popover no longer shows a line where the arrow meets the card.**
+  `TourPopover` painted the arrow with `popup.background.gray.subtle` while the card body uses `popup.background.gray.moderate`, so a visible seam ran along the junction. `Popover` already passes the matching token — this was drift introduced in the v11 → v12 popup-token migration, where the card was moved to `gray.moderate` and the tour's arrow was missed. Matching the fill token removes the colour step, but a line survived it: the popup surface carries a 1px inset hairline (`getPopupBoxShadowString`) on **every** edge, including the one the arrow sits on — so the container's own border was drawn straight across the join and the arrow still read as a separate shape stuck on top.
+
+  `TourPopover` was passing only `fillColor` to its arrow. `Popover` passes four props, and the other three are what close the join: a `strokeColor` so the outline continues around the arrow, a non-zero `strokeWidth` (which also offsets the arrow onto the container edge so its fill masks the hairline beneath it), and a `translateY(-1px)` nudge. Bringing the tour to parity with `Popover` makes the body and arrow read as one container with a single outline.
+
+  > React Native is intentionally left alone here. Its `PopupArrow` draws an opaque backing path (`surface.background.gray.intense`) beneath the fill and adds a stroke, so swapping the fill token alone does not make the arrow match the card — it only moves the mismatch (measured on the dark theme: from ~2/255 darker than the card to ~3/255 lighter). Fixing native means addressing that backing path, and is left as a follow-up.
+
+  **3. `SpotlightPopoverTour` — the gap between the arrow tip and the spotlight is now the same on every step.**
+  Nothing sets that gap directly; it falls out of two numbers measured from two different rectangles. `TourPopover` offsets the popup by `spacing[4] + ARROW_HEIGHT` (24px) so that, after the arrow's own 12px protrusion, the tip lands `GAP` (12px) from the anchor's edge — while `TourMask` draws the halo 6px past the traced element. The intended result is a constant 6px.
+
+  That held only when both measured the same element, and they did not. The mask resolves the step's ref through `resolveSpotlightTarget` to trace the painted component, but `TourPopover` set its position reference to the raw ref — so any overhang between the wrapper and the component inside it was added straight to the gap. A step whose wrapper is stretched by a flex row (`alignItems="stretch"`) sat visibly further from its spotlight than a step whose wrapper happened to match its card. `resolveSpotlightTarget` moves into the shared web utils and both now resolve through it, so the gap no longer depends on how a consumer wraps their markup.
+
+## 12.116.0
+
+### Minor Changes
+
+- dd8501226: feat(blade): add TreeView component
+
+  TreeView: hierarchical selectable list, standalone and inside Dropdown. First snowflake promotion (original Tree Hierarchy snowflake by Prarthana Gogoi).
+
+  - `TreeView`, `TreeViewItem`, `TreeViewLoadMore` exports (web-only; native entry throws a dev error)
+  - Standalone: single select (radio semantics) and multiple select with branch cascade, indeterminate checkboxes, roving tabindex keyboard map, `tree`/`treeitem` ARIA
+  - Inside Dropdown: drop-in replacement for ActionList - selection controlled through the trigger's `value`/`onChange` (SelectInput, FilterChipSelectInput), with an additive optional `selectedGroups` field in the onChange payload and smallest-describing-set display on the trigger
+  - Async children (`hasChildren` + `isLoading`) with selection inheritance, and `TreeViewLoadMore` for progressive loading at any depth
+
+### Patch Changes
+
+- dd8501226: fix(FilterChipSelectInput): sync selection when the controlled `value` changes
+
+  `FilterChipSelectInput` only mapped its controlled `value` to the dropdown selection on mount, so
+  later updates from the consumer were ignored — a "Clear" action in the dropdown footer emptied the
+  consumer's state but left the options (and the chip label) selected. The controlled `value` is now
+  the source of truth on every change, including when it is emptied.
+
+## 12.115.2
+
+### Patch Changes
+
+- 2db706e7a: Fixed `SpotlightPopoverTour` scrolling indefinitely and locking the page when a step's anchor is taller than the viewport (e.g. a large table). The tour now detects oversized anchors and scroll-aligns them to the top instead of trying to center them, so the page no longer freezes with the popover pushed off-screen.
+
+## 12.115.1
+
+### Patch Changes
+
+- d0f2310d9: feat: add BookmarkFilledIcon component
+
+## 12.115.0
+
+### Minor Changes
+
+- 51c91bfa0: feat(LineChart): add `ChartReferenceBand` and per-line reference bands for industry comparison
+
+  `LineChart` now supports reference bands — shaded min–max ranges drawn behind the trend line so a trend can be compared against an industry comparison range. Two capabilities:
+
+  1. **Standalone `ChartReferenceBand`** — a single data-driven band via `lowerDataKey`/`upperDataKey`:
+
+  ```tsx
+  <ChartLineWrapper data={data}>
+    <ChartReferenceBand lowerDataKey="min" upperDataKey="max" name="Reference band" />
+    <ChartXAxis dataKey="month" />
+    <ChartYAxis />
+    <ChartLine dataKey="activeUsers" name="Active users" />
+    <ChartLegend />
+  </ChartLineWrapper>
+  ```
+
+  `ChartReferenceBand` accepts `lowerDataKey` and `upperDataKey` (required), plus optional `name` (legend label, default `'Reference band'`), `color` (band fill token, default a faint categorical blue) and `showLegend` (default `true`).
+
+  2. **Per-line bands on `ChartLine`** — each line can declare its own `rangeLowerDataKey` / `rangeUpperDataKey` so a chart shows multiple trend lines, each with its own color-matched industry range band:
+
+  ```tsx
+  <ChartLineWrapper data={data}>
+    <ChartLine
+      dataKey="payments"
+      name="Payments"
+      rangeLowerDataKey="paymentsMin"
+      rangeUpperDataKey="paymentsMax"
+      rangeName="Payments industry range"
+    />
+    <ChartLine
+      dataKey="refunds"
+      name="Refunds"
+      rangeLowerDataKey="refundsMin"
+      rangeUpperDataKey="refundsMax"
+      rangeName="Refunds industry range"
+    />
+    <ChartXAxis dataKey="month" />
+    <ChartLegend />
+  </ChartLineWrapper>
+  ```
+
+  Each line's band auto-matches the line color (override with `rangeColor`), the tooltip shows an "industry range" (`low–high`) row per series, and the legend gets a swatch per band. The band renders behind the trend line on both web and React Native. A new _KitchenSink (Industry SR)_ story exposes `numberOfLines` (1–5) and `showReferenceBand` controls.
+
+## 12.114.0
+
+### Minor Changes
+
+- 5cd7f0961: feat(GenUI): add consumer-registered action slots for Card and Table components
+
+  Introduces a `componentActions` registry on `GenUIProvider` that lets consumers register render props for action UI below block-level components (CARD, TABLE). The design system renders the slot and hands the consumer the component's data and a `componentRef`, keeping all action logic (copy, download, export) on the consumer side with no DS dependency.
+
+## 12.113.3
+
+### Patch Changes
+
+- 3a2d9bd6e: fix(DatePicker): allow reopening a controlled range `FilterChipDatePicker` after a range is selected
+
+  The auto-close effect that commits a selection when `showFooterActions` is false compared the selected value by reference. For `selectionType="range"` in controlled mode (`value` + `onChange`) the value is rebuilt into a new array on every render, so the effect re-ran on each render and immediately closed the flyout whenever the existing range was already complete, making the picker impossible to reopen. The selection is now compared by content so auto-close only happens on an actual selection change.
+
+- d31fadf55: docs(Table): render Table example stories live instead of StackBlitz sandboxes
+
+## 12.113.2
+
+### Patch Changes
+
+- b168b2190: fix(BaseInput): pass Android autofill hint via `autoComplete` instead of the removed `autoCompleteType` prop
+
+  React Native renamed `autoCompleteType` to `autoComplete` in 0.66, so the Android autofill hint (e.g. `sms-otp` for `OTPInput`'s `autoCompleteSuggestionType="oneTimeCode"`) was silently dropped and never reached the native `EditText`. OTP keyboard suggestions and other autofill hints now work on Android.
+
+## 12.113.1
+
+### Patch Changes
+
+- b8e8c4687: feat(blade-svelte): add Klear360Provider theme context and style overrides
+
+  Adds Klear360Provider with theme context, color scheme management, and typography platform support for blade-svelte. Adds theme runtime utilities in blade-core (themeToCSSVariables, createTheme overrides, data-blade-color-scheme selectors), CSS cascade layers, component style override APIs, and button brand CSS vars.
+
+- 480b2de2f: fix: remove personal email from useTruncationTitle JSDoc
+
+  Replaces the personal email address in the JSDoc usage example of `useTruncationTitle.web.tsx` with a generic `user@example.com` to prevent personal emails from leaking in frontend source-map files.
+
+## 12.113.0
+
+### Minor Changes
+
+- a561db6cc: feat(AreaChart): add `connectNullsStyle` for a dashed no-data bridge on `ChartArea`
+
+  `ChartArea` now supports the same null-handling API as `ChartLine`:
+
+  - `connectNulls={false}` (default, unchanged): the area breaks at null points, leaving a hard gap. Use this for genuine data outages.
+  - `connectNulls={true}` + `connectNullsStyle="solid"` (default): real data renders as a solid area and the gap is bridged with a curved solid line, with no fill under the no-data stretch.
+  - `connectNulls={true}` + `connectNullsStyle="dashed"`: real data renders as a solid area and the gap is bridged with a curved dashed line, with no fill under the no-data stretch, signalling "no data for this period" without implying a measured value.
+
+  Available on both React web and React Native.
+
+  Also fixes a latent bug where multiple `AreaChart`s on the same page emitted gradients with the same id, causing every chart's fill to resolve to the first chart's gradient (and appear washed out / invisible). Gradient ids are now namespaced per chart instance.
+
+- a561db6cc: feat(ChartLine): add `connectNullsStyle` to draw a dashed bridge across null values
+
+  `ChartLine` now accepts a `connectNullsStyle` prop (`'solid' | 'dashed'`, default `'solid'`) that controls how the line is drawn across null points when `connectNulls` is `true`. With `'dashed'`, real data renders as a solid line while the stretch across `null` points renders dashed — signalling "no data for this period" without implying a measured value. `connectNulls={false}` (default) continues to leave a hard gap for genuine data outages, and `connectNulls={true}` remains a solid bridge by default.
+
+### Patch Changes
+
+- 05a7eeeea: fix(DatePicker): open on a selectable month when today is outside the `minDate`/`maxDate` range
+
+  Previously the calendar always opened on today's month even when every date in it was disabled by `minDate`/`maxDate`. Now, when no value or `visibleMonth`/`defaultVisibleMonth` is set, the initial month is clamped into the allowed range — opening on `maxDate`'s month when today is after `maxDate`, or `minDate`'s month when today is before `minDate`. Applies to both web and native.
+
+- 8ba8d1f26: Fix RollingText loading shimmer washing out dark backgrounds by clipping the highlight to text glyphs using `background-clip: text` instead of a white overlay.
+
+## 12.112.0
+
+### Minor Changes
+
+- 8030a0aac: feat(tokens): add bladeNeutralTheme and support publishing multiple themes from the Figma token publisher
+- c55ea279d: feat(tokens): add new emphasis levels (faint, moderate, strong) for primary surface and accent color category. Also migrates primary button, focus-ring, and action colors from azure to black (neutral) for the neutral theme, and updates blueGrayLight ghost value from a1 to a0.
+
+## 12.111.1
+
+### Patch Changes
+
+- 1ca6de095: Fix OTPInput focus to move to last input box after paste
+
+## 12.111.0
+
+### Minor Changes
+
+- d6be63acf: feat(rn): add React Native support for motion presets — Fade, Move, Slide, Scale, Morph, Stagger, and AnimateInteractions (built on the native BaseMotion engine)
+- ba4a59413: feat(FilterChip): honour `showClearButton`, add group-level Reset support, and improve multi-select value display
+
+  - `FilterChipSelectInput` & `FilterChipDatePicker`: now respect the `showClearButton` prop (default `true`). Set `showClearButton={false}` to hide the clear (cross) button for filters that must always hold a value.
+  - `FilterChipGroup`: added a group-level **Reset** action alongside the existing **Clear** action. `onResetButtonClick` renders a Reset link that fires a single callback WITHOUT emptying the chips (so controlled consumers can restore their own defaults), while `onClearButtonClick`/`showClearButton` keep the existing empty-everything behaviour. Both actions can be shown together, and each has an optional custom label (`resetButtonText` / `clearButtonText`).
+  - Multi-select filter chips now show the selected option's name when exactly one option is selected (instead of a redundant `1` counter) and collapse to a compact counter only when more than one option is selected.
+
+  **⚠️ Behavioral/visual change (no API break):** in `selectionType="multiple"`, a single selection previously always rendered a `Counter` (showing `1`) and now renders the option name as text. This changes the chip's rendered content, width, and layout for the single-selection case, and can shift layouts for existing consumers without any code change on their side. There is no code/type break and no opt-out prop today, so consumers who need the old always-counter rendering should pin the previous version until they've verified their layouts. If demand exists we can add an explicit display-mode prop in a follow-up.
+
+- 41f08ff48: feat(SegmentedControl): add new value-selector component
+
+## 12.110.0
+
+### Minor Changes
+
+- e78663d65: feat(Breadcrumb): Add React Native support for Breadcrumb and BreadcrumbItem components
+- efd3183a5: feat: expose maxWidth prop for Popover & Tooltip components
+- 06263c562: feat(AreaChart): add React Native support
+
+  Adds `AreaChart.native.tsx` with SVG-based rendering, reveal animation, interactive legend toggling, press-and-scrub tooltip, and reference lines for React Native.
+
+- 79c0ea1f3: feat(rn): add React Native support for BaseMotion engine
+- 7a7c21d09: feat(Card): add `ticket` and `info` card variants
+
+  Adds `TicketCard` and `InfoCard` with `Body` + `Footer` subcomponents.
+
+- 19e47319b: feat(native): add React Native implementation for ChatInput component
+- 1a681834d: feat(DatePicker): add `visibleMonth`/`defaultVisibleMonth` to control the rendered calendar month independently of `value`
+
+  `DatePicker`/`DateRangePicker` now accept `visibleMonth` (controlled), `defaultVisibleMonth` (uncontrolled), and `onVisibleMonthChange` props. These let the calendar open on a specific month without pre-selecting a date — useful for a "comparison" range picker that should default to the period immediately preceding a primary range picker's selection, while leaving the comparison `value` empty for the user to pick.
+
+  ```tsx
+  <DatePicker
+    selectionType="range"
+    label={{ start: 'Compare to' }}
+    defaultVisibleMonth={dayjs(primaryRangeStart)
+      .subtract(rangeLengthInDays + 1, 'day')
+      .toDate()}
+  />
+  ```
+
+  Falls back to the existing behavior (first date of `value`/`defaultValue`, or today) when not set — fully backwards compatible.
+
+- b9c86ecf7: feat(DonutChart): add React Native support
+
+  - Added `DonutChart.native.tsx` with full React Native implementation using `react-native-svg` and `react-native-reanimated`
+  - Added `AnimatedDonutSlice.native.tsx` for animated donut slice rendering with sweep-in animation
+  - Supports legend, tooltip, center content, custom colors, and data filtering parity with web DonutChart
+
+- e8471c128: feat(rn): add React Native support for Drawer component
+- d4a3a7d0d: feat(blade): add React Native implementation for FileUpload component
+
+  ### Platform differences
+
+  **`onChange` / `onUploadPress` semantics:** On web, `onChange` fires after the user picks files and passes the selected `fileList`. On React Native, tapping the upload area fires **`onUploadPress` only** — use it to open your own file picker (e.g. `react-native-document-picker`). FileUpload does **not** fire `onChange` on tap; update `fileList` yourself after the picker returns. Prefer controlled mode (`fileList` + updating it after the picker resolves). `onUploadPress` is typed with `Platform.Select` so it is native-only.
+
+  **Built-in validation (`accept`, `maxCount`, `maxSize`):** On web, these props are enforced internally (file-type filtering, count limits, size limits with inline error messages). On React Native they have no effect — validation must be handled by the consumer after the picker returns.
+
+  **`labelPosition`:** On web, `labelPosition="left"` renders the label beside the upload area. On React Native, labels always render above the upload area; `labelPosition="left"` is ignored with a `__DEV__` warning.
+
+  **`ref`:** Supported on native via `forwardRef`, but attaches to the outer container `BaseBox` (not a hidden file input as on web).
+
+  **Not supported on React Native:** `_motionMeta` (motion ref wiring is web-only), `onDrop` (no drag-and-drop), and `data-analytics-*` / `elementtiming` props (on web these are attached to the hidden file input). Passing unsupported props emits a `__DEV__` warning on native.
+
+  **Types:** `Klear360File` is platform-split (`bladeFile.ts` / `bladeFile.web.ts`). Web still extends the DOM `File` API; native is a plain object (`type` is optional because pickers may omit MIME types). Callbacks (`onPreview` / `onRemove` / `onReupload` / `onDismiss`) take `{ file: Klear360File }`.
+
+- 6797b1297: feat(DatePicker): support `displayFormat="compact"` in `FilterChipDatePicker`
+
+  The `FilterChipDatePicker` now accepts the `displayFormat="compact"` prop (previously only supported on `DatePicker`). In compact mode, selecting a named preset (e.g. "Past 7 days") shows the preset label inside the chip's selected state, while a custom range shows a humanised, easy-to-read date range (e.g. `7 Jun - 12 Jun 2026`) instead of the raw `DD/MM/YYYY` format.
+
+  The humanised compact format is also applied to the regular `DatePicker` input for custom range selections on the day picker (the field reverts to the editable `DD/MM/YYYY` format on focus, and the submitted form value is unchanged).
+
+- fa51cbdc8: fix(DatePicker): auto-close FilterChipDatePicker flyout on range/preset selection
+- 2df7adac1: feat(native): Add React Native support for InfoGroup component
+- 0150f07cd: feat(rn): add React Native support for LineChart
+
+  - SVG-based native line rendering with monotone and linear interpolation
+  - Tap-to-stay scrub tooltip on a single responder surface
+  - Reference lines with label placement matching web
+  - Opaque tooltip styled to match the web appearance
+
+- b24318bce: feat(ColorInput): add ColorInput component to the input family
+- b05f2902c: feat(rn): add React Native support for QuickFilter and QuickFilterGroup components
+- 601771cad: feat(rn): add React Native support for ButtonGroup
+
+  Also includes supporting native changes for grouped buttons:
+
+  - BaseButton press/active border color and per-corner radii inside ButtonGroup
+  - Dropdown height / overlay behavior when used as a split-button trigger
+  - Popover native trigger now listens to both `onClick`/`onPress` and `onTouchEnd` (debounced) so taps open reliably inside ScrollView / ButtonGroup
+
+- 203456462: feat(rn): add React Native support for FilterChipSelectInput
+- 39529e14a: feat(rn): add React Native support for StepGroup
+- 7d19fc5e1: feat(rn): add React Native support for SankeyChart component
+- d62a43518: feat(Chip): add `leading` prop for flags and custom elements
+- 28fff3670: feat(native): Add React Native support for SpotlightPopoverTour component
+- 6a676b6fe: Add React Native support for TimePicker with spin-wheel picker inside BottomSheet
+- 3c9addbe4: fix(TrustBadge): remove `emphasis` prop and align with Klear360 DSL trust marker design
+
+  The `emphasis` prop (`'subtle' | 'intense'`) and the `TrustBadgeEmphasis` type have been removed from TrustBadge. The new Klear360 DSL design uses a single sea-subtle pill treatment regardless of surface color. Migrate by removing any `emphasis` prop usage — the updated component renders correctly on all surfaces.
+
+  - `@klearnow/klear360`: `emphasis` prop removed from `TrustBadgeProps`
+  - `@klearnow/klear360-svelte`: `emphasis` prop removed from `TrustBadgeProps`
+  - `@klearnow/klear360-core`: `TrustBadgeEmphasis` type and `getTrustBadgePillEmphasisClass` removed; replaced by `getTrustBadgeVariantClass`
+
+### Patch Changes
+
+- 97b1d0c37: feat(rn): add React Native implementation for ChatMessage with rolling text animations, reasoning traces, and thumbnail preview support
+- 71a4f49ae: feat(rn): add React Native support for DatePicker
+- 28fff3670: fix(rn): fix TypeScript errors and test failures in SpotlightPopoverTour native component
+- 0bd5c4a24: feat(blade): refine GenUI markdown text rendering
+- dfa88a896: fix: prevent Carousel onChange from firing during programmatic scroll animations
+
+  In controlled Carousel, browsers like Firefox could fire scroll events before a smooth-scroll animation completed, causing the debounced scroll handler to detect a stale slide index and call onChange with the wrong value. This fix tracks programmatic scrolls with a ref flag so onChange is skipped during those animations. Uncontrolled and user-initiated (drag/swipe) interactions are unaffected.
+
+- 5edce67b2: fix(Charts): legend styling and spacing fixes
+
+  - Chart legend color swatches (web and native) now use `theme.border.radius['2xsmall']` (2px) instead of `theme.border.radius.small` (8px), aligning the legend dot styling with the design spec.
+  - Chart legend items (web) now have `theme.spacing[2]` (4px) padding on all sides, so each item's clickable/hoverable bounding box has 4px of breathing room around the color swatch and 4px after the label, in addition to the existing 8px gap between swatch and label and 16px gap between items.
+  - Fixed the gap between the X-axis and the legend (web) growing whenever `ChartXAxis` had a `label` prop set. The space for the axis label is now always reserved, so the legend's position relative to the axis stays constant whether or not an X-axis label is present.
+
+  Affects `BarChart`, `LineChart`, `AreaChart`, and `DonutChart`.
+
+- f2cf0ffaa: fix(DatePicker): collapse same-month ranges in compact display format
+
+  `displayFormat="compact"` now shows same-month date ranges as `1-23 Jun 2026` instead of repeating the month, e.g. `1 Jun - 23 Jun 2026`. Ranges spanning different months or years keep their existing format (`7 Jun - 12 Jul 2026`, `28 Dec 2025 - 3 Jan 2026`).
+
+- 086718d4a: feat(carousel): circular progress indicator on mobile
+- 754ed4c0a: fix(DonutChart): update legend selection behavior
+
+  - Keep uncontrolled donut chart legends fully selected when data keys arrive after initial render
+  - Add strikethrough styling for deselected legend items
+
+- c6f1e576e: fix(Tabs): align small filled horizontal tab corner radius with SegmentedControl
+
+  - TabList container: 16px → 8px (`border.radius.small`)
+  - TabItem: 12px → 6px (deliberate mid-point between xsmall=4px and small=8px, mirrors SegmentedControl item)
+  - TabIndicator: 12px → 6px (mirrors SegmentedControl indicator)
+  - Focus ring: 12px → 8px (`border.radius.small`)
+
+- 361b0605d: fix(Card): refactor ticket card outline with SVG for accurate notch UI
+
+## 12.109.0
+
+### Minor Changes
+
+- adff0f113: feat(AnnouncementBanner): add AnnouncementBanner component to blade, blade-core, and blade-svelte
+- 75288e989: feat(AppBar, TrustBadge): add AppBar and TrustBadge components
+
+  TrustBadge renders the "Klear360 Trusted Business" trust marker; its label is configurable
+  via a `label` prop (default: "Klear360 Trusted Business") so it can evolve (e.g. "Klear360
+  Verified") without a breaking API change. AppBar surfaces it through the `trustBadgeVariant`
+  prop on `AppBarLeading`.
+
+- 39f4f843f: feat(Radio): add `trailing` prop to display an element (e.g. a Badge) alongside a radio label in vertical orientation
+
+### Patch Changes
+
+- 0724d3d38: feat(blade-svelte): add ActionList component
+
+  Also fixes a React BaseMenu hover style: the hover background is now suppressed when `aria-selected=true` so a selected row's `fadedHighlighted` background is not overridden on pointer-enter. This intentional fix applies to all React `BaseMenu`-based consumers (ActionList, Select, etc.) and matches the expected selected-item UX.
+
+- 4c5c93823: fix(blade): update default chart color to blue
+
+## 12.108.5
+
+### Patch Changes
+
+- bc7c86651: fix(SankeyChart): remove horizontal scroll wrapper so card wraps chart naturally
+
+## 12.108.4
+
+### Patch Changes
+
+- d4a77ab80: fix(rn): disable includeFontPadding on TextInput to fix placeholder vertical alignment
+
+## 12.108.3
+
+### Patch Changes
+
+- d95ebf0b4: fix: resolve TypeScript errors in DatePicker calendar icon click handler by casting Klear360ElementRef to HTMLElement
+
+## 12.108.2
+
+### Patch Changes
+
+- 8b8c852e8: fix(native) :- fixed left padding in phone input's country selector
+
+## 12.108.1
+
+### Patch Changes
+
+- 3595bf51b: fix(blade): genui font weights and spacing
+
+## 12.108.0
+
+### Minor Changes
+
+- 90ddaed4c: **Alert:** Full-width Alert now has `border-radius: medium` instead of `none`.
+
+  > **⚠️ Visual Breaking Change:** If you use `isFullWidth` Alert in edge-to-edge/full-bleed layouts, the component will now render with rounded corners instead of sharp edges. Verify your layouts to ensure the rounded corners work with your design.
+
+### Patch Changes
+
+- 595326e84: fix(Preview): use theme-aware color for dot grid in dark mode
+- 90ddaed4c: feat(Alert): add maxWidth prop for custom width override
+- 06b8ed0e2: feat(Card): add variant prop
+- 8dd58d81f: chore(blade): setup React Native Storybook v10 with Hermes compatibility patches
+
+## 12.107.3
+
+### Patch Changes
+
+- a0cc2ca58: fix(rn): vertically align inline `Code` and `Link` with adjacent text on React Native by disabling Android's default font padding (`includeFontPadding: false`). Web rendering is unchanged.
+- 2df5b2b70: fix(rn): baseline-align and prevent clipping of Amount currency/decimal
+
+## 12.107.2
+
+### Patch Changes
+
+- 629a77e9d: fix(rn): fix ListItem text overflow on React Native
+- aab9b4c79: fix(rn): card header subtitle wraps correctly, footer buttons stay within bounds
+- 5f8e7401d: fix(rn): display tags in a horizontal row in Tag story
+- 48be721d8: fix(rn): spark upgrade RN easy layout fixes
+- c8b01213f: fix(rn): implement CounterInput for React Native with text centering, semibold weight, and slide animation
+- c6393ea73: fix(rn): fix double border on selected ChipGroup items
+- 9566bd6e3: fix(rn): fix Popover animation flash and story flex layout
+- f8907d623: feat(native): add native shadow overlay to match web 3D styling
+- 1a370c524: fix(rn): make overflow cards scrollable in Card story
+- 58ba1549d: feat(icons): add AgentStudioIcon and 6 filled icon variants
+- 1cd4cafa7: fix(native): add expanding focus ring animation for all inputs
+
+## 12.107.1
+
+### Patch Changes
+
+- 3891126cc: fix(Accordion): animation race condition
+- 90c660fef: fix(rn): fix BaseFooterSink layout for React Native
+- 7e8ffc9bf: fix(rn): fix Avatar story label wrapping on React Native
+- 57703cf66: fix(Drawer): fix stale closure in StackProvider causing back button to appear on L0 after closing all drawers
+- 0ae4f1c5a: feat(Input): update input sizing, success border, and add validationTextPlacement prop
+- 5cd3af431: feat(Accordion): apply Card surface styling to filled variant
+- ce3bf0b4e: fix(rn): fix story layout issues for Divider, Link, and Code components
+- c448696eb: fix(native): pass letterSpacing prop through BaseText.native.tsx
+
+## 12.107.0
+
+### Minor Changes
+
+- 11f7f0141: feat(native): added phone number input component in native
+
+### Patch Changes
+
+- 5f5289683: fix(Menu): fix asymmetric top/bottom padding in menu overlay
+
+## 12.106.1
+
+### Patch Changes
+
+- e657a6a1f: fix(Tabs): center tab labels on React Native to match web
+
+  `TabItem.native`'s `StyledTabButton` was missing `justifyContent: 'center'`, so full-width tab items (`isFullWidthTabItem`) left-aligned their labels on React Native, while the web variant (`TabItem.web`) centers them. Added the missing property to restore web/native parity.
+
+## 12.106.0
+
+### Minor Changes
+
+- bcdbef2f8: Adds a new SankeyChart component for visualising flow and proportional
+  relationships between nodes. Built on Recharts' native Sankey component.
+  Supports Klear360 color tokens, hover interactions, tooltips, label chips,
+  responsive resize, and click callbacks.
+
+### Patch Changes
+
+- 4fc149e14: fix(native): added scroll in carousel component
+
+## 12.105.1
+
+### Patch Changes
+
+- f116b3cae: fix: externalize react-native-safe-area-context as peer dependency
+
+## 12.105.0
+
+### Minor Changes
+
+- 374cb0479: feat(native): Added BottomNav component in React Native
+- 7268d4bf2: feat(native): Added Skeleton Loader for React Native
+
+### Patch Changes
+
+- 0f9dc0876: fix(typography): apply TASA Orbiter Display optical size on web headings
+
+## 12.104.2
+
+### Patch Changes
+
+- 37a1f0dd4: feat(blade): add checkboxDisplay prop for on-hover row checkbox visibility in table
+
+## 12.104.1
+
+### Patch Changes
+
+- 3b566c927: fix(native): transparency issue in tooltip for native
+
+## 12.104.0
+
+### Minor Changes
+
+- 07ba06c3f: feat(Table): change loading to use skeleton instead of spinner
+
+## 12.103.0
+
+### Minor Changes
+
+- e4b90e565: Fixed styled-components v6 error in BaseBox.native.tsx
+  Fixed makeBorderSize string issue with a native-only implementation
+  Fixed reanimated crash in Popover and Tooltip content wrappers
+  Fixed badge spacing, chips styling, switch AnimatedThumb, and TextInput label on native
+  Fixed Tooltip native implementation
+  Fixed Popover on iOS, Android, and crash on re-render
+  Added Avatar, AvatarGroup, and EmptyState native implementations
+  Added Spark native stubs (FluidGradient, RzpGlass)
+  Added native stubs for web-only components (MotionDashboard, StepperRouter, Rotate, Calendar, CustomMenu, SpinWheel)
+  Added StyledDropdownOverlay native stub
+
+## 12.102.0
+
+### Minor Changes
+
+- a9544ac6a: feat(native): flesh out DatePicker, BarChart, CommonChartComponents, and Toast native implementations
+
+  Builds out the native (React Native) implementations of components that previously shipped only as scaffolds:
+
+  - **DatePicker.native.tsx** — full Tier-1 native picker (was a stub). Calendar
+    renders inside a `BottomSheet`; supports `single` / `range` selection, presets,
+    min/max date, controlled state, locale-aware weekday labels via dayjs,
+    customisable header / apply / cancel / clear-button labels, and accessibility
+    state on day cells. Unsupported web-only props (`picker`, masked input, form
+    validation props) emit a `__DEV__` warning and are otherwise ignored.
+  - **Charts/BarChart/BarChart.native.tsx** — Tier-1 bar chart implementation.
+    Renders horizontal stacked / grouped bars via `react-native-svg`, with axes,
+    legend, grid, reference lines, secondary X-axis labels, and an empty-state
+    message when `data` is empty. `layout="vertical"` is a tracked follow-up and
+    emits a `__DEV__` warning today.
+  - **Charts/CommonChartComponents/** — native marker components for axes,
+    legend, grid, reference line, and tooltip. The tooltip emits a one-shot
+    `__DEV__` warning when used on native (native tooltip is a follow-up).
+  - **Toast** — `Toast.native.tsx`, `ToastContainer.native.tsx`, and
+    `useToast.native.tsx` replace the previous web-only Toast stack. `show()`,
+    `dismiss()`, promotional toast deduping, auto-dismiss, and the entrance /
+    exit animation are all wired up. Cross-platform `ToastProps.action.onClick`
+    type is corrected (was `event: ButtonProps['onClick']`, now
+    `event: React.MouseEvent<HTMLButtonElement>` — a fix to an existing typo).
+
+  Driven by the Klear360 merchant mobile app's Klear360 v12 migration spike, where
+  the prior native stubs were insufficient for the home/payments screens.
+
+- a9544ac6a: fix(Tabs.native): drop react-native-tab-view, rebuild on react-native-pager-view
+
+  > **Why minor (not patch):** this changeset removes `react-native-tab-view` from
+  > `peerDependencies` and broadens the `react-native-pager-view` peer range to
+  > `^6.2.1 || ^8.0.0`. Both are peer-dep contract changes that consumers must
+  > react to, which by convention warrants a minor bump.
+
+  Replaces the `react-native-tab-view@3.x` dependency (which declares `react: ~16.13.1` in devDeps
+  and triggers an "Invalid hook call" crash on React 19.2 + RN 0.85) with a direct
+  `react-native-pager-view` implementation.
+
+  **What changed:**
+
+  - `Tabs.native.tsx` — new implementation: custom `CustomTabBar` (ScrollView + Pressable +
+    `react-native-reanimated` animated indicator) + `PagerView` for swipe-between-panels.
+    No `TabBar` / `TabView` from `react-native-tab-view` anywhere in the render tree.
+  - `TabIndicator.native.tsx` — indicator logic moved inline; file retained as a no-op for
+    internal import compatibility.
+  - `SafeSceneMap.native.tsx` — removed `react-native-tab-view` type import; kept as a backwards-
+    compatible export (no longer used by `Tabs.native.tsx`).
+  - `packages/klear360/package.json` — removed `react-native-tab-view` from `peerDependencies` and
+    `devDependencies`; broadened `react-native-pager-view` peer range to `^6.2.1 || ^8.0.0` so
+    consumers on RN 0.85 with pager-view 8.x (e.g. `razorpay/frontend-mobile-app`) are covered
+    without a breaking peer-dep bump.
+
+  **Visual/behavioural parity:** all three variants (bordered, borderless, filled), sizes, and
+  `isFullWidthTabItem` are preserved. Animated indicator uses `withTiming` from reanimated (already
+  a Klear360 peer dep) for smooth transitions.
+
+  **Consumers:** `razorpay/frontend-mobile-app` — `react-native-tab-view@3.1.1` was already
+  installed there as a transitive dep; it is no longer required by Klear360 and can be removed from
+  the consumer's direct deps if desired.
+
+### Patch Changes
+
+- 40aca8649: feat(Icons): add block layout icons
+
+## 12.101.5
+
+### Patch Changes
+
+- ef481b003: feat(ChatInput): add hideFileUpload and autoFocus props
+
+## 12.101.4
+
+### Patch Changes
+
+- b18c31986: fix(OTPInput): match placeholder font size to input value font size
+
+## 12.101.3
+
+### Patch Changes
+
+- 376037488: fix(topnav): scope primary overlay and align global styles
+
+## 12.101.2
+
+### Patch Changes
+
+- 97a47b788: feat(blade-svelte): add Chip component
+- 9f6eee519: fix(build): disable tree-shaking in native rollup config
+
+  The native build's `getNativeConfig` was tree-shaking aggressively, dropping bindings whose usage rollup couldn't see across the separately-bundled entries (components, tokens, utils). This silently broke multi-statement modules — for example `tokens/global/motion.ts` shipped with only the `easing` object literal as a discarded expression, with `delay`, `duration`, and the `motion` wrapper (and its export) stripped entirely. Same pattern affected `tokens/global/typography.ts`, `utils/logger/logger.ts`, and ~24 other native files. Result: `import { motion }` / `import { logger }` / etc. resolved to `undefined` at runtime in the published `@klearnow/klear360@12.101.1` native bundle, which made every component depending on `theme.motion`, the Klear360Provider, the Toast, and the React-Native splash flow crash.
+
+  Mirrors the existing `treeshake: false` setting (and rationale comment) on `getWebConfig`. Consumers (the React Native app's Metro bundler) tree-shake their own bundle, so disabling rollup-level tree-shaking on the published native artifact is the correct call.
+
+- 481284546: feat(TopNav): add glow toggle and bottom overlay for primary variant
+
+## 12.101.1
+
+### Patch Changes
+
+- 24a2fff2e: feat(ChatInput, FileUploadItem): disabled submit on file error, trash icon in error state, autoscroll, fixed file item width
+
+## 12.101.0
+
+### Minor Changes
+
+- c25481570: fix(ChatInput): wire onDismiss so close button works on uploading files
+
+## 12.100.0
+
+### Minor Changes
+
+- d93fbc833: feat(TopNav): add paddingY prop to TopNavBrand component
+
+## 12.99.1
+
+### Patch Changes
+
+- cbfd2e804: fix(Table): hide Deselect when nothing selected; decouple row & checkbox click
+
+## 12.99.0
+
+### Minor Changes
+
+- f243e927e: feat(blade): add `variant` prop for primary and neutral backgrounds in TopNav
+
+  Added a new `variant` prop to `TopNav` component with two options:
+
+  - `variant="neutral"` (default) — existing dark/black background, fully backward-compatible
+  - `variant="primary"` — uses brand primary color background (Klear360 blue)
+
+  The explicit `backgroundColor` prop still takes precedence over `variant`, preserving the escape hatch for custom backgrounds.
+
+  **Usage:**
+
+  ```jsx
+  // Default neutral variant (existing behavior)
+  <TopNav>...</TopNav>
+
+  // Primary brand color variant
+  <TopNav variant="primary">...</TopNav>
+
+  // Custom background still works
+  <TopNav backgroundColor="surface.background.gray.intense">...</TopNav>
+  ```
+
+## 12.98.1
+
+### Patch Changes
+
+- 14beb5447: fix(blade): remove country name from dial code selector in PhoneNumberInput
+
+## 12.98.0
+
+### Minor Changes
+
+- f4b7c371a: feat(blade): add reticle icon
+
+### Patch Changes
+
+- ea50bce32: fix(blade): bottomsheet not scrolling in virtualized action list
+- 65bf2998d: fix(blade): phone number input bottomsheet issue
+
+## 12.97.1
+
+### Patch Changes
+
+- 7b617af17: fix(TimePicker): fix timepicker's dropdown z-index and focus management when rendered inside modal
+
+## 12.97.0
+
+### Minor Changes
+
+- 7113c390d: feat(Amount): add `fractionDigits="auto"` to automatically determine decimal places based on currency (e.g. JPY → 0, INR → 2, KWD → 3)
+
+## 12.96.6
+
+### Patch Changes
+
+- 2b7f5eaa6: chore(blade): point jsdelivr url to the latest release
+
+## 12.96.5
+
+### Patch Changes
+
+- 95802377c: fix(blade): fix encoding of blade spark video
+
+## 12.96.4
+
+### Patch Changes
+
+- 149635160: fix(SideNav): text alignment in sidenavitem
+
+## 12.96.3
+
+### Patch Changes
+
+- d1d70cac5: fix: use transient prop in Table cell styled components
+- 9e2e502e4: fix(blade): redo card effects with backgroundImage to avoid zIndexing and isolation issues
+
+## 12.96.2
+
+### Patch Changes
+
+- ca87948d5: fix(Modal): search in modal in topnav
+
+## 12.96.1
+
+### Patch Changes
+
+- b2f53f2bb: fix(blade): remove unneeded boxShadow in card
+
+## 12.96.0
+
+### Minor Changes
+
+- 4df852372: feat(GenUI): added badge support in InfoGroup component & component error fallbacks
+
+## 12.95.5
+
+### Patch Changes
+
+- e8d4a815b: fix(GenUI): update scroll behaviour for Table & add divider in Card & make title/subtitle option in Card
+
+## 12.95.4
+
+### Patch Changes
+
+- e75dcee43: feat(blade): update RazorSense bottomwave animation slightly
+
+## 12.95.3
+
+### Patch Changes
+
+- 9a0e38d40: feat(Card): pass elevation prop to CardSurface
+
+## 12.95.2
+
+### Patch Changes
+
+- 14bb86e66: fix(blade): input overflow, modal color in topnav, and card overflow
+- 61c29ed99: fix: remove the elevation prop from StyledDropdownOverlay
+
+## 12.95.1
+
+### Patch Changes
+
+- 331a9a605: feat(TabNavItem): add titleSuffix prop for status badges
+- 054c779e0: fix(blade): RazorSense background color mixing
+
+## 12.95.0
+
+### Minor Changes
+
+- a8823b007: feat(blade): update razorsense cdn path & added preloadRazorSenseAssets utility
+  feat(blade-mcp): add knowledgebase for RazorSense and RazorSenseGradient
+
+## 12.94.0
+
+### Minor Changes
+
+- d0b1f778c: fix(blade): razorsense animation flicker
+
+## 12.93.0
+
+### Minor Changes
+
+- 64aa27c4d: feat(blade): add RazorSense component
+
+## 12.92.1
+
+### Patch Changes
+
+- 06e127d3f: feat(SideNav): MCP update, mobile sidenav bug fix, refactors
+- ad0561254: fix(blade): list view changes
+
+## 12.92.0
+
+### Minor Changes
+
+- 8e349cd0a: feat(blade): update chat message padding
+- 032377573: feat(SideNav): add collapsible state to SideNav
+- 25932a3f4: feat(ChatInput): add onFocus and onBlur
+
+## 12.91.0
+
+### Minor Changes
+
+- e957a0375: feat(blade): added reasoning traces for ChatInput component
+
+  Props added:
+
+  - `reasoningTraces`: array of reasoning traces
+  - `reasoningStatus`: status of the reasoning process
+  - `reasoningTitle`: title of the reasoning traces
+  - `reasoningActiveStepIndex`: index of the active step
+
+## 12.90.0
+
+### Minor Changes
+
+- 22345e5c1: feat(blade): fix donut chart tooltip
+
+## 12.89.1
+
+### Patch Changes
+
+- aa123005f: fix(blade): remove word counting from GenUI TEXT component
+
+## 12.89.0
+
+### Minor Changes
+
+- c031c3c49: feat(blade): add amount component support in GenUI
+- c031c3c49: feat(blade): add GenUI Animation
+
+## 12.88.0
+
+### Minor Changes
+
+- 61297d8e0: feat(spark): chatmessage updates
+
+## 12.87.0
+
+### Minor Changes
+
+- 6d4888305: feat(LightBox): add lightbox component
+- 864c54f4a: feat(Menu): add `offset` prop
+
+## 12.86.0
+
+### Minor Changes
+
+- bbad553f1: feat(blade): enable topNavIndicator to watch for childlist changes
+
+## 12.85.1
+
+### Patch Changes
+
+- 413fdd1ed: fix(Chip): simplify border radius calculation using direct computation
+- 06e2003c6: feat: expose topNav context using TopNavActions
+
+## 12.85.0
+
+### Minor Changes
+
+- 567d5daee: feat(ChatInput): add onFileReupload callback to ChatInput
+
+## 12.84.0
+
+### Minor Changes
+
+- efba04492: feat(ChatInput): add ChatInput Component
+
+## 12.83.0
+
+### Minor Changes
+
+- 9e2f61360: # ✨ Klear360 Spark
+
+  This document covers changes, deprecations, and notable additions introduced in the Klear360 Spark update.
+
+  > NOTE:
+  > This is a minor change, it doesn't introduce any breaking changes.
+  >
+  > Though consumers may need to update snapshots & test cases in particular scenarios.
+
+  ***
+
+  ## Deprecated APIs
+
+  ### Theme — Popup Color Tokens
+
+  The shorthand `popup.background.subtle`, `popup.background.intense`, `popup.border.subtle`, and `popup.border.intense` color tokens are **deprecated**. They are still functional but will be removed in a future major version.
+
+  **Migration:** Use the namespaced `popup.[background|border].[color]` form instead.
+
+  ```ts
+  // Before (deprecated)
+  theme.colors.popup.background.subtle;
+  theme.colors.popup.background.intense;
+  theme.colors.popup.border.subtle;
+  theme.colors.popup.border.intense;
+
+  // After
+  theme.colors.popup.background.gray.subtle;
+  theme.colors.popup.background.gray.intense;
+  theme.colors.popup.border.gray.subtle;
+  theme.colors.popup.border.gray.intense;
+  ```
+
+  ***
+
+  ### `Card` — `backgroundColor` prop
+
+  The `backgroundColor` prop on `Card` is **deprecated and is now a no-op**. `Card` always renders with `surface.background.gray.intense` as its background, regardless of the value passed. The prop will be removed in a future major version.
+
+  ```tsx
+  // Before (deprecated — value was applied)
+  <Card backgroundColor="surface.background.gray.subtle">...</Card>
+
+  // After — prop is ignored, remove it
+  <Card>...</Card>
+  ```
+
+  ***
+
+  ### `Card` — `elevation` prop
+
+  The `elevation` prop on `Card` is **deprecated and is now a no-op**. `Card` always uses its own custom elevation style. The prop will be removed in a future major version.
+
+  ```tsx
+  // Before (deprecated — value was applied)
+  <Card elevation="midRaised">...</Card>
+
+  // After — prop is ignored, remove it
+  <Card>...</Card>
+  ```
+
+  ### `Card` — `borderRadius` prop
+
+  The `borderRadius` prop on `Card` is **deprecated and is now a no-op**. `Card` always uses `medium` borderRadius now. The prop will be removed in a future major version.
+
+  ```tsx
+  // Before (deprecated — value was applied)
+  <Card borderRadius="small">...</Card>
+
+  // After — prop is ignored, remove it
+  <Card>...</Card>
+  ```
+
+  ***
+
+  ## Visual Changes
+
+  ### `TopNav` — Always Renders in Dark / Black Theme
+
+  `TopNav` now **always forces a dark color scheme** (`colorScheme="dark"`) internally, regardless of the app's active color scheme. Its background is always `interactive.background.staticBlack.default`, giving it a permanent black appearance.
+
+  Previously, `TopNav` would inherit the app's color scheme. Any customization of `TopNav`'s background color via props no longer has the same effect because the internal `Klear360Provider` forces dark mode for all children.
+
+  **Impact:**
+
+  - All components rendered inside `TopNav` (buttons, icons, inputs, etc.) will always use dark-mode token values.
+  - Overlay components portalled _outside_ `TopNav` (e.g. `Popover`, `Menu`, `Dropdown`) correctly reset back to the app's original color scheme using the new `TopNavOverlayThemeOverride` wrapper — no action needed for those.
+  - If you render a `SearchInput` or similar focusable input inside `TopNav`, it switches to the app's original color scheme on focus (handled automatically by `TopNavOverlayThemeOverride`).
+
+  **Migration:** Remove any manual `backgroundColor` or color-scheme overrides applied to `TopNav` or its children, as these are now managed internally.
+
+  ```tsx
+  // Before — may have relied on inheriting app theme
+  <TopNav backgroundColor="surface.background.primary.intense">
+    ...
+  </TopNav>
+
+  // After — TopNav is always dark/black; pass no background override
+  <TopNav>
+    ...
+  </TopNav>
+  ```
+
+  ***
+
+  ## New Additions
+
+  ### Interactive Background — `ghost` State
+
+  A new `ghost` interactive state has been added to specific `interactive.background` color keys for transparent/invisible button backgrounds.
+
+  | Color Key                            | `ghost` State Available |
+  | ------------------------------------ | ----------------------- |
+  | `interactive.background.gray`        | ✅                      |
+  | `interactive.background.staticBlack` | ✅                      |
+  | `interactive.background.staticWhite` | ✅                      |
+
+  ```ts
+  // Available via theme tokens
+  theme.colors.interactive.background.gray.ghost;
+  theme.colors.interactive.background.staticBlack.ghost;
+  theme.colors.interactive.background.staticWhite.ghost;
+  ```
+
+  ***
+
+  ### `theme.backdropBlur` Tokens
+
+  A new `backdropBlur` token category is now available in the theme for use with CSS `backdrop-filter: blur()`. This enables consistent glassmorphic effects across the design system.
+
+  | Token                       | Value | Usage                    |
+  | --------------------------- | ----- | ------------------------ |
+  | `theme.backdropBlur.low`    | 4px   | Subtle background blur   |
+  | `theme.backdropBlur.medium` | 8px   | Moderate background blur |
+  | `theme.backdropBlur.high`   | 12px  | Strong background blur   |
+
+  ```tsx
+  import { useTheme } from '@klearnow/klear360/components';
+
+  const { theme } = useTheme();
+
+  // Use in styled components or inline styles
+  backdropFilter: `blur(${theme.backdropBlur.medium}px)`;
+  ```
+
+## 12.82.0
+
+### Minor Changes
+
+- 7952254f1: Add agentic loaded in ChatMessage
+
+### Patch Changes
+
+- 2ef2e255c: feat(blade): re-trigger release
+
+## 12.81.3
+
+### Patch Changes
+
+- 80e9900ae: Added sequential color support to ChartLine component
+
+## 12.81.2
+
+### Patch Changes
+
+- 6c65e83b1: fix(Table): hide deselect button when selectionType="none" is set
+  fix(Tabs): tab selection indicator line is not updated when state changes the layout
+
+## 12.81.1
+
+### Patch Changes
+
+- 72a1704ee: feat(blade): expose barSize prop in barChart
+
+## 12.81.0
+
+### Minor Changes
+
+- 84180580d: fix(blade): chart UX improvements and recharts upgrade
+
+  - Updated recharts from 3.1.2 to 3.7.0
+  - BarChart: Fixed unwanted re-animation on tooltip hover
+  - LineChart: Update auto color logic - single data indicator now defaults to gray.moderate
+  - Updated chart documentation
+
+## 12.80.1
+
+### Patch Changes
+
+- a4031566b: fix(blade): added meta attr to step-item and checkbox icon fade component
+
+## 12.80.0
+
+### Minor Changes
+
+- bf83ed9c3: fix(blade): update alert styles
+
+## 12.79.0
+
+### Minor Changes
+
+- 7e66ed45e: feat(DatePicker): add `showClearButton` and `onClearButtonClick` props
+
+  - **`showClearButton`**: When set to `true`, renders a clear icon button in the DatePicker input field. Clicking the button clears the selected date(s).
+  - **`onClearButtonClick`**: Event handler called when the clear button is clicked.
+
+  Example usage:
+
+  ```jsx
+  <DatePicker
+    label="Select date"
+    selectionType="single"
+    showClearButton
+    onClearButtonClick={() => console.log('Cleared!')}
+  />
+  ```
+
+  **Change for FilterChipDatePicker:**
+
+  When using `FilterChipDatePicker` with `selectionType="single"`, clearing the date will now return `null` instead of `[null, null]`. This aligns the clear behavior with the selection type:
+
+  - `selectionType="single"` → clears to `null`
+  - `selectionType="range"` → clears to `[null, null]`
+
+## 12.78.0
+
+### Minor Changes
+
+- ed48d1282: feat: Export FileUploadItem component
+
+## 12.77.0
+
+### Minor Changes
+
+- 10f6912a5: feat(Text): add `textDecorationLine="dotted"` for dotted underline styling (useful for abbreviations/tooltips)
+
+  feat(DatePicker): add `displayFormat` prop with `"compact"` | `"default"` options to control input display when using presets
+
+### Patch Changes
+
+- 29bac6692: fix npm publish
+
+## 12.76.0
+
+### Minor Changes
+
+- 59f65fd46: feat(blade): make legends for other charts clickable
+- 3317dc409: feat(blade): make donut chart responsive
+
+### Patch Changes
+
+- 828302f4d: refactor(blade): update GenUI SDK to use ReactMarkdown instead of Streamdown for React17 compatibility
+
+## 12.75.0
+
+### Minor Changes
+
+- 6f80d8b54: feat(blade): add add support to modify dataKey and nameKey in donut chart
+
+### Patch Changes
+
+- d9f9ef9ba: ci: update npm publishing via OIDC
+- 297cd9469: fix(blade): update ci bot permissions
+- 4f33fce21: fix: update storybook example & expose ChartLabelContentProps type
+
+## 12.74.0
+
+### Minor Changes
+
+- 3498bd73f: feat(blade): added GenUI components
+
+## 12.73.1
+
+### Patch Changes
+
+- 7320c7e4b: feat(blade): patch for table pagination
+
+## 12.73.0
+
+### Minor Changes
+
+- 16240ddd4: fix(blade): default pagesize in pagination
+
+## 12.72.0
+
+### Minor Changes
+
+- 069a7163d: Releasing Klear360 components to Svelte with new packages Klear360-core and Klear360-svelte
+- ac14ceb6a: Version mismatch issue fixed for blade svelte release
+
+## 12.71.0
+
+### Minor Changes
+
+- b6c2e2563: feat(blade): expose tick formatter
+
+## 12.70.1
+
+### Patch Changes
+
+- 1005547fa: blade(fix): allow users to modify interval and other props
+
+## 12.70.0
+
+### Minor Changes
+
+- ea3f318d9: feat(blade): add highlight lengends on click
+- d4e6866b7: feat(blade): add support for text truncation in x-axis label
+- b1d21bf26: feat(blade): add hover on line charts
+
+## 12.69.0
+
+### Minor Changes
+
+- 9f7cbd5ad: feat(blade): bundle recharts
+
+## 12.68.1
+
+### Patch Changes
+
+- 5ab22346a: fix(createTheme): color of `surface.background.primary.subtle` in createTheme function (white labelling)
+
+## 12.68.0
+
+### Minor Changes
+
+- b05315121: feat(blade): add data attribute in basefilter chip
+
+## 12.67.0
+
+### Minor Changes
+
+- f54a6600b: feat(blade): expose zIndex in toast & updated zIndex values
+- 0dbcbb6c2: feat(blade): added openInteraction prop for hover/click trigger on popover component
+
+## 12.66.0
+
+### Minor Changes
+
+- 731a6ca30: feat(blade): add pagination component
+
+## 12.65.1
+
+### Patch Changes
+
+- 75272f22b: fix(blade): correct border-radius for secondary variant in ButtonGroup when buttons are wrapped (e.g., inside Dropdown)
+
+## 12.65.0
+
+### Minor Changes
+
+- d508ed312: feat(blade): remove padding prop from FilterChipGroup
+
+  We have removed the `padding` prop from the `FilterChipGroup` component, which was introduced in the previous version. Padding is now handled internally as part of the global spacing update.
+
+  #### Impact
+
+  If your code was using the `padding` prop, you might notice spacing differences or snapshot changes in your tests. No functional changes are required otherwise.
+
+  #### How to Upgrade
+
+  Remove the `padding` prop usage from `FilterChipGroup`. The component will now automatically apply the correct spacing as per the new global layout rules.
+
+- 17e980ebd: ## feat(blade): list view v2
+
+  ### 🔧 Prop Updates
+
+  - **Deprecated Props:**
+    - List View Filters: searchValue, searchValuePlaceholder, searchName, onSearchChange, onSearchClear, searchTrailing, showFilters, onShowFiltersChange
+    - Table Header: rowDensity
+  - **Added:**
+    - `actions` (replaces deprecated search-related props)
+    - `FilterChipGroup.padding`
+    - `TableToolbar.placement`
+
+  ### 🎨 List View Visual & Structural Changes
+
+  - **Table Cell:** Font (M→S, S→XS), color (Normal→Subtle), links (Primary→Neutral)
+  - **Table Header:** Fixed height 36px, bg → `interactive.bg.gray.faded`, font (M→S, Normal→Subtle)
+  - **Pagination:** Height 60→48px, removed horizontal padding, smaller/subtle text
+  - **Quick Filter:** Always expanded, removed radio for single-select, unified badge color
+  - **Filter Chip:** Border 0.5px normal, height 24px, refreshed Clear Filter button, removed bg/divider
+  - **Filter Panel:** Removed old panel (Download/Copy), moved actions next to Quick Filters (Quick Filters left; Search + Actions right), added tooltips
+  - **Bulk Action Toolbar:** Overlays Table Header on selection; hidden otherwise (same on mobile)
+  - **Mobile:** Removed “Show Filter” button; bulk actions adapt; filters stay horizontally scrollable
+
+## 12.64.0
+
+### Minor Changes
+
+- 49082f564: feat(blade): charts new ui & color token update
+
+  ### Deprecation of `chart.background` prefix in color token
+
+  The `chart.background` prefix in color token has been deprecated to improve clarity and provide a more descriptive API. The new prefix is `data.background`.
+
+  **Impact**
+
+  Implementation that explicitly sets `chart.background` prefix in color token will use `data.background` as prefix.
+
+  **How to Upgrade**
+
+  You need to update your code where `chart.background` prefix in color token. You can either remove the prefix entirely to use default color themes or change the value to `data.background`.
+
+  ```diff
+  - color="chart.background.categorical.blue.moderate"
+  + color="data.background.categorical.blue.moderate"
+  ```
+
+  ### Updation of color mapping tokens for charts
+
+  We have update color mapping of few token related to charts. you might need to update your snaps.
+
+## 12.63.0
+
+### Minor Changes
+
+- e241824ec: added [elementtiming](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/elementtiming) attribute to components.
+
+## 12.62.0
+
+### Minor Changes
+
+- 10bea9302: feat(blade): creation view v2
+
+  - **Card**: Added prop to enable `cursor: pointer` for interactive states.
+  - **Creation View**:
+    - Added progress bar in full-page modal for multi-step forms.
+    - Included StepGroup example in medium modal.
+    - Enhanced the **Flow Selection Modal** with responsive behavior
+
+## 12.61.1
+
+### Patch Changes
+
+- 46b7a491b: revert: visually hidden changes
+
+  > **Note:** you might need to update your snaps
+
+## 12.61.0
+
+### Minor Changes
+
+- c5e3a9237: feat(blade): introduced footer and enhance header background for DetailedView
+
+  - **New Component**: Added `DrawerFooter` component with sticky positioning and optional divider in drawer
+  - **Enhanced DrawerHeader**: Added `showDivider` prop to control header divider visibility and upgraded gradient pattern from linear to radial
+  - **DetailedView Pattern Enhancement**:
+    - Add an option to toggle the footer's visibility
+    - Ensure the footer remains sticky at all times
+    - Upgrade the gradient pattern in the header
+
+## 12.60.2
+
+### Patch Changes
+
+- a4717aa85: fix(blade): scroll issue in bottomsheet
+
+## 12.60.1
+
+### Patch Changes
+
+- 5f2750544: feat(blade): update TopNav actions bg color, made profile avatar square
+
+## 12.60.0
+
+### Minor Changes
+
+- 9d7546305: feat(blade): added counter input component
+
+## 12.59.0
+
+### Minor Changes
+
+- ce80fb710: feat(blade): update ts version
+
+## 12.58.0
+
+### Minor Changes
+
+- 6d508bbc8: ## feat(blade): add donut charts 🍩
+
+  [Docs Link](https://design.klearnow.com/?path=/docs/components-charts-donutchart--docs)
+
+  ### Deprecation of `colorTheme='default'`
+
+  The `default` option for the `colorTheme` prop has been deprecated to improve clarity and provide a more descriptive API. The new default theme is `'categorical'`. This change makes the theme's purpose—applying a set of distinct colors for different categories—more explicit.
+
+  **Impact**
+
+  Implementation that explicitly sets `colorTheme='default'` will use `'categorical'` as default. Implementations that did not specify a `colorTheme` will automatically use the new `'categorical'` default and should see no change in behavior.
+
+  **How to Upgrade**
+
+  You need to update your code where `colorTheme='default'` is used. You can either remove the prop entirely or change the value to `'categorical'`.
+
+  ```diff
+  - <YourComponent colorTheme='default' />
+  + <YourComponent colorTheme='categorical' />
+
+  // Or, since it's the new default, simply remove the prop:
+  + <YourComponent />
+
+  ```
+
+  ### Updation of color mapping tokens for charts
+
+  We have update color mapping of few token related to charts. you might need to update your snaps.
+
+## 12.57.0
+
+### Minor Changes
+
+- f8be2c8ef: feat(Accordion): add `minWidth` prop to the Accordion component
+
+## 12.56.1
+
+### Patch Changes
+
+- 950c4881f: fix(blade): resolve stale values and button default behaviour in preset dropdown of datepicker
+
+## 12.56.0
+
+### Minor Changes
+
+- 1b07633c3: feat(blade): add BarChart component
+
+  [Docs Link](https://design.klearnow.com/?path=/docs/components-charts-barchart--docs)
+
+## 12.55.1
+
+### Patch Changes
+
+- fa2f47cad: fix(blade): invoke onApply of DatePicker when preset is selected from the preset dropdown
+- 2218df3db: feat(DropdownOverlay): add 'data-analytics' attribute
+
+## 12.55.0
+
+### Minor Changes
+
+- ac1d4fb54: feat(blade): add support for non-dismissible modals & bottomsheet
+
+  Introduces a new prop `isDismissible` in `Modal` and `BottomSheet` which can be used to prevent users from accidentally dismissing modals and bottomSheet by clicking outside or pressing the escape key. When `isDismissible={false}`, the close button is automatically hidden and the modal and bottomSheet can only be closed through explicit user actions.
+
+  ```jsx
+  <Modal isOpen={isOpen} isDismissible={false}>
+    // .... modal content ....
+  </Modal>
+  ```
+
+  ```jsx
+  <BottomSheet isOpen={isOpen} isDismissible={false}>
+    // .... bottomsheet component ....
+  </BottomSheet>
+  ```
+
+## 12.54.0
+
+### Minor Changes
+
+- c835336ad: feat(timepicker): added timepicker component
+
+## 12.53.1
+
+### Patch Changes
+
+- 0ff0152b2: fix(ActionListItem): support non-string values in item
+
+## 12.53.0
+
+### Minor Changes
+
+- ab1773547: feat(blade): add AreaChart component
+
+  [Docs Link](https://design.klearnow.com/?path=/docs/components-charts-areachart--docs)
+
+## 12.52.0
+
+### Minor Changes
+
+- fbc71b288: feat(blade): add support for Badge in SelectInput
+
+  Introduces a new prop `valueSuffix` which in `SelectInput` which can be used to render a Badge after the the value.
+
+  ```jsx
+  <SelectInput
+    valueSuffix={({ values }) => {
+      if (values[0] === 'item-1') {
+        return <Badge color="positive">20% Off</Badge>;
+      }
+      return null;
+    }}
+  />
+  ```
+
+## 12.51.0
+
+### Minor Changes
+
+- 2f0e492cd: feat(blade): added Chart subcomponents & Line Chart component
+
+  [Docs Link](https://design.klearnow.com/?path=/docs/components-charts-linechart--docs)
+
+## 12.50.0
+
+### Minor Changes
+
+- b9e48e2ab: feat(Box): add `backgroundFilter` and `transition` prop to Box component
+
+## 12.49.7
+
+### Patch Changes
+
+- 781cc325f: fix(blade): Double focus ring in DatePicker and Input
+
+## 12.49.6
+
+### Patch Changes
+
+- 57d2d9ff2: feat(datepicker): exposing footer prop
+
+## 12.49.5
+
+### Patch Changes
+
+- 77a78ddd7: chore: update babel version
+
+## 12.49.4
+
+### Patch Changes
+
+- 8132ef089: feat(datepicker): added partial validation
+
+## 12.49.3
+
+### Patch Changes
+
+- 37fbe24ee: fix: wrong layout position in case of bottom sheet
+
+## 12.49.2
+
+### Patch Changes
+
+- 9fd0523f9: fix(datepicker): changed arrow to hyphen in range input field
+
+## 12.49.1
+
+### Patch Changes
+
+- 828d6d4f3: revert: virtualization in phone number input
+
+## 12.49.0
+
+### Minor Changes
+
+- d21bd1c9a: feat: add filled icons
+
+## 12.48.0
+
+### Minor Changes
+
+- bf6f929e6: feat(datepicker): add formatted input, preset dropdown, single-field range selection
+
+## 12.47.1
+
+### Patch Changes
+
+- 3c8584905: fix : update bottom sheet height logic
+
+## 12.47.0
+
+### Minor Changes
+
+- 029964227: feat(blade): add new navigation button position overlap
+
+## 12.46.2
+
+### Patch Changes
+
+- b746d9db8: fix(ListView): enable horizontal scroll for filters on desktop, remove gradient overlay
+
+## 12.46.1
+
+### Patch Changes
+
+- 17b1be1e2: fix(blade): make promotional toast's leading prop optional
+
+## 12.46.0
+
+### Minor Changes
+
+- da2ffba9f: fix(blade): bottom sheet height logic
+
+  > **Note:** This release introduces a change in height of bottom sheet, earlier we were adding header + grabhandle height, even if header don't have title or subtitle. This release fixes that.
+
+## 12.45.0
+
+### Minor Changes
+
+- 8c9f43777: fix: date picker end date issue
+
+  > **Note:** This release introduces a change in how the DatePicker returns the time for the end date in a date range. Previously, it returned `00:00:00` now it returns `23:59:59` .
+
+## 12.44.0
+
+### Minor Changes
+
+- ea88e1487: '@klearnow/klear360': feat: box now supports `feedback.background` tokens
+  '@klearnow/klear360-mcp': feat: add confirmation pattern documentation and examples
+
+## 12.43.1
+
+### Patch Changes
+
+- a2cf026c4: fix(carousel): resolve Storybook interaction issues in peek mode
+
+## 12.43.0
+
+### Minor Changes
+
+- b2467ea18: feat(table): added spanning & nesting
+- d7f4084fa: feat(table): added support for grouping
+
+## 12.42.3
+
+### Patch Changes
+
+- 88afdb37f: fix: remove logs and add ref
+- abefb18cd: fix(inputgroup): payment card icon jsx error
+
+## 12.42.2
+
+### Patch Changes
+
+- b46d26bee: fix: table header sticky
+
+## 12.42.1
+
+### Patch Changes
+
+- 6d4b1f6e7: fix(blade): accordion sytling changes
+
+## 12.42.0
+
+### Minor Changes
+
+- 503e47531: feat: add support for dropdown in search
+- aba1bb999: feat(carousel): added peek behaviour in carousel
+
+## 12.41.5
+
+### Patch Changes
+
+- 061de8050: fix(blade): quick filter issue
+- 0a0918895: fix: Text sizes in button
+
+## 12.41.4
+
+### Patch Changes
+
+- 66c599d1a: fix(blade): label postion in chip group
+
+## 12.41.3
+
+### Patch Changes
+
+- 8fdc7e340: fix(blade): update month picker issue
+
+## 12.41.2
+
+### Patch Changes
+
+- 3bab8502b: feat(blade): add changeset icon
+
+## 12.41.1
+
+### Patch Changes
+
+- b86409b12: fix(blade): expose empty state component
+
+## 12.41.0
+
+### Minor Changes
+
+- 2a53e520f: feat(Tabs): sizing enhancements in tab component, add `size="small"`
+
+  > [!NOTE]
+  >
+  > This changes the top padding in existing Tab component. Although this won't cause any functional or visual breakage, it may cause visual change depending on the usage. You can adjust the padding on container if needed
+
+  <table>
+    <tr><th>Before</th><th>After</th></tr>
+    <tr>
+      <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/3a965299-27df-42f8-8018-907627a86ff3" /></td>
+      <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/5abc897f-370e-4220-ac95-1302eb9edd21" /></td>
+    </tr>
+  </table>
+
+- 1690286d0: feat(blade): add EmptyState component
+
+## 12.40.0
+
+### Minor Changes
+
+- a90644a3f: fix(blade): update CompanyRegistrationIcon
+
+## 12.39.0
+
+### Minor Changes
+
+- dfe654e76: feat(blade): add `labelSuffix` & `labelTrailing` props in Input family components
+
+## 12.38.0
+
+### Minor Changes
+
+- 4fd463368: feat(blade): card variants enhancement & docs
+- a839567f9: fix(blade): types in list , prefix color
+
+### Patch Changes
+
+- 6fa5fca1d: fix(blade): expose inputType in tableEditableCell
+
+## 12.37.0
+
+### Minor Changes
+
+- d8f9ddec9: feat(Typography): add `textTransform` support for typography components
+
+### Patch Changes
+
+- eda617bc3: fix(Tooltip): re-render issue on mobile tooltip
+
+## 12.36.0
+
+### Minor Changes
+
+- eb7381a21: feat: Selectable Card
+
+## 12.35.0
+
+### Minor Changes
+
+- 1801b3865: feat: Payment Component
+
+## 12.34.1
+
+### Patch Changes
+
+- 9e5c6ef04: fix(blade): table editable cell dropdown issue
+
+## 12.34.0
+
+### Minor Changes
+
+- b933afc11: feat: add toast container offset prop
+
+## 12.33.2
+
+### Patch Changes
+
+- b03d34fdf: feat(blade): update input styles
+- 2807550e3: feat(blade): add Dropdown in TextInput and SearchInput
+- b8453bbcf: fix(blade): leading and trailing in textInput
+- 11fb3afe7: feat(accordion): UI enhancement
+
+## 12.33.1
+
+### Patch Changes
+
+- 3d513728b: revert: "chore: update dependencies and improve CI workflow"
+
+## 12.33.0
+
+### Minor Changes
+
+- 43cc06167: feat(InfoGroup): add InfoGroup component
+
+### Patch Changes
+
+- 16a8f55c5: feat(InfoGroup): remove keyAlign prop
+  feat(InfoGroup knowledgebase): update knowledgebase to add InfoGroup component
+
+## 12.32.3
+
+### Patch Changes
+
+- c09440955: fix(table): fix table selected styles
+- 5badd6410: fix: label position to 'top' for CheckboxGroup and RadioGroup on mobile viewports
+
+## 12.32.2
+
+### Patch Changes
+
+- a9fdac32f: fix(blade): add disabled prop in filterchip
+
+## 12.32.1
+
+### Patch Changes
+
+- 562c93dac: feat(SideNav): change SideNav width and test mode icon
+  > [!NOTE]
+  >
+  > This changes the width of the SideNav. Make sure to adjust the rest of the layout accordingly if it depends on SideNav width.
+
+## 12.32.0
+
+### Minor Changes
+
+- d956170e9: feat(blade): add inputgroup
+
+### Patch Changes
+
+- 1d14b48c0: fix(blade): remove modal contraints
+
+## 12.31.5
+
+### Patch Changes
+
+- ce5916a56: feat(StepItem): expose minwidth for StepItem
+
+## 12.31.4
+
+### Patch Changes
+
+- 7fa1620e: fix(blade): listviewfilter props
+
+## 12.31.3
+
+### Patch Changes
+
+- be3e0233: fix: build script for node 22
+- 0f0df69c: fix(blade): make children optional for ListViewFilters
+
+## 12.31.2
+
+### Patch Changes
+
+- b42ad547: fix(blade): Display 'Show more filters' only if children are provided
+
+## 12.31.1
+
+### Patch Changes
+
+- 273730ff: fix: surface primary border color when using custom brand color
+
+## 12.31.0
+
+### Minor Changes
+
+- c48acef5: feat(Heading): add medium weight
+
+## 12.30.0
+
+### Minor Changes
+
+- 1de828f1: feat(fileUpload): add new size variant "variable"
+- a48a3a30: feat(blade): add preview component
+
+## 12.29.0
+
+### Minor Changes
+
+- 546aceaa3: feat(Card): add maxWidth property to card
+
+## 12.28.0
+
+### Minor Changes
+
+- b16eb895: feat(Amount): expose `fractionDigits` for control over decimals
+
+## 12.27.0
+
+### Minor Changes
+
+- 0b2b1d7a: fix(create-theme): disabled state colors in createTheme
+- ca378c3c: feat(stepgroup): UI enhancements
+
+### Patch Changes
+
+- bf3c19b0: fix(Tagged Inputs): prevent calling onTagChange twice
+
+## 12.26.0
+
+### Minor Changes
+
+- 06a77475: feat(blade): add orientation in radioGroup and checkbox
+
+## 12.25.2
+
+### Patch Changes
+
+- cc3d510b: - fixed accessibility issues in Avatar, Card and Checkbox.
+
+## 12.25.1
+
+### Patch Changes
+
+- a0132d50: fix(FC-3152): add data-analytics-\* for TabNav
+
+## 12.25.0
+
+### Minor Changes
+
+- 59fb0163: feat(PhoneNumberInput): add virtualization to phone number input
+
+## 12.24.0
+
+### Minor Changes
+
+- f7b868ad: feat(blade): add full page modal
+
+### Patch Changes
+
+- 9eb42df8: fix(StepGroup): extra space because of trailing property
+
+## 12.23.1
+
+### Patch Changes
+
+- c12197be: fix(blade): add accessibilityLabel in show more filters button in list view
+
+## 12.23.0
+
+### Minor Changes
+
+- 97cf1d95: feat(Drawer): add `onUnmount` to Drawer for triggering any state changes after drawer becomes invisible
+
+## 12.22.0
+
+### Minor Changes
+
+- 289a9c19: feat(Drawer): visual changes in Drawer (add border-radius, change stacking visuals)
+
+### Patch Changes
+
+- b514b529: fix(StepGroup): remove universal-base64 library
+
+## 12.21.3
+
+### Patch Changes
+
+- ca5ff972: fix(blade): filter chip keyboard navigation & auto-handling of selected state in controlled mode
+
+## 12.21.2
+
+### Patch Changes
+
+- fa9e437d: fix(blade): actionlistitem padding logic broken
+
+## 12.21.1
+
+### Patch Changes
+
+- fd18c78b: fix(blade): show title filterChipSelectInput, optional search in listview
+
+## 12.21.0
+
+### Minor Changes
+
+- c874d904: feat(StepGroup): support integrating stepgroup and collapsible
+- b64e93ed: feat(Drawer): add children support to DrawerHeader
+- 234b50ca: feat(Dropdown): support AutoComplete in DropdownHeader
+
+### Patch Changes
+
+- da5663e9: fix: reset datepicker to default picker value on close
+- 6345fc04: fix: auto-shifting of the date picker on picker change.
+- d9294055: fix: persists datevalues in case of month and year change
+
+## 12.20.1
+
+### Patch Changes
+
+- 7fdb6598: fix(SideNav): scroll issue in L2 menu
+
+## 12.20.0
+
+### Minor Changes
+
+- 65142216: feat(blade): add `FilterChipSelectInput` & `FilterChipDatePicker` components
+- 65142216: feat(blade): add list view pattern
+
+## 12.19.1
+
+### Patch Changes
+
+- 08ad3279: fix(blade): date picker resetting to prev value
+
+## 12.19.0
+
+### Minor Changes
+
+- 9284a1f9: feat(blade): feat: add virtualization in section list
+
+## 12.18.0
+
+### Minor Changes
+
+- fa1800c4: feat(storybook): pre-generate lock file for documentation examples
+- f211134b: feat(blade) : add keyicon , appleicon, androidicon
+
+## 12.17.1
+
+### Patch Changes
+
+- c28b9182: fix(Modal): remove clashing position of modal on module federated apps
+
+## 12.17.0
+
+### Minor Changes
+
+- 3afdadf3: fix(blade): datepicker autofocus not working on programmatically changing date
+
+## 12.16.2
+
+### Patch Changes
+
+- 89391f8b: fix(Input): fix color differences of label between figma and code
+
+## 12.16.1
+
+### Patch Changes
+
+- 20f744ab: fix(blade): datepicker height change issue
+
+## 12.16.0
+
+### Minor Changes
+
+- 87d37ebf: feat(blade): add table background color prop
+
+## 12.15.1
+
+### Patch Changes
+
+- 1419c1f5: fix(blade): focus on selected date by default in datepicker
+
+## 12.15.0
+
+### Minor Changes
+
+- bbf24c99: feat(blade): add support for table virtualization
+
+## 12.14.0
+
+### Minor Changes
+
+- 0b79d985: feat(QuickFilter): Add QuickFilters component
+
+## 12.13.1
+
+### Patch Changes
+
+- 37392871: feat(blade): add should showNavigationButtons prop in carousel
+
+## 12.13.0
+
+### Minor Changes
+
+- 19119623: feat(blade): add drag handle icon
+
+## 12.12.1
+
+### Patch Changes
+
+- 9dda1513: fix: remove js check that allows brand token for Box backgroundColor
+- 18fe5390: fix(blade): allow consumers to align chips in chipgroup
+- ba66b346: fix(blade): loading single button in buttonGroup
+
+## 12.12.0
+
+### Minor Changes
+
+- 7e155b6f: feat(blade): add engage and translate icons
+
+## 12.11.0
+
+### Minor Changes
+
+- d906838f: feat(blade): add Chat Message component
+
+## 12.10.0
+
+### Minor Changes
+
+- 142afcdf: feat(TextArea): expose `onKeydown` on TextArea and allow `numOfLines={1}`
+
+### Patch Changes
+
+- 6cf03ea3: feat: Improve OTPInput field value clear behaviour
+
+## 12.9.1
+
+### Patch Changes
+
+- 5531ef3f: feat: remove overflowY if L1 sidenav is collapsed
+- 5531ef3f: feat: SideNav improvements & fixes for X migration
+
+  1. Removed overflowY if L1 sidenav is collapsed
+  2. Fixed onVisibleLevelChange not getting called when clicking on a nested submenu
+
+## 12.9.0
+
+### Minor Changes
+
+- e035b38b: feat(DropdownIconButton): add support for DropdownIconButton and tooltip for Dropdown triggers
+
+## 12.8.2
+
+### Patch Changes
+
+- 3be3f0f9: fix(FileUpload): revert to not calling onChange on file remove
+
+  > [!NOTE]
+  >
+  > Check the below timeline if you're upgrading from 11.34.1+ version to this version
+
+  **Timeline of FileUpload changes**
+
+  - In 11.34.1: We did not call onChange on removing of file. Only onRemove was called
+  - In 11:36.2: We added dispatchEvent call which started calling onChange on onRemove (since React treats `input type="file"` differently than `input type="text"` - [CodeSandbox Link](https://codesandbox.io/p/sandbox/friendly-ishizaka-yk7mm3))
+  - In 12.4.0: We released a fix thinking onChange call was expected behaviour and we just updated the state value for it
+  - **This version:** Reverts back to 11.34.1 behaviour. If you're upgrading to this version from 11.34.1 or previous versions, the behaviour will stay same. If you're upgrading from 11.34.1+ and use FileUpload component, its recommended to test out FileUpload instances.
+
+- 3c040f66: feat: add icon only chip
+
+## 12.8.1
+
+### Patch Changes
+
+- 8b5602ba: fix(Avatar): misaligned menu on Avatar with icon
+
+## 12.8.0
+
+### Minor Changes
+
+- 98be8f05: feat(blade): add prompt and sort icon
+
+## 12.7.1
+
+### Patch Changes
+
+- 3b9d4cdd: feat(Elevate): add missing reexport for `Elevate`
+
+## 12.7.0
+
+### Minor Changes
+
+- 214b2121: feat(Motion / Elevate): add `Elevate` component to motion presets
+
+  Docs: https://design.klearnow.com/?path=/docs/motion-elevate--docs
+
+## 12.6.0
+
+### Minor Changes
+
+- f48096b2: feat(blade): add corner and arrow icons
+
+## 12.5.1
+
+### Patch Changes
+
+- 3a7f55f8: fix(codemod-v12): add missing token map for `standard.attentive` to codemod and manual migration
+- 08c5a4ae: fix(blade): fix: data analytics attribute from another external module
+
+## 12.5.0
+
+### Minor Changes
+
+- 194fffc5: feat(SideNav): add `description` on SideNavLink and `onVisibleLevelChange` callback on `SideNav`
+
+## 12.4.1
+
+### Patch Changes
+
+- 2692d5b6: fix(blade): remove file icon aligment while uploading
+
+## 12.4.0
+
+### Minor Changes
+
+- 964ee14c: feat: ability to align individual table column items
+
+### Patch Changes
+
+- 455e9651: fix(FileUpload): fileupload on remove clashes with onchage
+
+  > [!NOTE]
+  >
+  > Previously, onChange did not provide an updated value when a file was removed. Now, when a file is removed from FileUpload, onChange will return the updated value.
+
+- a87a200b: chore(blade): add data attributes in TabNav & Table components
+
+## 12.3.1
+
+### Patch Changes
+
+- 3a87bd69: fix(blade): unable to use switch inside card body
+
+## 12.3.0
+
+### Minor Changes
+
+- c228d8ca: feat(blade): add flask,keyboard and list-search icons
+
+### Patch Changes
+
+- 2326fa27: feat(tokens): change token values to match figma
+
+## 12.2.1
+
+### Patch Changes
+
+- dbd53024: fix(blade): date picker on level change typo
+
+## 12.2.0
+
+### Minor Changes
+
+- a9e46afb: feat(ActionList): add Virtualization in ActionList
+
+  ```jsx
+  <ActionList isVirtualized></ActionList>
+  ```
+
+  > [!NOTE]
+  >
+  > Current version only supports virtulization of fixed height list where items do not have descriptions. We'll be adding support for dynamic height lists in future versions
+
+### Patch Changes
+
+- 70259329: feat(blade): add dateformat and placeholder prop for datepicker input
+  fix(blade): Removed the chevron icon when the picker prop is used.
+
+## 12.1.1
+
+### Patch Changes
+
+- 6aae282a: chore(blade): change TabNavItem,TopNavActions background color & update examples
+- c676f3ed: fix(SideNav): empty padding in banner when banner component returns null
+
+## 12.1.0
+
+### Minor Changes
+
+- e00172bf: feat(blade): Changes in components for X migration
+
+  **Drawer:**
+
+  - Changed the drawer's showOverlay behaviour to not mandate the overlay on level2 stacking
+  - Exposed ref
+
+  **RadioGroup:**
+
+  - Exposed event in onChange
+
+  **ButtonGroup:**
+
+  - Added styled props
+  - Added support for Tooltip inside ButtonGroup
+
+  **IconButton:**
+
+  - Added styledProps
+
+  **SideNavLink:**
+
+  - Added onClick
+
+### Patch Changes
+
+- 41354f63: fix(blade): cleanup bodyscroll locks if bottomsheet is force unmounted
+
+## 12.0.3
+
+### Patch Changes
+
+- 0b5dc72d: fix: interactive card selected borderRadius
+
+## 12.0.2
+
+### Patch Changes
+
+- 95a58247: fix(blade): Add backwards compat for React17 - fallback for useInsertionEffect
+
+## 12.0.1
+
+### Patch Changes
+
+- 4178c595: docs: remove stackblitz and add story code
+  fix: export Stagger and AnimateInteractions
+
+## 12.0.0
+
+### Major Changes
+
+- 663da58e: feat(Motion): Release Motion Presets
+
+  - Check out [Klear360 v12 Upgrade Guide](https://github.com/klearnow/klear360/blob/master/packages/klear360/docs/migration-docs/upgrade-v12.md) for codemod and migration steps
+
+## 11.39.0
+
+### Minor Changes
+
+- 583900a1: feat(blade): add ray icon
+
+## 11.38.1
+
+### Patch Changes
+
+- 65431583: feat: update use-presence hook to latest for react 19 support
+
+## 11.38.0
+
+### Minor Changes
+
+- a51e8f70: feat(StepGroup): spacing enhancements, support for titleColor prop
+- 7117bfbc: feat: add support for data-analytics attribute
+
+## 11.37.0
+
+### Minor Changes
+
+- 778e388b: feat(blade): add new icons - IndiaFlag, MagicKonnect, WorldWide
+
+## 11.36.2
+
+### Patch Changes
+
+- f294a414: fix(blade): maxCharacters alignment in Input field
+- fa487f1e: fix(blade): Trigger native select events in dropdown/ file upload / Date picker
+
+## 11.36.1
+
+### Patch Changes
+
+- 8846293f: fix: dropdown not opening if user clicks on dropdown backdrop
+
+## 11.36.0
+
+### Minor Changes
+
+- e97ec75b: feat: add new icons
+
+### Patch Changes
+
+- 9294580c: feat: expose textAlign prop types in text input
+
+## 11.35.0
+
+### Minor Changes
+
+- e53905b0: feat(blade): add controlled state to carousel
+
+## 11.34.1
+
+### Patch Changes
+
+- 421a3a8e: fix(blade): bottomsheet body scroll lock not clearing
+
+## 11.34.0
+
+### Minor Changes
+
+- b63190b0: feat(BottomNav): add BottomNav component
+
+### Patch Changes
+
+- 479431ab: feat(BottomNav): remove tap animation
+
+## 11.33.0
+
+### Minor Changes
+
+- e35355af: feat(Table): add hover actions support on `TableRow`
+
+## 11.32.0
+
+### Minor Changes
+
+- a4a61681: feat(blade): revamped top-nav component
+
+  > NOTE:
+  > This might be a breaking change for you, if your project uses the older deprecated TopNav.
+
+## 11.31.2
+
+### Patch Changes
+
+- eef992bd: feat(blade): support test id for table row
+
+## 11.31.1
+
+### Patch Changes
+
+- 94b69155: fix(blade): set isDisabled to checkbox for disabled table rows [DSSUP-157]
+
+  Changed the visual styling of disabled checkbox to have 'not-allowed' cursor.
+
+## 11.31.0
+
+### Minor Changes
+
+- 234f1083: feat(Amount): add support for negative amount
+  fix(PhoneNumberInput): PhoneNumber input compatibility issues with i18nify
+
+  > [!NOTE]
+  >
+  > Consumers should upgrade to latest version of `@klearnow/i18nify-js` and `@klearnow/i18nify-react` for support of negative amount
+
+## 11.30.5
+
+### Patch Changes
+
+- 9d4f9b85: feat(blade): add height & styled props to carousel
+
+## 11.30.4
+
+### Patch Changes
+
+- 68e0ec53: fix(blade): Table cell text truncation
+
+## 11.30.3
+
+### Patch Changes
+
+- 98482ca9: fix(blade): interactive card cursor
+
+## 11.30.2
+
+### Patch Changes
+
+- 2f8a5029: fix(BaseHeader): Handle word break on single word. Fixes for AccordionItemHeader, DropdownHeader, etc
+
+## 11.30.1
+
+### Patch Changes
+
+- c050c1d9: fix: AccordionItemHeader to take full width
+
+## 11.30.0
+
+### Minor Changes
+
+- 6e059a68: feat: fix datepicker range selection bug & add onApply handler
+
+### Patch Changes
+
+- 98770d68: fix(Input): required necessity indicator label break
+- 3c31990d: feat(Table): add `defaultSelectedIds` prop
+
+## 11.29.0
+
+### Minor Changes
+
+- eaa75c64: feat(ActionList): add ActionListItemAvatar component for leading prop
+
+### Patch Changes
+
+- c6f8bc72: fix(blade): support overriding tooltip interactive wrapper display prop
+
+## 11.28.2
+
+### Patch Changes
+
+- 12f30712: fix(input): change `wordBreak` behaviour of input hint text & fix alignment
+- 601cedc8: feat(StepItem): add `isDisabled` prop to StepItem
+
+## 11.28.1
+
+### Patch Changes
+
+- 830c8744: fix(Table): table sticky column overlapping with relative cell
+
+## 11.28.0
+
+### Minor Changes
+
+- 95f19f49: feat: expose link negative/positive colors
+
+## 11.27.1
+
+### Patch Changes
+
+- 8ba3eab7: fix: datepicker necessityIndicator
+
+## 11.27.0
+
+### Minor Changes
+
+- f036ef58: feat: add EqualsIcon
+
+## 11.26.1
+
+### Patch Changes
+
+- 5d7317ca: fix: remove default `rel` values
+
+  > [!NOTE]
+  >
+  > While its non-ui-breaking change, you might want to add `rel="noopener noreferrer"` to your Button if that is what you're expecting. This PR removes the defaults in-order to not break analytics that relies on referrer.
+
+- 4dcad016: fix: set min-width on Radio to avoid shrinking
+
+## 11.26.0
+
+### Minor Changes
+
+- f26cf80d: chore: expose brand colors
+- 39742907: feat(TableEditableCell): refactor TableEditableCell and add TableEditableDropdownCell
+
+### Patch Changes
+
+- e13023de: fix: table footer background color
+- fb58be12: fix: Spinner colors
+
+## 11.25.0
+
+### Minor Changes
+
+- 45ed9267: feat: add avatar addons, added new topAddon and bottomAddon props
+
+## 11.24.3
+
+### Patch Changes
+
+- 343d494d: fix(ActionListItem, MenuItem): truncate text without spaces and add htmlTitle
+
+## 11.24.2
+
+### Patch Changes
+
+- 733b9545: fix: change onRemove/onReupload params
+
+## 11.24.1
+
+### Patch Changes
+
+- b38943c0: fix: table multiselect with pagination bug
+- 636952b6: feat: add multiselection-mode prop to Table
+- caee2688: fix: add button type button
+
+## 11.24.0
+
+### Minor Changes
+
+- 03837f9f: feat: add `TableEditableCell` component for Table
+
+## 11.23.3
+
+### Patch Changes
+
+- 5b3c42db: fix: white-labeling issue with surface text primary
+
+## 11.23.2
+
+### Patch Changes
+
+- 59a333b4: fix(FileUpload): correctly update errortText
+- bb06013f: fix(ProgressBar): show percentage with decimal when using as meter
+
+## 11.23.1
+
+### Patch Changes
+
+- 00238183: feat(Menu, Dropdown): add width props on MenuOverlay and allow it in SelectInput Dropdown
+
+## 11.23.0
+
+### Minor Changes
+
+- fe9a0cff: feat(blade): add TopNav component
+
+## 11.22.0
+
+### Minor Changes
+
+- 2cb7668b: feat(Menu): add Menu component
+
+## 11.21.9
+
+### Patch Changes
+
+- d12977d5: fix(FileUpload): correctly udpate state in controlled mode
+
+## 11.21.8
+
+### Patch Changes
+
+- 9b2883f8: feat: add iconColor prop to List & ListItem
+
+## 11.21.7
+
+### Patch Changes
+
+- be353128: fix: Spinner's white color
+
+## 11.21.6
+
+### Patch Changes
+
+- 0d6d7cf7: fix: bottomsheet initial focus triggering everytime
+- cc40b48e: fix(Accordion): add `maxWidth` prop
+
+## 11.21.5
+
+### Patch Changes
+
+- 25fe56db: fix(DatePicker): correct input alignment without label
+- e179dd50: fix(FileUpload): remove excessive margins
+
+## 11.21.4
+
+### Patch Changes
+
+- d3789888: fix: datepicker zIndex issue and expose zIndex prop
+
+## 11.21.3
+
+### Patch Changes
+
+- 4643a992: fix(blade): datepicker input width
+- c7ed69b4: chore: add petty cash budget icon
+
+## 11.21.2
+
+### Patch Changes
+
+- 2a4d1673: feat(FileUpload): add `onReupload` prop to use in case of error state
+
+## 11.21.1
+
+### Patch Changes
+
+- 04c84eb4: fix: datepicker label alignment
+
+## 11.21.0
+
+### Minor Changes
+
+- 0d3e260e: feat(SideNav): add SideNav component
+
+  Checkout [SideNav Documentation](https://design.klearnow.com/?path=/docs/components-sidenav--docs)
+
+### Patch Changes
+
+- 2d82e41c: fix(FileUpload): allow re-uploading of the same file
+
+## 11.20.0
+
+### Minor Changes
+
+- d9bb5223: refactor(blade): downgrade mantine to v6
+
+## 11.19.1
+
+### Patch Changes
+
+- 634eefd3: fix(Card, Switch): card border width, switch colors
+- 8f8b795e: fix: DatePicker necessityIndicator alignment
+
+## 11.19.0
+
+### Minor Changes
+
+- 2ed5299e: feat(blade): add DatePicker component
+
+## 11.18.3
+
+### Patch Changes
+
+- d500ec14: feat: add placeholder prop in phone input
+
+## 11.18.2
+
+### Patch Changes
+
+- 00c87e88: fix(blade): radio helptext being negative
+
+## 11.18.1
+
+### Patch Changes
+
+- 14f70c96: fix: update circular progress percentage color
+
+## 11.18.0
+
+### Minor Changes
+
+- 0c009edc: feat: add `SearchInput` component
+- 00edb732: feat: add `Avatar` & `AvatarGroup` components
+
+## 11.17.1
+
+### Patch Changes
+
+- 3d69bc9d: fix(blade): modal component failing to verify null component
+
+## 11.17.0
+
+### Minor Changes
+
+- 64108d77: feat(blade): add new icons and add figma icon importer script
+
+## 11.16.1
+
+### Patch Changes
+
+- 51c04c81: feat(Table): add compact rowDensity & update existing densities
+- 906e7f4f: fix(DropdownOverlay): Fix DropdownOverlay getting cropped in Sticky Table Column
+
+## 11.16.0
+
+### Minor Changes
+
+- afddbf27: feat: add label & validation related props to ChipGroup
+
+### Patch Changes
+
+- ef0fb059: feat(tokens): update dark mode tokens
+
+## 11.15.2
+
+### Patch Changes
+
+- 102dc873: fix: i18nify-react version upgraded to resolve duplicate i18nify-js copies
+
+## 11.15.1
+
+### Patch Changes
+
+- 989172ab: fix(blade): tab item button type
+
+## 11.15.0
+
+### Minor Changes
+
+- ada461c8: feat(StepGroup): add StepGroup component
+
+  Documentation: https://design.klearnow.com/?path=/docs/components-stepgroup--docs
+
+## 11.14.0
+
+### Minor Changes
+
+- 23a8364b: feat(blade): add leading prop in Alert
+
+## 11.13.1
+
+### Patch Changes
+
+- 2f0d96fb: fix(blade): phone number input dropdown not opening
+
+## 11.13.0
+
+### Minor Changes
+
+- 410cfb55: feat: add `circular` variant for the `ProgressBar` component
+
+  #### Changes
+
+  - The `"meter"` & `"progress"` values for the `variant` prop are deprecated in favor of the new `type?: "meter" | "progress"` prop.
+  - The `variant` prop now accepts `"linear"` & `"circular"` values.
+  - **Usage:**
+
+    ```js
+      <ProgressBar variant="circular" value={20}> label="Label" />
+    ```
+
+  #### Migration with Codemod
+
+  - The codemod will automatically update the `ProgressBar` component. Execute the codemod on the file/directory that needs to be migrated for the page via the following command:
+
+    > Need help? Check out [jscodeshift docs](https://github.com/facebook/jscodeshift) for CLI usage tips.
+
+    ```sh
+    npx jscodeshift ./PATH_TO_YOUR_DIR --extensions=tsx,ts,jsx,js -t ./node_modules/@klearnow/klear360/codemods/migrate-progressbar/transformers/index.ts --ignore-pattern="**/node_modules/**"
+    ```
+
+  - There might be some situations where the codemod falls short, If you encounter errors, refer the following examples to migrate the component manually:
+
+    ```diff
+    - <ProgressBar value={20}> label="Label" />
+    + <ProgressBar type="progress" value={20}> label="Label" />
+
+    - <ProgressBar variant="progress" value={20}> label="Label" />
+    + <ProgressBar type="progress" variant="linear" value={20}> label="Label" />
+
+    - <ProgressBar variant="meter" value={20}> label="Label" />
+    + <ProgressBar type="meter" variant="linear" value={20}> label="Label" />
+    ```
+
+## 11.12.0
+
+### Minor Changes
+
+- c5f24eae: feat(TextArea, TextInput): Support Tagged Inputs with `tags` and `isTaggedInput` prop
+  feat(Tag): max-width is removed from Tag component
+
+## 11.11.1
+
+### Patch Changes
+
+- cc69004a: fix: additional parameters added to retain fraction digits in humanize Amount figure
+
+## 11.11.0
+
+### Minor Changes
+
+- 8c5231d4: feat: add large size in FileUpload component
+
+  #### Usage
+
+  ```js
+  <FileUpload
+    size="large"
+    uploadType="single"
+    label="Upload GST certificate"
+    helpText="Upload .jpg, .jpeg, or .png file only"
+    accept="image/*"
+  />
+  ```
+
+## 11.10.0
+
+### Minor Changes
+
+- a75d2e3c: feat(blade): add PhoneNumber input
+
+## 11.9.1
+
+### Patch Changes
+
+- 38d97633: fix(Table): selection toggle for multiselect table
+
+## 11.9.0
+
+### Minor Changes
+
+- 015e6828: feat: Redesign all `Input` components
+
+  > Note: No breaking changes to the existing API. The Input components will continue to work as before but with an updated design.
+
+  ## Changes
+
+  ### TextInput
+
+  - Redesigned UI
+  - Add `leadingIcon` prop
+  - ⚠️ Deprecate `icon` prop in favour of `leadingIcon` which will be removed in the next major version
+  - Add `trailingIcon` prop
+  - Add `trailingLinkButton` prop
+  - Add `size` prop
+
+  ### TextArea
+
+  - Redesigned UI
+  - Add `size` prop
+
+  ### PasswordInput
+
+  - Redesigned UI
+  - Adds `size` prop
+
+  ### OTPInput
+
+  - Redesigned UI
+  - Add `size` prop
+
+  ### SelectInput
+
+  - Redesigned UI
+  - Add `size` prop
+
+  ### Autocomplete
+
+  - Redesigned UI
+  - Add `size` prop
+
+  ### Radio
+
+  - Add `size` prop
+
+  ### Checkbox
+
+  - Add `size` prop
+
+## 11.8.2
+
+### Patch Changes
+
+- 5be1dedb: fix: update ButtonGroup focus ring styles
+
+## 11.8.1
+
+### Patch Changes
+
+- 9dcc2914: fix(Button): use height and width to fix sizes in Icon Only Button
+
+## 11.8.0
+
+### Minor Changes
+
+- fd304e47: feat: add the `ButtonGroup` component
+
+## 11.7.0
+
+### Minor Changes
+
+- 524fa924: feat(Accordion): add new `filled` variant
+
+  New variant can be used to build individual filled Accordions like these
+
+  <img width="400" alt="image" src="https://github.com/klearnow/klear360/assets/30949385/7f3d737f-149a-42b0-be1b-1c86d5a0fd83">
+
+  > [!Warning]
+  >
+  > Accordion has a new API and the current API will be deprecated and removed in next major version
+
+  #### Migration from existing API
+
+  We have added `AccordionItemHeader` and `AccordionItemBody` components.
+
+  Props like `icon`, `title`, `description` from AccordionItem are deprecated.
+
+  - `icon` on AccordionItem can be replicated with `leading` on AccordionItemHeader
+  - `title` moves from AccordionItem to AccordionItemHeader
+  - `description` from AccordionItem can be passed to AccordionItemBody as children
+
+  ##### Diff
+
+  ```diff
+  <Accordion>
+    <AccordionItem
+  -    icon={StarIcon}
+  -    title="This is title"
+  -    description="Body content of Accordion"
+    />
+  </Accordion>
+  ```
+
+  ```diff
+  <Accordion>
+    <AccordionItem>
+  +    <AccordionItemHeader leading={<StarIcon size="large" />} title="This is title" />
+  +    <AccordionItemBody>Body content of Accordion</AccordionItemBody>
+    </AccordionItem>
+  </Accordion>
+  ```
+
+  Checkout full documentation at https://design.klearnow.com/?path=/docs/components-accordion--docs
+
+## 11.6.3
+
+### Patch Changes
+
+- 2c64f181: feat: support `defaultPlacement` prop on `DropdownOverlay`
+- ef68789a: fix(DropdownButton): scroll handling issues on keyboard navigations
+
+## 11.6.2
+
+### Patch Changes
+
+- a6a59686: fix: cover more cases with codemod
+- 902e28b4: fix: i18nify-js dependency updated
+
+## 11.6.1
+
+### Patch Changes
+
+- af39cab2: fix: add FileUpload exports
+- 26317e0e: feat: add adjusted font fallbacks for Inter and TASA
+
+## 11.6.0
+
+### Minor Changes
+
+- 9ebaf986: feat: add `FileUpload` component
+
+## 11.5.0
+
+### Minor Changes
+
+- bb7466e7: feat(blade): add `Breadcrumb` component
+
+## 11.4.0
+
+### Minor Changes
+
+- 51208914: feat(Drawer): add Drawer component
+
+  Checkout https://design.klearnow.com/?path=/docs/components-drawer--docs
+
+### Patch Changes
+
+- ab028b6c: fix(Tag): tag truncation in Select and AutoComplete
+
+## 11.3.1
+
+### Patch Changes
+
+- 85f229d0: refactor(blade): add meta attributes to Toast
+
+## 11.3.0
+
+### Minor Changes
+
+- 497799df: feat(blade): add toast component
+
+## 11.2.1
+
+### Patch Changes
+
+- 16a0e737: fix(Dropdown): remove scrollbar on tag slot and allow clicks on DropdownLink and DropdownButton chevron icons
+
+## 11.2.0
+
+### Minor Changes
+
+- f104cbf3: **feat: Added internationalization in Amount component via i18nify.
+  References**
+
+  - **i18nify-js:** https://www.npmjs.com/package/@klearnow/i18nify-js
+  - **i18nify-react:** https://www.npmjs.com/package/@klearnow/i18nify-react
+
+  **What changes ?**
+
+  1. The `<Amount />` component will now automatically format numbers based on the user's browser locale. For example, `<Amount value={123456.789} currency="INR">` will render `₹1,23,456.79` for browsers with the `en-IN` default locale, whereas it will render `₹123,456.79` for browsers with the `en-US` locale.
+
+  2. If you want to enable users to change the locale of your page, add the `@klearnow/i18nify-react` package and wrap your app inside the `I18nProvider`. Utilize the `setI18nState` utility to modify the locale. For more details, please refer to the [documentation](https://www.npmjs.com/package/@klearnow/i18nify-react).
+
+  3. Additionally, if you prefer to maintain a fixed locale for your page and amount component, enclose your app within `<I18nProvider initData={{locale: 'locale-you-want'}}>..`. For more details, please refer to the [documentation](https://www.npmjs.com/package/@klearnow/i18nify-react).
+
+  **How to update ?**
+
+  1. Install i18nify as dependency `yarn add @klearnow/i18nify-js`
+  2. _[Optional]_: Install i18nify-react as dependency to manage state effectively `yarn add @klearnow/i18nify-react`
+  3. Install latest Klear360 `yarn add @klearnow/klear360@latest`
+
+## 11.1.1
+
+### Patch Changes
+
+- 9801ff86: - feat(Dropdown): add E2E tests
+
+  - fix(Dropdown): dropdown getting closed without explicit isOpen={false} in controlled dropdown
+
+  > [!Note]
+  >
+  > if you have used ControlledDropdown in a similar way how it was documented, things should work fine.
+  >
+  > If you have used `isOpen` from Controlled Dropdown but you're not handling it inside `onOpenChange`, you will have to handle that state as well. E.g. `isOpen={isDropdownOpen} onOpenChange={(isOpen) => setIsDropdownOpen(isOpen)}`
+
+## 11.1.0
+
+### Minor Changes
+
+- b21e3aea: chore: add server-side pagination with `totalItemCount` & `paginationType`
+
+## 11.0.0
+
+### Major Changes
+
+- abd99bba: feat: revamp Klear360 with brand refresh changes
+
+  > [!WARNING]
+  >
+  > Breaking Change!
+  > This is a breaking change for all components in the library.
+  >
+  > Refer the [detailed v11 upgrade guide](https://github.com/klearnow/klear360/blob/master/packages/klear360/upgrade-v11.md) that contains instructions on how to use codemods for auto-upgrade along with manual steps if required
+
+## 10.23.5
+
+### Patch Changes
+
+- 3ac92ae4: fix(blade): expose card event type
+
+## 10.23.4
+
+### Patch Changes
+
+- d2a27c8a: feat(blade): add minHeight prop to Card
+
+## 10.23.3
+
+### Patch Changes
+
+- eebe574b: fix: remove page change check that would cause infinite renders
+- 3ab8c0ef: feat: add `onHover` & `onClick` callback to `TableRow`
+
+## 10.23.2
+
+### Patch Changes
+
+- bd7d8dc5: feat(Skeleton): add minHeight and minWidth prop
+
+## 10.23.1
+
+### Patch Changes
+
+- 6f89de9f: fix(Table): handle case where currentPage is greater than total pages
+
+## 10.23.0
+
+### Minor Changes
+
+- 469b2d72: feat: add `getKlear360Coverage` and `assertKlear360Coverage` utilities
+
+  Read more about it in the [Klear360 Coverage documentation](http://design.klearnow.com/?path=/story/utils-blade-coverage--page).
+
+## 10.22.0
+
+### Minor Changes
+
+- 40e51a56: feat(blade): optimize bundle size with isolated modules & enable codesplitting
+
+  **Migration:**
+
+  ## Jest
+
+  **transformIgnorePatterns:**
+
+  In your jest config's [`transformIgnorePatterns`](https://jestjs.io/docs/configuration#transformignorepatterns-arraystring) add `@table-library` so that it gets transpiled by jest.
+
+  ```diff
+  // jest.config.js
+  transformIgnorePatterns: [
+  -  '/node_modules/(?!(@klearnow/klear360|commander)|uuid|@babel/runtime/)',
+  +  '/node_modules/(?!(@klearnow/klear360|commander)|uuid|@babel/runtime|@table-library/)',
+  ],
+  ```
+
+  **moduleNameMapper:**
+
+  In your jest config's [`moduleNameMapper`](https://jestjs.io/docs/configuration#modulenamemapper-objectstring-string--arraystring), you can remove the aliased blade modules:
+
+  This is present in [x](https://github.com/klearnow/x/blob/master/jest.config.js#L49-L51), [frontend-website](https://github.com/klearnow/frontend-website/blob/master/jest.config.js#L14-L16) & [admin-dashboard](https://github.com/klearnow/admin-dashboard/blob/master/jest.config.js#L14-L16) repo.
+
+  ```diff
+  moduleNameMapper: {
+    '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)
+  ```
+
+## 10.21.0
+
+### Minor Changes
+
+- 32d188e6: feat(Collapsible): mark width prop as external
+
+  > [!WARNING]
+  >
+  > If you were using internal `_width` prop, you will have to rename it to `width`
+
+  ```diff
+  - <CollapsibleBody _width={} />
+  + <CollapsibleBody width={} />
+  ```
+
+## 10.20.1
+
+### Patch Changes
+
+- e89018c4: feat(Dropdown): Support `width` prop on DropdownOverlay
+- 37fa68cb: fix: define stylis plugin name property
+
+## 10.20.0
+
+### Minor Changes
+
+- 87d9638b: feat: increase the CSS specificity of all components
+
+  > [!WARNING]
+  >
+  > **We've enhanced the specificity of styles for Klear360 components. If you've defined styles in separate CSS at a root level targeting blade components, please note that they may no longer take effect as expected.
+  > The styles within the blade components will now take precedence.**
+  >
+  > **Your existing component snapshots may update, there is no change in the visual appearance of components. Please feel free to add the updated snapshots.**
+
+### Patch Changes
+
+- 1da66413: fix(blade): page gets scrolled to top on iOS when bottomsheet open
+- 2219e9a1: fix: refined text input label truncation for single-word overflow
+
+## 10.19.1
+
+### Patch Changes
+
+- 0d0e72ea: fix(blade): fixed SpotlightPopoverTour bugs
+
+  - Safari body-scroll-lock causing the page to get clipped because storybook doesn't set width/height on body - fixed by setting width/height
+  - Initial delay of opening the mask - fixed by immediately updating the mask size on initial render
+  - Delay of transitioning between steps which occurs because we need to wait for the animation to finish before scrolling otherwise the scroll gets interrupted - fixed by reduced this to 100ms
+
+## 10.19.0
+
+### Minor Changes
+
+- 23a3e111: feat: Add `Table` component
+
+## 10.18.2
+
+### Patch Changes
+
+- 9967cd96: fix: set default breakpoint without computing
+
+## 10.18.1
+
+### Patch Changes
+
+- 77b31aa1: fix(blade): remove extra margin left on carousel
+
+## 10.18.0
+
+### Minor Changes
+
+- 88aba1d6: feat(blade): added SpotlightPopoverTour web implementation
+
+## 10.17.4
+
+### Patch Changes
+
+- 97b9b4cc: fix(TextInput): white placeholder on autoFocus in android
+
+## 10.17.3
+
+### Patch Changes
+
+- 49db8d7c: chore(blade): only allow CarouselItem in Carousel children
+- ab2b1800: fix(blade): fixed react-native bottomsheet state bugs
+
+## 10.17.2
+
+### Patch Changes
+
+- f0d4dce5: fix: react native text input alignment with prefix
+
+## 10.17.1
+
+### Patch Changes
+
+- a0d3b13d: chore(blade): add file zip icon
+- 66a16267: fix(Dropdown): use popup background color token in DropdownOverlay and Popover
+
+  > **Note**
+  >
+  > For consumers, this changes the color of Dropdown overlay to fainter version in dark mode. It shouldn't break anything and hence the snapshots can be safely updated.
+
+## 10.17.0
+
+### Minor Changes
+
+- a35f5dfc: feat: update popup token, migrate overlay tokens
+
+  > **Warning**
+  >
+  > `theme.colors.overlay.background` is moved to `theme.colors.surface.overlay.background[800]`.
+  >
+  > Based on our analytics data, its a rarely used token hence, its a non-breaking change for most consumers (1 instance in razorpay/x repo).
+  > Although it is recommended to search for `colors.overlay.background` in your repo and confirm once if its not being used. If it is used you can follow migration step below.
+
+  ```diff
+  - background={theme.colors.overlay.background}
+  + background={theme.colors.surface.overlay.background[800]}
+  ```
+
+## 10.16.0
+
+### Minor Changes
+
+- fc7c8408: feat(blade): tabs implementation
+
+  > [!NOTE]
+  > We've updated `@floating-ui/react` to version `0.25.4`
+  > Consumers may need to update their jest snapshots
+
+### Patch Changes
+
+- c6d1ad9b: fix: update carousel nav button tokens
+- a17076b8: chore: fix popover close button background
+
+## 10.15.3
+
+### Patch Changes
+
+- f1ab23c8: fix(blade): remove preventDefault in selector label
+
+## 10.15.2
+
+### Patch Changes
+
+- 360abe73: fix(Autocomplete): enhance input handling for controlled scenarios
+- 69098f16: fix(checkbox): fixed alignment
+- 71ea0ac5: fix(Dropdown): enhance tag selection handling
+- 44153ba4: feat(Typography): accept `brand.secondary.500` as a valid `color` prop value
+- 8fdef8a7: docs: improve documentation aesthetics
+- 277ba6fa: fix(AutoComplete, SelectInput): disable tags in input when `isDisabled` is set to true
+- 08c161b6: fix(ActionListItem): checkbox spacing
+
+## 10.15.1
+
+### Patch Changes
+
+- f9d16dc4: fix(Alert): correct color prop behavior
+
+## 10.15.0
+
+### Minor Changes
+
+- 87c5a6ee: feat(Box): add `transform`, `transformOrigin`, `clipPath`, `opacity`, & `visibility` props
+
+### Patch Changes
+
+- 76d80dc2: fix(Input): ensure correct value passing for trailingFooterSlot & trailingHeaderSlot
+
+## 10.14.7
+
+### Patch Changes
+
+- 59f0b92c: fix: carousel indicator sync bug
+
+## 10.14.6
+
+### Patch Changes
+
+- 7738f70b: fix(Tooltip): prevent overriding the `aria-label` attribute
+- f38f7c0a: fix: react native crash with reanimated
+
+## 10.14.5
+
+### Patch Changes
+
+- 47b8149d: feat(ListItemText): make span as default tag for ListItemText
+
+## 10.14.4
+
+### Patch Changes
+
+- 87f75b03: feat: support `brand*` colors on Icon and borderColor styled prop
+
+## 10.14.3
+
+### Patch Changes
+
+- 4d6e6aeb: fix(AutoComplete): hide ActionListSection when items are filtered out
+
+## 10.14.2
+
+### Patch Changes
+
+- 3b76e389: fix(blade): remove FloatingFocusManager and added more tests
+
+  Fixes bug with floating ui where it was adding aria-hidden to dropdown trigger. more context [here](https://razorpay.slack.com/archives/CMQ3RBHEU/p1695972277506429?thread_ts=1693739607.070049&cid=CMQ3RBHEU).
+
+## 10.14.1
+
+### Patch Changes
+
+- a65ebf9c: feat(blade): update to use focus-visible
+
+  This will ensure that focus will only appear while using keyboard.
+  Note that this is a non-breaking change but you might need to update UT snapshots.
+
+## 10.14.0
+
+### Minor Changes
+
+- dc3e240b: feat: add `color` prop to `Alert`, `Badge`, `Button`, `Chip`, `ChipGroup`, `Counter`, `Link`, & `Spinner`
+
+  #### Color Tokens Update
+
+  **[New White Color Tokens:](https://design.klearnow.com/?path=/docs/tokens-colors--page)** Introducing white color tokens, enabling white buttons and links for enhanced design options.
+
+  #### Deprecated `intent` prop in favor of the new `color` prop
+
+  - **Alert** - Deprecated `intent` prop.
+  - **Badge** - Deprecated `variant` prop.
+  - **Chip & ChipGroup** - Deprecated `intent` prop.
+  - **Counter** - Deprecated `variant` and `intent` prop.
+  - **Spinner** - Deprecated the `contrast` prop.
+
+  #### Jest Snapshots
+
+  Your existing component snapshots may update, there is no change in the visual appearance of components. Feel free to commit the updated snapshots.
+
+## 10.13.2
+
+### Patch Changes
+
+- a047ea61: fix(AutoComplete): handle focus ring on option change
+
+## 10.13.1
+
+### Patch Changes
+
+- d22cbd3d: fix(AutoComplete): Handle inputValue in Controlled Single Selection
+- acd0f7b0: fix: change autocomplete search logic from startsWith to includes
+
+## 10.13.0
+
+### Minor Changes
+
+- e99730d7: feat: support customizing Klear360 Theme with a single brand color
+
+  You can find a detailed documentation [here](https://design.klearnow.com/?path=/docs/guides-theming-createtheme--page)
+
+  ### Example Usage
+
+      ```tsx
+      const customTheme = createTheme({ brandColor: '#19BEA2' })
+
+      <Klear360Provider themeTokens={customTheme} colorScheme={colorScheme}>
+       {App}
+      </Klear360Provider>
+      ```
+
+## 10.12.1
+
+### Patch Changes
+
+- 68820c36: feat: radio & checkbox integration with card
+
+## 10.12.0
+
+### Minor Changes
+
+- 2f2fcab4: feat(blade): add ref to OTP Input
+
+### Patch Changes
+
+- dc42ae1e: fix(Box): correctly apply border styles
+
+## 10.11.0
+
+### Minor Changes
+
+- c4242ad4: feat(Dropdown): add isOpen and onOpenChange
+
+  > **Warning**
+  >
+  > This PR marks `onDismiss` as deprecated. While it continues to work, we recommend consumers to move to onOpenChange using migration steps below
+
+  ### Migration from `onDismiss` on Dropdown
+
+  ```diff
+  <Dropdown
+  - onDismiss={() => console.log('dismissed')}
+  + onOpenChange={(isOpen) => {
+  +  if (!isOpen) {
+  +    console.log('dismissed');
+  +  }
+  + }}
+  />
+  ```
+
+- 18748f1f: feat(ActionListItem): add ActionListItemBadge component and `titleSuffix` option on ActionListItem
+
+## 10.10.0
+
+### Minor Changes
+
+- 18bdaed2: feat(blade): added Popover component
+
+  **Tooltip Changes**
+
+  - Added a new prop `title`
+
+### Patch Changes
+
+- c4ef32f8: chore: export popover & update status table
+
+## 10.9.2
+
+### Patch Changes
+
+- 86c57372: fix: type exports for Select and AutoComplete types
+
+## 10.9.1
+
+### Patch Changes
+
+- 1be2fecf: fix(AutoComplete): AutoComplete Storybook panel and React Native Icon Alignment in PasswordInput
+
+## 10.9.0
+
+### Minor Changes
+
+- 31fa01eb: feat(AutoComplete): add AutoComplete component
+
+## 10.8.1
+
+### Patch Changes
+
+- 09ca73d2: fix(ActionList): divider being added to last ActionListSection
+
+## 10.8.0
+
+### Minor Changes
+
+- ac405dfc: chore(blade): added id to Box component
+
+## 10.7.1
+
+### Patch Changes
+
+- 52288df2: fix(blade): carousel bug in safari
+
+## 10.7.0
+
+### Minor Changes
+
+- f43d9b35: feat(Icon): add default value for `size` & `color` props
+
+## 10.6.0
+
+### Minor Changes
+
+- 1732199a: fix(blade): fix firefox bug in carousel & fixed visible items not switching to `1` on mobile devices.
+
+## 10.5.0
+
+### Minor Changes
+
+- 3fc6ba3a: feat(Typography): add a new `Display` component
+
+  The Display component adds a strong visual touch. Utilize it to create eye-catching sections on your landing pages.
+
+## 10.4.4
+
+### Patch Changes
+
+- f1478f1b: fix(blade): extra left/right padding on amount component
+
+## 10.4.3
+
+### Patch Changes
+
+- 6b69d0e5: fix(blade): fixed card link overlay not working when wrapper is set to position:relative
+
+## 10.4.2
+
+### Patch Changes
+
+- 3d3bef8e: chore(blade): remove broken figma link from Card
+
+## 10.4.1
+
+### Patch Changes
+
+- 6ca6d35b: fix(Amount): correctly round the value upto 2 decimal places
+
+## 10.4.0
+
+### Minor Changes
+
+- a561aaca: feat: Add new `Chip` and `ChipGroup` components
+
+### Patch Changes
+
+- 9278e808: fix(blade): use thicker border in selected card
+
+## 10.3.2
+
+### Patch Changes
+
+- 67e0ae96: feat(blade): added interactive Card
+
+  Enables cards to be used as clickable, linkable & selectable.
+
+## 10.3.1
+
+### Patch Changes
+
+- 5f500f3d: fix(DropdownOverlay): Dropdown clipping issue in overflow scroll containers
+
+## 10.3.0
+
+### Minor Changes
+
+- 5872d7ea: refactor(blade): remove useKlear360InnerRef & expose native DOM nodes via ref
+
+## 10.2.1
+
+### Patch Changes
+
+- 98291854: chore: make accordion min-width 360px for large screens
+- 5f2f3e44: feat: add large size to List component
+
+## 10.2.0
+
+### Minor Changes
+
+- 30109b99: feat(blade): added Carousel component
+
+## 10.1.0
+
+### Minor Changes
+
+- 0e2d5154: feat(Box): add `draggable`, `onDragStart`, `onDragEnd`, `onDragEnter`, `onDragLeave`, `onDragOver`, `onDrop`, `pointerEvents`, & `placeItems` props
+
+## 10.0.0
+
+### Major Changes
+
+- abf52f07: build: upgrade react `v18.2.0`, react-native `v0.72.3` & other libraries
+
+  ### Upgrade the following packages:
+
+  - `react` to `18.2.0`
+  - `react-native` to `0.72.3`
+  - `react-dom` to `18.2.0`
+  - `react-native-reanimated` to `3.4.1`
+  - `react-test-renderer` to `18.2.0`
+  - `@react-native-async-storage/async-storage` to `1.19.1`
+  - `@testing-library/react` to `13.4.0`
+  - `@testing-library/react-native` to `12.2.0`
+
+  ### Migration Guide
+
+  - You can follow [React's](https://react.dev/blog/2022/03/08/react-18-upgrade-guide) & [React Native's](https://react-native-community.github.io/upgrade-helper/?from=0.66.5&to=0.72.3) guides to update your packages to the latest version
+  - If you are using `npm` as your package manager and continue to remain on `react` `v17`, you will have to run `npm install` with `--legacy-peer-deps` flag otherwise you will encounter react version mismatch errors
+  - React Native consumers will need to upgrade to `react-native-reanimated` `v3`
+
+## 9.7.0
+
+### Minor Changes
+
+- d5d174fa: feat: make `Badge`, `Counter`, & `Indicator` components `inline-flex` by default
+
+### Patch Changes
+
+- f4624db2: fix: react native errors with floating-ui/react
+- 2e20ce04: feat(Box): add support for the `transparent` background color
+
+## 9.6.1
+
+### Patch Changes
+
+- 5fb722d8: fix(Switch): correct cursor style in disabled state
+
+## 9.6.0
+
+### Minor Changes
+
+- 50d55a5f: feat(Amount): add support for more currencies
+
+## 9.5.3
+
+### Patch Changes
+
+- d7183b49: fix(SelectInput): truncate text in select input
+- 59518acb: feat(BottomSheet): add `zindex` prop & improve focus management logic
+
+  Thanks to @archie252000 for his contribution!
+
+## 9.5.2
+
+### Patch Changes
+
+- a1e75040: fix: standardize logs & errors
+- 37bdc811: fix(Box): handle `undefined` for `backgroundColor` prop
+- e8a81131: fix: remove className from Button, svg, Link
+
+  > **Note**
+  >
+  > There was an internal bug introduced with styled-props which allowed certain props like className to pass through and get added on DOM. This release fixes that bug.
+
+  This will be non-breaking for most projects (especially if you're using TypeScript).
+
+  If your project happened to use `className` prop on Button, SVG Icons, or Link, it will stop working post this release.
+
+## 9.5.1
+
+### Patch Changes
+
+- 14271605: refactor: move to `React.ReactElement` type
+
+## 9.5.0
+
+### Minor Changes
+
+- cbed430f: feat: strip off logs & errors in production builds
+
+#### Jest v27 and Custom Resolver Compatibility
+
+For users on Jest v27 or older, or those with custom Jest resolvers (like `jest-directory-named-resolve`) not supporting `package.json` exports, a `moduleNameMapper` update is needed. This ensures compatibility with the `@klearnow/klear360` package:
+
+```diff
+  moduleNameMapper: {
+    // ...rest of your config
++   '@klearnow/klear360/components': '<rootDir>/node_modules/@klearnow/klear360/build/components/index.development.web.js',
++   '@klearnow/klear360/utils': '<rootDir>/node_modules/@klearnow/klear360/build/utils/index.development.web.js',
++   '@klearnow/klear360/tokens': '<rootDir>/node_modules/@klearnow/klear360/build/tokens/index.development.web.js',
+  },
+```
+
+### Patch Changes
+
+- 2be798d9: feat: add zIndex prop to Tooltip
+
+## 9.4.1
+
+### Patch Changes
+
+- ebd3cbda: feat: add zIndex prop for Modal
+
+## 9.4.0
+
+### Minor Changes
+
+- 5bddbe08: feat(Input): make `label` prop optional & add `accessibilityLabel` prop to `TextInput`, `TextArea`, `PasswordInput`, `SelectInput`, and `OTPInput` components
+
+  #### Key Updates
+
+  - **Optional `label` Prop**: We understand that not all use cases require a label for the Input components. Therefore, we have made the label prop optional, providing you with the freedom to choose whether to display a label or not, depending on your specific application requirements.
+
+  - **Introducing `accessibilityLabel`:** Recognizing the significance of accessibility in modern applications, we have added the `accessibilityLabel` prop to the Input components. This prop enables developers to assign a descriptive label for the input field, making it more user-friendly for individuals using assistive technologies or screen readers.
+
+  - **Enhanced User Guidance:** To maintain usability, we have implemented a requirement that either the `label` or `accessibilityLabel` prop must be provided. This ensures that users will always have clear guidance when interacting with Inputs, promoting a seamless user experience.
+
+## 9.3.0
+
+### Minor Changes
+
+- d28d8a72: feat(Tag): add Tag component
+
+## 9.2.0
+
+### Minor Changes
+
+- 37d84ce7: feat: support `display` prop for all components with styled props
+
+  Restructures few components to ensure adding a display prop doesn't break the components
+
+## 9.1.2
+
+### Patch Changes
+
+- 6763f5fa: fix(List): re-export ListItemText
+
+## 9.1.1
+
+### Patch Changes
+
+- fe31363e: fix(Input): correct helpText and input box alignment
+- e7317212: fix: add border-style when border width or color is set
+
+## 9.1.0
+
+### Minor Changes
+
+- b1a1faef: feat(blade): added Skeleton Component
+
+### Patch Changes
+
+- 199d6f0e: fix(Card): fix spacing between header & leading on react native
+- dd234a65: feat: add support for ListItemText within List
+
+## 9.0.3
+
+### Patch Changes
+
+- 538390be: feat(Box, Typography): expose brand colors
+
+  - On Box, we're exposing all `brand.*` tokens on the background.
+  - On Typography, we're exposing all `brand.primary.*` tokens as color prop
+
+- d880e8e9: fix(Dropdown, BottomSheet): prioritise bottomsheet controlled state over dropdown
+
+## 9.0.2
+
+### Patch Changes
+
+- 8f4bc791: fix: CollapsibleLink arrow orientation when `direction` is top
+
+## 9.0.1
+
+### Patch Changes
+
+- dfea4962: fix(DropdownOverlay): position of Overlay with label on left
+
+## 9.0.0
+
+### Major Changes
+
+- 3d10cecb: fix: make OTPInput fluid width
+
+  ## ⚠️ Breaking change for OTPInput component
+
+  Changes the OTPInput to have a fluid width compared to a fixed width of 36px per field earlier
+
+  ### Migration guide
+
+  **It is recommended to let the OTPInput take the entire width of the parent form in order to ensure consistency with the rest of the Input elements.**
+
+  If you still want to keep the UI for OTPInput on your existing screens the same, you can do the following:
+
+  1. Wrap `OTPInput` with a `Box` component and assign a `maxWidth` of `168px` (for `otpLength` of 4) or `256px` (for `otpLength` of 6)
+
+  ```diff
+  + <Box maxWidth='256px' />
+    <OTPInput label='Enter OTP' otpLength={6} />
+  + </Box>
+  ```
+
+  **Before this change (OTPInput with fixed width):**
+
+  <img width="362" alt="Screenshot 2023-06-28 at 2 50 05 PM" src="https://github.com/klearnow/klear360/assets/24487274/6d23c4a8-6c27-44f1-bb47-0d2b61025a06">
+
+  **After making OTPInput fluid width (OTPInput with fluid width):**
+
+  <img width="354" alt="Screenshot 2023-06-28 at 2 49 57 PM" src="https://github.com/klearnow/klear360/assets/24487274/c3e40176-9f22-451e-a443-1274c4333aec">
+
+### Patch Changes
+
+- 92711d39: feat: standardize isRequired & necessityIndicator across `Checkbox`, `Radio` & `Input` components
+
+  You can now control the `required` property of Checkbox, Radio & Input components with `neccessityIndicator` as well as `isRequired` props
+
+## 8.15.3
+
+### Patch Changes
+
+- 4dd62afd: fix(blade): bottomsheet ssr fix
+
+## 8.15.2
+
+### Patch Changes
+
+- b2f55b7a: fix(blade): tooltip zIndex issue
+
+## 8.15.1
+
+### Patch Changes
+
+- c802e72f: feat: add blue variant to Counter component & change intent to variant
+
+  ## ⚠️ Changes for Counter component with backward compatibility
+
+  Changes the `intent` prop to `variant` since we support more than Feedback colors with the addition of `blue` color for Counter. We will continue to support `intent` prop for backward compatibility but it will be deprecated in an upcoming major release.
+
+  ### Migration guide
+
+  1. Replace all instances of Counter's `intent` prop with `variant
+     > The change is only in the naming of the prop, the value will remain unchanged.
+
+  ```diff
+   <Counter
+  -  intent='positive'
+  +  variant='positive'
+     value={42}
+   />
+  ```
+
+## 8.15.0
+
+### Minor Changes
+
+- bd5ededd: feat(DropdownHeaderFooter): add DropdownHeader DropdownFooter components
+
+  We have standardised the Header and Footer between Dropdown, BottomSheet, Modal, and any future components.
+
+  > **Warning**
+  >
+  > **Breaking Change :** For consumers who use - `ActionListHeader` or `ActionListFooter`.
+  >
+  > Through our code search we found there weren't any instances of these component in Klear360 code yet thus this is released under minor version
+
+  ## Migration Guide
+
+  > **Note**
+  >
+  > The Header and Footer are redesigned so it might not be possible to have 1:1 designs. The new header and footer will look different.
+
+  1. Remove `ActionListHeader` and `ActionListFooter` from the inside of the `ActionList`
+  2. Add `DropdownHeader` and `DropdownFooter` outside of the `ActionList`, inside `DropdownOverlay`.
+
+  ```diff
+  import {
+    Dropdown,
+    DropdownOverlay,
+    SelectInput,
+    ActionListHeader,
+    ActionListFooter,
+    ActionList,
+    ActionListItem
+  } from '@klearnow/klear360/components';
+
+  function App() {
+    return (
+      <Dropdown>
+        <SelectInput label="Select City" />
+        <DropdownOverlay>
+  +       <DropdownHeader title="Title" />
+          <ActionList>
+  -          <ActionListHeader title="Title" />
+              <ActionListItem />
+              <ActionListItem />
+  -          <ActionListFooter trailing={<Button>Apply</Button>} />
+          </ActionList>
+  +       <DropdownFooter>
+  +         <Box><Button>Apply</Button></Box>
+  +       </DropdownFooter>
+        </DropdownOverlay>
+      </Dropdown>
+    )
+  }
+
+  export { App };
+  ```
+
+  Checkout [Dropdown Docs](https://design.klearnow.com/?path=/story/components-dropdown-dropdown--page&globals=showInternalComponents:true;measureEnabled:false) for more details
+
+## 8.14.0
+
+### Minor Changes
+
+- e1f37f69: feat: add `Divider` component
+
+## 8.13.0
+
+### Minor Changes
+
+- 865cd411: refactor: remove internal utilities from index re-exports
+
+  > **Warning**
+  >
+  > We have removed some of the undocumented internal utilites from re-export of `@klearnow/klear360/utils`.
+  > We went through the imports usage of Klear360 and made sure to keep exporting the utilities that are currently being used to avoid breaking changes.
+
+  You can take a look at re-exports of [utils/index.ts](https://github.com/klearnow/klear360/blob/master/packages/klear360/src/utils/index.ts) to know which are the public utilities that we support. This is part of the larger effort in exporting and documenting useful utilities from blade and avoid exporting internal utilities which might break during internal refactors.
+
+  We have marked 2 utilities as `@deprecated` as they are expected to be internal utilities but currently being used in Klear360. These will be removed in future major versions and won't be documented.
+
+  - `toTitleCase`
+  - `usePrevious`
+
+  We would recommend moving these 2 utilities to your local repo utilities.
+
+### Patch Changes
+
+- f4c2afb5: feat: add background-image, size, position, origin, repeat props
+- 610422ab: feat: add text decoration support for typography
+
+  Thanks [@archie252000](https://github.com/archie252000) for the contribution!
+
+## 8.12.1
+
+### Patch Changes
+
+- fa8b2361: feat(blade): add and update data attributes in child components
+
+## 8.12.0
+
+### Minor Changes
+
+- 0478669a: feat: add `Accordion` and `Collapsible` components
+
+  > **Note**
+  >
+  > If you're upgrading from earlier PRE_RELEASE, there are no breaking changes in the API, however there are some changes in the rendered markup which may require updating any snapshots (if any) at your end
+
+- dd0695d7: feat(blade): added bottomsheet body zero padding option
+
+## 8.11.3
+
+### Patch Changes
+
+- e62244f8: fix: Dropdown opening up when clicked on ChevronDownIcon in disabled state
+
+## 8.11.2
+
+### Patch Changes
+
+- f828bc94: fix: react native display style bug
+
+## 8.11.1
+
+### Patch Changes
+
+- 3f72c0df: fix: dynamic positioning of dropdown overlay
+
+## 8.11.0
+
+### Minor Changes
+
+- acc35a2e: fix: support `min-content`, `none`, `fit-content` in SpacingValueType of Box and styled-props
+
+### Patch Changes
+
+- 9fc66217: feat(blade): added support for React.ReactNode on Title & Heading component
+- b08d09d8: fix(blade): fix modal portal ssr
+
+## 8.10.3
+
+### Patch Changes
+
+- 62522f3e: fix(dropdown): dropdown overlay positioning
+
+## 8.10.2
+
+### Patch Changes
+
+- 99016aff: feat(blade): add support for as prop for typography components
+- f08e6d4f: fix(blade): remove unnecessary attributes from dom
+
+## 8.10.1
+
+### Patch Changes
+
+- 17e5bae0: fix(patch-package): move to dependencies
+  - this should fix an issue with `patch-package` when trying to install latest version of blade
+- 33b507bc: fix(blade): invalid dom nesting in Link
+
+## 8.10.0
+
+### Minor Changes
+
+- ba05928c: feat: add `Accordion` and `Collapsible` pre-release
+
+  - `Accordion` and `Collapsible` are available on web as pre-release
+  - You may import and use the following: `Accordion_PRE_RELEASE` and `Collapsible_PRE_RELEASE`
+
+  > **Warning**
+  >
+  > These components are in pre-release which means there might be some changes by the stable release and there might be some rough edges.
+
+## 8.9.1
+
+### Patch Changes
+
+- 7613ca13: fix: show decimal upto 2 places when `isAfixSubtle:false`
+
+## 8.9.0
+
+### Minor Changes
+
+- d62a86d4: feat(blade): added tooltip component
+
+  Klear360 now has a peer dependency on [FloatingUI](https://floating-ui.com/), make sure to install it.
+
+  For web:
+
+  ```
+  yarn add @floating-ui/react
+  ```
+
+  For native:
+
+  ```
+  yarn add @floating-ui/react-native
+  ```
+
+## 8.8.4
+
+### Patch Changes
+
+- 333d0e7e: fix(DropdownOverlay): fix incorrect minWidth condition
+
+## 8.8.3
+
+### Patch Changes
+
+- 163717cf: fix(DropdownOverlay): DropdownOverlay width in SelectInput trigger
+
+## 8.8.2
+
+### Patch Changes
+
+- 40f05a94: fix(blade): BottomSheet unable to find ActionList component
+- ab4f10c4: fix: make Badge and Counter display inline-flex
+
+## 8.8.1
+
+### Patch Changes
+
+- 9456e9d3: fix(BaseInput): large label alignment
+- c8727e89: fix(tokens): update primary color theme tokens
+- 19749c7a: fix(blade): jsdoc comments
+
+## 8.8.0
+
+### Minor Changes
+
+- 20c9fc03: feat(Input): add `generic` value in `autoCompleteSuggestionType`
+- 9db8c219: feat: add Modal component
+
+### Patch Changes
+
+- 9db8c219: chore: update overlay color tokens
+- f78834ea: fix(Amount): Make Amount display `inline-flex`
+
+## 8.7.0
+
+### Minor Changes
+
+- fc46b240: feat(Code): add `isHighlighted` prop
+- f0b7a66b: feat(Typography): expose `color` from Typography components like `Text`, `Heading`, `Title`, `Code`
+
+### Patch Changes
+
+- b9394c66: fix: update migrate-typography script
+
+## 8.6.1
+
+### Patch Changes
+
+- 93626965: fix: ActionList border style
+
+## 8.6.0
+
+### Minor Changes
+
+- 8348634c: feat(Link): add `xsmall` Link size
+- 26a7d38c: feat(Button): Support `href`, `target`, and `rel` on Button component.
+
+  You can now use `href` on Button which renders as `a` tag instead of button automatically.
+
+  ```jsx
+  <Button href="https://youtu.be/iPaBUhIsslA" target="_blank" rel="noopener noreferrer">
+    I am Link!
+  </Button>
+  ```
+
+- 4ff72975: feat(DropdownLink): add `DropdownLink` trigger for Dropdown
+
+  Checkout [Checkout DropdownLink Documentation](https://design.klearnow.com/?path=/story/components-dropdown-with-button-and-link--with-link&globals=measureEnabled:false)
+
+- 3fe1ff8f: feat(blade): add textAlign to Box
+
+### Patch Changes
+
+- 14e5057e: fix: add min-width and max-width in Menu trigger Dropdown to fix width issues
+- 69a1bcef: chore(blade): improve BottomSheet documentation & added jsdoc
+- 4df0b721: fix(SelectInput): single select value clear
+
+  - You can pass `''` (empty string) in single select `value` prop to clear the selected value now.
+
+## 8.5.0
+
+### Minor Changes
+
+- 4a6ae99c: feat(Switch): add Switch component
+
+### Patch Changes
+
+- 245f677c: chore(blade): export switch
+
+## 8.4.1
+
+### Patch Changes
+
+- d30a7fd4: fix(blade): fix code & amount typography alignment issues
+
+## 8.4.0
+
+### Minor Changes
+
+- 4fb0f3fe: feat(Box): add `onScroll`, `onMouseOver`, `onMouseEnter`, `onMouseLeave` events
+
+## 8.3.0
+
+### Minor Changes
+
+- 06da7a2f: feat(Box): add `ref` support
+
+## 8.2.3
+
+### Patch Changes
+
+- ec18776c: fix: blade builds on npm & github
+
+## 8.2.2
+
+> **Warning**
+>
+> There were some build issues associated with this release, please upgrade to version >= 8.2.3 where this issue was resolved
+
+### Patch Changes
+
+- e4dcdfc4: build: fix npm publish by generating .npmrc in monorepo root
+
+## 8.2.1
+
+> **Warning**
+>
+> There were some build issues associated with this release, please upgrade to version >= 8.2.3 where this issue was resolved
+
+### Patch Changes
+
+- 1ab67fc7: fix: css vars build script with new elevation tokens
+
+## 8.2.0
+
+> **Warning**
+>
+> There were some build issues associated with this release, please upgrade to version >= 8.2.3 where this issue was resolved
+
+### Minor Changes
+
+- 16d0e9e3: feat: add new `elevation` tokens
+  This release adds new shadow tokens. Previously we had the following shadow tokens
+
+1. `level1`
+2. `level2`
+3. `level3`
+4. `level4`
+5. `level5`
+
+Plus we didn't had proper ways of using tokens across web and native like we have for our other tokens like Colors, Typography, Spacing, Motion, etc.
+
+Now the new introduced levels are:
+
+1. `none`
+2. `lowRaised`
+3. `midRasied`
+4. `highRaised`
+
+These tokens now will work across ios, android and web and will add all the require properties automatically for eg:
+
+- on web we have 2 layers of shadow as per new token values
+
+```
+{
+  /** offset-x | offset-y | blur-radius | spread-radius | color, offset-x | offset-y | blur-radius | spread-radius | color */
+  lowRaised: `0 4px 8px -2px hsla(217, 56%, 17%, 0.1), 0 2px 4px -2px hsla(217, 56%, 17%, 0.06)`,
+  midRaised: `0 12px 16px -4px hsla(217, 56%, 17%, 0.08), 0 4px 6px -2px hsla(217, 56%, 17%, 0.03)`,
+  highRaised: `0 24px 48px -12px hsla(217, 56%, 17%, 0.18)`
+}
+```
+
+- for RN, we can't have multi-layer shadows plus android and iOS both treat shadows differently, but now we have parity
+
+```
+{
+  // android only
+  elevation: 4,
+  shadowColor: 'hsla(217, 56%, 17%, 0.64)', // works on both
+  // ios only
+  shadowOpacity: 0.12,
+  shadowRadius: 2,
+  shadowOffset: {
+    width: 0,
+    height: 3,
+  },
+}
+```
+
+but all this is now abstracted and as a developer, you can do this across platforms:
+
+```
+theme.elevation.lowRaised // this will add necessary props based on the platform
+```
+
+Read the entire decision [doc here](https://docs.google.com/document/d/1GQEd-1JXFDbv3JsBMB2TgiSn8EJE43Gtm_Xtb_8dn04/edit)
+
+## 8.1.0
+
+### Minor Changes
+
+- 9f2dabfd: feat: add border support to Box component
+
+## 8.0.0
+
+### Major Changes
+
+- 9917a5cd: feat(Dropdown): Controlled Dropdown and Button Trigger
+
+  - Adds API to seamlessly build controlled dropdown
+  - Add DropdownButton component to trigger dropdown using Button
+  - Removes `isDefaultSelected` from `ActionListItem` _(see migration guide below)_
+
+  > **Warning**
+  >
+  > **Breaking change** for consumers who -
+  >
+  > - Use `isDefaultSelected` on `ActionListItem` component
+  > - Use `onChange` on `SelectInput` (under some scenarios. Check migration guide below)
+  >
+  > Rest of the consumers can safely upgrade without any migration
+
+  ### Migration Guide
+
+  #### `isDefaultSelected` Migration
+
+  We have removed `isDefaultSelected` from `<ActionListItem />` component. [Check out API decision](https://github.com/klearnow/klear360/blob/master/packages/klear360/src/components/Dropdown/_decisions/controlled-dropdown.md) for reasoning
+
+  If you were using it as a workaround for controlled selection,
+
+  - We now have a first class controlled selection support with `value` and `onChange` prop on `SelectInput`.
+
+    Checkout CodeSandbox Example for new API - https://codesandbox.io/s/blade-controlled-select-vxg30b
+
+  If you were using `isDefaultSelected` for default selections, you can now use `defaultValue` on SelectInput
+
+  - Remove `isDefaultSelected` and use `defaultValue` on SelectInput. You can pass array of values to `defaultValue` in case of multiselect
+    ```diff
+    <Dropdown>
+      <SelectInput
+        label="Select City"
+    +   defaultValue="mumbai"
+      />
+      <DropdownOverlay>
+        <ActionListItem
+          title="Mumbai"
+          value="mumbai"
+    -     isDefaultSelected
+         />
+        <ActionListItem title="Bangalore" value="bangalore" />
+      </DropdownOverlay>
+    </Dropdown>
+    ```
+
+  #### `onChange` on SelectInput Migration
+
+  As a part of [bug fix](https://github.com/klearnow/klear360/issues/1102), `onChange` will now **NOT** be called on initial render
+  like it previously did. This will only require migration if you were earlier relying on `onChange` to set initial value.
+
+  If you were relying on `onChange` to set initial value, you can now move those values to your `useState`'s initial value.
+
+  ```tsx
+  const Example = (): JSX.Element => {
+    const [cities, setCities] = React.useState();
+    return (
+      <>
+        <Dropdown>
+          <SelectInput label="Cities" onChange={({values}) => setCities(values) } />
+          <DropdownOverlay>
+            <ActionListItem title="Mumbai" value="mumbai" />
+            <ActionListItem title="Pune" value="pune" />
+          </DropdownOverlay>
+        </Dropdown>
+        <Text>{cities}</Text>
+        {/*
+          In earlier versions, value of `cities` would've been `['']`
+          (because onChange would've been called initially to set array with empty string value)
+
+          Now it will output undefined (anything you pass in your useState) as the onChange wouldn't be called on initial render
+        */}
+      <>
+    )
+  }
+  ```
+
+## 7.2.2
+
+### Patch Changes
+
+- 2a6b8c89: chore: add meta attribute `data-component-from-blade='true'` to native components
+
+## 7.2.1
+
+### Patch Changes
+
+- 40a16da7: fix(blade): BottomSheet body dynamic height
+- e0f80522: feat(blade): added bottomsheet component ids
+
+## 7.2.0
+
+### Minor Changes
+
+- 1333e756: feat(blade): added bottomsheet component
+
+  > For react-native consumers make sure to [go through the installation guide](https://design.klearnow.com/?path=/docs/guides-installation--page#-add-blade-to-your-application) on how to setup the peer dependencies
+
+  <details>
+    <summary>⚠️ Migration guide from prerelease version</summary>
+
+  Update the imports:
+
+  ```diff
+  import {
+  -  BottomSheet_PRE_RELEASE,
+  +  BottomSheet,
+    BottomSheetHeader,
+    BottomSheetBody,
+    BottomSheetFooter
+  } from "@klearnow/klear360/components"
+  ```
+
+  Changed Header Footer API:
+
+  **Header**
+
+  Prop changes:
+
+  - Removed prefix/suffix props and added new props
+
+  ```diff
+  -  title: string;
+  +  title?: string;
+    subtitle?: string;
+  -  prefix?: React.ReactNode;
+  -  suffix?: React.ReactNode;
+  +  leading?: React.ReactNode;
+  +  trailing?: React.ReactNode;
+  +  titleSuffix?: React.ReactNode;
+  +  showBackButton?: boolean;
+  +  onBackButtonClick?: () => void;
+  +  closeButtonRef: React.MutableRefObject<any>;
+  ```
+
+  **Footer**
+
+  Footer component now accepts JSX content
+
+  Before:
+
+  ```jsx
+  <BottomSheetFooter
+    trailing={{
+      primary: {
+        text: 'Hello',
+        onClick: () => {},
+      },
+      secondary: {
+        text: 'World',
+        onClick: () => {},
+      },
+    }}
+  />
+  ```
+
+  After:
+
+  ```jsx
+  <BottomSheetFooter>
+    <Button isFullWidth variant="secondary" onClick={() => {}}>
+      Hello
+    </Button>
+    <Button isFullWidth marginTop="spacing.5" onClick={() => {}}>
+      World
+    </Button>
+  </BottomSheetFooter>
+  ```
+
+  </details>
+
+## 7.1.3
+
+### Patch Changes
+
+- 73011827: fix(BottomSheet): ensure that the BottomSheet's lower snappoint will have a buffer
+- f2130469: fix(blade): bottomsheet isOpen state, simplify isOpen logic & glue code
+
+  Previously if users did not changed the isOpen state to false inside `onDismiss` the bottomsheet's internal state will still remain "open", but the bottomsheet would visually be hidden and the backdrop will still remain, this fixes the bug so that internally we won't modify the bottomsheet's position instead we will just call the `onDismiss`. [Check the loom](https://www.loom.com/share/f24fcb51b245431fbf1a0aeb53cea287) video here for more info.
+
+- 24d2a0b0: fix(cardFooter): alignment issue
+
+## 7.1.2
+
+### Patch Changes
+
+- 69ef5042: fix(blade): BottomSheet unable to scroll content
+
+## 7.1.1
+
+### Patch Changes
+
+- 85737340: fix(SelectInput): dropdown without label takes up margin space
+
+  A dropdown without any label will now correctly take no extra space for the margin
+
+## 7.1.0
+
+### Minor Changes
+
+- 85289118: feat(blade): BottomSheet prerelease
+
+  > **Warning**
+  >
+  > The final `BottomSheet` API isn't final and subjected to change as we work on stabilizing the component.
+
+## 7.0.4
+
+### Patch Changes
+
+- e3d5321c: perf(blade): integrate SectionList in ActionList
+
+## 7.0.3
+
+### Patch Changes
+
+- 6f7ec83f: fix(Box): add correct prop types in react native Box
+- abc4c156: fix(colors): incorrect value of ashGrayLight.1200
+
+  There was a typo earlier in the value of the token.
+
+- fce1c767: feat(TextInput): add note on `type="number"` attribute
+- c0701725: fix: remove internal BaseBox export (no change for consumers)
+
+## 7.0.2
+
+### Patch Changes
+
+- 71b4a85b: feat: add `htmlTitle` prop support for Link component on web
+
+## 7.0.1
+
+### Patch Changes
+
+- 0f6e2ad7: fix: ref breakage on react native
+- 9963a7be: feat(package.json): add "main" field to package.json
+
+## 7.0.0
+
+### Major Changes
+
+- 5248ea66: feat(Typography): streamline typography scale
+
+  > **Warning**
+  >
+  > Breaking Change!
+  > This is a breaking change for typography components and lineHeight scale
+  >
+  > We have written codemod to ease this process so please follow the [migration guide thoroughly](#breaking-changes)
+
+  ### Component Changes:
+
+  - Title:
+    - Added `xlarge` size
+  - Text:
+    - Added `large` size
+  - Link:
+    - Added `large` size
+  - Code:
+    - Added `weight=bold`
+
+  ### Breaking Changes:
+
+  - Title:
+    - Replace all `large` size variants to `xlarge`
+
+  ```diff
+  - <Title size="large">hello world</Title>
+  + <Title size="xlarge">hello world</Title>
+  ```
+
+  ***
+
+  ### Line-height scale changes
+
+  New scale has been changed to use numbered values for more flexibility, to read more about the changes [check this doc](https://docs.google.com/document/d/16j8dIKuQF9GjDgkhkZwnokVGNeoK7R-7zzIXHCgvveA/edit).
+
+  #### **Migration guide:**
+
+  Replace old named tokens to corresponding numbered values:
+
+  For example:
+
+  ```diff
+  - theme.typography.lineHeights.s
+  + theme.typography.lineHeights[50]
+  ```
+
+  **Old vs New mappings:**
+
+  | old | new |
+  | --- | --- |
+  | s   | 50  |
+  | m   | 50  |
+  | l   | 100 |
+  | xl  | 200 |
+  | 2xl | 300 |
+  | 3xl | 400 |
+  | 4xl | 600 |
+  | 5xl | 700 |
+  | 6xl | 800 |
+
+  #### **Migrate with Codemod:**
+
+  To change all instances of `theme.typography.lineHeights` to the new scale automatically use this codemod:
+
+  **Step1:** Install this version of blade
+
+  **Step2:** Run the codemod with the following command
+
+  > Checkout [jscodeshift docs](https://github.com/facebook/jscodeshift) for further cli usage help.
+
+  ```sh
+  npx jscodeshift ./YOUR_DIR --extensions=tsx,ts,jsx,js -t ./node_modules/@klearnow/klear360/codemods/migrate-typography/transformers/migrate-typography.ts --ignore-pattern="**/node_modules/**"
+  ```
+
+  > **Note**
+  >
+  > This codemod will cover 80% of the usecases, but it might miss certain edge cases, it is advised to thoroughly test & check the code to ensure nothing is missed.
+
+## 6.7.0
+
+### Minor Changes
+
+- 0c8e5f1b: feat: add `Amount` component
+
+  ### Usage
+
+  ```tsx
+  <Amount value={10000} />
+  ```
+
+## 6.6.3
+
+### Patch Changes
+
+- 0d7bb723: fix(blade): FileTextIcon alignment
+- b62358cb: perf: improve dropdown/actionlist performance
+
+## 6.6.2
+
+### Patch Changes
+
+- c7c66051: fix: ListItemLink alignment
+
+## 6.6.1
+
+### Patch Changes
+
+- fe89e6f6: fix: tree-shaking in Klear360 components
+- 7817c9e3: feat(Box): add different types for `display` on react native
+- c6512ba0: fix(Alert, Card): set `box-sizing` as `border-box` for Alert and Card
+
+## 6.6.0
+
+### Minor Changes
+
+- 5863f939: feat(OTPInput): add `onFocus` & `onBlur` props
+- 75daaa3c: feat(theme): add `name` property in `theme` to watch on theme changes
+
+### Patch Changes
+
+- 6a8524ab: feat(Link): add `hitSlop` support for native
+
+## 6.5.2
+
+### Patch Changes
+
+- 2700667f: fix(SelectInput): call user passed onBlur callback
+- 3855a583: fix(Card): CardHeader title alignment when subtitle is not present
+
+## 6.5.1
+
+### Patch Changes
+
+- 86cd05a6: chore(blade): update meta constant of Box
+
+## 6.5.0
+
+### Minor Changes
+
+- a4be1b06: feat(Layout Primitives): Add `Box` Component and Styled Props to Klear360 Components
+
+  Documentation: https://design.klearnow.com/?path=/docs/components-layout-primitives-box-layout-primitives-tutorial--page
+
+  **Breakpoint Token Changes**
+
+  `max` breakpoint is removed as it wasn't used and had same value as `xl`.
+  Through our audit, we didn't find any usage of this token. If you happen to use this somewhere, you can rename `breakpoints.max` to `breakpoints.xl`
+
+- 2c7034b7: feat(Input): add onSubmit prop on BaseInput, TextInput, TextArea, & PasswordInput for react-native
+
+## 6.4.0
+
+### Minor Changes
+
+- 4145d553: feat: add `testID` prop to all components
+- a7826b0b: feat(Input): add `autoCapitalize` support to `BaseInput`, `TextInput` & `PasswordInput`
+- bdd74d7a: feat(Text): add `textAlign` prop
+
+### Patch Changes
+
+- da4489b3: fix: lodash tree shaking to reduce effective bundle-size.
+
+## 6.3.0
+
+### Minor Changes
+
+- a2518742: feat(icons): add BulkPayoutsIcon
+
+## 6.2.3
+
+### Patch Changes
+
+- cbb1424b: fix: change import to default in package exports
+
+  Jest does not support the "import" condition in exports. This was causing tests to fail for Klear360 consumers. Changed "import" to "default" which is supported by all tools. Since Klear360 is not exporting a dual package, we don't need the "import" condition.
+
+## 6.2.2
+
+### Patch Changes
+
+- 559d97d9: feat: support string array in children
+
+  Users can now use dynamic variables inside children and don't have to wrap it around with string literals
+
+  ```jsx
+  <Button onClick={}>{someVariable} hello</Button>
+  ```
+
+## 6.2.1
+
+### Patch Changes
+
+- 7016c215: fix(Dropdown): infinite render onChange, positioning in flex container
+
+## 6.2.0
+
+### Minor Changes
+
+- bb2f1561: feat(Dropdown): Add `Dropdown`, `Select`, `ActionList`.
+
+  Check out [Dropdown Story](https://design.klearnow.com/?path=/docs/components-dropdown-with-select) for usage
+
+### Patch Changes
+
+- 505ca975: fix(checkbox): fixed screen reader styles
+
+  Fixed a bug where if we have lots of checkboxes in a small overflowed container the browser is trying to jump to the hidden inputs which is causing unexpected jumps in the scroll.
+
+## 6.1.0
+
+### Minor Changes
+
+- aff735ba: feat: add `List`, `ListItem`, `ListItemLink` & `ListItemCode` components
+
+## 6.0.5
+
+### Patch Changes
+
+- 38e8e6d0: chore(OTPInput): add `autoCompleteSuggestionType` prop and disable password manager with `isMasked`
+
+  We wanted to disable the password managers for OTPInput when `isMasked` is set. The straightforward way to do this is set autocomplete='off' (i.e autoCompleteSuggestionType='none'). The issue with autocomplete is that its not an enforcement but a suggestion to the browser to follow. Safari mostly adheres to it but Chrome and Firefox ignores it and shows the password managers anyway. We decided on a workaround to unset `type` on first render and set it to `password` once a value is entered. This way the password managers won't make any suggestions when the user is on an empty OTP input field.
+
+## 6.0.4
+
+### Patch Changes
+
+- 26ffc564: fix: add types field to package exports for ESM TypeScript projects
+
+## 6.0.3
+
+### Patch Changes
+
+- c95e814a: chore(blade): fix dependabot alerts
+- d2cfab2d: fix(blade): checkbox icon wrapper position
+
+  Fixed a bug in checkbox where the checkbox icon was flaoting outside it's wrapper because we've added `position: absolute` in the FadeIn animation component but forgot to add `position: relative` in the parent wrapper.
+
+## 6.0.2
+
+### Patch Changes
+
+- ba5ec1ac: fix: mark react-native peerDependencies as optional
+- 4a178a79: fix(Alert): color of title and description
+
+  - The color of title and description will look slightly subtle now to match the current designs.
+  - Internally uses the `subtle` type correctly now to fix a discrepancy in color for title and description.
+
+## 6.0.1
+
+### Patch Changes
+
+- 62a98bb1: fix(blade): update BaseInput background color
+
+## 6.0.0
+
+### Major Changes
+
+- 980bc038: fix(Alert)!: fix typo in prop `isDismissible`
+
+  > **Warning**
+  >
+  > Breaking change. Update prop `isDismissable` to `isDismissible`.
+
+  ### Migration guide
+
+  Find and replace:
+
+  ```diff
+  <Alert
+  - isDismissable
+  + isDismissible
+  />
+  ```
+
+- 5f7e4876: feat(blade): added all icons from figma
+
+  **Breaking Changes:**
+
+  - Renamed `RefreshLeft` icon to `Refresh`
+
+### Minor Changes
+
+- 82d75b71: chore(blade): added new icons
+- 29238f1e: feat(blade): added ref support for input components
+
+## 5.5.1
+
+### Patch Changes
+
+- 735e370: fix(blade): update peerDependencies to support react v18
+
+## 5.5.0
+
+### Minor Changes
+
+- a094736: feat: expose `onFocus` on `TextInput` and `TextArea`
+- 2c2841a: added transaction icon
+- 46425d3: feat(blade): add ClockIcon
+- 1dd920e: feat(Icons): add BankIcon
+- 227be3d: added tag, shuffle, user, book, and settlements icons
+- e64d7cc: chore: design changes for Badge, Counter, Spinner
+
+### Patch Changes
+
+- ba16503: fix(blade): TextInput clear button state on initial render
+
+## 5.4.3
+
+### Patch Changes
+
+- e6c3ea9: fix(blade): restrict childrens in Card component
+
+## 5.4.2
+
+### Patch Changes
+
+- da470b0: fix: remove `maxWidth` from Badge
+
+## 5.4.1
+
+### Patch Changes
+
+- 7eb6e4c: feat(Code): Use alpha 50 token in Code component's background
+
+## 5.4.0
+
+### Minor Changes
+
+- 5c8005f: feat: add `ProgressBar` component
+
+## 5.3.0
+
+### Minor Changes
+
+- 26baa81: feat(blade): added Card component
+
+## 5.2.1
+
+### Patch Changes
+
+- 9966931: chore: fix dom nesting in form label component
+- e660831: fix: change acceptable BaseInput `type` from `numeric` to `number`
+
+## 5.2.0
+
+### Minor Changes
+
+- d03de10: feat(Alert): update `isFullWidth` to make inline borderless alerts on desktop
+
+  > **Warning**
+  >
+  > `isBorderless` prop is removed and its usage is now replaced by `isFullWidth`. The layout is updated to match the designs and is now centered on desktop resolutions.
+
+  ### Steps for migration:
+
+  ```diff
+  <Alert
+  - isBorderless
+  + isFullWidth
+  />
+  ```
+
+## 5.1.5
+
+### Patch Changes
+
+- 756f4b4: feat: allow masked otp input
+
+`OTPInput` now supports an `isMasked` prop
+
+## 5.1.4
+
+### Patch Changes
+
+- 71f274e: fix(Checkbox): allow Checkbox to accept `childern` prop of type `React.ReactNode`
+
+## 5.1.3
+
+### Patch Changes
+
+- af9bdc9: fix(Alert): responsive design alignment
+
+## 5.1.2
+
+### Patch Changes
+
+- bd0b675: chore(blade): added blade component data attributes
+
+## 5.1.1
+
+### Patch Changes
+
+- 5a6b980: feat: add Mail icon
+
+## 5.1.0
+
+### Minor Changes
+
+- d4b981e: fix: show `Spinner` on `TextInput` when `isLoading=true`
+  - Adds spinner when `isLoading: true` is passed to `TextInput`. This was a long pending TODO
+  - Update Spinner sizes after the design was updated \* This doesn't need any code mod since there are 9 instances of spinner being used with default variant i.e medium
+
+## 5.0.1
+
+### Patch Changes
+
+- 96cf25f: feat: add new icons (lock, settings, file-text, users, slash)
+
+## 5.0.0
+
+### Major Changes
+
+- fc2a3bf:
+
+  > **Warning**
+  >
+  > This is a breaking change for `Alert` component. The UI is updated to match the designs.
+
+  feat(Alert): design revamp
+
+  - `Alert` is updated to match the new designs
+    - Bordered variant is now more compact and smaller in size
+  - A new `neutral` intent is added. This is the new default if you haven't passed any `intent` explicitly.
+
+  ### Migration guide for consumers
+
+  - Earlier the default `intent` was `information`, this is now updated to `neutral`. If you were earlier using alerts without explicitly passing `intent` you should update that to continue using `information` as intent:
+
+  ```diff
+  <Alert
+  + intent="information"
+  />
+  ```
+
+### Patch Changes
+
+- bb170bb: fix: set input type='text' when type='search' passed
+
+## 4.0.0
+
+### Major Changes
+
+- d747de4: chore: Badge design changes
+
+  - Adds a new small size
+  - Bumps existing small & medium to medium & large respectively
+  - Horizontal padding changes in the large size
+
+  ### Migration Guide for Badge Consumers
+
+  1. For existing `small` size badge, bump the size from `small` to `medium`
+
+  ```diff
+  - <Badge size='small'>...</Badge>
+  + <Badge size='medium'>...</Badge>
+  ```
+
+  2. For existing `medium` size badge, bump the size from `medium` to `large`
+
+  ```diff
+  - <Badge size='medium'>...</Badge>
+  + <Badge size='large'>...</Badge>
+  ```
+
+  3. For existing badge with no `size` specified, add `size='large'` since default size is `medium`
+     > Note: The horizontal padding is changed from `8px` to `12px` for the new `large` size which makes it visually bigger than the existing `medium` size
+
+  ```diff
+  - <Badge>...</Badge>
+  + <Badge size='large'>...</Badge>
+  ```
+
+## 3.8.0
+
+### Minor Changes
+
+- 32c1f05: feat(Counter): design changes
+
+  - Added small variant in Counter
+  - Fixed italic font
+
+## 3.7.1
+
+### Patch Changes
+
+- 03bb818: feat(tokens): add new tokens
+  - updates color tokens of banking theme to match the designs
+- 002e0a2: feat(tokens): add new tokens
+  - Updates tokens for payment theme to match the designs
+- 66f473e: fix: remove aria-hidden for checkbox and radio
+
+## 3.7.0
+
+### Minor Changes
+
+- 67e5059: feat(Indicator): add Indicator component
+
+## 3.6.2
+
+### Patch Changes
+
+- 63c950a: feat(IconButton): export IconButton
+  - Adds a new `IconButton` component useful for making transparent icon only buttons
+
+## 3.6.1
+
+### Patch Changes
+
+- add9b3e: fix(Typography): inherit `text-align` property from parent in Typography components
+
+## 3.6.0
+
+### Minor Changes
+
+- 0f4df3a: feat(blade): added counter component
+- c5b28bc: feat(tokens): add new tokens to neutral palette
+
+## 3.5.3
+
+### Patch Changes
+
+- 92cfa80: fix(Alert): throw error if `secondaryAction` is defined without `primaryAction`
+
+## 3.5.2
+
+### Patch Changes
+
+- ffe9872: fix: `@babel-runtime` issues when importing in codesandbox and vite
+
+## 3.5.1
+
+### Patch Changes
+
+- dea879d: fix(IconButton): add `type="button"` to stop form submission
+
+## 3.5.0
+
+### Minor Changes
+
+- 8dc131d: feat(blade): added `small` variant in Checkbox/Radio
+
+## 3.4.2
+
+### Patch Changes
+
+- 48c36af: feat: add README to npm
+
+## 3.4.1
+
+### Patch Changes
+
+- 49894f2: feat: adding Link icon
+
+## 3.4.0
+
+### Minor Changes
+
+- 6429d93: feat(Link): add `size` prop and support for `small` size
+
+  > **Note**
+  >
+  > Icons in links are slightly bumped up now to match the designs
+
+  <img width="379" alt="image" src="https://user-images.githubusercontent.com/6682655/196698626-e73dcc07-3d35-49e1-8ead-95c5826f3c41.png">
+
+## 3.3.0
+
+### Minor Changes
+
+- 37c00c0: feat: publish `@klearnow/klear360` package on NPM
+
+  _No changes are required for consumer. We will be publishing on both, github package registry and npm._
+
+## 3.2.0
+
+### Minor Changes
+
+- f7e8941: added RotateCounterClockWiseIcon, TrendingUpIcon, TrendingDownIcon, ExternalLinkIcon, HelpCircleIcon
+
+## 3.1.6
+
+### Patch Changes
+
+- 66d3184: Update few tokens value which was typo on figma
+
+## 3.1.5
+
+### Patch Changes
+
+- a539fe5: feat(tokens): add new tokens
+
+## 3.1.4
+
+### Patch Changes
+
+- f0b901d: chore: remove border from Badge component
+
+## 3.1.3
+
+### Patch Changes
+
+- 2576ce3: fix(link): add type prop for button variant
+
+## 3.1.2
+
+### Patch Changes
+
+- ba0c74d: fix: use the correct maxWidth for OTPInput
+
+## 3.1.1
+
+### Patch Changes
+
+- aee7e57: feat(Icons): add MinusIcon
+
+## 3.1.0
+
+### Minor Changes
+
+- c3d9d2f: feat: add OTPInput component
+
+## 3.0.0
+
+### Major Changes
+
+- 3aebc58: feat(Typography): make `size` prop consistent for `Heading`, `Title`, and `Text`
+
+  > **Warning**
+  >
+  > Breaking Change!
+  > This is a breaking change for apps that are using `Title` or `Heading` component from blade. Rest of the apps can upgrade without any migrations.
+
+  #### Migration
+
+  _**Tip:** If you're using TypeScript, run `yarn tsc` and that should throw errors wherever a change is required._
+
+  1. **`<Title />`:** Rename `variant` prop to `size` in Title
+
+  ```diff
+  - <Title variant="small">Some Title</Title>
+  + <Title size="small">Some Title</Title>
+  ```
+
+  2. **`<Heading />`:** Rename `variant` prop to `size` if the value is `small`, `medium,` or `large`. No change is required on `variant="subheading"`.
+
+  ```diff
+  <Heading variant="subheading">Nothing changes here</Heading> // No change here
+
+  - <Heading variant="medium">Medium Heading</Heading>
+  + <Heading size="medium">Medium Heading</Heading>
+  ```
+
+  ##### Edge Cases
+
+  Make sure to follow migration on new component if `Title` or `Heading` from blade is overriden with styled-components.
+
+  ```diff
+  const MyTitle = styled(Title)`
+    // some styles
+  `
+
+  - <MyTitle variant="large" />
+  + <MyTitle size="large" />
+  ```
+
+- e16c154: feat(PasswordInput)!: rename from `PasswordField` to `PasswordInput`
+
+  #### Migration
+
+  > **Warning**
+  >
+  > Breaking change!
+
+  Rename occurences of `PasswordField` to `PasswordInput`, no changes in the API.
+
+  ```diff
+  - PasswordField
+  + PasswordInput
+  ```
+
+### Minor Changes
+
+- eeba339: feat(Code): add `<Code />` component :shipit:
+
+## 2.5.1
+
+### Patch Changes
+
+- 0ce8390: fix(BaseInput): use cursor not-allowed for disabled inputs
+
+## 2.5.0
+
+### Minor Changes
+
+- d0017cd: feat(PasswordField): add final export :tada:
+  - adds a new `PasswordField` component
+
+## 2.4.0
+
+### Minor Changes
+
+- bf92637: feat(blade): Improve platform types with TS 4.7
+
+  ### Added support for platform dependant types
+
+  Migration Steps
+
+  1. Upgrade to TypeScript 4.7+
+  2. In `tsconfig.json` add `moduleSuffix: ['.web', '']` or `moduleSuffix: ['.native', '']` (depending on the platform)
+
+  ```js
+  {
+    "compilerOptions": {
+      // For react-native use `.native`
+      // For web use `.web` extension
+      "moduleSuffixes": [".web", ""]
+    }
+  }
+  ```
+
+  > **Note**:
+  > if you are on <TS 4.7 or don't specify the `moduleSuffixes` blade will fallback to resolving `web` types
+
+## 2.3.0
+
+### Minor Changes
+
+- 887cd11: feat(blade): added TextArea component
+
+## 2.2.2
+
+### Patch Changes
+
+- a8c5c08: tests: add tests for `TextInput`
+  fix: render clear button on mount when the `defaultValue` or `value` is passed
+
+## 2.2.1
+
+### Patch Changes
+
+- 4b6bfda: fix: update spinner easing
+
+## 2.2.0
+
+### Minor Changes
+
+- 7c272be: feat: add `Spinner` component
+  - Also adds an internal `BaseSpinner` component
+
+## 2.1.0
+
+### Minor Changes
+
+- a6bf780: feat(TextInput): add TextInput Field
+
+  ### This release publishes **`TextField`** Input
+
+  #### [Figma Link](https://www.figma.com/file/jubmQL9Z8V7881ayUD95ps/Klear360---Payment-Light?node-id=10953%3A210737)
+
+  #### Capabilities
+
+  - Support for various `type` of TextInput i.e `'text' | 'telephone' | 'email' | 'url' | 'numeric' | 'search'`
+  - Automatically decide `keyboardType`, `keyboardReturnKeyType`, `autoCompleteSuggestionType` based on `type` attribute alone
+
+  ![image](https://user-images.githubusercontent.com/11384858/188391913-d45e40b4-1b92-4fab-8bf8-8d49891929f8.png)
+
+  - Max characters to be accepted by the input field which will in turn also render a counter
+    ![image](https://user-images.githubusercontent.com/11384858/188390436-2854807d-5fb0-42de-8171-3ba61be4b9f6.png)
+
+  - Clear the content of the input field with the help of a clear button
+    ![image](https://user-images.githubusercontent.com/11384858/188391183-8e262200-7424-4a80-a5fe-1c7166be26ce.png)
+
+  - Attach `prefix` and `suffix` to the input field
+  - Fully Accessible
+
+### Patch Changes
+
+- a8c7620: ## Internal changes
+
+  tests(BaseInput): add web tests and fix onBlur
+
+  - Adds `onBlur`
+
+- 1417e90: changed native text-input helptext color
+
+## 2.0.0
+
+### Major Changes
+
+- cc4355a: feat(blade): added 2px spacing token
+
+  #### Breaking changes
+
+> **Note**
+>
+> This breaking change affects you only if you're using the tokens directly somewhere. If you're only using the components then nothing needs to be updated at your end.
+
+- Added 2px token, thus all spacing tokens have shifted by 1 step.
+
+#### Migration steps
+
+Shift every spacing token other than the first one (`0th` index) by +1
+
+```diff
+- <div style={{ margin: theme.spacing[1] }} />
++ <div style={{ margin: theme.spacing[2] }} />
+```
+
+### Patch Changes
+
+- a402ef1: feat(icons): add `RefreshLeft` icon
+
+## 1.1.0
+
+### Minor Changes
+
+- 5f1033c: feat: add `Alert` component :tada:
+
+### Patch Changes
+
+- cd5f61f: feat(tokens): add new tokens
+- e8d932a: feat: add `blue` variant to `Badge`
+- acfd566: feat(icons): arrow up and arrow left
+
+## 1.0.2
+
+### Patch Changes
+
+- 771981c: fix(blade): radio & checkbox icon alignment
+
+## 1.0.1
+
+### Patch Changes
+
+- ef7f459: fix: font weight of `Link` component
+
+## 1.0.0
+
+### Major Changes
+
+- 51a6787: feat: add `Radio` & `RadioGroup` component
+
+  ## ⚠️ Breaking change for `Checkbox`
+
+  - We've renamed the `neccessityIndicator` prop to `necessityIndicator` to fix a spelling error
+
+- 65834be: fix: icon sizes for `Icon`, `IconButton`, `Button`, `Link` & `Spinner` components
+
+  ## ⚠️ Breaking changes for `Icon`
+
+  **❗️This version introduces a breaking change for the `Icon` component's `size` prop**
+
+  Earlier, the `size` prop had the following size to pixel mapping:
+
+  - **xxsmall:** 10px
+  - **xsmall**: 12px
+  - **small**: 16px
+  - **medium**: 20px
+  - **large**: 24px
+  - **xlarge**: 32px
+
+  Now, the correct `size` prop will have the following size to pixel mapping:
+
+  - **xsmall**: 8px
+  - **small**: 12px
+  - **medium**: 16px
+  - **large**: 20px
+  - **xlarge**: 24px
+  - **2xlarge**: 32px
+
+  > ⚠️ `xxsmall` is not an accepted value anymore. Instead, we have a new acceptable value of `2xlarge`.
+
+### Minor Changes
+
+- 61a17fe: feat: add `Badge` component
+
+## 0.13.6
+
+### Patch Changes
+
+- b365464: fix: button spinner layout
+- f3abfbe: feat(Icons): add new icons
+
+## 0.13.5
+
+### Patch Changes
+
+- 7909d7c: fix(blade): Checkbox design changes
+
+## 0.13.4
+
+### Patch Changes
+
+- 2778973: chore: add appropriate types for onClick of Button & BaseButton
+
+## 0.13.3
+
+### Patch Changes
+
+- 3ea6d6c: fix(blade): fixes checkbox helptext and errortext alignment for individual checkboxes
+
+## 0.13.2
+
+### Patch Changes
+
+- 17b2c71: fix: button styling for native
+
+## 0.13.1
+
+### Patch Changes
+
+- 985f82a: refactor: use Box component on BaseButton
+
+## 0.13.0
+
+### Minor Changes
+
+- b8cc7df: feat: add checkbox component
+- eb65c30: feat: add support for css theme variables
+- f61675e: feat: add `Link` & `BaseLink` components
+
+## 0.12.0
+
+### Minor Changes
+
+- 381e9c7: fix(Klear360): add `size` prop to Text component and update tokens
+
+  This PR updates the typography tokens scale for mobile devices to create better visual hierarchy which we received as feedback from other teams as well.
+
+  It also adds a new `size` prop to `Text` component for `variant='body'`
+
+## 0.11.4
+
+### Patch Changes
+
+- 66f9b24: feat(tokens): add new tokens
+
+## 0.11.3
+
+### Patch Changes
+
+- e0a2631: feat: add Download, Edit, History, Plus, Pause, & Trash icons
+
+## 0.11.2
+
+### Patch Changes
+
+- b2b86b4: fix: SkipNav export
+
+## 0.11.1
+
+### Patch Changes
+
+- 873676f: fix: button export to components
+
+## 0.11.0
+
+### Minor Changes
+
+- 5d022f4: feat: add `Button` component
+
+### Patch Changes
+
+- cddd298: chore: update currency icons
+
+## 0.10.1
+
+### Patch Changes
+
+- 7b9baf7: fix(blade): broken gray color types in theme.d.ts file
+
+## 0.10.0
+
+### Minor Changes
+
+- a800a96: feat(blade): added makeAccessible function
+
+  makeAccessible function is a compatibility layer between web & native for accessibility props
+  More [info in RFC](https://github.com/klearnow/klear360/blob/master/rfcs/2022-04-09-accessibility.md#platform-specific-implementation--5)
+
+### Patch Changes
+
+- a800a96: fix(blade): added aria hidden in icons
+
+## 0.9.0
+
+### Minor Changes
+
+- 0c3a951: feat(blade): Added SkipNav component
+
+  Learn more about [Skip Navigations in Accessibility RFC](https://github.com/klearnow/klear360/blob/master/rfcs/2022-04-09-accessibility.md#skip-navigations)
+
+- 5c750bb: feat(blade): add VisuallyHidden component
+
+  This component is used specifically when you want to hide certain things visually for people who are not visually impaired but also want to make your content is accessible to visually impaired people via assistive technologies.
+
+  You can play around with it on [Storybook](https://master--61c19ee8d3d282003ac1d81c.chromatic.com/?path=/docs/components-accessibility-visuallyhidden--visually-hidden)
+
+## 0.8.0
+
+### Minor Changes
+
+- 002fce2: fix: icon colors & remove `surface.action.icon.link.*` colors from `theme`
+
+  ## Breaking Changes
+
+  - Remove the following tokens from `paymentTheme` & `bankingTheme` theme of Klear360:
+
+    - `colors.surface.action.icon.link.default.lowContrast`
+    - `colors.surface.action.icon.link.default.highContrast`
+    - `colors.surface.action.icon.link.hover.lowContrast`
+    - `colors.surface.action.icon.link.hover.highContrast`
+    - `colors.surface.action.icon.link.focus.lowContrast`
+    - `colors.surface.action.icon.link.focus.highContrast`
+    - `colors.surface.action.icon.link.active.lowContrast`
+    - `colors.surface.action.icon.link.active.highContrast`
+    - `colors.surface.action.icon.link.disabled.lowContrast`
+    - `colors.surface.action.icon.link.disabled.highContrast`
+
+    If you are using any of these tokens, they will no longer be available in your `theme`. Make sure you remove usage of these tokens from your codebase.
+
+  ## Fixes
+
+  1. Fix incorrect Icon colors that were supported & suggested by TypeScript
+
+## 0.7.2
+
+### Patch Changes
+
+- 9f0bb83: feat: add Dollar, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, Close icons
+
+## 0.7.1
+
+### Patch Changes
+
+- 25a7b89: fix(blade): add contrast prop to Typography components
+
+  Add `contrast` prop to all the Typography components so that consumers can change the intent to grab the attention towards the text. The possible values for `contrast` are `high` or `low` and accordingly the color token will be used to set the color of the Typography components
+
+## 0.7.0
+
+### Minor Changes
+
+- 52efedb: fix(blade): set defaults for all typography components
+
+  Make all the props optional to have a better DX and add default values for all the important props
+
+## 0.6.0
+
+### Minor Changes
+
+- e352eef: fix(blade): add `Heading` component
+
+## 0.5.0
+
+### Minor Changes
+
+- 75882a7: feat(Klear360): add `Title`component
+
+  The API for `Title` component can be found under [Typography/Text/\_decisions](https://github.com/klearnow/klear360/blob/master/packages/klear360/src/components/Typography/_decisions/decisions.md)
+
+## 0.4.0
+
+### Minor Changes
+
+- 294173e: - Add the following components that would act as building blocks for our icons:
+  1. `Svg`
+  2. `Path`
+  3. `Rect`
+  4. `Defs`
+  5. `ClipPath`
+  6. `G`
+  - Add `CreditCardIcon` component
+  - Add `RupeeIcon` component
+
+### Patch Changes
+
+- e76cd01: feat/add-text-component
+
+## 0.3.0
+
+### Minor Changes
+
+- a20b608: feat(blade): add motion tokens
+
+  ### Motion tokens
+
+  We have added tokens for
+
+  1. Delay
+  2. Duration
+  3. Easing
+
+  You can find a detailed RFC for motion here: [View Formatted RFC](https://github.com/klearnow/klear360/blob/rfc/2022-03-22-motion-rfc/rfcs/2022-03-22-motion-rfc.md)
+
+## 0.2.0
+
+### Minor Changes
+
+- 6885ac3: feat(blade): add BaseText component
+
+## 0.1.6
+
+### Patch Changes
+
+- 33e3930: feat(blade): add listener for toggling breakpoints
+
+  **Updates**
+
+  - Add `breakpoints` token to the themes.
+  - Out of the box responsiveness support for typography tokens.
+  - Publish `useBreakpoint` hook.
+  - Following breakpoints are supported as of today.
+    ```
+    /** max width: 320px  */
+    xs: 320;
+    /** min width: 321px and max width: 480px */
+    s: 480;
+    /** min width: 481px and max width: 768px */
+    m: 768;
+    /** min width: 769 and max width: 1024px */
+    l: 1024;
+    /** min width: 1025 and max width: 1200px */
+    xl: 1200;
+    /** min width: 1201px  */
+    max: 1201;
+    ```
+  - For web the typography scale will toggle between mobile and desktop
+    - `xs, s, m` are considered as mobile
+    - `l, xl, xl` are considered as desktop
+  - For react native we always default to mobile typography scale
+
+  **What does it mean for me(as a developer)?**
+
+  - If you’re already using Klear360 tokens then you can leverage this by just running `yarn upgrade @klearnow/klear360@0.1.6` and that’s it you are set 🚀
+    - You can use the typography tokens as you were doing previously. Refer the [usage guideline here](https://61c19ee8d3d282003ac1d81c-jukcfyruls.chromatic.com/?path=/story/guides-usage--page&globals=measureEnabled:false#tokens)
+  - You can use these `breakpoints` as a base reference to build your next set of features by just following the [usage guidelines here](https://61c19ee8d3d282003ac1d81c-jukcfyruls.chromatic.com/?path=/story/tokens-breakpoints--page&globals=measureEnabled:false).
+
+  This is our first step towards building responsive and adaptive applications. We’ll be publishing Typography Components next which will be built on top of these tokens and you can use them directly for your projects. Meanwhile, [read more about our responsive and adaptive strategy in this RFC](https://github.com/klearnow/klear360/blob/master/rfcs/2022-02-11-responsive-and-adaptive-layout-strategy.md)
+
+## 0.1.5
+
+### Patch Changes
+
+- 04677a3: fix(blade): add lineheight tokens
+
+## 0.1.4
+
+### Patch Changes
+
+- f992f77: fix(blade): typo in exports field
+
+## 0.1.3
+
+### Patch Changes
+
+- d32dd9d: fix(blade): add overlay color token
+
+## 0.1.2
+
+### Patch Changes
+
+- 8cddfad: fix(blade): update desktop typography scale
+
+## 0.1.1
+
+### Patch Changes
+
+- 6c69a4d: fix(blade): update imports and exports
+
+## 0.1.0
+
+### Minor Changes
+
+- de4124f: ### ⚠️ **Breaking Change** ⚠️
+  This PR introduces a major breaking change on how we access tokens.
+
+  ### Why did we want to change the way we access tokens?
+
+  So, previously if you had to start consuming tokens from the new version of Klear360 you start with importing the theme provider:
+
+  ```jsx
+  // App entry point
+  import { ThemeProvider } from '@klearnow/klear360/components';
+  import { paymentTheme } from '@klearnow/klear360/tokens';
+
+  function App(): JSX.Element {
+    return (
+      <React.Fragment>
+        <GlobalStyle />
+        <ThemeProvider theme={paymentTheme}>
+          <Card />
+        </ThemeProvider>
+      </React.Fragment>
+    );
+  }
+
+  export default App;
+  ```
+
+  And then in one of our components, we'll use the `useTheme()` hook to get the theme and the mode like following 👇
+
+  ```jsx
+  const StyledCard = styled.div(
+    ({ theme }: { theme: Theme }) => `
+    width: 368px;
+    background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+    border-radius: ${theme.border.radius.medium}px;
+    box-shadow: ${theme.shadows.offsetX.level[1]}px ${theme.shadows.offsetY.level[1]}px ${theme.shadows.blurRadius.level[1]}px ${theme.shadows.color.level[1].onLight}, ${theme.shadows.offsetX.level[1]}px ${theme.shadows.offsetY.level[1]}px ${theme.shadows.blurRadius.level[1]}px ${theme.shadows.color.level[1].onLight};
+    padding: ${theme.spacing[5]}px;
+    display: flex;
+    flex-direction: column;
+  `,
+  );
+
+  const Card = (): React.ReactElement => {
+    const { theme } = useTheme();
+    return (
+      <React.Fragment>
+        <DisplayLarge theme={theme}>Cash Advance </DisplayLarge>
+        <StyledCard theme={theme}>
+          <AlertInformation theme={theme}>
+            The interest charged will be deposited back into your bank account within a day of
+            repayment.
+          </AlertInformation>
+          <Divider theme={theme} />
+          <CaptionRegular theme={theme}>
+            This amount will be deducted in 3 installments from your settlement balance between Feb
+            18-20 on a daily basis.
+          </CaptionRegular>
+        </StyledCard>
+      </React.Fragment>
+    );
+  };
+  ```
+
+  #### Problem with the existing implementation:
+
+  So we pass the raw theme tokens which have everything light mode colors, dark mode colors. Different typography scales for desktop, mobile, etc. But as a consumer look at how do we access the tokens from the above file
+
+  ```jsx
+
+  const { theme } = useTheme();
+
+  background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+  font-size: ${theme.typography.desktop.fonts.size[200]}px;
+  ```
+
+  - Isn't it weird to explicitly write `onLight`/`onDark` by hand while accessing color tokens?
+  - Isn't it weird to explicitly write `desktop` to access the typography scale for desktop?
+  - How would you as a developer change things let's say if the user toggles the color mode?
+  - How would you as a developer change the typography scale if the user switches from desktop to mobile or vice-versa?
+
+  You can't! Because we have **hardcoded** the object properties and which means we lost the power of dynamically changing these things based on the user's behavior which is incorrect.
+
+  #### What is the root cause of this issue?
+
+  The root cause is the mental model of how we store tokens and how do we consume them. Typically our tokens are nothing but our design decisions. So this means we need to store every decision in our token file, for eg: light mode colors, dark mode colors, typography scale for desktop, typography scale for mobile but when we consume them we want the system to take care of these things and give us single value for the modes and the platform.
+
+  So we want something like this 👇
+
+  ```diff
+
+  const { theme } = useTheme();
+
+  -background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+  +background-color: ${theme.colors.surface.background.level2.lowContrast};
+  -font-size: ${theme.typography.desktop.fonts.size[200]}px;
+  +font-size: ${theme.typography.fonts.size[200]}px;
+  ```
+
+  Notice the removal of **`onLight`** and **`desktop`** keys from the theme object.
+
+  So we want our system to behave in such a manner that:
+
+  - We input the raw theme(which has color modes and platform types)
+  - It will output the flat theme which will have color mode and platform type selected, so we don't have to hardcode `onLight`/`onDark` or `desktop`/`mobile`.
+
+  ### What is the solution?
+
+  The system we spoke about is nothing but our `Klear360Provider`(previously known as `ThemeProvider`). It'll accept the raw theme as a prop and then based on the device type and color mode pick those values from `themeTokens` and set it in the context as `theme`. We can then use `useTheme()` hook to get the theme from the context which will be flattened.
+
+  This is how things will look after this change 👇
+
+  ```diff
+  // App entry point
+  -import { ThemeProvider } from '@klearnow/klear360/components';
+  +import { Klear360Provider } from '@klearnow/klear360/components';
+  import { paymentTheme } from '@klearnow/klear360/tokens';
+
+  function App(): JSX.Element {
+    return (
+      <React.Fragment>
+        <GlobalStyle />
+  -      <ThemeProvider theme={paymentTheme}>
+  +      <Klear360Provider themeTokens={paymentTheme}>
+          <Card />
+  -      </ThemeProvider>
+  +      </Klear360Provider>
+      </React.Fragment>
+    );
+  }
+
+  export default App;
+
+  // somewhere in the app
+  const { theme } = useTheme();
+
+  -background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+  +background-color: ${theme.colors.surface.background.level2.lowContrast};
+  -font-size: ${theme.typography.desktop.fonts.size[200]}px;
+  +font-size: ${theme.typography.fonts.size[200]}px;
+  ```
+
+  ### Migration guide for apps using the older version
+
+  1. Rename **ThemeProvider** to **Klear360Provider**
+
+  ```diff
+  -import { ThemeProvider } from '@klearnow/klear360/components';
+  +import { Klear360Provider } from '@klearnow/klear360/components';
+  ```
+
+  2. Rename `theme` prop on provider to `themeTokens`
+
+  ```diff
+  -<Klear360Provider theme={paymentTheme}>
+  +<Klear360Provider themeTokens={paymentTheme}>
+  ```
+
+  3. import `Theme` type to be imported from `@klearnow/klear360/components` instead of `@klearnow/klear360/tokens`
+
+  ```diff
+  -import type { Theme } from '@klearnow/klear360/tokens';
+  +import type { Theme } from '@klearnow/klear360/components';
+  ```
+
+  4. Remove all the `onLight`/`onDark` keywords from the theme colors object
+
+  ```diff
+  -background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+  +background-color: ${theme.colors.surface.background.level2.lowContrast};
+  ```
+
+  5. Remove all the `desktop`/`mobile` keywords from the theme typography object
+
+  ```diff
+  -background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+  +background-color: ${theme.colors.surface.background.level2.lowContrast};
+  ```
+
+## 0.0.8
+
+### Patch Changes
+
+- 7a09800: fix(blade): add description in token types
+
+## 0.0.7
+
+### Patch Changes
+
+- 1aa2961: fix(blade): export all the types of global tokens for consumers
+- d8d8027: fix(blade): typo in color tokens
+
+## 0.0.6
+
+### Patch Changes
+
+- 8374dc1: build(blade): generate root `.d.ts`
+
+## 0.0.5
+
+### Patch Changes
+
+- 057cf66: build(blade): add re-exports to `.ts` instead of `.js`
+
+## 0.0.4
+
+### Patch Changes
+
+- efb59d9: feat(blade): add type generation scripts
+
+## 0.0.3
+
+### Patch Changes
+
+- f0b2b01: fix(blade): typo in exports field
+
+## 0.0.2
+
+### Patch Changes
+
+- 55ac5d3: feat(blade): add rollup to build blade
+  :
+
+  - '@klearnow/klear360/tokens': '@klearnow/klear360/build/tokens/index.development.web.js',
+  - '@klearnow/klear360/utils': '@klearnow/klear360/build/utils/index.development.web.js',
+  - '@klearnow/klear360/components': '@klearnow/klear360/build/components/index.development.web.js',
+    },
+
+  ```
+
+  ## Third Party Libs
+
+  While this change is not a breaking change, but we've made a few changes in how the dependencies are handled by blade internally.
+
+  - Web:
+
+  In web, we've marked all the dependencies as `external`, that means you don't need to install the peer dependencies manually,
+  If you have `@floating-ui/react` in your `package.json` you can safely remove it, yarn/npm will automatically install the appropriate version for you.
+
+  - Native:
+
+  In native, we've marked all the dependencies as peerDependencies, so that web consumers doesn't have to install them + ensures there are no mismatches between blade vs consumer dependencies.
+  Please refer to the [installation guide](https://design.klearnow.com/?path=/docs/guides-installation--page#-add-blade-to-your-application)https://design.klearnow.com/?path=/docs/guides-installation--page#-add-blade-to-your-application for more details.
+  ```
+
+### Patch Changes
+
+- 2b37cf6e: feat(TextInput): onClick prop added to TextInput
+
+## 10.21.0
+
+### Minor Changes
+
+- 32d188e6: feat(Collapsible): mark width prop as external
+
+  > [!WARNING]
+  >
+  > If you were using internal `_width` prop, you will have to rename it to `width`
+
+  ```diff
+  - <CollapsibleBody _width={} />
+  + <CollapsibleBody width={} />
+  ```
+
+## 10.20.1
+
+### Patch Changes
+
+- e89018c4: feat(Dropdown): Support `width` prop on DropdownOverlay
+- 37fa68cb: fix: define stylis plugin name property
+
+## 10.20.0
+
+### Minor Changes
+
+- 87d9638b: feat: increase the CSS specificity of all components
+
+  > [!WARNING]
+  >
+  > **We've enhanced the specificity of styles for Klear360 components. If you've defined styles in separate CSS at a root level targeting blade components, please note that they may no longer take effect as expected.
+  > The styles within the blade components will now take precedence.**
+  >
+  > **Your existing component snapshots may update, there is no change in the visual appearance of components. Please feel free to add the updated snapshots.**
+
+### Patch Changes
+
+- 1da66413: fix(blade): page gets scrolled to top on iOS when bottomsheet open
+- 2219e9a1: fix: refined text input label truncation for single-word overflow
+
+## 10.19.1
+
+### Patch Changes
+
+- 0d0e72ea: fix(blade): fixed SpotlightPopoverTour bugs
+
+  - Safari body-scroll-lock causing the page to get clipped because storybook doesn't set width/height on body - fixed by setting width/height
+  - Initial delay of opening the mask - fixed by immediately updating the mask size on initial render
+  - Delay of transitioning between steps which occurs because we need to wait for the animation to finish before scrolling otherwise the scroll gets interrupted - fixed by reduced this to 100ms
+
+## 10.19.0
+
+### Minor Changes
+
+- 23a3e111: feat: Add `Table` component
+
+## 10.18.2
+
+### Patch Changes
+
+- 9967cd96: fix: set default breakpoint without computing
+
+## 10.18.1
+
+### Patch Changes
+
+- 77b31aa1: fix(blade): remove extra margin left on carousel
+
+## 10.18.0
+
+### Minor Changes
+
+- 88aba1d6: feat(blade): added SpotlightPopoverTour web implementation
+
+## 10.17.4
+
+### Patch Changes
+
+- 97b9b4cc: fix(TextInput): white placeholder on autoFocus in android
+
+## 10.17.3
+
+### Patch Changes
+
+- 49db8d7c: chore(blade): only allow CarouselItem in Carousel children
+- ab2b1800: fix(blade): fixed react-native bottomsheet state bugs
+
+## 10.17.2
+
+### Patch Changes
+
+- f0d4dce5: fix: react native text input alignment with prefix
+
+## 10.17.1
+
+### Patch Changes
+
+- a0d3b13d: chore(blade): add file zip icon
+- 66a16267: fix(Dropdown): use popup background color token in DropdownOverlay and Popover
+
+  > **Note**
+  >
+  > For consumers, this changes the color of Dropdown overlay to fainter version in dark mode. It shouldn't break anything and hence the snapshots can be safely updated.
+
+## 10.17.0
+
+### Minor Changes
+
+- a35f5dfc: feat: update popup token, migrate overlay tokens
+
+  > **Warning**
+  >
+  > `theme.colors.overlay.background` is moved to `theme.colors.surface.overlay.background[800]`.
+  >
+  > Based on our analytics data, its a rarely used token hence, its a non-breaking change for most consumers (1 instance in razorpay/x repo).
+  > Although it is recommended to search for `colors.overlay.background` in your repo and confirm once if its not being used. If it is used you can follow migration step below.
+
+  ```diff
+  - background={theme.colors.overlay.background}
+  + background={theme.colors.surface.overlay.background[800]}
+  ```
+
+## 10.16.0
+
+### Minor Changes
+
+- fc7c8408: feat(blade): tabs implementation
+
+  > [!NOTE]
+  > We've updated `@floating-ui/react` to version `0.25.4`
+  > Consumers may need to update their jest snapshots
+
+### Patch Changes
+
+- c6d1ad9b: fix: update carousel nav button tokens
+- a17076b8: chore: fix popover close button background
+
+## 10.15.3
+
+### Patch Changes
+
+- f1ab23c8: fix(blade): remove preventDefault in selector label
+
+## 10.15.2
+
+### Patch Changes
+
+- 360abe73: fix(Autocomplete): enhance input handling for controlled scenarios
+- 69098f16: fix(checkbox): fixed alignment
+- 71ea0ac5: fix(Dropdown): enhance tag selection handling
+- 44153ba4: feat(Typography): accept `brand.secondary.500` as a valid `color` prop value
+- 8fdef8a7: docs: improve documentation aesthetics
+- 277ba6fa: fix(AutoComplete, SelectInput): disable tags in input when `isDisabled` is set to true
+- 08c161b6: fix(ActionListItem): checkbox spacing
+
+## 10.15.1
+
+### Patch Changes
+
+- f9d16dc4: fix(Alert): correct color prop behavior
+
+## 10.15.0
+
+### Minor Changes
+
+- 87c5a6ee: feat(Box): add `transform`, `transformOrigin`, `clipPath`, `opacity`, & `visibility` props
+
+### Patch Changes
+
+- 76d80dc2: fix(Input): ensure correct value passing for trailingFooterSlot & trailingHeaderSlot
+
+## 10.14.7
+
+### Patch Changes
+
+- 59f0b92c: fix: carousel indicator sync bug
+
+## 10.14.6
+
+### Patch Changes
+
+- 7738f70b: fix(Tooltip): prevent overriding the `aria-label` attribute
+- f38f7c0a: fix: react native crash with reanimated
+
+## 10.14.5
+
+### Patch Changes
+
+- 47b8149d: feat(ListItemText): make span as default tag for ListItemText
+
+## 10.14.4
+
+### Patch Changes
+
+- 87f75b03: feat: support `brand*` colors on Icon and borderColor styled prop
+
+## 10.14.3
+
+### Patch Changes
+
+- 4d6e6aeb: fix(AutoComplete): hide ActionListSection when items are filtered out
+
+## 10.14.2
+
+### Patch Changes
+
+- 3b76e389: fix(blade): remove FloatingFocusManager and added more tests
+
+  Fixes bug with floating ui where it was adding aria-hidden to dropdown trigger. more context [here](https://razorpay.slack.com/archives/CMQ3RBHEU/p1695972277506429?thread_ts=1693739607.070049&cid=CMQ3RBHEU).
+
+## 10.14.1
+
+### Patch Changes
+
+- a65ebf9c: feat(blade): update to use focus-visible
+
+  This will ensure that focus will only appear while using keyboard.
+  Note that this is a non-breaking change but you might need to update UT snapshots.
+
+## 10.14.0
+
+### Minor Changes
+
+- dc3e240b: feat: add `color` prop to `Alert`, `Badge`, `Button`, `Chip`, `ChipGroup`, `Counter`, `Link`, & `Spinner`
+
+  #### Color Tokens Update
+
+  **[New White Color Tokens:](https://design.klearnow.com/?path=/docs/tokens-colors--page)** Introducing white color tokens, enabling white buttons and links for enhanced design options.
+
+  #### Deprecated `intent` prop in favor of the new `color` prop
+
+  - **Alert** - Deprecated `intent` prop.
+  - **Badge** - Deprecated `variant` prop.
+  - **Chip & ChipGroup** - Deprecated `intent` prop.
+  - **Counter** - Deprecated `variant` and `intent` prop.
+  - **Spinner** - Deprecated the `contrast` prop.
+
+  #### Jest Snapshots
+
+  Your existing component snapshots may update, there is no change in the visual appearance of components. Feel free to commit the updated snapshots.
+
+## 10.13.2
+
+### Patch Changes
+
+- a047ea61: fix(AutoComplete): handle focus ring on option change
+
+## 10.13.1
+
+### Patch Changes
+
+- d22cbd3d: fix(AutoComplete): Handle inputValue in Controlled Single Selection
+- acd0f7b0: fix: change autocomplete search logic from startsWith to includes
+
+## 10.13.0
+
+### Minor Changes
+
+- e99730d7: feat: support customizing Klear360 Theme with a single brand color
+
+  You can find a detailed documentation [here](https://design.klearnow.com/?path=/docs/guides-theming-createtheme--page)
+
+  ### Example Usage
+
+      ```tsx
+      const customTheme = createTheme({ brandColor: '#19BEA2' })
+
+      <Klear360Provider themeTokens={customTheme} colorScheme={colorScheme}>
+       {App}
+      </Klear360Provider>
+      ```
+
+## 10.12.1
+
+### Patch Changes
+
+- 68820c36: feat: radio & checkbox integration with card
+
+## 10.12.0
+
+### Minor Changes
+
+- 2f2fcab4: feat(blade): add ref to OTP Input
+
+### Patch Changes
+
+- dc42ae1e: fix(Box): correctly apply border styles
+
+## 10.11.0
+
+### Minor Changes
+
+- c4242ad4: feat(Dropdown): add isOpen and onOpenChange
+
+  > **Warning**
+  >
+  > This PR marks `onDismiss` as deprecated. While it continues to work, we recommend consumers to move to onOpenChange using migration steps below
+
+  ### Migration from `onDismiss` on Dropdown
+
+  ```diff
+  <Dropdown
+  - onDismiss={() => console.log('dismissed')}
+  + onOpenChange={(isOpen) => {
+  +  if (!isOpen) {
+  +    console.log('dismissed');
+  +  }
+  + }}
+  />
+  ```
+
+- 18748f1f: feat(ActionListItem): add ActionListItemBadge component and `titleSuffix` option on ActionListItem
+
+## 10.10.0
+
+### Minor Changes
+
+- 18bdaed2: feat(blade): added Popover component
+
+  **Tooltip Changes**
+
+  - Added a new prop `title`
+
+### Patch Changes
+
+- c4ef32f8: chore: export popover & update status table
+
+## 10.9.2
+
+### Patch Changes
+
+- 86c57372: fix: type exports for Select and AutoComplete types
+
+## 10.9.1
+
+### Patch Changes
+
+- 1be2fecf: fix(AutoComplete): AutoComplete Storybook panel and React Native Icon Alignment in PasswordInput
+
+## 10.9.0
+
+### Minor Changes
+
+- 31fa01eb: feat(AutoComplete): add AutoComplete component
+
+## 10.8.1
+
+### Patch Changes
+
+- 09ca73d2: fix(ActionList): divider being added to last ActionListSection
+
+## 10.8.0
+
+### Minor Changes
+
+- ac405dfc: chore(blade): added id to Box component
+
+## 10.7.1
+
+### Patch Changes
+
+- 52288df2: fix(blade): carousel bug in safari
+
+## 10.7.0
+
+### Minor Changes
+
+- f43d9b35: feat(Icon): add default value for `size` & `color` props
+
+## 10.6.0
+
+### Minor Changes
+
+- 1732199a: fix(blade): fix firefox bug in carousel & fixed visible items not switching to `1` on mobile devices.
+
+## 10.5.0
+
+### Minor Changes
+
+- 3fc6ba3a: feat(Typography): add a new `Display` component
+
+  The Display component adds a strong visual touch. Utilize it to create eye-catching sections on your landing pages.
+
+## 10.4.4
+
+### Patch Changes
+
+- f1478f1b: fix(blade): extra left/right padding on amount component
+
+## 10.4.3
+
+### Patch Changes
+
+- 6b69d0e5: fix(blade): fixed card link overlay not working when wrapper is set to position:relative
+
+## 10.4.2
+
+### Patch Changes
+
+- 3d3bef8e: chore(blade): remove broken figma link from Card
+
+## 10.4.1
+
+### Patch Changes
+
+- 6ca6d35b: fix(Amount): correctly round the value upto 2 decimal places
+
+## 10.4.0
+
+### Minor Changes
+
+- a561aaca: feat: Add new `Chip` and `ChipGroup` components
+
+### Patch Changes
+
+- 9278e808: fix(blade): use thicker border in selected card
+
+## 10.3.2
+
+### Patch Changes
+
+- 67e0ae96: feat(blade): added interactive Card
+
+  Enables cards to be used as clickable, linkable & selectable.
+
+## 10.3.1
+
+### Patch Changes
+
+- 5f500f3d: fix(DropdownOverlay): Dropdown clipping issue in overflow scroll containers
+
+## 10.3.0
+
+### Minor Changes
+
+- 5872d7ea: refactor(blade): remove useKlear360InnerRef & expose native DOM nodes via ref
+
+## 10.2.1
+
+### Patch Changes
+
+- 98291854: chore: make accordion min-width 360px for large screens
+- 5f2f3e44: feat: add large size to List component
+
+## 10.2.0
+
+### Minor Changes
+
+- 30109b99: feat(blade): added Carousel component
+
+## 10.1.0
+
+### Minor Changes
+
+- 0e2d5154: feat(Box): add `draggable`, `onDragStart`, `onDragEnd`, `onDragEnter`, `onDragLeave`, `onDragOver`, `onDrop`, `pointerEvents`, & `placeItems` props
+
+## 10.0.0
+
+### Major Changes
+
+- abf52f07: build: upgrade react `v18.2.0`, react-native `v0.72.3` & other libraries
+
+  ### Upgrade the following packages:
+
+  - `react` to `18.2.0`
+  - `react-native` to `0.72.3`
+  - `react-dom` to `18.2.0`
+  - `react-native-reanimated` to `3.4.1`
+  - `react-test-renderer` to `18.2.0`
+  - `@react-native-async-storage/async-storage` to `1.19.1`
+  - `@testing-library/react` to `13.4.0`
+  - `@testing-library/react-native` to `12.2.0`
+
+  ### Migration Guide
+
+  - You can follow [React's](https://react.dev/blog/2022/03/08/react-18-upgrade-guide) & [React Native's](https://react-native-community.github.io/upgrade-helper/?from=0.66.5&to=0.72.3) guides to update your packages to the latest version
+  - If you are using `npm` as your package manager and continue to remain on `react` `v17`, you will have to run `npm install` with `--legacy-peer-deps` flag otherwise you will encounter react version mismatch errors
+  - React Native consumers will need to upgrade to `react-native-reanimated` `v3`
+
+## 9.7.0
+
+### Minor Changes
+
+- d5d174fa: feat: make `Badge`, `Counter`, & `Indicator` components `inline-flex` by default
+
+### Patch Changes
+
+- f4624db2: fix: react native errors with floating-ui/react
+- 2e20ce04: feat(Box): add support for the `transparent` background color
+
+## 9.6.1
+
+### Patch Changes
+
+- 5fb722d8: fix(Switch): correct cursor style in disabled state
+
+## 9.6.0
+
+### Minor Changes
+
+- 50d55a5f: feat(Amount): add support for more currencies
+
+## 9.5.3
+
+### Patch Changes
+
+- d7183b49: fix(SelectInput): truncate text in select input
+- 59518acb: feat(BottomSheet): add `zindex` prop & improve focus management logic
+
+  Thanks to @archie252000 for his contribution!
+
+## 9.5.2
+
+### Patch Changes
+
+- a1e75040: fix: standardize logs & errors
+- 37bdc811: fix(Box): handle `undefined` for `backgroundColor` prop
+- e8a81131: fix: remove className from Button, svg, Link
+
+  > **Note**
+  >
+  > There was an internal bug introduced with styled-props which allowed certain props like className to pass through and get added on DOM. This release fixes that bug.
+
+  This will be non-breaking for most projects (especially if you're using TypeScript).
+
+  If your project happened to use `className` prop on Button, SVG Icons, or Link, it will stop working post this release.
+
+## 9.5.1
+
+### Patch Changes
+
+- 14271605: refactor: move to `React.ReactElement` type
+
+## 9.5.0
+
+### Minor Changes
+
+- cbed430f: feat: strip off logs & errors in production builds
+
+#### Jest v27 and Custom Resolver Compatibility
+
+For users on Jest v27 or older, or those with custom Jest resolvers (like `jest-directory-named-resolve`) not supporting `package.json` exports, a `moduleNameMapper` update is needed. This ensures compatibility with the `@klearnow/klear360` package:
+
+```diff
+  moduleNameMapper: {
+    // ...rest of your config
++   '@klearnow/klear360/components': '<rootDir>/node_modules/@klearnow/klear360/build/components/index.development.web.js',
++   '@klearnow/klear360/utils': '<rootDir>/node_modules/@klearnow/klear360/build/utils/index.development.web.js',
++   '@klearnow/klear360/tokens': '<rootDir>/node_modules/@klearnow/klear360/build/tokens/index.development.web.js',
+  },
+```
+
+### Patch Changes
+
+- 2be798d9: feat: add zIndex prop to Tooltip
+
+## 9.4.1
+
+### Patch Changes
+
+- ebd3cbda: feat: add zIndex prop for Modal
+
+## 9.4.0
+
+### Minor Changes
+
+- 5bddbe08: feat(Input): make `label` prop optional & add `accessibilityLabel` prop to `TextInput`, `TextArea`, `PasswordInput`, `SelectInput`, and `OTPInput` components
+
+  #### Key Updates
+
+  - **Optional `label` Prop**: We understand that not all use cases require a label for the Input components. Therefore, we have made the label prop optional, providing you with the freedom to choose whether to display a label or not, depending on your specific application requirements.
+
+  - **Introducing `accessibilityLabel`:** Recognizing the significance of accessibility in modern applications, we have added the `accessibilityLabel` prop to the Input components. This prop enables developers to assign a descriptive label for the input field, making it more user-friendly for individuals using assistive technologies or screen readers.
+
+  - **Enhanced User Guidance:** To maintain usability, we have implemented a requirement that either the `label` or `accessibilityLabel` prop must be provided. This ensures that users will always have clear guidance when interacting with Inputs, promoting a seamless user experience.
+
+## 9.3.0
+
+### Minor Changes
+
+- d28d8a72: feat(Tag): add Tag component
+
+## 9.2.0
+
+### Minor Changes
+
+- 37d84ce7: feat: support `display` prop for all components with styled props
+
+  Restructures few components to ensure adding a display prop doesn't break the components
+
+## 9.1.2
+
+### Patch Changes
+
+- 6763f5fa: fix(List): re-export ListItemText
+
+## 9.1.1
+
+### Patch Changes
+
+- fe31363e: fix(Input): correct helpText and input box alignment
+- e7317212: fix: add border-style when border width or color is set
+
+## 9.1.0
+
+### Minor Changes
+
+- b1a1faef: feat(blade): added Skeleton Component
+
+### Patch Changes
+
+- 199d6f0e: fix(Card): fix spacing between header & leading on react native
+- dd234a65: feat: add support for ListItemText within List
+
+## 9.0.3
+
+### Patch Changes
+
+- 538390be: feat(Box, Typography): expose brand colors
+
+  - On Box, we're exposing all `brand.*` tokens on the background.
+  - On Typography, we're exposing all `brand.primary.*` tokens as color prop
+
+- d880e8e9: fix(Dropdown, BottomSheet): prioritise bottomsheet controlled state over dropdown
+
+## 9.0.2
+
+### Patch Changes
+
+- 8f4bc791: fix: CollapsibleLink arrow orientation when `direction` is top
+
+## 9.0.1
+
+### Patch Changes
+
+- dfea4962: fix(DropdownOverlay): position of Overlay with label on left
+
+## 9.0.0
+
+### Major Changes
+
+- 3d10cecb: fix: make OTPInput fluid width
+
+  ## ⚠️ Breaking change for OTPInput component
+
+  Changes the OTPInput to have a fluid width compared to a fixed width of 36px per field earlier
+
+  ### Migration guide
+
+  **It is recommended to let the OTPInput take the entire width of the parent form in order to ensure consistency with the rest of the Input elements.**
+
+  If you still want to keep the UI for OTPInput on your existing screens the same, you can do the following:
+
+  1. Wrap `OTPInput` with a `Box` component and assign a `maxWidth` of `168px` (for `otpLength` of 4) or `256px` (for `otpLength` of 6)
+
+  ```diff
+  + <Box maxWidth='256px' />
+    <OTPInput label='Enter OTP' otpLength={6} />
+  + </Box>
+  ```
+
+  **Before this change (OTPInput with fixed width):**
+
+  <img width="362" alt="Screenshot 2023-06-28 at 2 50 05 PM" src="https://github.com/klearnow/klear360/assets/24487274/6d23c4a8-6c27-44f1-bb47-0d2b61025a06">
+
+  **After making OTPInput fluid width (OTPInput with fluid width):**
+
+  <img width="354" alt="Screenshot 2023-06-28 at 2 49 57 PM" src="https://github.com/klearnow/klear360/assets/24487274/c3e40176-9f22-451e-a443-1274c4333aec">
+
+### Patch Changes
+
+- 92711d39: feat: standardize isRequired & necessityIndicator across `Checkbox`, `Radio` & `Input` components
+
+  You can now control the `required` property of Checkbox, Radio & Input components with `neccessityIndicator` as well as `isRequired` props
+
+## 8.15.3
+
+### Patch Changes
+
+- 4dd62afd: fix(blade): bottomsheet ssr fix
+
+## 8.15.2
+
+### Patch Changes
+
+- b2f55b7a: fix(blade): tooltip zIndex issue
+
+## 8.15.1
+
+### Patch Changes
+
+- c802e72f: feat: add blue variant to Counter component & change intent to variant
+
+  ## ⚠️ Changes for Counter component with backward compatibility
+
+  Changes the `intent` prop to `variant` since we support more than Feedback colors with the addition of `blue` color for Counter. We will continue to support `intent` prop for backward compatibility but it will be deprecated in an upcoming major release.
+
+  ### Migration guide
+
+  1. Replace all instances of Counter's `intent` prop with `variant
+     > The change is only in the naming of the prop, the value will remain unchanged.
+
+  ```diff
+   <Counter
+  -  intent='positive'
+  +  variant='positive'
+     value={42}
+   />
+  ```
+
+## 8.15.0
+
+### Minor Changes
+
+- bd5ededd: feat(DropdownHeaderFooter): add DropdownHeader DropdownFooter components
+
+  We have standardised the Header and Footer between Dropdown, BottomSheet, Modal, and any future components.
+
+  > **Warning**
+  >
+  > **Breaking Change :** For consumers who use - `ActionListHeader` or `ActionListFooter`.
+  >
+  > Through our code search we found there weren't any instances of these component in Klear360 code yet thus this is released under minor version
+
+  ## Migration Guide
+
+  > **Note**
+  >
+  > The Header and Footer are redesigned so it might not be possible to have 1:1 designs. The new header and footer will look different.
+
+  1. Remove `ActionListHeader` and `ActionListFooter` from the inside of the `ActionList`
+  2. Add `DropdownHeader` and `DropdownFooter` outside of the `ActionList`, inside `DropdownOverlay`.
+
+  ```diff
+  import {
+    Dropdown,
+    DropdownOverlay,
+    SelectInput,
+    ActionListHeader,
+    ActionListFooter,
+    ActionList,
+    ActionListItem
+  } from '@klearnow/klear360/components';
+
+  function App() {
+    return (
+      <Dropdown>
+        <SelectInput label="Select City" />
+        <DropdownOverlay>
+  +       <DropdownHeader title="Title" />
+          <ActionList>
+  -          <ActionListHeader title="Title" />
+              <ActionListItem />
+              <ActionListItem />
+  -          <ActionListFooter trailing={<Button>Apply</Button>} />
+          </ActionList>
+  +       <DropdownFooter>
+  +         <Box><Button>Apply</Button></Box>
+  +       </DropdownFooter>
+        </DropdownOverlay>
+      </Dropdown>
+    )
+  }
+
+  export { App };
+  ```
+
+  Checkout [Dropdown Docs](https://design.klearnow.com/?path=/story/components-dropdown-dropdown--page&globals=showInternalComponents:true;measureEnabled:false) for more details
+
+## 8.14.0
+
+### Minor Changes
+
+- e1f37f69: feat: add `Divider` component
+
+## 8.13.0
+
+### Minor Changes
+
+- 865cd411: refactor: remove internal utilities from index re-exports
+
+  > **Warning**
+  >
+  > We have removed some of the undocumented internal utilites from re-export of `@klearnow/klear360/utils`.
+  > We went through the imports usage of Klear360 and made sure to keep exporting the utilities that are currently being used to avoid breaking changes.
+
+  You can take a look at re-exports of [utils/index.ts](https://github.com/klearnow/klear360/blob/master/packages/klear360/src/utils/index.ts) to know which are the public utilities that we support. This is part of the larger effort in exporting and documenting useful utilities from blade and avoid exporting internal utilities which might break during internal refactors.
+
+  We have marked 2 utilities as `@deprecated` as they are expected to be internal utilities but currently being used in Klear360. These will be removed in future major versions and won't be documented.
+
+  - `toTitleCase`
+  - `usePrevious`
+
+  We would recommend moving these 2 utilities to your local repo utilities.
+
+### Patch Changes
+
+- f4c2afb5: feat: add background-image, size, position, origin, repeat props
+- 610422ab: feat: add text decoration support for typography
+
+  Thanks [@archie252000](https://github.com/archie252000) for the contribution!
+
+## 8.12.1
+
+### Patch Changes
+
+- fa8b2361: feat(blade): add and update data attributes in child components
+
+## 8.12.0
+
+### Minor Changes
+
+- 0478669a: feat: add `Accordion` and `Collapsible` components
+
+  > **Note**
+  >
+  > If you're upgrading from earlier PRE_RELEASE, there are no breaking changes in the API, however there are some changes in the rendered markup which may require updating any snapshots (if any) at your end
+
+- dd0695d7: feat(blade): added bottomsheet body zero padding option
+
+## 8.11.3
+
+### Patch Changes
+
+- e62244f8: fix: Dropdown opening up when clicked on ChevronDownIcon in disabled state
+
+## 8.11.2
+
+### Patch Changes
+
+- f828bc94: fix: react native display style bug
+
+## 8.11.1
+
+### Patch Changes
+
+- 3f72c0df: fix: dynamic positioning of dropdown overlay
+
+## 8.11.0
+
+### Minor Changes
+
+- acc35a2e: fix: support `min-content`, `none`, `fit-content` in SpacingValueType of Box and styled-props
+
+### Patch Changes
+
+- 9fc66217: feat(blade): added support for React.ReactNode on Title & Heading component
+- b08d09d8: fix(blade): fix modal portal ssr
+
+## 8.10.3
+
+### Patch Changes
+
+- 62522f3e: fix(dropdown): dropdown overlay positioning
+
+## 8.10.2
+
+### Patch Changes
+
+- 99016aff: feat(blade): add support for as prop for typography components
+- f08e6d4f: fix(blade): remove unnecessary attributes from dom
+
+## 8.10.1
+
+### Patch Changes
+
+- 17e5bae0: fix(patch-package): move to dependencies
+  - this should fix an issue with `patch-package` when trying to install latest version of blade
+- 33b507bc: fix(blade): invalid dom nesting in Link
+
+## 8.10.0
+
+### Minor Changes
+
+- ba05928c: feat: add `Accordion` and `Collapsible` pre-release
+
+  - `Accordion` and `Collapsible` are available on web as pre-release
+  - You may import and use the following: `Accordion_PRE_RELEASE` and `Collapsible_PRE_RELEASE`
+
+  > **Warning**
+  >
+  > These components are in pre-release which means there might be some changes by the stable release and there might be some rough edges.
+
+## 8.9.1
+
+### Patch Changes
+
+- 7613ca13: fix: show decimal upto 2 places when `isAfixSubtle:false`
+
+## 8.9.0
+
+### Minor Changes
+
+- d62a86d4: feat(blade): added tooltip component
+
+  Klear360 now has a peer dependency on [FloatingUI](https://floating-ui.com/), make sure to install it.
+
+  For web:
+
+  ```
+  yarn add @floating-ui/react
+  ```
+
+  For native:
+
+  ```
+  yarn add @floating-ui/react-native
+  ```
+
+## 8.8.4
+
+### Patch Changes
+
+- 333d0e7e: fix(DropdownOverlay): fix incorrect minWidth condition
+
+## 8.8.3
+
+### Patch Changes
+
+- 163717cf: fix(DropdownOverlay): DropdownOverlay width in SelectInput trigger
+
+## 8.8.2
+
+### Patch Changes
+
+- 40f05a94: fix(blade): BottomSheet unable to find ActionList component
+- ab4f10c4: fix: make Badge and Counter display inline-flex
+
+## 8.8.1
+
+### Patch Changes
+
+- 9456e9d3: fix(BaseInput): large label alignment
+- c8727e89: fix(tokens): update primary color theme tokens
+- 19749c7a: fix(blade): jsdoc comments
+
+## 8.8.0
+
+### Minor Changes
+
+- 20c9fc03: feat(Input): add `generic` value in `autoCompleteSuggestionType`
+- 9db8c219: feat: add Modal component
+
+### Patch Changes
+
+- 9db8c219: chore: update overlay color tokens
+- f78834ea: fix(Amount): Make Amount display `inline-flex`
+
+## 8.7.0
+
+### Minor Changes
+
+- fc46b240: feat(Code): add `isHighlighted` prop
+- f0b7a66b: feat(Typography): expose `color` from Typography components like `Text`, `Heading`, `Title`, `Code`
+
+### Patch Changes
+
+- b9394c66: fix: update migrate-typography script
+
+## 8.6.1
+
+### Patch Changes
+
+- 93626965: fix: ActionList border style
+
+## 8.6.0
+
+### Minor Changes
+
+- 8348634c: feat(Link): add `xsmall` Link size
+- 26a7d38c: feat(Button): Support `href`, `target`, and `rel` on Button component.
+
+  You can now use `href` on Button which renders as `a` tag instead of button automatically.
+
+  ```jsx
+  <Button href="https://youtu.be/iPaBUhIsslA" target="_blank" rel="noopener noreferrer">
+    I am Link!
+  </Button>
+  ```
+
+- 4ff72975: feat(DropdownLink): add `DropdownLink` trigger for Dropdown
+
+  Checkout [Checkout DropdownLink Documentation](https://design.klearnow.com/?path=/story/components-dropdown-with-button-and-link--with-link&globals=measureEnabled:false)
+
+- 3fe1ff8f: feat(blade): add textAlign to Box
+
+### Patch Changes
+
+- 14e5057e: fix: add min-width and max-width in Menu trigger Dropdown to fix width issues
+- 69a1bcef: chore(blade): improve BottomSheet documentation & added jsdoc
+- 4df0b721: fix(SelectInput): single select value clear
+
+  - You can pass `''` (empty string) in single select `value` prop to clear the selected value now.
+
+## 8.5.0
+
+### Minor Changes
+
+- 4a6ae99c: feat(Switch): add Switch component
+
+### Patch Changes
+
+- 245f677c: chore(blade): export switch
+
+## 8.4.1
+
+### Patch Changes
+
+- d30a7fd4: fix(blade): fix code & amount typography alignment issues
+
+## 8.4.0
+
+### Minor Changes
+
+- 4fb0f3fe: feat(Box): add `onScroll`, `onMouseOver`, `onMouseEnter`, `onMouseLeave` events
+
+## 8.3.0
+
+### Minor Changes
+
+- 06da7a2f: feat(Box): add `ref` support
+
+## 8.2.3
+
+### Patch Changes
+
+- ec18776c: fix: blade builds on npm & github
+
+## 8.2.2
+
+> **Warning**
+>
+> There were some build issues associated with this release, please upgrade to version >= 8.2.3 where this issue was resolved
+
+### Patch Changes
+
+- e4dcdfc4: build: fix npm publish by generating .npmrc in monorepo root
+
+## 8.2.1
+
+> **Warning**
+>
+> There were some build issues associated with this release, please upgrade to version >= 8.2.3 where this issue was resolved
+
+### Patch Changes
+
+- 1ab67fc7: fix: css vars build script with new elevation tokens
+
+## 8.2.0
+
+> **Warning**
+>
+> There were some build issues associated with this release, please upgrade to version >= 8.2.3 where this issue was resolved
+
+### Minor Changes
+
+- 16d0e9e3: feat: add new `elevation` tokens
+  This release adds new shadow tokens. Previously we had the following shadow tokens
+
+1. `level1`
+2. `level2`
+3. `level3`
+4. `level4`
+5. `level5`
+
+Plus we didn't had proper ways of using tokens across web and native like we have for our other tokens like Colors, Typography, Spacing, Motion, etc.
+
+Now the new introduced levels are:
+
+1. `none`
+2. `lowRaised`
+3. `midRasied`
+4. `highRaised`
+
+These tokens now will work across ios, android and web and will add all the require properties automatically for eg:
+
+- on web we have 2 layers of shadow as per new token values
+
+```
+{
+  /** offset-x | offset-y | blur-radius | spread-radius | color, offset-x | offset-y | blur-radius | spread-radius | color */
+  lowRaised: `0 4px 8px -2px hsla(217, 56%, 17%, 0.1), 0 2px 4px -2px hsla(217, 56%, 17%, 0.06)`,
+  midRaised: `0 12px 16px -4px hsla(217, 56%, 17%, 0.08), 0 4px 6px -2px hsla(217, 56%, 17%, 0.03)`,
+  highRaised: `0 24px 48px -12px hsla(217, 56%, 17%, 0.18)`
+}
+```
+
+- for RN, we can't have multi-layer shadows plus android and iOS both treat shadows differently, but now we have parity
+
+```
+{
+  // android only
+  elevation: 4,
+  shadowColor: 'hsla(217, 56%, 17%, 0.64)', // works on both
+  // ios only
+  shadowOpacity: 0.12,
+  shadowRadius: 2,
+  shadowOffset: {
+    width: 0,
+    height: 3,
+  },
+}
+```
+
+but all this is now abstracted and as a developer, you can do this across platforms:
+
+```
+theme.elevation.lowRaised // this will add necessary props based on the platform
+```
+
+Read the entire decision [doc here](https://docs.google.com/document/d/1GQEd-1JXFDbv3JsBMB2TgiSn8EJE43Gtm_Xtb_8dn04/edit)
+
+## 8.1.0
+
+### Minor Changes
+
+- 9f2dabfd: feat: add border support to Box component
+
+## 8.0.0
+
+### Major Changes
+
+- 9917a5cd: feat(Dropdown): Controlled Dropdown and Button Trigger
+
+  - Adds API to seamlessly build controlled dropdown
+  - Add DropdownButton component to trigger dropdown using Button
+  - Removes `isDefaultSelected` from `ActionListItem` _(see migration guide below)_
+
+  > **Warning**
+  >
+  > **Breaking change** for consumers who -
+  >
+  > - Use `isDefaultSelected` on `ActionListItem` component
+  > - Use `onChange` on `SelectInput` (under some scenarios. Check migration guide below)
+  >
+  > Rest of the consumers can safely upgrade without any migration
+
+  ### Migration Guide
+
+  #### `isDefaultSelected` Migration
+
+  We have removed `isDefaultSelected` from `<ActionListItem />` component. [Check out API decision](https://github.com/klearnow/klear360/blob/master/packages/klear360/src/components/Dropdown/_decisions/controlled-dropdown.md) for reasoning
+
+  If you were using it as a workaround for controlled selection,
+
+  - We now have a first class controlled selection support with `value` and `onChange` prop on `SelectInput`.
+
+    Checkout CodeSandbox Example for new API - https://codesandbox.io/s/blade-controlled-select-vxg30b
+
+  If you were using `isDefaultSelected` for default selections, you can now use `defaultValue` on SelectInput
+
+  - Remove `isDefaultSelected` and use `defaultValue` on SelectInput. You can pass array of values to `defaultValue` in case of multiselect
+    ```diff
+    <Dropdown>
+      <SelectInput
+        label="Select City"
+    +   defaultValue="mumbai"
+      />
+      <DropdownOverlay>
+        <ActionListItem
+          title="Mumbai"
+          value="mumbai"
+    -     isDefaultSelected
+         />
+        <ActionListItem title="Bangalore" value="bangalore" />
+      </DropdownOverlay>
+    </Dropdown>
+    ```
+
+  #### `onChange` on SelectInput Migration
+
+  As a part of [bug fix](https://github.com/klearnow/klear360/issues/1102), `onChange` will now **NOT** be called on initial render
+  like it previously did. This will only require migration if you were earlier relying on `onChange` to set initial value.
+
+  If you were relying on `onChange` to set initial value, you can now move those values to your `useState`'s initial value.
+
+  ```tsx
+  const Example = (): JSX.Element => {
+    const [cities, setCities] = React.useState();
+    return (
+      <>
+        <Dropdown>
+          <SelectInput label="Cities" onChange={({values}) => setCities(values) } />
+          <DropdownOverlay>
+            <ActionListItem title="Mumbai" value="mumbai" />
+            <ActionListItem title="Pune" value="pune" />
+          </DropdownOverlay>
+        </Dropdown>
+        <Text>{cities}</Text>
+        {/*
+          In earlier versions, value of `cities` would've been `['']`
+          (because onChange would've been called initially to set array with empty string value)
+
+          Now it will output undefined (anything you pass in your useState) as the onChange wouldn't be called on initial render
+        */}
+      <>
+    )
+  }
+  ```
+
+## 7.2.2
+
+### Patch Changes
+
+- 2a6b8c89: chore: add meta attribute `data-component-from-blade='true'` to native components
+
+## 7.2.1
+
+### Patch Changes
+
+- 40a16da7: fix(blade): BottomSheet body dynamic height
+- e0f80522: feat(blade): added bottomsheet component ids
+
+## 7.2.0
+
+### Minor Changes
+
+- 1333e756: feat(blade): added bottomsheet component
+
+  > For react-native consumers make sure to [go through the installation guide](https://design.klearnow.com/?path=/docs/guides-installation--page#-add-blade-to-your-application) on how to setup the peer dependencies
+
+  <details>
+    <summary>⚠️ Migration guide from prerelease version</summary>
+
+  Update the imports:
+
+  ```diff
+  import {
+  -  BottomSheet_PRE_RELEASE,
+  +  BottomSheet,
+    BottomSheetHeader,
+    BottomSheetBody,
+    BottomSheetFooter
+  } from "@klearnow/klear360/components"
+  ```
+
+  Changed Header Footer API:
+
+  **Header**
+
+  Prop changes:
+
+  - Removed prefix/suffix props and added new props
+
+  ```diff
+  -  title: string;
+  +  title?: string;
+    subtitle?: string;
+  -  prefix?: React.ReactNode;
+  -  suffix?: React.ReactNode;
+  +  leading?: React.ReactNode;
+  +  trailing?: React.ReactNode;
+  +  titleSuffix?: React.ReactNode;
+  +  showBackButton?: boolean;
+  +  onBackButtonClick?: () => void;
+  +  closeButtonRef: React.MutableRefObject<any>;
+  ```
+
+  **Footer**
+
+  Footer component now accepts JSX content
+
+  Before:
+
+  ```jsx
+  <BottomSheetFooter
+    trailing={{
+      primary: {
+        text: 'Hello',
+        onClick: () => {},
+      },
+      secondary: {
+        text: 'World',
+        onClick: () => {},
+      },
+    }}
+  />
+  ```
+
+  After:
+
+  ```jsx
+  <BottomSheetFooter>
+    <Button isFullWidth variant="secondary" onClick={() => {}}>
+      Hello
+    </Button>
+    <Button isFullWidth marginTop="spacing.5" onClick={() => {}}>
+      World
+    </Button>
+  </BottomSheetFooter>
+  ```
+
+  </details>
+
+## 7.1.3
+
+### Patch Changes
+
+- 73011827: fix(BottomSheet): ensure that the BottomSheet's lower snappoint will have a buffer
+- f2130469: fix(blade): bottomsheet isOpen state, simplify isOpen logic & glue code
+
+  Previously if users did not changed the isOpen state to false inside `onDismiss` the bottomsheet's internal state will still remain "open", but the bottomsheet would visually be hidden and the backdrop will still remain, this fixes the bug so that internally we won't modify the bottomsheet's position instead we will just call the `onDismiss`. [Check the loom](https://www.loom.com/share/f24fcb51b245431fbf1a0aeb53cea287) video here for more info.
+
+- 24d2a0b0: fix(cardFooter): alignment issue
+
+## 7.1.2
+
+### Patch Changes
+
+- 69ef5042: fix(blade): BottomSheet unable to scroll content
+
+## 7.1.1
+
+### Patch Changes
+
+- 85737340: fix(SelectInput): dropdown without label takes up margin space
+
+  A dropdown without any label will now correctly take no extra space for the margin
+
+## 7.1.0
+
+### Minor Changes
+
+- 85289118: feat(blade): BottomSheet prerelease
+
+  > **Warning**
+  >
+  > The final `BottomSheet` API isn't final and subjected to change as we work on stabilizing the component.
+
+## 7.0.4
+
+### Patch Changes
+
+- e3d5321c: perf(blade): integrate SectionList in ActionList
+
+## 7.0.3
+
+### Patch Changes
+
+- 6f7ec83f: fix(Box): add correct prop types in react native Box
+- abc4c156: fix(colors): incorrect value of ashGrayLight.1200
+
+  There was a typo earlier in the value of the token.
+
+- fce1c767: feat(TextInput): add note on `type="number"` attribute
+- c0701725: fix: remove internal BaseBox export (no change for consumers)
+
+## 7.0.2
+
+### Patch Changes
+
+- 71b4a85b: feat: add `htmlTitle` prop support for Link component on web
+
+## 7.0.1
+
+### Patch Changes
+
+- 0f6e2ad7: fix: ref breakage on react native
+- 9963a7be: feat(package.json): add "main" field to package.json
+
+## 7.0.0
+
+### Major Changes
+
+- 5248ea66: feat(Typography): streamline typography scale
+
+  > **Warning**
+  >
+  > Breaking Change!
+  > This is a breaking change for typography components and lineHeight scale
+  >
+  > We have written codemod to ease this process so please follow the [migration guide thoroughly](#breaking-changes)
+
+  ### Component Changes:
+
+  - Title:
+    - Added `xlarge` size
+  - Text:
+    - Added `large` size
+  - Link:
+    - Added `large` size
+  - Code:
+    - Added `weight=bold`
+
+  ### Breaking Changes:
+
+  - Title:
+    - Replace all `large` size variants to `xlarge`
+
+  ```diff
+  - <Title size="large">hello world</Title>
+  + <Title size="xlarge">hello world</Title>
+  ```
+
+  ***
+
+  ### Line-height scale changes
+
+  New scale has been changed to use numbered values for more flexibility, to read more about the changes [check this doc](https://docs.google.com/document/d/16j8dIKuQF9GjDgkhkZwnokVGNeoK7R-7zzIXHCgvveA/edit).
+
+  #### **Migration guide:**
+
+  Replace old named tokens to corresponding numbered values:
+
+  For example:
+
+  ```diff
+  - theme.typography.lineHeights.s
+  + theme.typography.lineHeights[50]
+  ```
+
+  **Old vs New mappings:**
+
+  | old | new |
+  | --- | --- |
+  | s   | 50  |
+  | m   | 50  |
+  | l   | 100 |
+  | xl  | 200 |
+  | 2xl | 300 |
+  | 3xl | 400 |
+  | 4xl | 600 |
+  | 5xl | 700 |
+  | 6xl | 800 |
+
+  #### **Migrate with Codemod:**
+
+  To change all instances of `theme.typography.lineHeights` to the new scale automatically use this codemod:
+
+  **Step1:** Install this version of blade
+
+  **Step2:** Run the codemod with the following command
+
+  > Checkout [jscodeshift docs](https://github.com/facebook/jscodeshift) for further cli usage help.
+
+  ```sh
+  npx jscodeshift ./YOUR_DIR --extensions=tsx,ts,jsx,js -t ./node_modules/@klearnow/klear360/codemods/migrate-typography/transformers/migrate-typography.ts --ignore-pattern="**/node_modules/**"
+  ```
+
+  > **Note**
+  >
+  > This codemod will cover 80% of the usecases, but it might miss certain edge cases, it is advised to thoroughly test & check the code to ensure nothing is missed.
+
+## 6.7.0
+
+### Minor Changes
+
+- 0c8e5f1b: feat: add `Amount` component
+
+  ### Usage
+
+  ```tsx
+  <Amount value={10000} />
+  ```
+
+## 6.6.3
+
+### Patch Changes
+
+- 0d7bb723: fix(blade): FileTextIcon alignment
+- b62358cb: perf: improve dropdown/actionlist performance
+
+## 6.6.2
+
+### Patch Changes
+
+- c7c66051: fix: ListItemLink alignment
+
+## 6.6.1
+
+### Patch Changes
+
+- fe89e6f6: fix: tree-shaking in Klear360 components
+- 7817c9e3: feat(Box): add different types for `display` on react native
+- c6512ba0: fix(Alert, Card): set `box-sizing` as `border-box` for Alert and Card
+
+## 6.6.0
+
+### Minor Changes
+
+- 5863f939: feat(OTPInput): add `onFocus` & `onBlur` props
+- 75daaa3c: feat(theme): add `name` property in `theme` to watch on theme changes
+
+### Patch Changes
+
+- 6a8524ab: feat(Link): add `hitSlop` support for native
+
+## 6.5.2
+
+### Patch Changes
+
+- 2700667f: fix(SelectInput): call user passed onBlur callback
+- 3855a583: fix(Card): CardHeader title alignment when subtitle is not present
+
+## 6.5.1
+
+### Patch Changes
+
+- 86cd05a6: chore(blade): update meta constant of Box
+
+## 6.5.0
+
+### Minor Changes
+
+- a4be1b06: feat(Layout Primitives): Add `Box` Component and Styled Props to Klear360 Components
+
+  Documentation: https://design.klearnow.com/?path=/docs/components-layout-primitives-box-layout-primitives-tutorial--page
+
+  **Breakpoint Token Changes**
+
+  `max` breakpoint is removed as it wasn't used and had same value as `xl`.
+  Through our audit, we didn't find any usage of this token. If you happen to use this somewhere, you can rename `breakpoints.max` to `breakpoints.xl`
+
+- 2c7034b7: feat(Input): add onSubmit prop on BaseInput, TextInput, TextArea, & PasswordInput for react-native
+
+## 6.4.0
+
+### Minor Changes
+
+- 4145d553: feat: add `testID` prop to all components
+- a7826b0b: feat(Input): add `autoCapitalize` support to `BaseInput`, `TextInput` & `PasswordInput`
+- bdd74d7a: feat(Text): add `textAlign` prop
+
+### Patch Changes
+
+- da4489b3: fix: lodash tree shaking to reduce effective bundle-size.
+
+## 6.3.0
+
+### Minor Changes
+
+- a2518742: feat(icons): add BulkPayoutsIcon
+
+## 6.2.3
+
+### Patch Changes
+
+- cbb1424b: fix: change import to default in package exports
+
+  Jest does not support the "import" condition in exports. This was causing tests to fail for Klear360 consumers. Changed "import" to "default" which is supported by all tools. Since Klear360 is not exporting a dual package, we don't need the "import" condition.
+
+## 6.2.2
+
+### Patch Changes
+
+- 559d97d9: feat: support string array in children
+
+  Users can now use dynamic variables inside children and don't have to wrap it around with string literals
+
+  ```jsx
+  <Button onClick={}>{someVariable} hello</Button>
+  ```
+
+## 6.2.1
+
+### Patch Changes
+
+- 7016c215: fix(Dropdown): infinite render onChange, positioning in flex container
+
+## 6.2.0
+
+### Minor Changes
+
+- bb2f1561: feat(Dropdown): Add `Dropdown`, `Select`, `ActionList`.
+
+  Check out [Dropdown Story](https://design.klearnow.com/?path=/docs/components-dropdown-with-select) for usage
+
+### Patch Changes
+
+- 505ca975: fix(checkbox): fixed screen reader styles
+
+  Fixed a bug where if we have lots of checkboxes in a small overflowed container the browser is trying to jump to the hidden inputs which is causing unexpected jumps in the scroll.
+
+## 6.1.0
+
+### Minor Changes
+
+- aff735ba: feat: add `List`, `ListItem`, `ListItemLink` & `ListItemCode` components
+
+## 6.0.5
+
+### Patch Changes
+
+- 38e8e6d0: chore(OTPInput): add `autoCompleteSuggestionType` prop and disable password manager with `isMasked`
+
+  We wanted to disable the password managers for OTPInput when `isMasked` is set. The straightforward way to do this is set autocomplete='off' (i.e autoCompleteSuggestionType='none'). The issue with autocomplete is that its not an enforcement but a suggestion to the browser to follow. Safari mostly adheres to it but Chrome and Firefox ignores it and shows the password managers anyway. We decided on a workaround to unset `type` on first render and set it to `password` once a value is entered. This way the password managers won't make any suggestions when the user is on an empty OTP input field.
+
+## 6.0.4
+
+### Patch Changes
+
+- 26ffc564: fix: add types field to package exports for ESM TypeScript projects
+
+## 6.0.3
+
+### Patch Changes
+
+- c95e814a: chore(blade): fix dependabot alerts
+- d2cfab2d: fix(blade): checkbox icon wrapper position
+
+  Fixed a bug in checkbox where the checkbox icon was flaoting outside it's wrapper because we've added `position: absolute` in the FadeIn animation component but forgot to add `position: relative` in the parent wrapper.
+
+## 6.0.2
+
+### Patch Changes
+
+- ba5ec1ac: fix: mark react-native peerDependencies as optional
+- 4a178a79: fix(Alert): color of title and description
+
+  - The color of title and description will look slightly subtle now to match the current designs.
+  - Internally uses the `subtle` type correctly now to fix a discrepancy in color for title and description.
+
+## 6.0.1
+
+### Patch Changes
+
+- 62a98bb1: fix(blade): update BaseInput background color
+
+## 6.0.0
+
+### Major Changes
+
+- 980bc038: fix(Alert)!: fix typo in prop `isDismissible`
+
+  > **Warning**
+  >
+  > Breaking change. Update prop `isDismissable` to `isDismissible`.
+
+  ### Migration guide
+
+  Find and replace:
+
+  ```diff
+  <Alert
+  - isDismissable
+  + isDismissible
+  />
+  ```
+
+- 5f7e4876: feat(blade): added all icons from figma
+
+  **Breaking Changes:**
+
+  - Renamed `RefreshLeft` icon to `Refresh`
+
+### Minor Changes
+
+- 82d75b71: chore(blade): added new icons
+- 29238f1e: feat(blade): added ref support for input components
+
+## 5.5.1
+
+### Patch Changes
+
+- 735e370: fix(blade): update peerDependencies to support react v18
+
+## 5.5.0
+
+### Minor Changes
+
+- a094736: feat: expose `onFocus` on `TextInput` and `TextArea`
+- 2c2841a: added transaction icon
+- 46425d3: feat(blade): add ClockIcon
+- 1dd920e: feat(Icons): add BankIcon
+- 227be3d: added tag, shuffle, user, book, and settlements icons
+- e64d7cc: chore: design changes for Badge, Counter, Spinner
+
+### Patch Changes
+
+- ba16503: fix(blade): TextInput clear button state on initial render
+
+## 5.4.3
+
+### Patch Changes
+
+- e6c3ea9: fix(blade): restrict childrens in Card component
+
+## 5.4.2
+
+### Patch Changes
+
+- da470b0: fix: remove `maxWidth` from Badge
+
+## 5.4.1
+
+### Patch Changes
+
+- 7eb6e4c: feat(Code): Use alpha 50 token in Code component's background
+
+## 5.4.0
+
+### Minor Changes
+
+- 5c8005f: feat: add `ProgressBar` component
+
+## 5.3.0
+
+### Minor Changes
+
+- 26baa81: feat(blade): added Card component
+
+## 5.2.1
+
+### Patch Changes
+
+- 9966931: chore: fix dom nesting in form label component
+- e660831: fix: change acceptable BaseInput `type` from `numeric` to `number`
+
+## 5.2.0
+
+### Minor Changes
+
+- d03de10: feat(Alert): update `isFullWidth` to make inline borderless alerts on desktop
+
+  > **Warning**
+  >
+  > `isBorderless` prop is removed and its usage is now replaced by `isFullWidth`. The layout is updated to match the designs and is now centered on desktop resolutions.
+
+  ### Steps for migration:
+
+  ```diff
+  <Alert
+  - isBorderless
+  + isFullWidth
+  />
+  ```
+
+## 5.1.5
+
+### Patch Changes
+
+- 756f4b4: feat: allow masked otp input
+
+`OTPInput` now supports an `isMasked` prop
+
+## 5.1.4
+
+### Patch Changes
+
+- 71f274e: fix(Checkbox): allow Checkbox to accept `childern` prop of type `React.ReactNode`
+
+## 5.1.3
+
+### Patch Changes
+
+- af9bdc9: fix(Alert): responsive design alignment
+
+## 5.1.2
+
+### Patch Changes
+
+- bd0b675: chore(blade): added blade component data attributes
+
+## 5.1.1
+
+### Patch Changes
+
+- 5a6b980: feat: add Mail icon
+
+## 5.1.0
+
+### Minor Changes
+
+- d4b981e: fix: show `Spinner` on `TextInput` when `isLoading=true`
+  - Adds spinner when `isLoading: true` is passed to `TextInput`. This was a long pending TODO
+  - Update Spinner sizes after the design was updated \* This doesn't need any code mod since there are 9 instances of spinner being used with default variant i.e medium
+
+## 5.0.1
+
+### Patch Changes
+
+- 96cf25f: feat: add new icons (lock, settings, file-text, users, slash)
+
+## 5.0.0
+
+### Major Changes
+
+- fc2a3bf:
+
+  > **Warning**
+  >
+  > This is a breaking change for `Alert` component. The UI is updated to match the designs.
+
+  feat(Alert): design revamp
+
+  - `Alert` is updated to match the new designs
+    - Bordered variant is now more compact and smaller in size
+  - A new `neutral` intent is added. This is the new default if you haven't passed any `intent` explicitly.
+
+  ### Migration guide for consumers
+
+  - Earlier the default `intent` was `information`, this is now updated to `neutral`. If you were earlier using alerts without explicitly passing `intent` you should update that to continue using `information` as intent:
+
+  ```diff
+  <Alert
+  + intent="information"
+  />
+  ```
+
+### Patch Changes
+
+- bb170bb: fix: set input type='text' when type='search' passed
+
+## 4.0.0
+
+### Major Changes
+
+- d747de4: chore: Badge design changes
+
+  - Adds a new small size
+  - Bumps existing small & medium to medium & large respectively
+  - Horizontal padding changes in the large size
+
+  ### Migration Guide for Badge Consumers
+
+  1. For existing `small` size badge, bump the size from `small` to `medium`
+
+  ```diff
+  - <Badge size='small'>...</Badge>
+  + <Badge size='medium'>...</Badge>
+  ```
+
+  2. For existing `medium` size badge, bump the size from `medium` to `large`
+
+  ```diff
+  - <Badge size='medium'>...</Badge>
+  + <Badge size='large'>...</Badge>
+  ```
+
+  3. For existing badge with no `size` specified, add `size='large'` since default size is `medium`
+     > Note: The horizontal padding is changed from `8px` to `12px` for the new `large` size which makes it visually bigger than the existing `medium` size
+
+  ```diff
+  - <Badge>...</Badge>
+  + <Badge size='large'>...</Badge>
+  ```
+
+## 3.8.0
+
+### Minor Changes
+
+- 32c1f05: feat(Counter): design changes
+
+  - Added small variant in Counter
+  - Fixed italic font
+
+## 3.7.1
+
+### Patch Changes
+
+- 03bb818: feat(tokens): add new tokens
+  - updates color tokens of banking theme to match the designs
+- 002e0a2: feat(tokens): add new tokens
+  - Updates tokens for payment theme to match the designs
+- 66f473e: fix: remove aria-hidden for checkbox and radio
+
+## 3.7.0
+
+### Minor Changes
+
+- 67e5059: feat(Indicator): add Indicator component
+
+## 3.6.2
+
+### Patch Changes
+
+- 63c950a: feat(IconButton): export IconButton
+  - Adds a new `IconButton` component useful for making transparent icon only buttons
+
+## 3.6.1
+
+### Patch Changes
+
+- add9b3e: fix(Typography): inherit `text-align` property from parent in Typography components
+
+## 3.6.0
+
+### Minor Changes
+
+- 0f4df3a: feat(blade): added counter component
+- c5b28bc: feat(tokens): add new tokens to neutral palette
+
+## 3.5.3
+
+### Patch Changes
+
+- 92cfa80: fix(Alert): throw error if `secondaryAction` is defined without `primaryAction`
+
+## 3.5.2
+
+### Patch Changes
+
+- ffe9872: fix: `@babel-runtime` issues when importing in codesandbox and vite
+
+## 3.5.1
+
+### Patch Changes
+
+- dea879d: fix(IconButton): add `type="button"` to stop form submission
+
+## 3.5.0
+
+### Minor Changes
+
+- 8dc131d: feat(blade): added `small` variant in Checkbox/Radio
+
+## 3.4.2
+
+### Patch Changes
+
+- 48c36af: feat: add README to npm
+
+## 3.4.1
+
+### Patch Changes
+
+- 49894f2: feat: adding Link icon
+
+## 3.4.0
+
+### Minor Changes
+
+- 6429d93: feat(Link): add `size` prop and support for `small` size
+
+  > **Note**
+  >
+  > Icons in links are slightly bumped up now to match the designs
+
+  <img width="379" alt="image" src="https://user-images.githubusercontent.com/6682655/196698626-e73dcc07-3d35-49e1-8ead-95c5826f3c41.png">
+
+## 3.3.0
+
+### Minor Changes
+
+- 37c00c0: feat: publish `@klearnow/klear360` package on NPM
+
+  _No changes are required for consumer. We will be publishing on both, github package registry and npm._
+
+## 3.2.0
+
+### Minor Changes
+
+- f7e8941: added RotateCounterClockWiseIcon, TrendingUpIcon, TrendingDownIcon, ExternalLinkIcon, HelpCircleIcon
+
+## 3.1.6
+
+### Patch Changes
+
+- 66d3184: Update few tokens value which was typo on figma
+
+## 3.1.5
+
+### Patch Changes
+
+- a539fe5: feat(tokens): add new tokens
+
+## 3.1.4
+
+### Patch Changes
+
+- f0b901d: chore: remove border from Badge component
+
+## 3.1.3
+
+### Patch Changes
+
+- 2576ce3: fix(link): add type prop for button variant
+
+## 3.1.2
+
+### Patch Changes
+
+- ba0c74d: fix: use the correct maxWidth for OTPInput
+
+## 3.1.1
+
+### Patch Changes
+
+- aee7e57: feat(Icons): add MinusIcon
+
+## 3.1.0
+
+### Minor Changes
+
+- c3d9d2f: feat: add OTPInput component
+
+## 3.0.0
+
+### Major Changes
+
+- 3aebc58: feat(Typography): make `size` prop consistent for `Heading`, `Title`, and `Text`
+
+  > **Warning**
+  >
+  > Breaking Change!
+  > This is a breaking change for apps that are using `Title` or `Heading` component from blade. Rest of the apps can upgrade without any migrations.
+
+  #### Migration
+
+  _**Tip:** If you're using TypeScript, run `yarn tsc` and that should throw errors wherever a change is required._
+
+  1. **`<Title />`:** Rename `variant` prop to `size` in Title
+
+  ```diff
+  - <Title variant="small">Some Title</Title>
+  + <Title size="small">Some Title</Title>
+  ```
+
+  2. **`<Heading />`:** Rename `variant` prop to `size` if the value is `small`, `medium,` or `large`. No change is required on `variant="subheading"`.
+
+  ```diff
+  <Heading variant="subheading">Nothing changes here</Heading> // No change here
+
+  - <Heading variant="medium">Medium Heading</Heading>
+  + <Heading size="medium">Medium Heading</Heading>
+  ```
+
+  ##### Edge Cases
+
+  Make sure to follow migration on new component if `Title` or `Heading` from blade is overriden with styled-components.
+
+  ```diff
+  const MyTitle = styled(Title)`
+    // some styles
+  `
+
+  - <MyTitle variant="large" />
+  + <MyTitle size="large" />
+  ```
+
+- e16c154: feat(PasswordInput)!: rename from `PasswordField` to `PasswordInput`
+
+  #### Migration
+
+  > **Warning**
+  >
+  > Breaking change!
+
+  Rename occurences of `PasswordField` to `PasswordInput`, no changes in the API.
+
+  ```diff
+  - PasswordField
+  + PasswordInput
+  ```
+
+### Minor Changes
+
+- eeba339: feat(Code): add `<Code />` component :shipit:
+
+## 2.5.1
+
+### Patch Changes
+
+- 0ce8390: fix(BaseInput): use cursor not-allowed for disabled inputs
+
+## 2.5.0
+
+### Minor Changes
+
+- d0017cd: feat(PasswordField): add final export :tada:
+  - adds a new `PasswordField` component
+
+## 2.4.0
+
+### Minor Changes
+
+- bf92637: feat(blade): Improve platform types with TS 4.7
+
+  ### Added support for platform dependant types
+
+  Migration Steps
+
+  1. Upgrade to TypeScript 4.7+
+  2. In `tsconfig.json` add `moduleSuffix: ['.web', '']` or `moduleSuffix: ['.native', '']` (depending on the platform)
+
+  ```js
+  {
+    "compilerOptions": {
+      // For react-native use `.native`
+      // For web use `.web` extension
+      "moduleSuffixes": [".web", ""]
+    }
+  }
+  ```
+
+  > **Note**:
+  > if you are on <TS 4.7 or don't specify the `moduleSuffixes` blade will fallback to resolving `web` types
+
+## 2.3.0
+
+### Minor Changes
+
+- 887cd11: feat(blade): added TextArea component
+
+## 2.2.2
+
+### Patch Changes
+
+- a8c5c08: tests: add tests for `TextInput`
+  fix: render clear button on mount when the `defaultValue` or `value` is passed
+
+## 2.2.1
+
+### Patch Changes
+
+- 4b6bfda: fix: update spinner easing
+
+## 2.2.0
+
+### Minor Changes
+
+- 7c272be: feat: add `Spinner` component
+  - Also adds an internal `BaseSpinner` component
+
+## 2.1.0
+
+### Minor Changes
+
+- a6bf780: feat(TextInput): add TextInput Field
+
+  ### This release publishes **`TextField`** Input
+
+  #### [Figma Link](https://www.figma.com/file/jubmQL9Z8V7881ayUD95ps/Klear360---Payment-Light?node-id=10953%3A210737)
+
+  #### Capabilities
+
+  - Support for various `type` of TextInput i.e `'text' | 'telephone' | 'email' | 'url' | 'numeric' | 'search'`
+  - Automatically decide `keyboardType`, `keyboardReturnKeyType`, `autoCompleteSuggestionType` based on `type` attribute alone
+
+  ![image](https://user-images.githubusercontent.com/11384858/188391913-d45e40b4-1b92-4fab-8bf8-8d49891929f8.png)
+
+  - Max characters to be accepted by the input field which will in turn also render a counter
+    ![image](https://user-images.githubusercontent.com/11384858/188390436-2854807d-5fb0-42de-8171-3ba61be4b9f6.png)
+
+  - Clear the content of the input field with the help of a clear button
+    ![image](https://user-images.githubusercontent.com/11384858/188391183-8e262200-7424-4a80-a5fe-1c7166be26ce.png)
+
+  - Attach `prefix` and `suffix` to the input field
+  - Fully Accessible
+
+### Patch Changes
+
+- a8c7620: ## Internal changes
+
+  tests(BaseInput): add web tests and fix onBlur
+
+  - Adds `onBlur`
+
+- 1417e90: changed native text-input helptext color
+
+## 2.0.0
+
+### Major Changes
+
+- cc4355a: feat(blade): added 2px spacing token
+
+  #### Breaking changes
+
+> **Note**
+>
+> This breaking change affects you only if you're using the tokens directly somewhere. If you're only using the components then nothing needs to be updated at your end.
+
+- Added 2px token, thus all spacing tokens have shifted by 1 step.
+
+#### Migration steps
+
+Shift every spacing token other than the first one (`0th` index) by +1
+
+```diff
+- <div style={{ margin: theme.spacing[1] }} />
++ <div style={{ margin: theme.spacing[2] }} />
+```
+
+### Patch Changes
+
+- a402ef1: feat(icons): add `RefreshLeft` icon
+
+## 1.1.0
+
+### Minor Changes
+
+- 5f1033c: feat: add `Alert` component :tada:
+
+### Patch Changes
+
+- cd5f61f: feat(tokens): add new tokens
+- e8d932a: feat: add `blue` variant to `Badge`
+- acfd566: feat(icons): arrow up and arrow left
+
+## 1.0.2
+
+### Patch Changes
+
+- 771981c: fix(blade): radio & checkbox icon alignment
+
+## 1.0.1
+
+### Patch Changes
+
+- ef7f459: fix: font weight of `Link` component
+
+## 1.0.0
+
+### Major Changes
+
+- 51a6787: feat: add `Radio` & `RadioGroup` component
+
+  ## ⚠️ Breaking change for `Checkbox`
+
+  - We've renamed the `neccessityIndicator` prop to `necessityIndicator` to fix a spelling error
+
+- 65834be: fix: icon sizes for `Icon`, `IconButton`, `Button`, `Link` & `Spinner` components
+
+  ## ⚠️ Breaking changes for `Icon`
+
+  **❗️This version introduces a breaking change for the `Icon` component's `size` prop**
+
+  Earlier, the `size` prop had the following size to pixel mapping:
+
+  - **xxsmall:** 10px
+  - **xsmall**: 12px
+  - **small**: 16px
+  - **medium**: 20px
+  - **large**: 24px
+  - **xlarge**: 32px
+
+  Now, the correct `size` prop will have the following size to pixel mapping:
+
+  - **xsmall**: 8px
+  - **small**: 12px
+  - **medium**: 16px
+  - **large**: 20px
+  - **xlarge**: 24px
+  - **2xlarge**: 32px
+
+  > ⚠️ `xxsmall` is not an accepted value anymore. Instead, we have a new acceptable value of `2xlarge`.
+
+### Minor Changes
+
+- 61a17fe: feat: add `Badge` component
+
+## 0.13.6
+
+### Patch Changes
+
+- b365464: fix: button spinner layout
+- f3abfbe: feat(Icons): add new icons
+
+## 0.13.5
+
+### Patch Changes
+
+- 7909d7c: fix(blade): Checkbox design changes
+
+## 0.13.4
+
+### Patch Changes
+
+- 2778973: chore: add appropriate types for onClick of Button & BaseButton
+
+## 0.13.3
+
+### Patch Changes
+
+- 3ea6d6c: fix(blade): fixes checkbox helptext and errortext alignment for individual checkboxes
+
+## 0.13.2
+
+### Patch Changes
+
+- 17b2c71: fix: button styling for native
+
+## 0.13.1
+
+### Patch Changes
+
+- 985f82a: refactor: use Box component on BaseButton
+
+## 0.13.0
+
+### Minor Changes
+
+- b8cc7df: feat: add checkbox component
+- eb65c30: feat: add support for css theme variables
+- f61675e: feat: add `Link` & `BaseLink` components
+
+## 0.12.0
+
+### Minor Changes
+
+- 381e9c7: fix(Klear360): add `size` prop to Text component and update tokens
+
+  This PR updates the typography tokens scale for mobile devices to create better visual hierarchy which we received as feedback from other teams as well.
+
+  It also adds a new `size` prop to `Text` component for `variant='body'`
+
+## 0.11.4
+
+### Patch Changes
+
+- 66f9b24: feat(tokens): add new tokens
+
+## 0.11.3
+
+### Patch Changes
+
+- e0a2631: feat: add Download, Edit, History, Plus, Pause, & Trash icons
+
+## 0.11.2
+
+### Patch Changes
+
+- b2b86b4: fix: SkipNav export
+
+## 0.11.1
+
+### Patch Changes
+
+- 873676f: fix: button export to components
+
+## 0.11.0
+
+### Minor Changes
+
+- 5d022f4: feat: add `Button` component
+
+### Patch Changes
+
+- cddd298: chore: update currency icons
+
+## 0.10.1
+
+### Patch Changes
+
+- 7b9baf7: fix(blade): broken gray color types in theme.d.ts file
+
+## 0.10.0
+
+### Minor Changes
+
+- a800a96: feat(blade): added makeAccessible function
+
+  makeAccessible function is a compatibility layer between web & native for accessibility props
+  More [info in RFC](https://github.com/klearnow/klear360/blob/master/rfcs/2022-04-09-accessibility.md#platform-specific-implementation--5)
+
+### Patch Changes
+
+- a800a96: fix(blade): added aria hidden in icons
+
+## 0.9.0
+
+### Minor Changes
+
+- 0c3a951: feat(blade): Added SkipNav component
+
+  Learn more about [Skip Navigations in Accessibility RFC](https://github.com/klearnow/klear360/blob/master/rfcs/2022-04-09-accessibility.md#skip-navigations)
+
+- 5c750bb: feat(blade): add VisuallyHidden component
+
+  This component is used specifically when you want to hide certain things visually for people who are not visually impaired but also want to make your content is accessible to visually impaired people via assistive technologies.
+
+  You can play around with it on [Storybook](https://master--61c19ee8d3d282003ac1d81c.chromatic.com/?path=/docs/components-accessibility-visuallyhidden--visually-hidden)
+
+## 0.8.0
+
+### Minor Changes
+
+- 002fce2: fix: icon colors & remove `surface.action.icon.link.*` colors from `theme`
+
+  ## Breaking Changes
+
+  - Remove the following tokens from `paymentTheme` & `bankingTheme` theme of Klear360:
+
+    - `colors.surface.action.icon.link.default.lowContrast`
+    - `colors.surface.action.icon.link.default.highContrast`
+    - `colors.surface.action.icon.link.hover.lowContrast`
+    - `colors.surface.action.icon.link.hover.highContrast`
+    - `colors.surface.action.icon.link.focus.lowContrast`
+    - `colors.surface.action.icon.link.focus.highContrast`
+    - `colors.surface.action.icon.link.active.lowContrast`
+    - `colors.surface.action.icon.link.active.highContrast`
+    - `colors.surface.action.icon.link.disabled.lowContrast`
+    - `colors.surface.action.icon.link.disabled.highContrast`
+
+    If you are using any of these tokens, they will no longer be available in your `theme`. Make sure you remove usage of these tokens from your codebase.
+
+  ## Fixes
+
+  1. Fix incorrect Icon colors that were supported & suggested by TypeScript
+
+## 0.7.2
+
+### Patch Changes
+
+- 9f0bb83: feat: add Dollar, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, Close icons
+
+## 0.7.1
+
+### Patch Changes
+
+- 25a7b89: fix(blade): add contrast prop to Typography components
+
+  Add `contrast` prop to all the Typography components so that consumers can change the intent to grab the attention towards the text. The possible values for `contrast` are `high` or `low` and accordingly the color token will be used to set the color of the Typography components
+
+## 0.7.0
+
+### Minor Changes
+
+- 52efedb: fix(blade): set defaults for all typography components
+
+  Make all the props optional to have a better DX and add default values for all the important props
+
+## 0.6.0
+
+### Minor Changes
+
+- e352eef: fix(blade): add `Heading` component
+
+## 0.5.0
+
+### Minor Changes
+
+- 75882a7: feat(Klear360): add `Title`component
+
+  The API for `Title` component can be found under [Typography/Text/\_decisions](https://github.com/klearnow/klear360/blob/master/packages/klear360/src/components/Typography/_decisions/decisions.md)
+
+## 0.4.0
+
+### Minor Changes
+
+- 294173e: - Add the following components that would act as building blocks for our icons:
+  1. `Svg`
+  2. `Path`
+  3. `Rect`
+  4. `Defs`
+  5. `ClipPath`
+  6. `G`
+  - Add `CreditCardIcon` component
+  - Add `RupeeIcon` component
+
+### Patch Changes
+
+- e76cd01: feat/add-text-component
+
+## 0.3.0
+
+### Minor Changes
+
+- a20b608: feat(blade): add motion tokens
+
+  ### Motion tokens
+
+  We have added tokens for
+
+  1. Delay
+  2. Duration
+  3. Easing
+
+  You can find a detailed RFC for motion here: [View Formatted RFC](https://github.com/klearnow/klear360/blob/rfc/2022-03-22-motion-rfc/rfcs/2022-03-22-motion-rfc.md)
+
+## 0.2.0
+
+### Minor Changes
+
+- 6885ac3: feat(blade): add BaseText component
+
+## 0.1.6
+
+### Patch Changes
+
+- 33e3930: feat(blade): add listener for toggling breakpoints
+
+  **Updates**
+
+  - Add `breakpoints` token to the themes.
+  - Out of the box responsiveness support for typography tokens.
+  - Publish `useBreakpoint` hook.
+  - Following breakpoints are supported as of today.
+    ```
+    /** max width: 320px  */
+    xs: 320;
+    /** min width: 321px and max width: 480px */
+    s: 480;
+    /** min width: 481px and max width: 768px */
+    m: 768;
+    /** min width: 769 and max width: 1024px */
+    l: 1024;
+    /** min width: 1025 and max width: 1200px */
+    xl: 1200;
+    /** min width: 1201px  */
+    max: 1201;
+    ```
+  - For web the typography scale will toggle between mobile and desktop
+    - `xs, s, m` are considered as mobile
+    - `l, xl, xl` are considered as desktop
+  - For react native we always default to mobile typography scale
+
+  **What does it mean for me(as a developer)?**
+
+  - If you’re already using Klear360 tokens then you can leverage this by just running `yarn upgrade @klearnow/klear360@0.1.6` and that’s it you are set 🚀
+    - You can use the typography tokens as you were doing previously. Refer the [usage guideline here](https://61c19ee8d3d282003ac1d81c-jukcfyruls.chromatic.com/?path=/story/guides-usage--page&globals=measureEnabled:false#tokens)
+  - You can use these `breakpoints` as a base reference to build your next set of features by just following the [usage guidelines here](https://61c19ee8d3d282003ac1d81c-jukcfyruls.chromatic.com/?path=/story/tokens-breakpoints--page&globals=measureEnabled:false).
+
+  This is our first step towards building responsive and adaptive applications. We’ll be publishing Typography Components next which will be built on top of these tokens and you can use them directly for your projects. Meanwhile, [read more about our responsive and adaptive strategy in this RFC](https://github.com/klearnow/klear360/blob/master/rfcs/2022-02-11-responsive-and-adaptive-layout-strategy.md)
+
+## 0.1.5
+
+### Patch Changes
+
+- 04677a3: fix(blade): add lineheight tokens
+
+## 0.1.4
+
+### Patch Changes
+
+- f992f77: fix(blade): typo in exports field
+
+## 0.1.3
+
+### Patch Changes
+
+- d32dd9d: fix(blade): add overlay color token
+
+## 0.1.2
+
+### Patch Changes
+
+- 8cddfad: fix(blade): update desktop typography scale
+
+## 0.1.1
+
+### Patch Changes
+
+- 6c69a4d: fix(blade): update imports and exports
+
+## 0.1.0
+
+### Minor Changes
+
+- de4124f: ### ⚠️ **Breaking Change** ⚠️
+  This PR introduces a major breaking change on how we access tokens.
+
+  ### Why did we want to change the way we access tokens?
+
+  So, previously if you had to start consuming tokens from the new version of Klear360 you start with importing the theme provider:
+
+  ```jsx
+  // App entry point
+  import { ThemeProvider } from '@klearnow/klear360/components';
+  import { paymentTheme } from '@klearnow/klear360/tokens';
+
+  function App(): JSX.Element {
+    return (
+      <React.Fragment>
+        <GlobalStyle />
+        <ThemeProvider theme={paymentTheme}>
+          <Card />
+        </ThemeProvider>
+      </React.Fragment>
+    );
+  }
+
+  export default App;
+  ```
+
+  And then in one of our components, we'll use the `useTheme()` hook to get the theme and the mode like following 👇
+
+  ```jsx
+  const StyledCard = styled.div(
+    ({ theme }: { theme: Theme }) => `
+    width: 368px;
+    background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+    border-radius: ${theme.border.radius.medium}px;
+    box-shadow: ${theme.shadows.offsetX.level[1]}px ${theme.shadows.offsetY.level[1]}px ${theme.shadows.blurRadius.level[1]}px ${theme.shadows.color.level[1].onLight}, ${theme.shadows.offsetX.level[1]}px ${theme.shadows.offsetY.level[1]}px ${theme.shadows.blurRadius.level[1]}px ${theme.shadows.color.level[1].onLight};
+    padding: ${theme.spacing[5]}px;
+    display: flex;
+    flex-direction: column;
+  `,
+  );
+
+  const Card = (): React.ReactElement => {
+    const { theme } = useTheme();
+    return (
+      <React.Fragment>
+        <DisplayLarge theme={theme}>Cash Advance </DisplayLarge>
+        <StyledCard theme={theme}>
+          <AlertInformation theme={theme}>
+            The interest charged will be deposited back into your bank account within a day of
+            repayment.
+          </AlertInformation>
+          <Divider theme={theme} />
+          <CaptionRegular theme={theme}>
+            This amount will be deducted in 3 installments from your settlement balance between Feb
+            18-20 on a daily basis.
+          </CaptionRegular>
+        </StyledCard>
+      </React.Fragment>
+    );
+  };
+  ```
+
+  #### Problem with the existing implementation:
+
+  So we pass the raw theme tokens which have everything light mode colors, dark mode colors. Different typography scales for desktop, mobile, etc. But as a consumer look at how do we access the tokens from the above file
+
+  ```jsx
+
+  const { theme } = useTheme();
+
+  background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+  font-size: ${theme.typography.desktop.fonts.size[200]}px;
+  ```
+
+  - Isn't it weird to explicitly write `onLight`/`onDark` by hand while accessing color tokens?
+  - Isn't it weird to explicitly write `desktop` to access the typography scale for desktop?
+  - How would you as a developer change things let's say if the user toggles the color mode?
+  - How would you as a developer change the typography scale if the user switches from desktop to mobile or vice-versa?
+
+  You can't! Because we have **hardcoded** the object properties and which means we lost the power of dynamically changing these things based on the user's behavior which is incorrect.
+
+  #### What is the root cause of this issue?
+
+  The root cause is the mental model of how we store tokens and how do we consume them. Typically our tokens are nothing but our design decisions. So this means we need to store every decision in our token file, for eg: light mode colors, dark mode colors, typography scale for desktop, typography scale for mobile but when we consume them we want the system to take care of these things and give us single value for the modes and the platform.
+
+  So we want something like this 👇
+
+  ```diff
+
+  const { theme } = useTheme();
+
+  -background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+  +background-color: ${theme.colors.surface.background.level2.lowContrast};
+  -font-size: ${theme.typography.desktop.fonts.size[200]}px;
+  +font-size: ${theme.typography.fonts.size[200]}px;
+  ```
+
+  Notice the removal of **`onLight`** and **`desktop`** keys from the theme object.
+
+  So we want our system to behave in such a manner that:
+
+  - We input the raw theme(which has color modes and platform types)
+  - It will output the flat theme which will have color mode and platform type selected, so we don't have to hardcode `onLight`/`onDark` or `desktop`/`mobile`.
+
+  ### What is the solution?
+
+  The system we spoke about is nothing but our `Klear360Provider`(previously known as `ThemeProvider`). It'll accept the raw theme as a prop and then based on the device type and color mode pick those values from `themeTokens` and set it in the context as `theme`. We can then use `useTheme()` hook to get the theme from the context which will be flattened.
+
+  This is how things will look after this change 👇
+
+  ```diff
+  // App entry point
+  -import { ThemeProvider } from '@klearnow/klear360/components';
+  +import { Klear360Provider } from '@klearnow/klear360/components';
+  import { paymentTheme } from '@klearnow/klear360/tokens';
+
+  function App(): JSX.Element {
+    return (
+      <React.Fragment>
+        <GlobalStyle />
+  -      <ThemeProvider theme={paymentTheme}>
+  +      <Klear360Provider themeTokens={paymentTheme}>
+          <Card />
+  -      </ThemeProvider>
+  +      </Klear360Provider>
+      </React.Fragment>
+    );
+  }
+
+  export default App;
+
+  // somewhere in the app
+  const { theme } = useTheme();
+
+  -background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+  +background-color: ${theme.colors.surface.background.level2.lowContrast};
+  -font-size: ${theme.typography.desktop.fonts.size[200]}px;
+  +font-size: ${theme.typography.fonts.size[200]}px;
+  ```
+
+  ### Migration guide for apps using the older version
+
+  1. Rename **ThemeProvider** to **Klear360Provider**
+
+  ```diff
+  -import { ThemeProvider } from '@klearnow/klear360/components';
+  +import { Klear360Provider } from '@klearnow/klear360/components';
+  ```
+
+  2. Rename `theme` prop on provider to `themeTokens`
+
+  ```diff
+  -<Klear360Provider theme={paymentTheme}>
+  +<Klear360Provider themeTokens={paymentTheme}>
+  ```
+
+  3. import `Theme` type to be imported from `@klearnow/klear360/components` instead of `@klearnow/klear360/tokens`
+
+  ```diff
+  -import type { Theme } from '@klearnow/klear360/tokens';
+  +import type { Theme } from '@klearnow/klear360/components';
+  ```
+
+  4. Remove all the `onLight`/`onDark` keywords from the theme colors object
+
+  ```diff
+  -background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+  +background-color: ${theme.colors.surface.background.level2.lowContrast};
+  ```
+
+  5. Remove all the `desktop`/`mobile` keywords from the theme typography object
+
+  ```diff
+  -background-color: ${theme.colors.surface.background.level2.lowContrast.onLight};
+  +background-color: ${theme.colors.surface.background.level2.lowContrast};
+  ```
+
+## 0.0.8
+
+### Patch Changes
+
+- 7a09800: fix(blade): add description in token types
+
+## 0.0.7
+
+### Patch Changes
+
+- 1aa2961: fix(blade): export all the types of global tokens for consumers
+- d8d8027: fix(blade): typo in color tokens
+
+## 0.0.6
+
+### Patch Changes
+
+- 8374dc1: build(blade): generate root `.d.ts`
+
+## 0.0.5
+
+### Patch Changes
+
+- 057cf66: build(blade): add re-exports to `.ts` instead of `.js`
+
+## 0.0.4
+
+### Patch Changes
+
+- efb59d9: feat(blade): add type generation scripts
+
+## 0.0.3
+
+### Patch Changes
+
+- f0b2b01: fix(blade): typo in exports field
+
+## 0.0.2
+
+### Patch Changes
+
+- 55ac5d3: feat(blade): add rollup to build blade

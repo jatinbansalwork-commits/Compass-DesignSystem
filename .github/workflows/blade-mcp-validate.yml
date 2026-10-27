@@ -1,0 +1,40 @@
+name: Klear360 MCP Validate
+
+on:
+  pull_request:
+    paths:
+      - 'packages/klear360-mcp/**'
+      - 'packages/klear360-plugin/**'
+      - 'scripts/syncPluginManifestVersion.js'
+      - 'scripts/validateKlear360Plugin.mjs'
+      - '.github/workflows/klear360-mcp-validate.yml'
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest # nosemgrep: non-self-hosted-runner
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v3
+      - name: Use Node v22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - name: Setup Cache & Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Validate Klear360 Plugin
+        run: yarn validate:klear360-plugin
+      - name: Run Unit Tests
+        run: yarn test
+        working-directory: packages/klear360-mcp
+      - name: Check Knowledgebase Ships In Tarball
+        run: |
+          rm -rf knowledgebase
+          npm pack --dry-run 2>&1 | grep 'knowledgebase/components/Button.md'
+        working-directory: packages/klear360-mcp
+

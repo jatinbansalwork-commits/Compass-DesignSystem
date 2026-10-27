@@ -1,0 +1,8 @@
+**/*.stories.tsx
+**/*.stories.ts
+**/docs/**
+**/__tests__/**
+**/*.md
+# Generated build output and coverage — not hand-edited source
+build/**
+coverage/**

@@ -1,0 +1,92 @@
+name: Klear360 Chromatic
+
+on:
+  push:
+  pull_request:
+    types: [labeled]
+
+env:
+  GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+
+jobs:
+  chromatic-deployment:
+    name: Chromatic Deployment
+    runs-on: ubuntu-latest # nosemgrep: non-self-hosted-runner
+    if: ${{ github.event_name == 'push' || github.event.label.name == 'Run Interaction Tests' }}
+    outputs:
+      storybookUrl: ${{ steps.chromatic.outputs.storybookUrl }}
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Use Node v20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.19.5
+      - name: Setup Cache & Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Install Dashboard Playground Dependencies
+        working-directory: packages/klear360/klear360-dashboard-template
+        run: yarn install
+      - name: Build Dashboard Playground
+        working-directory: packages/klear360/klear360-dashboard-template
+        run: yarn run build
+      - name: Copy Dashboard to Storybook Site
+        working-directory: packages/klear360
+        run: |
+          if [ -d "storybook-site/dashboard" ]; then
+            rm -rf storybook-site/dashboard
+          fi
+          mkdir -p storybook-site/dashboard
+          if [ -d "klear360-dashboard-template/dist" ]; then
+            cp -r klear360-dashboard-template/dist/* storybook-site/dashboard/
+            echo "✓ Dashboard build output copied to storybook-site/dashboard/"
+          else
+            echo "✗ Dashboard dist directory not found"
+            exit 1
+          fi
+      - name: Build klear360-core
+        run: yarn build:klear360-core
+      - name: Build Svelte Storybook
+        working-directory: packages/klear360-svelte
+        run: yarn build-storybook
+      - name: Copy Svelte Storybook to Storybook Site
+        working-directory: packages/klear360
+        run: |
+          if [ -d "storybook-site/svelte" ]; then
+            rm -rf storybook-site/svelte
+          fi
+          mkdir -p storybook-site/svelte
+          if [ -d "../klear360-svelte/storybook-static" ]; then
+            cp -r ../klear360-svelte/storybook-static/* storybook-site/svelte/
+            echo "✓ Svelte Storybook copied to storybook-site/svelte/"
+          else
+            echo "✗ Svelte Storybook not found"
+            exit 1
+          fi
+      - name: Publish to Chromatic
+        id: chromatic
+        uses: chromaui/action@v1
+        with:
+          token: ${{ env.GITHUB_ACCESS_TOKEN }}
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: packages/klear360
+          storybookBaseDir: packages/klear360
+          buildScriptName: react:storybook:build
+          exitOnceUploaded: true
+          onlyChanged: true
+          untraced: '**/package.json'
+          traceChanged: 'expanded'
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+
+  browserstack-tests:
+    name: BrowserStack Tests
+    needs: chromatic-deployment
+    if: ${{ github.event.label.name == 'Run Interaction Tests' || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
+    uses: ./.github/workflows/blade-browserstack.yml
+    with:
+      chromatic_url: ${{ needs.chromatic-deployment.outputs.storybookUrl }}
+    secrets: inherit

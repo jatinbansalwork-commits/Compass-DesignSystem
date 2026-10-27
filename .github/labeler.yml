@@ -1,0 +1,46 @@
+blade:
+  - changed-files:
+      - any-glob-to-any-file: ['packages/klear360/**']
+
+klear360-svelte:
+  - changed-files:
+      - any-glob-to-any-file: ['packages/klear360-svelte/**']
+
+klear360-core:
+  - changed-files:
+      - any-glob-to-any-file: ['packages/klear360-core/**']
+
+klear360-mcp:
+  - changed-files:
+      - any-glob-to-any-file: ['packages/klear360-mcp/**']
+
+klear360-plugin:
+  - changed-files:
+      - any-glob-to-any-file: ['packages/klear360-plugin/**']
+
+react-native:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'packages/klear360/**/*.native.*'
+          - 'packages/klear360/android/**'
+          - 'packages/klear360/ios/**'
+          - 'packages/klear360/.storybook/react-native/**'
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ['.github/**']
+
+figma-plugins:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'packages/plugin-figma-*/**'
+          - 'packages/plugin-blade-*/**'
+          - 'packages/widget-figma-*/**'
+
+eslint-plugin-klear360:
+  - changed-files:
+      - any-glob-to-any-file: ['packages/eslint-plugin-klear360/**']
+
+examples:
+  - changed-files:
+      - any-glob-to-any-file: ['packages/examples/**']

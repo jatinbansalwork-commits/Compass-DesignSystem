@@ -1,0 +1,43 @@
+import styled from 'styled-components';
+import type { StyledFileUploadWrapperProps } from './types';
+import { fileUploadMotionTokens, fileUploadColorTokens } from './fileUploadTokens';
+import getIn from '~utils/lodashButBetter/get';
+import BaseBox from '~components/Box/BaseBox';
+import { makeMotionTime } from '~utils/makeMotionTime';
+import { castWebType } from '~utils';
+
+const StyledFileUploadWrapper = styled(BaseBox)<StyledFileUploadWrapperProps>(
+  ({ theme, isDisabled, isActive, isDragActive }) => {
+    const easing = getIn(theme.motion, fileUploadMotionTokens.easing);
+    const duration = castWebType(
+      makeMotionTime(getIn(theme.motion, fileUploadMotionTokens.duration)),
+    );
+
+    return {
+      display: 'flex',
+      borderStyle: 'dashed',
+      transitionProperty: 'background-color, border-color',
+      transitionTimingFunction: easing,
+      transitionDuration: duration,
+      // Only dragging switches the border. A click also sets isActive, but the picker can stay open
+      // with no event to clear it, which would leave the border stuck on the active colour.
+      borderColor: getIn(
+        theme.colors,
+        fileUploadColorTokens.border[isDisabled ? 'disabled' : isDragActive ? 'active' : 'default'],
+      ),
+
+      ...(isActive && {
+        backgroundColor: getIn(theme.colors, fileUploadColorTokens.background.active),
+      }),
+
+      ...(!isDisabled &&
+        !isActive && {
+          '&:hover': {
+            backgroundColor: getIn(theme.colors, fileUploadColorTokens.background.hover),
+          },
+        }),
+    };
+  },
+);
+
+export { StyledFileUploadWrapper };

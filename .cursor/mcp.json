@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "klear360-mcp": {
+      "command": "node",
+      "args": [
+        "/Users/jatinbansal/Downloads/Klear360-Master/packages/blade-mcp/dist/server.js"
+      ]
+    }
+  }
+}

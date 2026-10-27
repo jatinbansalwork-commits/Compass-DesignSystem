@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["src/**/*.ts", "src/**/*.svelte"],
+  "exclude": ["node_modules/**/*"],
+  "compilerOptions": {
+    "types": ["svelte", "node"],
+    "target": "ES2022",
+    "lib": ["dom", "ES2022", "dom.iterable"],
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "allowArbitraryExtensions": true,
+    // As in the checkout, where src comes from
+    "noUnusedLocals": false
+  }
+}

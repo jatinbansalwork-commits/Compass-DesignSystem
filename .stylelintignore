@@ -1,0 +1,17 @@
+# dependencies
+node_modules
+
+# testing
+coverage
+
+# build directories
+**/storybook-site
+**/storybook-static
+**/build
+**/dist
+
+# klear360-svelte: generated/ambient declaration files
+packages/klear360-svelte/src/**/*.d.ts
+
+# misc
+.DS_Store

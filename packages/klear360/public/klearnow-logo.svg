@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="27" viewBox="0 0 90 27" fill="none" role="img" aria-label="KlearNow">
+  <g transform="translate(0 1.5) scale(0.0165)">
+    <path
+      d="M1123.24 298.455L626.261 11.515C599.554 -3.83834 566.783 -3.83834 540.076 11.515L43.0921 298.455C16.3851 313.808 0 342.322 0 373.157V947.037C0 977.873 16.3851 1006.26 43.0921 1021.74L46.0593 1023.42L384.736 807.05L292.1 1165.47L347.578 1197.46L483.307 672.225L177.789 867.432L226.687 658.549L793.213 296.648L532.851 1304.29L540.334 1308.55C567.041 1323.9 599.813 1323.9 626.52 1308.55L1123.5 1021.61C1150.21 1006.26 1166.6 977.744 1166.6 946.908V373.028C1166.6 342.192 1150.21 313.808 1123.5 298.326L1123.24 298.455Z"
+      fill="url(#klearnow-mark-gradient)"
+    />
+  </g>
+  <text
+    x="24"
+    y="19"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica Neue, sans-serif"
+    font-size="13.5"
+    font-weight="700"
+    fill="#003F5B"
+  >
+    KlearNow
+  </text>
+  <defs>
+    <linearGradient id="klearnow-mark-gradient" x1="641" y1="0" x2="641" y2="1320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9772FF" />
+      <stop offset="0.609375" stop-color="#003F5B" />
+    </linearGradient>
+  </defs>
+</svg>

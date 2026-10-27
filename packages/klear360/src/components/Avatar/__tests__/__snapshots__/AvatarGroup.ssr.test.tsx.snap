@@ -1,0 +1,363 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<AvatarGroup /> should render AvatarGroup  1`] = `"<div id="root"><div data-blade-component="avatar-group" role="group" class="BaseBox-bksIuc StyledAvatarGroup-sc-1fkrhuq-0  ipKnNU"><div data-blade-component="avatar" class="BaseBox-bksIuc StyledAvatar-sc-127ewkg-0 dJEpKS hLLnGR"><div data-blade-component="base-box" class="BaseBox-bksIuc dLgLvj"><div color="information" class="StyledAvatarButton-sc-1w6qflj-0 jDBgSQ"><div data-blade-component="base-box" class="BaseBox-bksIuc iLTzl"><p letter-spacing="50" class="StyledBaseText-foUshD ghSfsg" data-blade-component="text">NK</p></div></div></div></div><div data-blade-component="avatar" class="BaseBox-bksIuc StyledAvatar-sc-127ewkg-0 dJEpKS hLLnGR"><div data-blade-component="base-box" class="BaseBox-bksIuc dLgLvj"><div color="positive" class="StyledAvatarButton-sc-1w6qflj-0 dWaPYB"><div data-blade-component="base-box" class="BaseBox-bksIuc iLTzl"><p letter-spacing="50" class="StyledBaseText-foUshD XZRCz" data-blade-component="text">AN</p></div></div></div></div><div data-blade-component="avatar" class="BaseBox-bksIuc StyledAvatar-sc-127ewkg-0 dJEpKS hLLnGR"><div data-blade-component="base-box" class="BaseBox-bksIuc dLgLvj"><div color="negative" class="StyledAvatarButton-sc-1w6qflj-0 kOTGqL"><div data-blade-component="base-box" class="BaseBox-bksIuc iLTzl"><p letter-spacing="50" class="StyledBaseText-foUshD dGqDra" data-blade-component="text">RB</p></div></div></div></div><div data-blade-component="avatar" class="BaseBox-bksIuc StyledAvatar-sc-127ewkg-0 dJEpKS hLLnGR"><div data-blade-component="base-box" class="BaseBox-bksIuc dLgLvj"><div color="primary" class="StyledAvatarButton-sc-1w6qflj-0 tkrAk"><div data-blade-component="base-box" class="BaseBox-bksIuc iLTzl"><p letter-spacing="50" class="StyledBaseText-foUshD iwndPR" data-blade-component="text">CH</p></div></div></div></div><div data-blade-component="avatar" class="BaseBox-bksIuc StyledAvatar-sc-127ewkg-0 dJEpKS hLLnGR"><div data-blade-component="base-box" class="BaseBox-bksIuc dLgLvj"><div color="positive" class="StyledAvatarButton-sc-1w6qflj-0 dWaPYB"><div data-blade-component="base-box" class="BaseBox-bksIuc iLTzl"><p letter-spacing="50" class="StyledBaseText-foUshD XZRCz" data-blade-component="text">SA</p></div></div></div></div></div></div>"`;
+
+exports[`<AvatarGroup /> should render AvatarGroup  2`] = `
+.c1.c1.c1.c1.c1 {
+  background-color: hsla(0,0%,100%,1);
+}
+
+.c3.c3.c3.c3.c3 {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.c5.c5.c5.c5.c5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  z-index: 1;
+  height: 100%;
+}
+
+.c2.c2.c2.c2.c2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  outline: 0.5px solid hsla(204,8%,88%,1);
+}
+
+.c4.c4.c4.c4.c4 {
+  display: block;
+  text-align: center;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  cursor: default;
+  min-height: 36px;
+  height: 36px;
+  width: 36px;
+  border: none;
+  border-radius: 9999px;
+  background-color: hsla(200,100%,41%,0.09);
+}
+
+.c4.c4.c4.c4.c4 img {
+  display: block;
+  height: 36px;
+  width: 36px;
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+.c7.c7.c7.c7.c7 {
+  display: block;
+  text-align: center;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  cursor: default;
+  min-height: 36px;
+  height: 36px;
+  width: 36px;
+  border: none;
+  border-radius: 9999px;
+  background-color: hsla(150,100%,28%,0.09);
+}
+
+.c7.c7.c7.c7.c7 img {
+  display: block;
+  height: 36px;
+  width: 36px;
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+.c9.c9.c9.c9.c9 {
+  display: block;
+  text-align: center;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  cursor: default;
+  min-height: 36px;
+  height: 36px;
+  width: 36px;
+  border: none;
+  border-radius: 9999px;
+  background-color: hsla(4,85%,44%,0.09);
+}
+
+.c9.c9.c9.c9.c9 img {
+  display: block;
+  height: 36px;
+  width: 36px;
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+.c11.c11.c11.c11.c11 {
+  display: block;
+  text-align: center;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  cursor: default;
+  min-height: 36px;
+  height: 36px;
+  width: 36px;
+  border: none;
+  border-radius: 9999px;
+  background-color: hsla(218,89%,51%,0.09);
+}
+
+.c11.c11.c11.c11.c11 img {
+  display: block;
+  height: 36px;
+  width: 36px;
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+.c6.c6.c6.c6.c6 {
+  color: hsla(200,100%,33%,1);
+  font-family: "Inter","Inter Fallback Arial",Arial;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-style: normal;
+  -webkit-text-decoration-line: none;
+  text-decoration-line: none;
+  line-height: 1.0625rem;
+  -webkit-letter-spacing: -0.15600000000000003px;
+  -moz-letter-spacing: -0.15600000000000003px;
+  -ms-letter-spacing: -0.15600000000000003px;
+  letter-spacing: -0.15600000000000003px;
+  margin: 0;
+  padding: 0;
+}
+
+.c8.c8.c8.c8.c8 {
+  color: hsla(150,100%,23%,1);
+  font-family: "Inter","Inter Fallback Arial",Arial;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-style: normal;
+  -webkit-text-decoration-line: none;
+  text-decoration-line: none;
+  line-height: 1.0625rem;
+  -webkit-letter-spacing: -0.15600000000000003px;
+  -moz-letter-spacing: -0.15600000000000003px;
+  -ms-letter-spacing: -0.15600000000000003px;
+  letter-spacing: -0.15600000000000003px;
+  margin: 0;
+  padding: 0;
+}
+
+.c10.c10.c10.c10.c10 {
+  color: hsla(4,85%,44%,1);
+  font-family: "Inter","Inter Fallback Arial",Arial;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-style: normal;
+  -webkit-text-decoration-line: none;
+  text-decoration-line: none;
+  line-height: 1.0625rem;
+  -webkit-letter-spacing: -0.15600000000000003px;
+  -moz-letter-spacing: -0.15600000000000003px;
+  -ms-letter-spacing: -0.15600000000000003px;
+  letter-spacing: -0.15600000000000003px;
+  margin: 0;
+  padding: 0;
+}
+
+.c12.c12.c12.c12.c12 {
+  color: hsla(0,0%,2%,1);
+  font-family: "Inter","Inter Fallback Arial",Arial;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-style: normal;
+  -webkit-text-decoration-line: none;
+  text-decoration-line: none;
+  line-height: 1.0625rem;
+  -webkit-letter-spacing: -0.15600000000000003px;
+  -moz-letter-spacing: -0.15600000000000003px;
+  -ms-letter-spacing: -0.15600000000000003px;
+  letter-spacing: -0.15600000000000003px;
+  margin: 0;
+  padding: 0;
+}
+
+.c0.c0.c0.c0.c0 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+}
+
+.c0.c0.c0.c0.c0 > *:not(:first-child) {
+  margin-left: -18px;
+  z-index: 2;
+}
+
+<div
+  id="root"
+>
+  <div
+    class=" c0"
+    data-blade-component="avatar-group"
+    role="group"
+  >
+    <div
+      class="c1 c2"
+      data-blade-component="avatar"
+    >
+      <div
+        class="c3"
+        data-blade-component="base-box"
+      >
+        <div
+          class="c4"
+          color="information"
+        >
+          <div
+            class="c5"
+            data-blade-component="base-box"
+          >
+            <p
+              class="c6"
+              data-blade-component="text"
+              letter-spacing="50"
+            >
+              NK
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="c1 c2"
+      data-blade-component="avatar"
+    >
+      <div
+        class="c3"
+        data-blade-component="base-box"
+      >
+        <div
+          class="c7"
+          color="positive"
+        >
+          <div
+            class="c5"
+            data-blade-component="base-box"
+          >
+            <p
+              class="c8"
+              data-blade-component="text"
+              letter-spacing="50"
+            >
+              AN
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="c1 c2"
+      data-blade-component="avatar"
+    >
+      <div
+        class="c3"
+        data-blade-component="base-box"
+      >
+        <div
+          class="c9"
+          color="negative"
+        >
+          <div
+            class="c5"
+            data-blade-component="base-box"
+          >
+            <p
+              class="c10"
+              data-blade-component="text"
+              letter-spacing="50"
+            >
+              RB
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="c1 c2"
+      data-blade-component="avatar"
+    >
+      <div
+        class="c3"
+        data-blade-component="base-box"
+      >
+        <div
+          class="c11"
+          color="primary"
+        >
+          <div
+            class="c5"
+            data-blade-component="base-box"
+          >
+            <p
+              class="c12"
+              data-blade-component="text"
+              letter-spacing="50"
+            >
+              CH
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="c1 c2"
+      data-blade-component="avatar"
+    >
+      <div
+        class="c3"
+        data-blade-component="base-box"
+      >
+        <div
+          class="c7"
+          color="positive"
+        >
+          <div
+            class="c5"
+            data-blade-component="base-box"
+          >
+            <p
+              class="c8"
+              data-blade-component="text"
+              letter-spacing="50"
+            >
+              SA
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

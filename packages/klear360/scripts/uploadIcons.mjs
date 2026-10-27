@@ -1,0 +1,566 @@
+/* eslint-disable import/no-extraneous-dependencies */
+/**
+ * Turns an icon payload from the Figma plugin into icon components and opens a PR.
+ *
+ * The payload is the same `[{ [iconName]: svgString }]` array that `scripts/icons.json` holds, so
+ * a local export can be replayed with:
+ *
+ *   node ./scripts/uploadIcons.mjs ./scripts/icons.json --targets=react --dry-run
+ *
+ * In CI it arrives gzip + base64 encoded through the `ICONS_PAYLOAD` environment variable, and the
+ * packages to generate for through `ICONS_TARGETS`.
+ *
+ * Targets:
+ * - `react`  → `@klearnow/klear360`. One component serves web and native, since `Icons/_Svg` has a
+ *              `.web` and a `.native` implementation of every element.
+ *
+ * A React push also lists added icons in `@klearnow/klear360-mcp`'s `AvailableIcons.md`.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import zlib from 'node:zlib';
+import { fileURLToPath } from 'node:url';
+import execa from 'execa';
+import lodash from 'lodash';
+import nodePlop from 'node-plop';
+import randomNameGenerator from 'moniker';
+
+const GITHUB_BOT_EMAIL = 'tools+cibot@klearnow.ai';
+const GITHUB_BOT_USERNAME = 'rzpcibot';
+
+const BLADE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const REPO_ROOT = path.resolve(BLADE_ROOT, '../..');
+const REACT_ICONS_DIRECTORY = path.join(BLADE_ROOT, 'src/components/Icons');
+const MCP_ROOT = path.join(REPO_ROOT, 'packages/klear360-mcp');
+const MCP_AVAILABLE_ICONS_FILE = path.join(MCP_ROOT, 'knowledgebase/general/AvailableIcons.md');
+const MCP_GENERAL_DOCS_SNAPSHOT = path.join(
+  MCP_ROOT,
+  'src/tools/__tests__/__snapshots__/getKlear360GeneralDocs.test.ts.snap',
+);
+const MCP_PACKAGE_NAME = '@klearnow/klear360-mcp';
+
+const TARGETS = {
+  react: { packageName: '@klearnow/klear360', label: 'React (web + native)' },
+};
+
+const args = process.argv.slice(2);
+const flags = args.filter((arg) => arg.startsWith('--'));
+const payloadArg = args.find((arg) => !arg.startsWith('--'));
+const targetsFlag = flags.find((flag) => flag.startsWith('--targets='))?.split('=')[1];
+const isDryRun = flags.includes('--dry-run');
+const skipTypecheck = flags.includes('--skip-typecheck');
+const skipSnapshots = flags.includes('--skip-snapshots');
+
+/** Problems that must not ship. A non-empty list downgrades the PR to a draft. */
+const blockers = [];
+/** Worth a reviewer's attention but not a reason to hold the push. */
+const warnings = [];
+
+// ---------------------------------------------------------------------------------------------
+// payload
+// ---------------------------------------------------------------------------------------------
+
+const readPayload = () => {
+  const raw = process.env.ICONS_PAYLOAD || payloadArg;
+  if (!raw) {
+    throw new Error('No payload. Pass a JSON file path, or set ICONS_PAYLOAD.');
+  }
+  if (fs.existsSync(raw)) {
+    return JSON.parse(fs.readFileSync(raw, 'utf8'));
+  }
+  try {
+    return JSON.parse(zlib.gunzipSync(Buffer.from(raw, 'base64')).toString('utf8'));
+  } catch (error) {
+    return JSON.parse(raw);
+  }
+};
+
+/** A dispatch from a plugin build that predates targets carries none, and meant React. */
+const readTargets = () => {
+  const requested = (process.env.ICONS_TARGETS || targetsFlag || 'react')
+    .split(',')
+    .map((target) => target.trim())
+    .filter(Boolean);
+  const unknown = requested.filter((target) => !TARGETS[target]);
+  if (unknown.length || !requested.length) {
+    throw new Error(
+      `Unknown target(s): ${unknown.join(', ')}. Expected one or more of: ${Object.keys(
+        TARGETS,
+      ).join(', ')}.`,
+    );
+  }
+  return new Set(requested);
+};
+
+/** Must match `plopfile.js`, which names the folder and the component. */
+const toComponentName = (iconName) => `${lodash.startCase(iconName).trim().replace(/\s/g, '')}Icon`;
+
+/**
+ * Everything that would make the generator write the wrong thing, or write nothing, is rejected
+ * before a single file changes. A half-generated icon set is harder to review than none.
+ */
+const parseIcons = (payload) => {
+  if (!Array.isArray(payload) || !payload.length) {
+    throw new Error('Expected a non-empty array of `{ [iconName]: svgString }` entries.');
+  }
+
+  const icons = payload.map((entry, index) => {
+    const [iconName, svg] = Object.entries(entry ?? {})[0] ?? [];
+    if (typeof iconName !== 'string' || typeof svg !== 'string' || !svg.includes('<svg')) {
+      throw new Error(`Entry ${index} is not an \`{ [iconName]: svgString }\` pair.`);
+    }
+    const componentName = toComponentName(iconName);
+    if (!/^[A-Z][A-Za-z0-9]*Icon$/.test(componentName)) {
+      throw new Error(
+        `"${iconName}" does not make a valid component name (got \`${componentName}\`). Rename the layer in Figma.`,
+      );
+    }
+    return { iconName, svg, componentName };
+  });
+
+  const seen = new Map();
+  icons.forEach(({ iconName, componentName }) => {
+    if (seen.has(componentName)) {
+      throw new Error(
+        `"${seen.get(
+          componentName,
+        )}" and "${iconName}" both become \`${componentName}\`. Rename one of them in Figma.`,
+      );
+    }
+    seen.set(componentName, iconName);
+  });
+
+  return icons;
+};
+
+/**
+ * Both generators hardcode `viewBox="0 0 24 24"`, so artwork drawn on any other frame size is
+ * squashed or cropped without any error.
+ */
+const checkViewBox = ({ svg, componentName }) => {
+  const viewBox = /viewBox="([^"]*)"/.exec(svg)?.[1]?.trim();
+  if (viewBox !== '0 0 24 24') {
+    blockers.push(
+      `\`${componentName}\` was exported with \`viewBox="${viewBox}"\`, but icons are generated on a 24×24 frame. Resize the icon in Figma to 24×24 and export again.`,
+    );
+  }
+};
+
+// ---------------------------------------------------------------------------------------------
+// shared helpers
+// ---------------------------------------------------------------------------------------------
+
+const readIfExists = (filePath) =>
+  fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : null;
+
+const runStep = ({ name, cwd, command }) => {
+  console.log(`\n▶ ${name}: ${command}`);
+  try {
+    // `preferLocal` puts node_modules/.bin (e.g. cross-env) on PATH outside of `yarn run`
+    execa.commandSync(command, { cwd, stdio: 'inherit', shell: true, preferLocal: true });
+    return true;
+  } catch (error) {
+    blockers.push(`\`${name}\` failed (\`${command}\`). See the workflow logs for the output.`);
+    return false;
+  }
+};
+
+const prettierWrite = (paths) => {
+  if (paths.length) execa.sync('yarn', ['prettier', '--write', ...paths], { cwd: BLADE_ROOT });
+};
+
+// ---------------------------------------------------------------------------------------------
+// react (@klearnow/klear360 — web + native)
+// ---------------------------------------------------------------------------------------------
+
+const reactComponentFile = (componentName) =>
+  path.join(REACT_ICONS_DIRECTORY, componentName, `${componentName}.tsx`);
+
+const reportPlopFailures = (label, { failures }) => {
+  failures.forEach((failure) => {
+    blockers.push(`${label}: ${failure.error ?? failure.message ?? JSON.stringify(failure)}`);
+  });
+};
+
+/** Icon names each registry lists, read as the files are written rather than trusted. */
+const REACT_ICON_REGISTRIES = [
+  { file: 'iconMap.ts', entryPattern: /^\s+(\w+Icon): \w+Component,$/gm },
+  { file: 'index.ts', entryPattern: /^export \{ default as (\w+Icon) \}/gm },
+];
+
+const readRegisteredIcons = ({ file, entryPattern }) =>
+  new Set(
+    [...fs.readFileSync(path.join(REACT_ICONS_DIRECTORY, file), 'utf8').matchAll(entryPattern)].map(
+      (match) => match[1],
+    ),
+  );
+
+const generateReactIcons = async (icons) => {
+  // the plop generators resolve `./src/...` against the working directory
+  process.chdir(BLADE_ROOT);
+  const plop = await nodePlop(path.join(BLADE_ROOT, 'plopfile.js'));
+  const iconGenerator = plop.getGenerator('generate-icons');
+  const reexportsGenerator = plop.getGenerator('generate-reexports');
+
+  // The re-exports are rebuilt from every icon folder, so an icon that was never registered by
+  // hand lands in this PR too. Say so, or the reviewer finds an entry nobody asked for.
+  const previouslyRegistered = REACT_ICON_REGISTRIES.map(readRegisteredIcons);
+  const exportedNames = new Set(icons.map(({ componentName }) => componentName));
+
+  const previousSources = new Map(
+    icons.map(({ componentName }) => [
+      componentName,
+      readIfExists(reactComponentFile(componentName)),
+    ]),
+  );
+
+  // sequential: each run modifies files the next one reads
+  for (const icon of icons) {
+    // eslint-disable-next-line no-await-in-loop
+    const results = await iconGenerator.runActions({
+      iconName: icon.iconName,
+      svgContents: icon.svg,
+    });
+    reportPlopFailures(icon.componentName, results);
+  }
+
+  reportPlopFailures('Icon re-exports', await reexportsGenerator.runActions({}));
+
+  REACT_ICON_REGISTRIES.forEach((registry, index) => {
+    const newlyRegistered = [...readRegisteredIcons(registry)].filter(
+      (name) => !previouslyRegistered[index].has(name) && !exportedNames.has(name),
+    );
+    if (newlyRegistered.length) {
+      warnings.push(
+        `${newlyRegistered.map((name) => `\`${name}\``).join(', ')} already existed but ${
+          newlyRegistered.length === 1 ? 'was' : 'were'
+        } missing from \`packages/klear360/src/components/Icons/${
+          registry.file
+        }\`. Regenerating it registered ${newlyRegistered.length === 1 ? 'it' : 'them'} as well.`,
+      );
+    }
+  });
+
+  // Plop formats with its own options, so its raw output never matches a committed file. Compare
+  // only after the repo's formatting, or every re-exported icon reads as changed.
+  prettierWrite([
+    ...icons.map(({ componentName }) => path.join(REACT_ICONS_DIRECTORY, componentName)),
+    path.join(REACT_ICONS_DIRECTORY, 'iconMap.ts'),
+    path.join(REACT_ICONS_DIRECTORY, 'index.ts'),
+  ]);
+
+  const result = { added: [], updated: [], unchanged: [], skipped: [] };
+  previousSources.forEach((previous, componentName) => {
+    if (previous === null) result.added.push(componentName);
+    else if (previous !== readIfExists(reactComponentFile(componentName)))
+      result.updated.push(componentName);
+    else result.unchanged.push(componentName);
+  });
+
+  const changed = [...result.added, ...result.updated];
+  result.touchedPaths = changed.length
+    ? [
+        ...changed.map((componentName) => path.join(REACT_ICONS_DIRECTORY, componentName)),
+        path.join(REACT_ICONS_DIRECTORY, 'iconMap.ts'),
+        path.join(REACT_ICONS_DIRECTORY, 'index.ts'),
+      ]
+    : [];
+  return result;
+};
+
+const verifyReactIcons = (changed) => {
+  if (!skipTypecheck) {
+    runStep({ name: '@klearnow/klear360 typecheck', cwd: BLADE_ROOT, command: 'yarn typecheck' });
+  }
+  if (!skipSnapshots) {
+    const testPaths = changed.map((name) => `src/components/Icons/${name}/`).join(' ');
+    runStep({
+      name: 'web snapshots',
+      cwd: BLADE_ROOT,
+      command: `cross-env FRAMEWORK=REACT yarn jest -c ./jest.web.config.js --updateSnapshot --forceExit --ci=false ${testPaths}`,
+    });
+    runStep({
+      name: 'native snapshots',
+      cwd: BLADE_ROOT,
+      command: `cross-env FRAMEWORK=REACT_NATIVE yarn jest -c ./jest.native.config.js --updateSnapshot --forceExit --ci=false ${testPaths}`,
+    });
+  }
+};
+
+// ---------------------------------------------------------------------------------------------
+// klear360-mcp (the icon list AI assistants pick from)
+// ---------------------------------------------------------------------------------------------
+
+const MCP_ICON_ROW_PATTERN = /^\| (\w+Icon) \| .* \|$/;
+
+/** A filled icon whose outline already has a row is described by it; nothing else can be. */
+const describeIcon = (componentName, listedNames) => {
+  const outlineName = componentName.replace(/FilledIcon$/, 'Icon');
+  if (outlineName !== componentName && listedNames.has(outlineName)) {
+    return { description: `Filled variant of ${outlineName}`, isPlaceholder: false };
+  }
+  const words = lodash.startCase(componentName.replace(/Icon$/, '')).toLowerCase();
+  return { description: `${lodash.upperFirst(words)} icon`, isPlaceholder: true };
+};
+
+/**
+ * The list is only roughly alphabetical, so re-sorting it would move rows nobody touched. A filled
+ * icon goes right after its outline, like the existing ones; anything else goes before the first
+ * row that sorts after it.
+ */
+const findMcpRowIndex = (lines, componentName) => {
+  const rows = lines
+    .map((line, index) => ({ name: MCP_ICON_ROW_PATTERN.exec(line)?.[1], index }))
+    .filter(({ name }) => name);
+
+  const outlineName = componentName.replace(/FilledIcon$/, 'Icon');
+  const outlineRow = outlineName !== componentName && rows.find(({ name }) => name === outlineName);
+  if (outlineRow) return outlineRow.index + 1;
+
+  const nextRow = rows.find(
+    ({ name }) => name.localeCompare(componentName, 'en', { sensitivity: 'base' }) > 0,
+  );
+  return nextRow ? nextRow.index : rows[rows.length - 1].index + 1;
+};
+
+/** Returns the paths it changed, which is none when every added icon is already listed. */
+const addIconsToMcpDocs = (addedComponentNames) => {
+  const lines = fs.readFileSync(MCP_AVAILABLE_ICONS_FILE, 'utf8').split('\n');
+  const listedNames = new Set(lines.map((line) => MCP_ICON_ROW_PATTERN.exec(line)?.[1]));
+  const placeholders = [];
+
+  [...addedComponentNames].sort().forEach((componentName) => {
+    if (listedNames.has(componentName)) return;
+    const { description, isPlaceholder } = describeIcon(componentName, listedNames);
+    lines.splice(findMcpRowIndex(lines, componentName), 0, `| ${componentName} | ${description} |`);
+    listedNames.add(componentName);
+    if (isPlaceholder) placeholders.push(componentName);
+  });
+
+  if (placeholders.length) {
+    warnings.push(
+      `${placeholders.map((name) => `\`${name}\``).join(', ')} ${
+        placeholders.length === 1 ? 'was' : 'were'
+      } added to \`packages/klear360-mcp/knowledgebase/general/AvailableIcons.md\` with a description made from the name. Replace it with what the icon is for, so AI assistants pick it for the right use (e.g. "Star for ratings or favorites").`,
+    );
+  }
+
+  const updated = lines.join('\n');
+  if (updated === fs.readFileSync(MCP_AVAILABLE_ICONS_FILE, 'utf8')) return [];
+  fs.writeFileSync(MCP_AVAILABLE_ICONS_FILE, updated);
+  return [MCP_AVAILABLE_ICONS_FILE, MCP_GENERAL_DOCS_SNAPSHOT];
+};
+
+/** The general-docs snapshot embeds the icon list, so it moves with every row added. */
+const verifyMcpDocs = () => {
+  if (skipSnapshots) return;
+  runStep({
+    name: 'klear360-mcp general docs snapshot',
+    cwd: MCP_ROOT,
+    command: 'yarn vitest run --update src/tools/__tests__/getKlear360GeneralDocs.test.ts',
+  });
+};
+
+// ---------------------------------------------------------------------------------------------
+// reporting
+// ---------------------------------------------------------------------------------------------
+
+const changedIn = (result) => [...result.added, ...result.updated];
+
+const describeIcons = (componentNames) => {
+  const shown = componentNames.slice(0, 3).join(', ');
+  const rest = componentNames.length - 3;
+  return rest > 0 ? `${shown} and ${rest} more` : shown;
+};
+
+const buildTitle = (results) => {
+  const unique = (names) => [...new Set(names)];
+  const added = unique(Object.values(results).flatMap((result) => result.added));
+  const updated = unique(
+    Object.values(results)
+      .flatMap((result) => result.updated)
+      .filter((name) => !added.includes(name)),
+  );
+  if (added.length && updated.length) {
+    return `feat(icons): add ${describeIcons(added)}, update ${describeIcons(updated)}`;
+  }
+  if (added.length) return `feat(icons): add ${describeIcons(added)}`;
+  return `fix(icons): update ${describeIcons(updated)}`;
+};
+
+const bulletList = (componentNames) => componentNames.map((name) => `- \`${name}\``).join('\n');
+
+const buildTargetSection = (target, result) => {
+  const { packageName, label } = TARGETS[target];
+  const sections = [`## ${label} — \`${packageName}\``, ''];
+
+  if (!changedIn(result).length && !result.skipped.length) {
+    sections.push('_No changes._', '');
+  }
+  if (result.added.length) sections.push('**Added**', '', bulletList(result.added), '');
+  if (result.updated.length) {
+    sections.push(
+      '**Updated** — these already existed and their artwork changed:',
+      '',
+      bulletList(result.updated),
+      '',
+    );
+  }
+  if (result.skipped.length) {
+    sections.push(
+      '**Skipped** — could not be generated, see Blocking:',
+      '',
+      bulletList(result.skipped),
+      '',
+    );
+  }
+  if (result.unchanged.length) {
+    sections.push(
+      '<details>',
+      `<summary>Exported but unchanged (${result.unchanged.length})</summary>`,
+      '',
+      bulletList(result.unchanged),
+      '',
+      '</details>',
+      '',
+    );
+  }
+  return sections;
+};
+
+const buildPullRequestBody = (results, { isMcpDocsUpdated }) => {
+  const sections = [
+    'This PR was opened by the Icons Upload GitHub action from icons exported with the Klear360 Token Publisher Figma plugin.',
+    '',
+  ];
+
+  if (blockers.length) {
+    sections.push(
+      '## ⛔️ Blocking',
+      '',
+      'Opened as a draft because the push could not verify itself. Fix these before marking it ready:',
+      '',
+      ...blockers.map((blocker) => `- ${blocker}`),
+      '',
+    );
+  }
+  if (warnings.length) {
+    sections.push('## Warnings', '', ...warnings.map((warning) => `- ${warning}`), '');
+  }
+
+  Object.entries(results).forEach(([target, result]) => {
+    sections.push(...buildTargetSection(target, result));
+  });
+
+  if (isMcpDocsUpdated) {
+    sections.push(
+      `## Klear360 MCP — \`${MCP_PACKAGE_NAME}\``,
+      '',
+      'Added icons are listed in `knowledgebase/general/AvailableIcons.md`, so AI assistants can suggest them.',
+      '',
+    );
+  }
+
+  return sections.join('\n');
+};
+
+const writeChangeset = ({ branchName, title, results, isMcpDocsUpdated }) => {
+  const frontmatter = [
+    ...Object.entries(results)
+      .filter(([, result]) => changedIn(result).length)
+      .map(([target]) => TARGETS[target].packageName),
+    ...(isMcpDocsUpdated ? [MCP_PACKAGE_NAME] : []),
+  ]
+    .map((packageName) => `'${packageName}': patch`)
+    .join('\n');
+  const changesetPath = path.join(REPO_ROOT, `.changeset/${branchName}.md`);
+  fs.writeFileSync(changesetPath, `---\n${frontmatter}\n---\n\n${title}\n`);
+  return changesetPath;
+};
+
+// ---------------------------------------------------------------------------------------------
+// main
+// ---------------------------------------------------------------------------------------------
+
+const uploadIcons = async () => {
+  const targets = readTargets();
+  const icons = parseIcons(readPayload());
+  icons.forEach(checkViewBox);
+
+  const results = {};
+  if (targets.has('react')) results.react = await generateReactIcons(icons);
+  // the MCP docs describe `@klearnow/klear360`'s icons, so only a React push lists new ones there
+  const mcpDocsPaths = results.react ? addIconsToMcpDocs(results.react.added) : [];
+
+  const touchedPaths = [
+    ...Object.values(results).flatMap((result) => result.touchedPaths),
+    ...mcpDocsPaths,
+  ];
+  if (!touchedPaths.length) {
+    console.log('Every exported icon already matches the repo. Nothing to do.');
+    blockers.forEach((blocker) => console.error(`⛔️  ${blocker}`));
+    return;
+  }
+
+  if (results.react && changedIn(results.react).length) verifyReactIcons(changedIn(results.react));
+  if (mcpDocsPaths.length) verifyMcpDocs();
+
+  Object.entries(results).forEach(([target, result]) => {
+    console.log(
+      `\n${TARGETS[target].label}: ${result.added.length} added, ${result.updated.length} updated, ${result.unchanged.length} unchanged, ${result.skipped.length} skipped.`,
+    );
+  });
+  warnings.forEach((warning) => console.warn(`⚠️  ${warning}`));
+  blockers.forEach((blocker) => console.error(`⛔️  ${blocker}`));
+
+  const title = buildTitle(results);
+  const body = buildPullRequestBody(results, { isMcpDocsUpdated: mcpDocsPaths.length > 0 });
+
+  if (isDryRun) {
+    console.log(`\n--dry-run: files written, git and GitHub untouched.\n\n# ${title}\n\n${body}`);
+    return;
+  }
+
+  const branchName = `figma-icons-${randomNameGenerator
+    .generator([randomNameGenerator.verb, randomNameGenerator.noun])
+    .choose()}`;
+  const changesetPath = writeChangeset({
+    branchName,
+    title,
+    results,
+    isMcpDocsUpdated: mcpDocsPaths.length > 0,
+  });
+
+  execa.sync('git', ['checkout', '-b', branchName], { cwd: REPO_ROOT });
+  execa.sync('git', ['config', 'user.email', GITHUB_BOT_EMAIL], { cwd: REPO_ROOT });
+  execa.sync('git', ['config', 'user.name', GITHUB_BOT_USERNAME], { cwd: REPO_ROOT });
+  execa.sync('git', ['add', '--', ...touchedPaths, changesetPath], { cwd: REPO_ROOT });
+  execa.sync('git', ['commit', '-m', title], {
+    cwd: REPO_ROOT,
+    env: { HUSKY_SKIP_HOOKS: 1 },
+  });
+  execa.sync('git', ['push', 'origin', branchName], { cwd: REPO_ROOT });
+
+  execa.sync(
+    'gh',
+    [
+      'pr',
+      'create',
+      '--title',
+      title,
+      '--head',
+      branchName,
+      '--repo',
+      'klearnow/klear360',
+      '--body',
+      body,
+      ...(blockers.length ? ['--draft'] : []),
+    ],
+    { cwd: REPO_ROOT, stdio: 'inherit' },
+  );
+};
+
+uploadIcons().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

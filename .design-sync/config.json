@@ -1,0 +1,6 @@
+{
+  "pkg": "@klearnow/klear360",
+  "globalName": "Klear360",
+  "shape": "package",
+  "buildCmd": "pnpm -F \"@klearnow/klear360...\" build"
+}

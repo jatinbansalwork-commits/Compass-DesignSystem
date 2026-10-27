@@ -1,0 +1,561 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<FileUpload /> should render in SSR 1`] = `"<div id="root"><div data-blade-component="file-upload" class="BaseBox-bksIuc lbOIzR"><div data-blade-component="base-box" class="BaseBox-bksIuc lhbwwB"><span style="width:100%;flex-shrink:0;margin-right:0px" id="fileuploadinput-undefined-label-undefined" data-blade-component="form-label"><div data-blade-component="base-box" class="BaseBox-bksIuc fhmUvk"><div data-blade-component="base-box" class="BaseBox-bksIuc eHGxoV"><div data-blade-component="base-box" class="BaseBox-bksIuc"><div data-blade-component="base-box" class="BaseBox-bksIuc gQLxiP"><p letter-spacing="50" class="StyledBaseText-foUshD lhkeBN" data-blade-component="text">Upload GST certificate</p><div data-blade-component="visually-hidden" class="VisuallyHiddenweb__StyledVisuallyHidden-g3hls3-0 fVGPRy"><p letter-spacing="50" class="StyledBaseText-foUshD izyCsZ" data-blade-component="text">, Upload .jpg, .jpeg, or .png file only</p></div></div></div></div></div></span><label style="cursor:pointer;width:100%" data-blade-component="file-upload-label" class="SelectorLabelweb__StyledSelectorLabel-sc-1yoi09a-0 VrcmW"><div data-blade-component="base-box" class="BaseBox-bksIuc lbOIzR"><div data-comp="f" data-blade-component="base-box" class="BaseBox-bksIuc StyledFileUploadWrapperweb__StyledFileUploadWrapper-sc-12lf2rw-0 bwNdjM doTcXZ"><div data-blade-component="box" class="BaseBox-bksIuc eIRNUU"><p letter-spacing="50" class="StyledBaseText-foUshD hjkZVx" data-blade-component="text">Drag files here or<!-- --> </p><input id="fileuploadinput-undefined-input-undefined" name="single-file-upload-input" type="file" accept="image/*" aria-required="false" aria-invalid="false" aria-disabled="false" aria-describedby="fileuploadinput-undefined-label-undefined" class="SelectorInputweb__StyledInput-sc-1bnkrae-0 etksHY"/><div data-blade-component="box" class="BaseBox-bksIuc fvrzBR"><div data-blade-component="box" class="BaseBox-bksIuc eHGxoV"><svg aria-hidden="true" data-blade-component="icon" height="16px" viewBox="0 0 24 24" width="16px" fill="none" class="Svgweb__StyledSvg-vcmjs8-0"><path d="M11.2929 1.29289C11.6834 0.902369 12.3166 0.902369 12.7071 1.29289L16.7071 5.29289C17.0976 5.68342 17.0976 6.31658 16.7071 6.70711C16.3166 7.09763 15.6834 7.09763 15.2929 6.70711L13 4.41421V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V4.41421L8.70711 6.70711C8.31658 7.09763 7.68342 7.09763 7.29289 6.70711C6.90237 6.31658 6.90237 5.68342 7.29289 5.29289L11.2929 1.29289Z" fill="hsla(0, 0%, 2%, 1)" data-blade-component="svg-path"></path><path d="M3 16C3.55228 16 4 16.4477 4 17V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V17C20 16.4477 20.4477 16 21 16C21.5523 16 22 16.4477 22 17V20C22 21.6569 20.6569 23 19 23H5C3.34315 23 2 21.6569 2 20V17C2 16.4477 2.44772 16 3 16Z" fill="hsla(0, 0%, 2%, 1)" data-blade-component="svg-path"></path></svg><p letter-spacing="50" class="StyledBaseText-foUshD gYkspo" data-blade-component="text">Upload</p></div></div></div></div></div></label></div><div data-blade-component="base-box" class="BaseBox-bksIuc krcKbL"><div data-blade-component="base-box" class="BaseBox-bksIuc hlMTNd"><div id="fileuploadinput-undefined-helptext-undefined" data-blade-component="base-box" class="BaseBox-bksIuc clhaJX"><span data-blade-component="base-box" class="BaseBox-bksIuc orhco"><span letter-spacing="50" class="StyledBaseText-foUshD hCZErE" data-blade-component="text">Upload .jpg, .jpeg, or .png file only</span></span></div></div></div></div></div>"`;
+
+exports[`<FileUpload /> should render in SSR 2`] = `
+.c0.c0.c0.c0.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  width: 100%;
+}
+
+.c1.c1.c1.c1.c1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+}
+
+.c2.c2.c2.c2.c2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-bottom: 4px;
+  width: 100%;
+}
+
+.c3.c3.c3.c3.c3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.c4.c4.c4.c4.c4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  max-height: 36px;
+  gap: 0px;
+}
+
+.c9.c9.c9.c9.c9 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  height: 56px;
+  width: 100%;
+  border-radius: 8px;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.c11.c11.c11.c11.c11 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  padding: 8px;
+  gap: 6px;
+}
+
+.c14.c14.c14.c14.c14 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.c16.c16.c16.c16.c16 {
+  margin-left: 0px;
+}
+
+.c17.c17.c17.c17.c17 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: 'justify;-webkit-justify-content:'space-between;
+  -ms-flex-pack: 'justify;justify-content:'space-between;
+}
+
+.c18.c18.c18.c18.c18 {
+  margin-top: 4px;
+}
+
+.c19.c19.c19.c19.c19 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.c10.c10.c10.c10.c10 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  border-style: dashed;
+  -webkit-transition-property: background-color,border-color;
+  transition-property: background-color,border-color;
+  -webkit-transition-timing-function: cubic-bezier(0.3,0,0.2,1);
+  transition-timing-function: cubic-bezier(0.3,0,0.2,1);
+  -webkit-transition-duration: 80ms;
+  transition-duration: 80ms;
+  border-color: hsla(205,8%,71%,1);
+}
+
+.c10.c10.c10.c10.c10:hover {
+  background-color: hsla(206,10%,29%,0.06);
+}
+
+.c5.c5.c5.c5.c5 {
+  color: hsla(200,10%,18%,1);
+  font-family: "Inter","Inter Fallback Arial",Arial;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-style: normal;
+  -webkit-text-decoration-line: none;
+  text-decoration-line: none;
+  line-height: 1.0625rem;
+  -webkit-letter-spacing: -0.15600000000000003px;
+  -moz-letter-spacing: -0.15600000000000003px;
+  -ms-letter-spacing: -0.15600000000000003px;
+  letter-spacing: -0.15600000000000003px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: break-word;
+}
+
+.c7.c7.c7.c7.c7 {
+  color: hsla(0,0%,2%,1);
+  font-family: "Inter","Inter Fallback Arial",Arial;
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-style: normal;
+  -webkit-text-decoration-line: none;
+  text-decoration-line: none;
+  line-height: 1.25rem;
+  -webkit-letter-spacing: -0.18200000000000002px;
+  -moz-letter-spacing: -0.18200000000000002px;
+  -ms-letter-spacing: -0.18200000000000002px;
+  letter-spacing: -0.18200000000000002px;
+  margin: 0;
+  padding: 0;
+}
+
+.c12.c12.c12.c12.c12 {
+  color: hsla(200,10%,18%,1);
+  font-family: "Inter","Inter Fallback Arial",Arial;
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-style: normal;
+  -webkit-text-decoration-line: none;
+  text-decoration-line: none;
+  line-height: 1.25rem;
+  -webkit-letter-spacing: -0.18200000000000002px;
+  -moz-letter-spacing: -0.18200000000000002px;
+  -ms-letter-spacing: -0.18200000000000002px;
+  letter-spacing: -0.18200000000000002px;
+  margin: 0;
+  padding: 0;
+}
+
+.c15.c15.c15.c15.c15 {
+  color: hsla(0,0%,2%,1);
+  font-family: "Inter","Inter Fallback Arial",Arial;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-style: normal;
+  -webkit-text-decoration-line: none;
+  text-decoration-line: none;
+  line-height: 1.25rem;
+  -webkit-letter-spacing: -0.18200000000000002px;
+  -moz-letter-spacing: -0.18200000000000002px;
+  -ms-letter-spacing: -0.18200000000000002px;
+  letter-spacing: -0.18200000000000002px;
+  margin: 0;
+  padding: 0;
+}
+
+.c20.c20.c20.c20.c20 {
+  color: hsla(204,9%,42%,1);
+  font-family: "Inter","Inter Fallback Arial",Arial;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  font-style: normal;
+  -webkit-text-decoration-line: none;
+  text-decoration-line: none;
+  line-height: 1rem;
+  -webkit-letter-spacing: -0.14300000000000002px;
+  -moz-letter-spacing: -0.14300000000000002px;
+  -ms-letter-spacing: -0.14300000000000002px;
+  letter-spacing: -0.14300000000000002px;
+  margin: 0;
+  padding: 0;
+  word-break: break-word;
+  margin-top: 0px;
+}
+
+.c8.c8.c8.c8.c8 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.c6.c6.c6.c6.c6 {
+  border: 0;
+  -webkit-clip: rect(0 0 0 0);
+  clip: rect(0 0 0 0);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: 0 -1px -1px 0;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  left: -10000px;
+  white-space: nowrap;
+  word-wrap: normal;
+}
+
+.c13.c13.c13.c13.c13 {
+  border: 0;
+  -webkit-clip: rect(0 0 0 0);
+  clip: rect(0 0 0 0);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: 0 -1px -1px 0;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  left: -10000px;
+  white-space: nowrap;
+  word-wrap: normal;
+}
+
+.c13.c13.c13.c13.c13:focus-visible + div {
+  outline: 4px solid hsla(218,89%,51%,0.18);
+  outline-offset: 1px;
+  -webkit-transition-property: outline-width;
+  transition-property: outline-width;
+  -webkit-transition-duration: 80ms;
+  transition-duration: 80ms;
+  -webkit-transition-timing-function: cubic-bezier(0.3,0,0.2,1);
+  transition-timing-function: cubic-bezier(0.3,0,0.2,1);
+  z-index: 2;
+}
+
+.c13.c13.c13.c13.c13:hover + div {
+  border-color: hsla(204,8%,88%,1);
+  background-color: hsla(0,0%,100%,0);
+  -webkit-transition-timing-function: cubic-bezier(0.3,0,0.2,1);
+  transition-timing-function: cubic-bezier(0.3,0,0.2,1);
+  -webkit-transition-duration: 80ms;
+  transition-duration: 80ms;
+}
+
+@media screen and (min-width:320px) {
+  .c9.c9.c9.c9.c9 {
+    border-style: solid;
+  }
+}
+
+@media screen and (min-width:480px) {
+  .c9.c9.c9.c9.c9 {
+    border-style: solid;
+  }
+}
+
+@media screen and (min-width:768px) {
+  .c9.c9.c9.c9.c9 {
+    border-style: solid;
+  }
+}
+
+@media screen and (min-width:1024px) {
+  .c9.c9.c9.c9.c9 {
+    border-style: solid;
+  }
+}
+
+@media screen and (min-width:1200px) {
+  .c9.c9.c9.c9.c9 {
+    border-style: solid;
+  }
+}
+
+@media screen and (min-width:480px) {
+  .c11.c11.c11.c11.c11 {
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+
+@media screen and (min-width:480px) {
+  .c14.c14.c14.c14.c14 {
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+
+<div
+  id="root"
+>
+  <div
+    class="c0"
+    data-blade-component="file-upload"
+  >
+    <div
+      class="c1"
+      data-blade-component="base-box"
+    >
+      <span
+        data-blade-component="form-label"
+        id="fileuploadinput-1-label-6"
+        style="width:100%;flex-shrink:0;margin-right:0px"
+      >
+        <div
+          class="c2"
+          data-blade-component="base-box"
+        >
+          <div
+            class="c3"
+            data-blade-component="base-box"
+          >
+            <div
+              class=""
+              data-blade-component="base-box"
+            >
+              <div
+                class="c4"
+                data-blade-component="base-box"
+              >
+                <p
+                  class="c5"
+                  data-blade-component="text"
+                  letter-spacing="50"
+                >
+                  Upload GST certificate
+                </p>
+                <div
+                  class="c6"
+                  data-blade-component="visually-hidden"
+                >
+                  <p
+                    class="c7"
+                    data-blade-component="text"
+                    letter-spacing="50"
+                  >
+                    , Upload .jpg, .jpeg, or .png file only
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </span>
+      <label
+        class="c8"
+        data-blade-component="file-upload-label"
+        style="cursor:pointer;width:100%"
+      >
+        <div
+          class="c0"
+          data-blade-component="base-box"
+        >
+          <div
+            class="c9 c10"
+            data-blade-component="base-box"
+            data-comp="f"
+          >
+            <div
+              class="c11"
+              data-blade-component="box"
+            >
+              <p
+                class="c12"
+                data-blade-component="text"
+                letter-spacing="50"
+              >
+                Drag files here or
+                <!-- -->
+                 
+              </p>
+              <input
+                accept="image/*"
+                aria-describedby="fileuploadinput-1-label-6"
+                aria-disabled="false"
+                aria-invalid="false"
+                aria-required="false"
+                class="c13"
+                id="fileuploadinput-1-input-2"
+                name="single-file-upload-input"
+                type="file"
+              />
+              <div
+                class="c14"
+                data-blade-component="box"
+              >
+                <div
+                  class="c3"
+                  data-blade-component="box"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="Svgweb__StyledSvg-vcmjs8-0"
+                    data-blade-component="icon"
+                    fill="none"
+                    height="16px"
+                    viewBox="0 0 24 24"
+                    width="16px"
+                  >
+                    <path
+                      d="M11.2929 1.29289C11.6834 0.902369 12.3166 0.902369 12.7071 1.29289L16.7071 5.29289C17.0976 5.68342 17.0976 6.31658 16.7071 6.70711C16.3166 7.09763 15.6834 7.09763 15.2929 6.70711L13 4.41421V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V4.41421L8.70711 6.70711C8.31658 7.09763 7.68342 7.09763 7.29289 6.70711C6.90237 6.31658 6.90237 5.68342 7.29289 5.29289L11.2929 1.29289Z"
+                      data-blade-component="svg-path"
+                      fill="hsla(0, 0%, 2%, 1)"
+                    />
+                    <path
+                      d="M3 16C3.55228 16 4 16.4477 4 17V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V17C20 16.4477 20.4477 16 21 16C21.5523 16 22 16.4477 22 17V20C22 21.6569 20.6569 23 19 23H5C3.34315 23 2 21.6569 2 20V17C2 16.4477 2.44772 16 3 16Z"
+                      data-blade-component="svg-path"
+                      fill="hsla(0, 0%, 2%, 1)"
+                    />
+                  </svg>
+                  <p
+                    class="c15"
+                    data-blade-component="text"
+                    letter-spacing="50"
+                  >
+                    Upload
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </label>
+    </div>
+    <div
+      class="c16"
+      data-blade-component="base-box"
+    >
+      <div
+        class="c17"
+        data-blade-component="base-box"
+      >
+        <div
+          class="c18"
+          data-blade-component="base-box"
+          id="fileuploadinput-1-helptext-4"
+        >
+          <span
+            class="c19"
+            data-blade-component="base-box"
+          >
+            <span
+              class="c20"
+              data-blade-component="text"
+              letter-spacing="50"
+            >
+              Upload .jpg, .jpeg, or .png file only
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -1,0 +1,21 @@
+yarn run v1.22.22
+$ /Users/jatinbansal/Downloads/Klear360-Master/node_modules/.bin/eslint src/components src/hooks --rule '{"react-hooks/rules-of-hooks": "error", "react-hooks/exhaustive-deps": "warn"}' --ext .ts,.tsx
+
+Oops! Something went wrong! :(
+
+ESLint: 8.40.0
+
+ESLint couldn't find the plugin "eslint-plugin-blade".
+
+(The package "eslint-plugin-blade" was not found when loaded as a Node module from the directory "/Users/jatinbansal/Downloads/Klear360-Master".)
+
+It's likely that the plugin isn't installed correctly. Try reinstalling by running the following:
+
+    npm install eslint-plugin-blade@latest --save-dev
+
+The plugin "eslint-plugin-blade" was referenced from the config file in "../../.eslintrc.js#overrides[1]".
+
+If you still can't figure out the problem, please stop by https://eslint.org/chat/help to chat with the team.
+
+error Command failed with exit code 2.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

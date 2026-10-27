@@ -1,0 +1,197 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
+/* eslint-disable @typescript-eslint/no-shadow */
+import React from 'react';
+import { useCheckboxGroupContext } from './CheckboxGroup/CheckboxGroupContext';
+import { CheckboxIcon } from './CheckboxIcon';
+import { useCheckbox } from './useCheckbox';
+import { checkboxHoverTokens, checkboxSizes } from './checkboxTokens';
+import isEmpty from '~utils/lodashButBetter/isEmpty';
+import isUndefined from '~utils/lodashButBetter/isUndefined';
+import { metaAttribute, MetaConstants } from '~utils/metaAttribute';
+import { getStyledProps } from '~components/Box/styledProps';
+import BaseBox from '~components/Box/BaseBox';
+import { FormHint } from '~components/Form';
+import { SelectorLabel } from '~components/Form/Selector/SelectorLabel';
+import { SelectorTitle } from '~components/Form/Selector/SelectorTitle';
+import { SelectorSupportText } from '~components/Form/Selector/SelectorSupportText';
+import { SelectorInput } from '~components/Form/Selector/SelectorInput';
+import type { Klear360ElementRef } from '~utils/types';
+import { assignWithoutSideEffects } from '~utils/assignWithoutSideEffects';
+import { throwKlear360Error } from '~utils/logger';
+import { makeSize, useTheme } from '~utils';
+import { getInnerMotionRef, getOuterMotionRef } from '~utils/getMotionRefs';
+import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
+
+import type { CheckboxProps, OnChange } from './checkboxTypes';
+
+const _Checkbox: React.ForwardRefRenderFunction<Klear360ElementRef, CheckboxProps> = (
+  {
+    defaultChecked,
+    validationState,
+    isChecked,
+    isDisabled,
+    isIndeterminate,
+    isRequired,
+    name,
+    onChange,
+    value,
+    children,
+    helpText,
+    errorText,
+    size = 'medium',
+    tabIndex,
+    testID,
+    _motionMeta,
+    ...rest
+  },
+  ref,
+) => {
+  const groupProps = useCheckboxGroupContext();
+
+  // ban certain props in checkbox while inside group
+  const hasValidationState = !isUndefined(validationState);
+  const hasName = !isUndefined(name);
+  const hasDefaultChecked = !isUndefined(defaultChecked);
+  const hasIsChecked = !isUndefined(isChecked);
+  const hasOnChange = !isUndefined(onChange);
+
+  if (__DEV__) {
+    if (
+      (hasValidationState || hasName || hasDefaultChecked || hasIsChecked || hasOnChange) &&
+      !isEmpty(groupProps)
+    ) {
+      const props = [
+        hasValidationState ? 'validationState' : undefined,
+        hasName ? 'name' : undefined,
+        hasDefaultChecked ? 'defaultChecked' : undefined,
+        hasIsChecked ? 'isChecked' : undefined,
+        hasOnChange ? 'onChange' : undefined,
+      ]
+        .filter(Boolean)
+        .join(',');
+
+      throwKlear360Error({
+        message: `Cannot set \`${props}\` on <Checkbox /> when it's inside <CheckboxGroup />, Please set it on the <CheckboxGroup /> itself`,
+        moduleName: 'Checkbox',
+      });
+    }
+
+    // mandate value prop when using inside group
+    if (!value && !isEmpty(groupProps)) {
+      throw new Error(
+        `[Klear360 Checkbox]: <CheckboxGroup /> requires that you pass unique "value" prop to each <Checkbox />
+      <CheckboxGroup>
+        <Checkbox value="apple">Apple</Checkbox>
+        <Checkbox value="mango">Mango</Checkbox>
+      </CheckboxGroup>
+      `,
+      );
+    }
+  }
+
+  const _validationState = validationState ?? groupProps?.validationState;
+  const _hasError = _validationState === 'error';
+  const _isDisabled = isDisabled ?? groupProps?.isDisabled;
+  const _isRequired = Boolean(
+    isRequired || groupProps?.isRequired || groupProps?.necessityIndicator === 'required',
+  );
+  const _name = name ?? groupProps?.name;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  const _isChecked = isChecked ?? groupProps?.state?.isChecked(value!);
+  const _size = groupProps.size ?? size;
+  const { theme } = useTheme();
+  const formHintSize = {
+    small: 'medium',
+    medium: 'medium',
+    large: 'large',
+  } as const;
+
+  const showSupportingText = helpText;
+
+  const handleChange: OnChange = ({ isChecked, event, value }) => {
+    if (isChecked) {
+      groupProps?.state?.addValue(value!);
+    } else {
+      groupProps?.state?.removeValue(value!);
+    }
+
+    onChange?.({ isChecked, event, value });
+  };
+
+  const { state, ids, inputProps } = useCheckbox({
+    defaultChecked,
+    isChecked: _isChecked,
+    isIndeterminate,
+    hasError: _hasError,
+    hasHelperText: Boolean(showSupportingText),
+    isDisabled: _isDisabled,
+    isRequired: _isRequired,
+    name: _name,
+    value,
+    onChange: handleChange,
+  });
+
+  // Checkbox icon's size & margin + margin-left of SelectorTitle which is 2
+  const helpTextLeftSpacing = makeSize(checkboxSizes.icon[size].width + theme.spacing[3]);
+
+  return (
+    <BaseBox
+      ref={getOuterMotionRef({ _motionMeta, ref })}
+      {...metaAttribute({ name: MetaConstants.Checkbox, testID })}
+      {...getStyledProps(rest)}
+    >
+      <SelectorLabel
+        componentName={MetaConstants.CheckboxLabel}
+        inputProps={state.isReactNative ? inputProps : {}}
+        style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+      >
+        <BaseBox display="flex" flexDirection="column">
+          <BaseBox display="flex" flexDirection="row">
+            <SelectorInput
+              hoverTokens={checkboxHoverTokens}
+              isChecked={state.isChecked || Boolean(isIndeterminate)}
+              isDisabled={_isDisabled}
+              hasError={_hasError}
+              inputProps={inputProps}
+              tabIndex={tabIndex}
+              ref={getInnerMotionRef({ _motionMeta, ref })}
+              {...makeAnalyticsAttribute(rest)}
+            />
+            <CheckboxIcon
+              size={_size}
+              isChecked={state.isChecked}
+              isIndeterminate={isIndeterminate}
+              isDisabled={_isDisabled}
+              isNegative={_hasError}
+            />
+            {children ? (
+              <SelectorTitle size={_size} isDisabled={_isDisabled}>
+                {children}
+              </SelectorTitle>
+            ) : null}
+          </BaseBox>
+          {showSupportingText ? (
+            <BaseBox marginLeft={helpTextLeftSpacing}>
+              <SelectorSupportText size={_size} id={ids?.helpTextId}>
+                {helpText}
+              </SelectorSupportText>
+            </BaseBox>
+          ) : null}
+        </BaseBox>
+      </SelectorLabel>
+      <FormHint
+        size={formHintSize[_size]}
+        errorText={errorText}
+        errorTextId={ids?.errorTextId}
+        type={validationState === 'error' ? 'error' : 'help'}
+      />
+    </BaseBox>
+  );
+};
+
+const Checkbox = assignWithoutSideEffects(React.forwardRef(_Checkbox), {
+  displayName: 'Checkbox',
+});
+
+export type { CheckboxProps };
+export { Checkbox };

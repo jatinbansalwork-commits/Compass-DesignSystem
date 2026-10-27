@@ -1,0 +1,203 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { Box, Text, Heading } from '../../src/components';
+import { klear360Theme } from '../../src/tokens';
+
+<Meta title="Tokens/Colors" />
+
+# Colors
+
+Klear360 uses the same Klearnow brand scales in **light** and **dark** mode. Components read semantic tokens (`interactive.background.primary.default`, etc.); `theme.colors.onLight` and `theme.colors.onDark` map those roles to the palette below (dark uses deeper indigo/bluegray surfaces and slightly brighter steps for primary and feedback on charcoal backgrounds).
+
+const swatchBorder = '1px solid rgba(100, 114, 140, 0.28)';
+
+/** Box does not forward `style` or raw hex `backgroundColor` — use a plain div for swatches. */
+export const ColorSwatch = ({ color, width = '100%', height = '40px' }) => (
+  <div
+    style={{
+      width,
+      height,
+      borderRadius: 8,
+      border: swatchBorder,
+      backgroundColor: color,
+      boxSizing: 'border-box',
+    }}
+  />
+);
+
+export const SwatchRow = ({ name, shades }) => (
+  <Box marginBottom="spacing.6">
+    <Heading size="xsmall" marginBottom="spacing.2">
+      {name}
+    </Heading>
+    <Box display="flex" flexWrap="wrap" gap="spacing.2">
+      {shades.map(({ step, hex }) => (
+        <Box key={step} width="72px">
+          <ColorSwatch color={hex} />
+          <Text size="small" color="surface.text.gray.muted">
+            {step}
+          </Text>
+          <Text size="small" color="surface.text.gray.subtle">
+            {hex}
+          </Text>
+        </Box>
+      ))}
+    </Box>
+  </Box>
+);
+
+export const SemanticLight = () => {
+  const c = klear360Theme.colors.onLight;
+  const rows = [
+    ['Primary button', c.interactive.background.primary.default],
+    ['Primary hover', c.interactive.background.primary.highlighted],
+    ['Page background', c.surface.background.gray.subtle],
+    ['Card surface', c.surface.background.gray.intense],
+    ['Body text', c.surface.text.gray.normal],
+    ['Muted text', c.surface.text.gray.muted],
+    ['Success', c.feedback.background.positive.intense],
+    ['Error', c.feedback.background.negative.intense],
+    ['Warning', c.feedback.background.notice.intense],
+    ['Info', c.feedback.background.information.intense],
+  ];
+  return (
+    <Box display="flex" flexDirection="column" gap="spacing.3" marginBottom="spacing.8">
+      <Heading size="small">Light mode — semantic colors (live from theme)</Heading>
+      {rows.map(([label, value]) => (
+        <Box key={label} display="flex" alignItems="center" gap="spacing.4">
+          <ColorSwatch color={value} width="48px" height="28px" />
+          <Text size="medium">{label}</Text>
+          <Text size="small" color="surface.text.gray.muted">
+            {value}
+          </Text>
+        </Box>
+      ))}
+    </Box>
+  );
+};
+
+<SemanticLight />
+
+export const SemanticDark = () => {
+  const c = klear360Theme.colors.onDark;
+  const rows = [
+    ['Primary button', c.interactive.background.primary.default],
+    ['Primary hover', c.interactive.background.primary.highlighted],
+    ['Page background', c.surface.background.gray.subtle],
+    ['Card surface', c.surface.background.gray.intense],
+    ['Body text', c.surface.text.gray.normal],
+    ['Muted text', c.surface.text.gray.muted],
+    ['Success', c.feedback.background.positive.intense],
+    ['Error', c.feedback.background.negative.intense],
+    ['Warning', c.feedback.background.notice.intense],
+    ['Info', c.feedback.background.information.intense],
+  ];
+  return (
+    <Box display="flex" flexDirection="column" gap="spacing.3" marginBottom="spacing.8">
+      <Heading size="small">Dark mode — semantic colors (live from theme)</Heading>
+      {rows.map(([label, value]) => (
+        <Box key={label} display="flex" alignItems="center" gap="spacing.4">
+          <ColorSwatch color={value} width="48px" height="28px" />
+          <Text size="medium">{label}</Text>
+          <Text size="small" color="surface.text.gray.muted">
+            {value}
+          </Text>
+        </Box>
+      ))}
+    </Box>
+  );
+};
+
+<SemanticDark />
+
+## Brand scales (hex)
+
+<SwatchRow
+  name="indigo — primary brand"
+  shades={[
+    { step: '50', hex: '#FDFDFD' },
+    { step: '100', hex: '#E7ECF0' },
+    { step: '200', hex: '#C0CED5' },
+    { step: '300', hex: '#5B8396' },
+    { step: '400', hex: '#32647B' },
+    { step: '500', hex: '#003F5B' },
+    { step: '600', hex: '#003952' },
+    { step: '700', hex: '#002E42' },
+    { step: '800', hex: '#011A25' },
+    { step: '900', hex: '#020F19' },
+  ]}
+/>
+
+<SwatchRow
+  name="blue-sapphire — info / links"
+  shades={[
+    { step: '50', hex: '#FCFCFC' },
+    { step: '100', hex: '#E6F0F2' },
+    { step: '200', hex: '#C0D6DC' },
+    { step: '300', hex: '#5D96A9' },
+    { step: '400', hex: '#337E95' },
+    { step: '500', hex: '#005E7A' },
+    { step: '600', hex: '#005571' },
+    { step: '700', hex: '#004458' },
+    { step: '800', hex: '#002734' },
+    { step: '900', hex: '#001A26' },
+  ]}
+/>
+
+<SwatchRow
+  name="bluegray — surfaces & text"
+  shades={[
+    { step: '50', hex: '#F8F9FA' },
+    { step: '100', hex: '#F7F8FA' },
+    { step: '200', hex: '#E1E3E7' },
+    { step: '300', hex: '#A4ACBA' },
+    { step: '400', hex: '#7F8EA1' },
+    { step: '500', hex: '#64728C' },
+    { step: '600', hex: '#536376' },
+    { step: '800', hex: '#272D36' },
+    { step: '900', hex: '#1F252B' },
+  ]}
+/>
+
+<SwatchRow
+  name="green — success"
+  shades={[
+    { step: '500', hex: '#22C45D' },
+    { step: '600', hex: '#1CA650' },
+  ]}
+/>
+
+<SwatchRow
+  name="red — error"
+  shades={[
+    { step: '500', hex: '#FF3D33' },
+    { step: '600', hex: '#D9332B' },
+  ]}
+/>
+
+<SwatchRow
+  name="marigold — warning"
+  shades={[
+    { step: '500', hex: '#F69000' },
+    { step: '600', hex: '#E08201' },
+  ]}
+/>
+
+<SwatchRow
+  name="purple / gold / rose — charts & accents"
+  shades={[
+    { step: 'purple 500', hex: '#5D498E' },
+    { step: 'gold 500', hex: '#907D53' },
+    { step: 'rose 600', hex: '#7B4353' },
+  ]}
+/>
+
+## Categories
+
+- **interactive** — buttons, inputs, links
+- **feedback** — success, error, warning, info
+- **surface** — page and container backgrounds, body text
+- **overlay** — modal scrims
+- **popup** — dropdowns, tooltips
+- **data** — chart colors
+
+Every category exists under `theme.colors.onLight` and `theme.colors.onDark`. Toggle **color scheme** in the Storybook toolbar to compare.

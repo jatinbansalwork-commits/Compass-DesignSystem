@@ -1,0 +1,96 @@
+name: Klear360 Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+
+permissions:
+  id-token: write      # For OIDC/npm provenance
+  contents: write      # For pushing commits/branches
+  pull-requests: write #
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest # nosemgrep: non-self-hosted-runner
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Use Node v22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      - name: Upgrade npm for OIDC trusted publishing
+        run: npm install -g npm@11.5.1
+      - name: Setup Cache & Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Build Klear360 Core
+        working-directory: packages/klear360-core
+        run: yarn build
+      - name: Create Release Pull Request & Publish packages
+        id: changesets
+        uses: changesets/action@v1
+        if: github.event_name != 'workflow_dispatch' # only run on master merges
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+          BLADE_MCP_SENTRY_DSN: ${{ secrets.BLADE_MCP_SENTRY_DSN }}
+          BLADE_SEGMENT_KEY: ${{ secrets.BLADE_SEGMENT_KEY }}
+        with:
+          version: yarn version-packages
+          publish: yarn release
+          commit: 'build: update version'
+          title: 'build: update version'
+      - name: Publish to public npm registry
+        if: steps.changesets.outputs.published == 'true' || github.event_name == 'workflow_dispatch' # run when the package is published via changeset or if a release is triggered manually.
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+          # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          BLADE_MCP_SENTRY_DSN: ${{ secrets.BLADE_MCP_SENTRY_DSN }}
+          BLADE_SEGMENT_KEY: ${{ secrets.BLADE_SEGMENT_KEY }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        run: yarn publish-npm
+      - name: Build Klear360 if not built by changeset
+        if: steps.changesets.outputs.published == 'false'
+        working-directory: packages/klear360
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+        run: yarn build
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        if: steps.changesets.outputs.published == 'true' || github.event_name == 'workflow_dispatch' # run when the package is published via changeset or if a release is triggered manually.
+        with:
+          token: ${{ env.GITHUB_ACCESS_TOKEN }}
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: packages/klear360
+          storybookBaseDir: packages/klear360
+          buildScriptName: react:storybook:build
+          exitOnceUploaded: true
+          onlyChanged: true
+          untraced: '**/package.json'
+          traceChanged: 'expanded'
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+      - name: Publish Klear360 Svelte to Chromatic
+        uses: chromaui/action@v1
+        if: steps.changesets.outputs.published == 'true' || github.event_name == 'workflow_dispatch' # run when the package is published via changeset or if a release is triggered manually.
+        with:
+          token: ${{ env.GITHUB_ACCESS_TOKEN }}
+          projectToken: ${{ secrets.CHROMATIC_SVELTE_PROJECT_TOKEN }}
+          workingDir: packages/klear360-svelte
+          storybookBaseDir: packages/klear360-svelte
+          buildScriptName: build-storybook
+          exitOnceUploaded: true
+          onlyChanged: true
+          untraced: '**/package.json'
+          traceChanged: 'expanded'
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
