@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Table as ReactTable } from '@table-library/react-table-library/table';
 import { useTheme as useTableTheme } from '@table-library/react-table-library/theme';
 import type { MiddlewareFunction } from '@table-library/react-table-library/types/common';
-import { useSort } from '@table-library/react-table-library/sort';
 import { usePagination } from '@table-library/react-table-library/pagination';
 import {
   SelectClickTypes,
@@ -12,24 +11,35 @@ import {
 import { useTree } from '@table-library/react-table-library/tree';
 import styled from 'styled-components';
 import usePresence from 'use-presence';
-import type { TableContextType } from './TableContext';
-import { TableContext } from './TableContext';
+import type { TableDataContextType, TableRowContextType } from './TableContext';
+import { TableDataContext, TableRowContext } from './TableContext';
 import { ComponentIds } from './componentIds';
 import {
   checkboxCellWidth,
   firstColumnStickyZIndex,
+  stickyHeaderColumnZIndex,
   refreshWrapperZIndex,
   tableBackgroundColor,
   tablePagination,
+  tableRow,
   classes,
 } from './tokens';
 import type {
   TableProps,
   TableNode,
+  TableData,
   Identifier,
   TablePaginationType,
   TableHeaderRowProps,
+  TableSortOrderEntry,
 } from './types';
+import { applyMultiSort } from './sort/applyMultiSort';
+import { toggleTableSort } from './sort/toggleTableSort';
+import { collectGroupHeaderIds } from './utils/collectGroupHeaderIds';
+import {
+  buildTableFromColumnConfig,
+  gridTemplateColumnsFromConfig,
+} from './buildColumnsFromConfig';
 import { getTableBodyStyles } from './commonStyles';
 import { TableSurface } from './TableSurface.web';
 import { makeBorderSize, makeMotionTime, makeSpace } from '~utils';
@@ -48,7 +58,6 @@ import getIn from '~utils/lodashButBetter/get';
 import { makeAccessible } from '~utils/makeAccessible';
 import { useIsMobile } from '~utils/useIsMobile';
 import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
-import { useIsomorphicLayoutEffect } from '~utils/useIsomorphicLayoutEffect';
 import { useListViewContext } from '~components/ListView/ListViewContext';
 
 const rowSelectType: Record<
@@ -77,11 +86,12 @@ const getTableHeaderCellCount = (children: (data: []) => React.ReactElement): nu
       const tableHeaderChildrenArray = React.isValidElement(tableHeader)
         ? React.Children.toArray(tableHeader.props.children)
         : null;
-      const tableHeaderRow = tableHeaderChildrenArray?.find(
+      const tableHeaderRows = tableHeaderChildrenArray?.filter(
         (child) => getComponentId(child) === ComponentIds.TableHeaderRow,
       );
-      const tableHeaderRowChildrenArray = React.isValidElement(tableHeaderRow)
-        ? React.Children.toArray(tableHeaderRow.props.children)
+      const leafTableHeaderRow = tableHeaderRows?.[tableHeaderRows.length - 1];
+      const tableHeaderRowChildrenArray = React.isValidElement(leafTableHeaderRow)
+        ? React.Children.toArray(leafTableHeaderRow.props.children)
         : null;
       const tableHeaderCells = tableHeaderRowChildrenArray
         ? tableHeaderRowChildrenArray.filter(
@@ -174,7 +184,8 @@ const StyledSkeletonRow = styled(BaseBox)<{ $columns: number; $isHeader?: boolea
 );
 
 const _Table = <Item,>({
-  children,
+  children: childrenProp,
+  columns,
   data,
   multiSelectTrigger = 'row',
   selectionType = 'none',
@@ -182,6 +193,11 @@ const _Table = <Item,>({
   isHeaderSticky,
   isFooterSticky,
   isFirstColumnSticky,
+  stickyColumnCount: stickyColumnCountProp,
+  stickyColumnWidths,
+  isLastColumnSticky,
+  trailingStickyColumnCount: trailingStickyColumnCountProp,
+  trailingStickyColumnWidths,
   rowDensity = 'normal',
   onSortChange,
   sortFunctions,
@@ -194,15 +210,154 @@ const _Table = <Item,>({
   isRefreshing = false,
   showBorderedCells = false,
   defaultSelectedIds = [],
+  selectedIds: selectedIdsProp,
+  initialSort,
+  expandedRowIds: expandedRowIdsProp,
+  defaultExpandedRowIds,
+  onExpandedRowIdsChange,
   backgroundColor = tableBackgroundColor,
   isGrouped = false,
   checkboxDisplay = 'always',
+  filterFunctions,
+  filterConfig = {},
+  columnFilterValues: columnFilterValuesProp,
+  defaultColumnFilterValues = {},
+  onColumnFilterValuesChange,
+  globalFilterValue: globalFilterValueProp,
+  defaultGlobalFilterValue = '',
+  onGlobalFilterValueChange,
+  showHeaderFilterRow = true,
   ...rest
 }: TableProps<Item>): React.ReactElement => {
   const { theme, colorScheme } = useTheme();
   const { isInsideListView } = useListViewContext();
-  const [selectedRows, setSelectedRows] = React.useState<TableNode<unknown>['id'][]>(
-    selectionType !== 'none' ? defaultSelectedIds : [],
+
+  if (__DEV__) {
+    if (columns && childrenProp) {
+      throwCompassError({
+        message: 'Use either `columns` or `children` on Table, not both.',
+        moduleName: 'Table',
+      });
+    }
+    if (!columns && !childrenProp) {
+      throwCompassError({
+        message: 'Table requires `children` or `columns`.',
+        moduleName: 'Table',
+      });
+    }
+  }
+
+  const children =
+    childrenProp ??
+    ((tableData: TableNode<Item>[]) => buildTableFromColumnConfig(columns ?? [], tableData));
+
+  const resolvedGridTemplateColumns =
+    gridTemplateColumns ??
+    (columns?.length ? gridTemplateColumnsFromConfig(columns) : undefined);
+
+  const [internalGlobalFilterValue, setInternalGlobalFilterValue] = React.useState(
+    defaultGlobalFilterValue,
+  );
+  const globalFilterValue = globalFilterValueProp ?? internalGlobalFilterValue;
+
+  const setGlobalFilterValue = useCallback(
+    (value: string): void => {
+      if (globalFilterValueProp === undefined) {
+        setInternalGlobalFilterValue(value);
+      }
+      onGlobalFilterValueChange?.(value);
+    },
+    [globalFilterValueProp, onGlobalFilterValueChange],
+  );
+
+  const [internalColumnFilterValues, setInternalColumnFilterValues] = React.useState<
+    Record<string, string | string[]>
+  >(defaultColumnFilterValues);
+  const columnFilterValues = columnFilterValuesProp ?? internalColumnFilterValues;
+
+  const setColumnFilterValue = useCallback(
+    (key: string, value: string | string[]): void => {
+      const nextValues = { ...columnFilterValues, [key]: value };
+      if (columnFilterValuesProp === undefined) {
+        setInternalColumnFilterValues(nextValues);
+      }
+      onColumnFilterValuesChange?.(nextValues);
+    },
+    [columnFilterValues, columnFilterValuesProp, onColumnFilterValuesChange],
+  );
+
+  const filterableColumns = useMemo(() => Object.keys(filterFunctions ?? {}), [filterFunctions]);
+
+  const activeColumnFilters = useMemo(
+    () =>
+      Object.entries(columnFilterValues).filter(([, value]) =>
+        Array.isArray(value) ? value.length > 0 : Boolean(value),
+      ),
+    [columnFilterValues],
+  );
+
+  const applyFilters = useCallback(
+    (nodesToFilter: TableNode<Item>[]): TableNode<Item>[] => {
+      if (!filterFunctions || (activeColumnFilters.length === 0 && !globalFilterValue)) {
+        return nodesToFilter;
+      }
+      return nodesToFilter
+        .filter((node) => {
+          const passesColumnFilters = activeColumnFilters.every(([key, value]) => {
+            const filterFn = filterFunctions[key];
+            return filterFn ? filterFn(node, value) : true;
+          });
+          if (!passesColumnFilters) return false;
+          if (!globalFilterValue) return true;
+          return Object.values(filterFunctions).some((filterFn) =>
+            filterFn(node, globalFilterValue),
+          );
+        })
+        .map((node) => {
+          const nodeWithChildren = node as TableNode<Item> & { nodes?: TableNode<Item>[] };
+          return Array.isArray(nodeWithChildren.nodes)
+            ? { ...node, nodes: applyFilters(nodeWithChildren.nodes) }
+            : node;
+        });
+    },
+    [filterFunctions, activeColumnFilters, globalFilterValue],
+  );
+
+  const filteredData: TableData<Item> = useMemo(
+    () =>
+      activeColumnFilters.length > 0 || globalFilterValue
+        ? { nodes: applyFilters(data.nodes) }
+        : data,
+    [data, applyFilters, activeColumnFilters, globalFilterValue],
+  );
+
+  const [sortOrder, setSortOrder] = React.useState<TableSortOrderEntry[]>(() =>
+    initialSort?.sortKey && sortFunctions?.[initialSort.sortKey]
+      ? [{ sortKey: initialSort.sortKey, direction: initialSort.direction }]
+      : [],
+  );
+
+  const sortedFilteredData: TableData<Item> = useMemo(() => {
+    if (!sortFunctions || sortOrder.length === 0) {
+      return filteredData;
+    }
+    return {
+      nodes: applyMultiSort(filteredData.nodes, sortOrder, sortFunctions),
+    };
+  }, [filteredData, sortFunctions, sortOrder]);
+
+  const [internalSelectedRows, setInternalSelectedRows] = React.useState<
+    TableNode<unknown>['id'][]
+  >(selectionType !== 'none' ? defaultSelectedIds : []);
+  const isSelectionControlled = selectedIdsProp !== undefined;
+  const selectedRows = isSelectionControlled ? selectedIdsProp : internalSelectedRows;
+  const setSelectedRows = useCallback(
+    (ids: Identifier[]): void => {
+      if (!isSelectionControlled) {
+        setInternalSelectedRows(ids);
+      }
+    },
+    [isSelectionControlled],
   );
   const [disabledRows, setDisabledRows] = React.useState<TableNode<unknown>['id'][]>([]);
   const [totalItems, setTotalItems] = React.useState(data.nodes.length || 0);
@@ -215,11 +370,51 @@ const _Table = <Item,>({
   const [hasHoverActions, setHasHoverActions] = React.useState(false);
   const tableRootComponent = children([]);
   const isVirtualized = getComponentId(tableRootComponent) === ComponentIds.VirtualizedTable;
-  // Need to make header is sticky if first column is sticky otherwise the first header cell will not be sticky
-  const shouldHeaderBeSticky = isVirtualized || isHeaderSticky || isFirstColumnSticky;
+
+  if (__DEV__ && isGrouped && isVirtualized) {
+    throwCompassError({
+      message:
+        '`isGrouped` and virtualized tables are not supported together — collapsed groups will still render incorrectly.',
+      moduleName: 'Table',
+    });
+  }
 
   const isMobile = useIsMobile();
   const lastHoverActionsColWidth = isMobile ? '1fr' : '0px';
+
+  const requestedStickyColumnCount = stickyColumnCountProp ?? (isFirstColumnSticky ? 1 : 0);
+  const requestedTrailingStickyColumnCount =
+    trailingStickyColumnCountProp ?? (isLastColumnSticky ? 1 : 0);
+
+  if (__DEV__) {
+    if (
+      requestedStickyColumnCount > 1 &&
+      (!stickyColumnWidths || stickyColumnWidths.length < requestedStickyColumnCount)
+    ) {
+      throwCompassError({
+        message:
+          '`stickyColumnWidths` must provide a pixel width for each of the `stickyColumnCount` columns when freezing more than one column.',
+        moduleName: 'Table',
+      });
+    }
+    if (
+      requestedTrailingStickyColumnCount > 1 &&
+      (!trailingStickyColumnWidths ||
+        trailingStickyColumnWidths.length < requestedTrailingStickyColumnCount)
+    ) {
+      throwCompassError({
+        message:
+          '`trailingStickyColumnWidths` must provide a pixel width for each of the `trailingStickyColumnCount` columns when freezing more than one column.',
+        moduleName: 'Table',
+      });
+    }
+  }
+
+  const stickyColumnCount = isMobile ? 0 : requestedStickyColumnCount;
+  const trailingStickyColumnCount = isMobile ? 0 : requestedTrailingStickyColumnCount;
+
+  const shouldHeaderBeSticky =
+    isVirtualized || isHeaderSticky || stickyColumnCount > 0 || trailingStickyColumnCount > 0;
 
   const {
     isEntering: isRefreshSpinnerEntering,
@@ -230,71 +425,83 @@ const _Table = <Item,>({
     transitionDuration: theme.motion.duration.quick,
   });
 
-  // Table Theme
   const columnCount = getTableHeaderCellCount(children);
-  const firstColumnStickyHeaderCellCSS = isFirstColumnSticky
-    ? `
-  &:nth-of-type(1) {
-    left: 0 !important;
+
+  const getStickyColumnsCSS = useCallback(
+    (zIndex: number): string => {
+      if (stickyColumnCount < 1 && trailingStickyColumnCount < 1) return '';
+
+      const isMultiSelect = selectionType === 'multiple';
+      const lastStickyBoxShadow = showBorderedCells
+        ? `box-shadow: 1px 0 0 0 ${getIn(theme.colors, tableRow.borderColor)} !important;`
+        : '';
+      const stickyRule = (domIndex: number, left: number, isLastSticky: boolean): string => `
+  &:nth-of-type(${domIndex}) {
+    left: ${left}px !important;
     position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
+    z-index: ${zIndex} !important;
+    ${isLastSticky ? lastStickyBoxShadow : ''}
   }
-  /* Higher z-index for sticky first column cells that also span rows to prevent stacking issues */
-  &:nth-of-type(1).${classes.HAS_ROW_SPANNING} {
-    z-index: 3 !important;
-  }
-  ${
-    selectionType === 'multiple' &&
-    `&:nth-of-type(2) {
-    left: ${checkboxCellWidth}px !important;
+  &:nth-of-type(${domIndex}).${classes.HAS_ROW_SPANNING} {
+    z-index: ${zIndex + 1} !important;
+  }`;
+
+      const rules: string[] = [];
+      let cumulativeLeft = 0;
+      if (isMultiSelect && stickyColumnCount > 0) {
+        rules.push(stickyRule(1, 0, false));
+        cumulativeLeft = checkboxCellWidth;
+      }
+      for (let i = 0; i < stickyColumnCount; i += 1) {
+        const domIndex = i + 1 + (isMultiSelect ? 1 : 0);
+        rules.push(stickyRule(domIndex, cumulativeLeft, i === stickyColumnCount - 1));
+        cumulativeLeft += Number.parseFloat(stickyColumnWidths?.[i] ?? '0');
+      }
+
+      if (trailingStickyColumnCount > 0) {
+        const trailingStickyRule = (
+          domIndexFromEnd: number,
+          right: number,
+          isFirstTrailingSticky: boolean,
+        ): string => `
+  &:nth-last-of-type(${domIndexFromEnd}) {
+    right: ${right}px !important;
     position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
+    z-index: ${zIndex} !important;
+    ${isFirstTrailingSticky ? lastStickyBoxShadow : ''}
   }
-  `
-  }`
-    : '';
-  const firstColumnStickyFooterCellCSS = isFirstColumnSticky
-    ? `
-  &:nth-of-type(1) {
-    left: 0 !important;
-    position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
-  }
-  /* Higher z-index for sticky first column cells that also span rows to prevent stacking issues */
-  &:nth-of-type(1).${classes.HAS_ROW_SPANNING} {
-    z-index: 3 !important;
-  }
-  ${
-    selectionType === 'multiple' &&
-    `&:nth-of-type(2) {
-    left: ${checkboxCellWidth}px !important;
-    position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
-  }
-  `
-  }`
-    : '';
-  const firstColumnStickyBodyCellCSS = isFirstColumnSticky
-    ? `
-  &:nth-of-type(1) {
-    left: 0 !important;
-    position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
-  }
-  /* Higher z-index for sticky first column cells that also span rows to prevent stacking issues */
-  &:nth-of-type(1).${classes.HAS_ROW_SPANNING} {
-    z-index: 3 !important;
-  }
-  ${
-    selectionType === 'multiple' &&
-    `&:nth-of-type(2) {
-    left: ${checkboxCellWidth}px !important;
-    position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
-  }
-  `
-  }`
-    : '';
+  &:nth-last-of-type(${domIndexFromEnd}).${classes.HAS_ROW_SPANNING} {
+    z-index: ${zIndex + 1} !important;
+  }`;
+
+        const trailingDomOffset = hasHoverActions ? 1 : 0;
+        let cumulativeRight = 0;
+        for (let i = 0; i < trailingStickyColumnCount; i += 1) {
+          const domIndexFromEnd = i + 1 + trailingDomOffset;
+          rules.push(trailingStickyRule(domIndexFromEnd, cumulativeRight, i === 0));
+          cumulativeRight += Number.parseFloat(trailingStickyColumnWidths?.[i] ?? '0');
+        }
+      }
+
+      return rules.join('\n');
+    },
+    [
+      stickyColumnCount,
+      trailingStickyColumnCount,
+      selectionType,
+      stickyColumnWidths,
+      trailingStickyColumnWidths,
+      hasHoverActions,
+      showBorderedCells,
+      theme,
+    ],
+  );
+  const stickyColumnsCSS = useMemo(() => getStickyColumnsCSS(firstColumnStickyZIndex), [
+    getStickyColumnsCSS,
+  ]);
+  const stickyHeaderColumnsCSS = useMemo(() => getStickyColumnsCSS(stickyHeaderColumnZIndex), [
+    getStickyColumnsCSS,
+  ]);
 
   const tableTheme = useTableTheme({
     Table: `
@@ -314,36 +521,37 @@ const _Table = <Item,>({
         : ''
     }
     --data-table-library_grid-template-columns: ${
-      gridTemplateColumns
-        ? `${gridTemplateColumns} ${hasHoverActions ? lastHoverActionsColWidth : ''}`
+      resolvedGridTemplateColumns
+        ? `${selectionType === 'multiple' ? 'min-content' : ''} ${resolvedGridTemplateColumns} ${
+            hasHoverActions ? lastHoverActionsColWidth : ''
+          }`
         : ` ${
             selectionType === 'multiple' ? 'min-content' : ''
           } repeat(${columnCount},minmax(100px, 1fr)) ${
             hasHoverActions ? lastHoverActionsColWidth : ''
-          } !important;`
+          }`
     } !important;
     background-color: ${getIn(theme.colors, backgroundColor)};
+    isolation: isolate;
     `,
     HeaderCell: `
     position: ${shouldHeaderBeSticky ? 'sticky' : 'relative'};
-    
     top: ${shouldHeaderBeSticky ? '0' : undefined};
-    ${firstColumnStickyHeaderCellCSS}
+    ${stickyHeaderColumnsCSS}
     `,
     Cell: `
-    ${firstColumnStickyBodyCellCSS}
+    ${stickyColumnsCSS}
     `,
     FooterCell: `
     position: ${isFooterSticky ? 'sticky' : 'relative'};
     bottom: ${isFooterSticky ? '0' : undefined};
-    ${firstColumnStickyFooterCellCSS}
+    ${stickyColumnsCSS}
     `,
   });
 
   useEffect(() => {
-    // Get the total number of items
-    setTotalItems(data.nodes.length);
-  }, [data.nodes]);
+    setTotalItems(sortedFilteredData.nodes.length);
+  }, [sortedFilteredData.nodes]);
 
   // Selection Logic
   const onSelectChange: MiddlewareFunction = (_, state): void => {
@@ -386,7 +594,7 @@ const _Table = <Item,>({
         rowSelectConfig.fns.onToggleById(id);
       }
     },
-    [rowSelectConfig.fns],
+    [rowSelectConfig.fns, selectionType, isGrouped],
   );
 
   const deselectAllRows = useMemo(
@@ -398,72 +606,114 @@ const _Table = <Item,>({
 
   const toggleAllRowsSelection = useMemo(
     () => (): void => {
-      if (selectedRows.length > 0) {
-        rowSelectConfig.fns.onRemoveAll();
-      } else if (isGrouped) {
-        rowSelectConfig.fns.onToggleAll({});
-      } else {
-        const ids = data.nodes
-          .map((item: TableNode<Item>) => (disabledRows.includes(item.id) ? null : item.id))
-          .filter(Boolean) as Identifier[];
+      if (isGrouped) {
+        if (selectedRows.length > 0) {
+          rowSelectConfig.fns.onRemoveAll();
+        } else {
+          rowSelectConfig.fns.onToggleAll({});
+        }
+        return;
+      }
 
-        rowSelectConfig.fns.onAddAll(ids);
+      const visibleSelectableIds = sortedFilteredData.nodes
+        .map((item: TableNode<Item>) => (disabledRows.includes(item.id) ? null : item.id))
+        .filter(Boolean) as Identifier[];
+      const isAllVisibleSelected =
+        visibleSelectableIds.length > 0 &&
+        visibleSelectableIds.every((id) => selectedRows.includes(id));
+
+      if (isAllVisibleSelected) {
+        rowSelectConfig.fns.onRemoveByIds(visibleSelectableIds);
+      } else {
+        const idsToAdd = visibleSelectableIds.filter((id) => !selectedRows.includes(id));
+        rowSelectConfig.fns.onAddByIds(idsToAdd, {});
       }
     },
-    [rowSelectConfig.fns, data.nodes, selectedRows, disabledRows],
+    [rowSelectConfig.fns, sortedFilteredData.nodes, selectedRows, disabledRows, isGrouped],
   );
+
+  const defaultExpandedIds = useMemo(
+    () =>
+      defaultExpandedRowIds ??
+      (isGrouped ? collectGroupHeaderIds(data.nodes) : []),
+    [data.nodes, defaultExpandedRowIds, isGrouped],
+  );
+
+  const [internalExpandedRowIds, setInternalExpandedRowIds] = React.useState<Identifier[]>(
+    defaultExpandedIds,
+  );
+
+  const expandedRowIds = expandedRowIdsProp ?? internalExpandedRowIds;
+
+  const onTreeChange: MiddlewareFunction = (_, state): void => {
+    const ids: Identifier[] = state.ids ?? [];
+    if (expandedRowIdsProp === undefined) {
+      setInternalExpandedRowIds(ids);
+    }
+    onExpandedRowIdsChange?.(ids);
+  };
 
   const tree = useTree(
     isGrouped ? data : { nodes: [] },
-    {},
+    isGrouped
+      ? {
+          state: { ids: expandedRowIds },
+          onChange: onTreeChange,
+        }
+      : {},
     {
-      // Disable row click expand/collapse (fallback enables unwanted expand/collapse on row click)
       clickType: undefined,
-      // Disable all indentation for flat appearance
       treeYLevel: undefined,
     },
   );
 
-  useIsomorphicLayoutEffect(() => {
-    if (isGrouped && tree?.fns.onToggleAll) {
-      tree.fns.onToggleAll({ ids: [] });
-    }
-  }, []);
-
-  // Sort Logic
-  const handleSortChange: MiddlewareFunction = (_, state) => {
-    onSortChange?.({
-      sortKey: state.sortKey,
-      isSortReversed: state.reverse,
-    });
-  };
-
-  const sort = useSort(
-    data,
-    {
-      onChange: handleSortChange,
+  const toggleRowExpansionById = useCallback(
+    (id: Identifier): void => {
+      tree.fns.onToggleById(id);
     },
-    {
-      // @ts-expect-error ignore this, if sortFunctions is undefined, it will be ignored
-      sortFns: sortFunctions,
-    },
+    [tree.fns],
   );
 
-  const currentSortedState: TableContextType<Item>['currentSortedState'] = useMemo(() => {
+  const currentSortedState: TableDataContextType<Item>['currentSortedState'] = useMemo(() => {
+    const primary = sortOrder[0];
     return {
-      sortKey: sort.state.sortKey,
-      isSortReversed: sort.state.reverse,
+      sortKey: primary?.sortKey ?? '',
+      isSortReversed: primary?.direction === 'desc',
       sortableColumns: Object.keys(sortFunctions ?? {}),
+      sortOrder,
     };
-  }, [sort.state, sortFunctions]);
+  }, [sortOrder, sortFunctions]);
+
+  const onSortChangeRef = useRef(onSortChange);
+  onSortChangeRef.current = onSortChange;
+
+  const notifySortChange = useCallback((order: TableSortOrderEntry[]): void => {
+    const primary = order[0];
+    if (!primary) {
+      onSortChangeRef.current?.({ sortKey: '', isSortReversed: false });
+      return;
+    }
+    onSortChangeRef.current?.({
+      sortKey: primary.sortKey,
+      isSortReversed: primary.direction === 'desc',
+    });
+  }, []);
 
   const toggleSort = useCallback(
-    (sortKey: string): void => {
-      sort.fns.onToggleSort({
-        sortKey,
+    (sortKey: string, isMultiSort?: boolean): void => {
+      if (!sortFunctions?.[sortKey]) {
+        return;
+      }
+      setSortOrder((current) => {
+        const next = toggleTableSort(current, sortKey, {
+          shiftKey: isMultiSort,
+          removableSort: true,
+        });
+        notifySortChange(next);
+        return next;
       });
     },
-    [sort.fns],
+    [sortFunctions, notifySortChange],
   );
 
   // Pagination
@@ -477,7 +727,7 @@ const _Table = <Item,>({
       : undefined;
 
   const paginationConfig = usePagination(
-    data,
+    sortedFilteredData,
     {
       state: {
         page: 0,
@@ -522,77 +772,105 @@ const _Table = <Item,>({
     }
   }
 
-  // Table Context
-  const tableContext: TableContextType<Item> = useMemo(
+  const tableRowContext: TableRowContextType = useMemo(
     () => ({
       selectionType,
       selectedRows,
-      totalItems,
       toggleRowSelectionById,
       toggleAllRowsSelection,
       deselectAllRows,
       rowDensity,
-      toggleSort,
-      currentSortedState,
-      setPaginationPage,
-      setPaginationRowSize,
-      currentPaginationState,
       showStripedRows,
       disabledRows,
       setDisabledRows,
-      paginationType,
-      setPaginationType,
       backgroundColor,
       headerRowDensity,
       setHeaderRowDensity,
       showBorderedCells,
+      shouldHeaderBeSticky,
       hasHoverActions,
       setHasHoverActions,
       multiSelectTrigger,
       columnCount,
-      gridTemplateColumns,
+      gridTemplateColumns: resolvedGridTemplateColumns,
       isVirtualized,
-      tableData: data.nodes,
       isGrouped,
+      expandedRowIds,
+      toggleRowExpansionById,
       tableToolbarPlacement: toolbar?.props?.placement ?? 'inline',
       checkboxDisplay,
     }),
     [
       selectionType,
       selectedRows,
-      totalItems,
       toggleRowSelectionById,
       toggleAllRowsSelection,
       deselectAllRows,
-      gridTemplateColumns,
+      resolvedGridTemplateColumns,
       rowDensity,
-      toggleSort,
       columnCount,
-      currentSortedState,
-      setPaginationPage,
-      setPaginationRowSize,
-      currentPaginationState,
       showStripedRows,
       disabledRows,
       setDisabledRows,
-      paginationType,
-      setPaginationType,
       backgroundColor,
       headerRowDensity,
       setHeaderRowDensity,
       showBorderedCells,
+      shouldHeaderBeSticky,
       hasHoverActions,
       setHasHoverActions,
       multiSelectTrigger,
       isVirtualized,
-      data,
       isGrouped,
+      toolbar?.props?.placement,
       checkboxDisplay,
+      expandedRowIds,
+      toggleRowExpansionById,
+    ],
+  );
+
+  const tableDataContext: TableDataContextType<Item> = useMemo(
+    () => ({
+      totalItems,
+      toggleSort,
+      currentSortedState,
+      setPaginationPage,
+      setPaginationRowSize,
+      currentPaginationState,
+      paginationType,
+      setPaginationType,
+      tableData: sortedFilteredData.nodes,
+      globalFilterValue,
+      setGlobalFilterValue,
+      columnFilterValues,
+      setColumnFilterValue,
+      filterableColumns,
+      filterConfig,
+      showHeaderFilterRow,
+    }),
+    [
+      totalItems,
+      toggleSort,
+      currentSortedState,
+      setPaginationPage,
+      setPaginationRowSize,
+      currentPaginationState,
+      paginationType,
+      setPaginationType,
+      sortedFilteredData.nodes,
+      globalFilterValue,
+      setGlobalFilterValue,
+      columnFilterValues,
+      setColumnFilterValue,
+      filterableColumns,
+      filterConfig,
+      showHeaderFilterRow,
     ],
   );
 
   return (
-    <TableContext.Provider value={tableContext}>
+    <TableRowContext.Provider value={tableRowContext}>
+      <TableDataContext.Provider value={tableDataContext}>
       <TableSurface
         colorScheme={colorScheme}
         borderRadius={isInsideListView ? 'none' : 'medium'}
@@ -673,11 +951,11 @@ const _Table = <Item,>({
             <StyledReactTable
               role="table"
               layout={{ fixedHeader: shouldHeaderBeSticky, horizontalScroll: true }}
-              data={data}
+              data={sortedFilteredData}
               // @ts-expect-error ignore this, theme clashes with styled-component's theme. We're using useTheme from blade to get actual theme
               theme={tableTheme}
               select={selectionType !== 'none' ? rowSelectConfig : null}
-              sort={sortFunctions ? sort : null}
+              sort={null}
               tree={isGrouped ? tree : null}
               $styledProps={{
                 height,
@@ -697,9 +975,41 @@ const _Table = <Item,>({
           </BaseBox>
         )}
       </TableSurface>
-    </TableContext.Provider>
+      </TableDataContext.Provider>
+    </TableRowContext.Provider>
   );
 };
+
+/**
+ * Table — displays tabular data with optional sorting, filtering, selection, grouping, and
+ * virtualization. Compose with `TableHeader`, `TableBody`, `TableRow`, and `TableCell`, or use
+ * {@link CompassDataTable} for a Prime-style experience shell.
+ *
+ * @example
+ * ```tsx
+ * <Table data={{ nodes }} sortFunctions={sortFunctions}>
+ *   {(rows) => (
+ *     <>
+ *       <TableHeader>
+ *         <TableHeaderRow>
+ *           <TableHeaderCell headerKey="NAME">Name</TableHeaderCell>
+ *         </TableHeaderRow>
+ *       </TableHeader>
+ *       <TableBody>
+ *         {rows.map((row) => (
+ *           <TableRow key={row.id} item={row}>
+ *             <TableCell>{row.name}</TableCell>
+ *           </TableRow>
+ *         ))}
+ *       </TableBody>
+ *     </>
+ *   )}
+ * </Table>
+ * ```
+ *
+ * ----
+ * Design Storybook link — add URL when available (confirm path with design portal).
+ */
 const Table = assignWithoutSideEffects(_Table, {
   componentId: ComponentIds.Table,
 });

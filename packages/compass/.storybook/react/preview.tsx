@@ -82,7 +82,15 @@ export const parameters = {
           'useTheme',
         ],
         'Components',
-        ['*', 'Interaction Tests', 'KitchenSink'],
+        [
+          '*',
+          [
+            'Table',
+            ['Guide', 'Examples', 'Experience', 'Features', 'Parts', '*'],
+          ],
+          'Interaction Tests',
+          'KitchenSink',
+        ],
         'Patterns',
         ['ListView'],
         'Motion',

@@ -13,7 +13,7 @@ import { IconButton } from '~components/Button/IconButton';
 import { CopyIcon, TrashIcon } from '~components/Icons';
 
 export default {
-  title: 'Components/Table/API',
+  title: 'Components/Table/Features/Hover Actions',
   component: TableHeaderRow,
   args: {},
   argTypes: {

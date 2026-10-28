@@ -15,7 +15,7 @@ import { CompassProvider } from '~components/CompassProvider';
 import { compassTheme } from '~tokens/theme';
 
 export default {
-  title: 'Components/Table/API',
+  title: 'Components/Table/Features/Design Reference',
   component: TableComponent,
 } as Meta<TableProps<unknown>>;
 

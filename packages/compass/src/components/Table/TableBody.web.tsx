@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Body, Row, Cell } from '@table-library/react-table-library/table';
 import { Virtualized } from '@table-library/react-table-library/virtualized';
 import styled from 'styled-components';
-import { useTableContext } from './TableContext';
+import { useTableDataContext, useTableRowContext } from './TableContext';
 import { checkboxCellWidth, classes, tableRow } from './tokens';
 import { ComponentIds } from './componentIds';
 import type {
@@ -30,6 +30,8 @@ import { size } from '~tokens/global';
 import { makeAccessible } from '~utils/makeAccessible';
 import { useIsomorphicLayoutEffect } from '~utils/useIsomorphicLayoutEffect';
 import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
+import { IconButton } from '~components/Button/IconButton';
+import { ChevronDownIcon, ChevronRightIcon } from '~components/Icons';
 const StyledBody = styled(Body)<{
   $isSelectable: boolean;
   $showStripedRows: boolean;
@@ -59,7 +61,7 @@ const StyledBody = styled(Body)<{
 });
 
 const _TableBody = <Item,>({ children, ...rest }: TableBodyProps<Item>): React.ReactElement => {
-  const { showStripedRows, selectionType } = useTableContext();
+  const { showStripedRows, selectionType } = useTableRowContext();
   const isSelectable = selectionType !== 'none';
 
   return (
@@ -136,7 +138,7 @@ const _TableCell = ({
   ...rest
 }: TableCellProps): React.ReactElement => {
   const isChildrenString = typeof children === 'string';
-  const { selectionType, rowDensity, showStripedRows, backgroundColor } = useTableContext();
+  const { selectionType, rowDensity, showStripedRows, backgroundColor } = useTableRowContext();
   const isSelectable = selectionType !== 'none';
 
   const hasRowSpan = Boolean(gridRowStart && gridRowEnd);
@@ -235,7 +237,7 @@ const StyledRow = styled(Row)<{
   $isGrouped: boolean;
   $isGroupHeader: boolean;
 }>(({ theme, $isSelectable, $isHoverable, $showBorderedCells, $isGrouped, $isGroupHeader }) => {
-  const { hasHoverActions, checkboxDisplay, selectionType } = useTableContext();
+  const { hasHoverActions, checkboxDisplay, selectionType } = useTableRowContext();
 
   const rowBackgroundTransition = `background-color ${makeMotionTime(
     getIn(theme.motion, tableRow.backgroundColorMotionDuration),
@@ -361,7 +363,9 @@ const _TableRow = <Item,>({
     isVirtualized,
     isGrouped,
     multiSelectTrigger,
-  } = useTableContext();
+    expandedRowIds,
+    toggleRowExpansionById,
+  } = useTableRowContext();
   const isSelectable = selectionType !== 'none';
   const isMultiSelect = selectionType === 'multiple';
   const isSelected = selectedRows?.includes(item.id);
@@ -405,6 +409,46 @@ const _TableRow = <Item,>({
     }
   }, [hasHoverActions]);
 
+  const isExpanded = expandedRowIds.includes(item.id);
+
+  const bodyCells = useMemo(() => {
+    if (!isGroupHeader || !isGrouped) {
+      return children;
+    }
+    const childArray = React.Children.toArray(children);
+    if (childArray.length === 0) {
+      return children;
+    }
+    const [firstChild, ...restChildren] = childArray;
+    if (!React.isValidElement(firstChild)) {
+      return children;
+    }
+    const firstElement = firstChild as React.ReactElement<{ children?: React.ReactNode }>;
+    const enhancedFirst = React.cloneElement(firstElement, {
+      children: (
+        <BaseBox display="flex" flexDirection="row" alignItems="center" gap="spacing.2">
+          <IconButton
+            icon={isExpanded ? ChevronDownIcon : ChevronRightIcon}
+            accessibilityLabel={isExpanded ? 'Collapse group' : 'Expand group'}
+            onClick={(event) => {
+              event.stopPropagation();
+              toggleRowExpansionById(item.id);
+            }}
+          />
+          {firstElement.props.children}
+        </BaseBox>
+      ),
+    });
+    return [enhancedFirst, ...restChildren];
+  }, [
+    children,
+    isExpanded,
+    isGroupHeader,
+    isGrouped,
+    item.id,
+    toggleRowExpansionById,
+  ]);
+
   return (
     <StyledRow
       disabled={isDisabled}
@@ -435,7 +479,7 @@ const _TableRow = <Item,>({
           isIndeterminate={isIndeterminate}
         />
       )}
-      {children}
+      {bodyCells}
       {hoverActions ? (
         <TableCell _hasPadding={false}>
           <BaseBox
@@ -481,7 +525,8 @@ const _Virtulized = <Item,>({
   children,
 }: VirtualizedWrapperProps): React.ReactElement => {
   const [parsedHeader = null, parsedBody = null] = React.Children.toArray(children);
-  const { rowDensity, tableData } = useTableContext<Item>();
+  const { rowDensity } = useTableRowContext();
+  const { tableData } = useTableDataContext<Item>();
   const _tableRow = Number(tableRow.minHeight[rowDensity]);
 
   const _rowHeight = (item: TableNode<Item>, index: number): number => {

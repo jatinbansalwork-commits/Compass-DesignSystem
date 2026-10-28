@@ -20,6 +20,23 @@ type TableBackgroundColors = `surface.background.gray.${DotNotationToken<
   Theme['colors']['surface']['background']['gray']
 >}`;
 
+type TableSortDirection = 'asc' | 'desc';
+
+type TableSortOrderEntry = {
+  sortKey: string;
+  direction: TableSortDirection;
+};
+
+type TableInitialSort = {
+  sortKey: string;
+  direction: TableSortDirection;
+};
+
+type TableColumnFilterConfig = {
+  type: 'dropdown' | 'multiselect';
+  options: { label: string; value: string }[];
+};
+
 type RowHeightType = number | ((item: TableLibraryTableNode, index: number) => number);
 
 /**
@@ -85,6 +102,10 @@ type TableHeaderRowProps = {
    * The header row is now always compact (36px height) regardless of this prop value.
    **/
   rowDensity?: TableProps<unknown>['rowDensity'];
+  /** @private */
+  _isLeafHeaderRow?: boolean;
+  /** @private */
+  _stickyTopOffsetPx?: number;
 } & DataAnalyticsAttribute;
 
 type TableHeaderCellProps = {
@@ -106,15 +127,20 @@ type TableHeaderCellProps = {
   textAlign?: 'left' | 'center' | 'right';
 
   _hasPadding?: boolean;
+  /** @private */
+  _stickyTopOffsetPx?: number;
 } & TableCellGridSpanningProps &
   DataAnalyticsAttribute;
 
 type TableProps<Item> = {
   /**
-   * The children of the Table component should be a function that returns TableHeader, TableBody and TableFooter components.
-   * The function will be called with the tableData prop.
+   * Composable table markup. Omit when using declarative `columns` instead (mutually exclusive).
    */
-  children: (tableData: TableNode<Item>[]) => React.ReactElement;
+  children?: (tableData: TableNode<Item>[]) => React.ReactElement;
+  /**
+   * Declarative columns — Table builds header/body from config. Mutually exclusive with `children`.
+   */
+  columns?: TableColumnConfig<Item>[];
   /**
    * The data prop is an object with a nodes property that is an array of objects.
    * Each object in the array is a row in the table.
@@ -167,9 +193,30 @@ type TableProps<Item> = {
   isFooterSticky?: boolean;
   /**
    * The isFirstColumnSticky prop determines whether the first column is sticky or not.
-   * The default value is `false`.
+   * The default value is `false`. Equivalent to `stickyColumnCount={1}`.
    **/
   isFirstColumnSticky?: boolean;
+  /**
+   * Number of leading columns (after any multi-select checkbox column) to freeze while scrolling.
+   * `isFirstColumnSticky` is shorthand for `stickyColumnCount={1}` without `stickyColumnWidths`.
+   **/
+  stickyColumnCount?: number;
+  /**
+   * Pixel width for each leading sticky column, in order. Required when `stickyColumnCount` > 1.
+   **/
+  stickyColumnWidths?: string[];
+  /**
+   * Whether the last data column is sticky. Equivalent to `trailingStickyColumnCount={1}`.
+   **/
+  isLastColumnSticky?: boolean;
+  /**
+   * Number of trailing columns (before hover-actions column) to freeze while scrolling.
+   **/
+  trailingStickyColumnCount?: number;
+  /**
+   * Pixel width for each trailing sticky column, in order. Required when `trailingStickyColumnCount` > 1.
+   **/
+  trailingStickyColumnWidths?: string[];
   /**
    * The rowDensity prop determines the density of the table.
    * The rowDensity prop can be 'compact', 'normal', or'comfortable'.
@@ -238,6 +285,20 @@ type TableProps<Item> = {
    */
   defaultSelectedIds?: Identifier[];
   /**
+   * Controlled selected row ids. When set, selection state is driven by this prop and
+   * `onSelectionChange` still fires on user interaction.
+   */
+  selectedIds?: Identifier[];
+  /**
+   * Sort applied on mount before any header click. `sortKey` must exist in `sortFunctions`.
+   */
+  initialSort?: TableInitialSort;
+  /** Controlled expanded group row ids (`isGrouped`). */
+  expandedRowIds?: Identifier[];
+  /** Default expanded ids; defaults to all group-header ids. */
+  defaultExpandedRowIds?: Identifier[];
+  onExpandedRowIdsChange?: (ids: Identifier[]) => void;
+  /**
    * The backgroundColor prop determines the background color of the table.
    **/
   backgroundColor?: TableBackgroundColors | 'transparent';
@@ -260,6 +321,23 @@ type TableProps<Item> = {
    * @default 'always'
    */
   checkboxDisplay?: 'always' | 'on-hover';
+  filterFunctions?: Record<
+    string,
+    (item: TableNode<Item>, filterValue: string | string[]) => boolean
+  >;
+  filterConfig?: Record<string, TableColumnFilterConfig>;
+  columnFilterValues?: Record<string, string | string[]>;
+  defaultColumnFilterValues?: Record<string, string | string[]>;
+  onColumnFilterValuesChange?: (values: Record<string, string | string[]>) => void;
+  globalFilterValue?: string;
+  defaultGlobalFilterValue?: string;
+  onGlobalFilterValueChange?: (value: string) => void;
+  /**
+   * When `false`, skips the auto-injected per-column filter row under the header (filtering via
+   * `filterFunctions` / `columnFilterValues` still runs). Use with toolbar advanced filters.
+   * @default true
+   */
+  showHeaderFilterRow?: boolean;
 } & DataAnalyticsAttribute &
   StyledPropsCompass;
 
@@ -359,6 +437,25 @@ type TableCellProps = {
    **/
   backgroundColor?: TableBackgroundColors | 'transparent';
 } & TableCellGridSpanningProps &
+  DataAnalyticsAttribute;
+
+type TableColumnConfig<Item> = {
+  key: string;
+  header: React.ReactNode;
+  render: (item: TableNode<Item>, index: number) => React.ReactNode;
+  width?: string;
+  headerKey?: string;
+  textAlign?: TableCellProps['textAlign'];
+};
+
+type TableTitleDescriptionBehavior = 'truncate' | 'wrap';
+
+type TableTitleDescriptionCellProps = {
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  descriptionBehavior?: TableTitleDescriptionBehavior;
+  descriptionLines?: number;
+} & TestID &
   DataAnalyticsAttribute;
 
 type TableEditableCellProps = Pick<
@@ -547,6 +644,11 @@ type TableToolbarProps = {
   placement?: TableToolbarPlacement;
 } & DataAnalyticsAttribute;
 
+type TableToolbarSearchProps = {
+  placeholder?: string;
+  accessibilityLabel?: string;
+} & DataAnalyticsAttribute;
+
 type TableToolbarActionsProps = {
   children?: React.ReactNode;
 } & StyledPropsCompass &
@@ -662,7 +764,14 @@ export type {
   TablePaginationProps,
   TableToolbarProps,
   TableToolbarActionsProps,
+  TableToolbarSearchProps,
   TableToolbarPlacement,
+  TableColumnFilterConfig,
+  TableSortOrderEntry,
+  TableInitialSort,
+  TableColumnConfig,
+  TableTitleDescriptionCellProps,
+  TableTitleDescriptionBehavior,
   TableBackgroundColors,
   TablePaginationType,
   TablePaginationCommonProps,

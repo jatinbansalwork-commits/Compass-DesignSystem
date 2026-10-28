@@ -6,6 +6,23 @@ Table
 
 A table component that displays data in a grid format through rows and columns of cells. Table facilitates data organization and allows users to scan, sort, compare, and take action on large amounts of data. It supports features like row selection, pagination, sorting, sticky headers/footers, and customizable cell content.
 
+## Storybook layout
+
+In Storybook (`Components → Table`), stories are grouped for clarity:
+
+| Section | Use when |
+| -------- | -------- |
+| **Guide** | Orientation — start here |
+| **Table** (root) | `Table` props playground |
+| **Examples** | End-to-end recipes (sort, selection, sticky, loading, …) |
+| **Parts** | One subcomponent at a time (Header, Row, Toolbar, Pagination, …) |
+| **Features** | One behavior (filtering, grouping, nesting, spanning, virtualized, …) |
+| **Experience / CompassDataTable** | Optional Prime-style toolbar UX (`useTableExperienceController`, `CompassDataTable`) |
+
+See `packages/compass/src/components/Table/docs/STORYBOOK.md` for the maintainer file map.
+
+**Recent core APIs:** `selectedIds` (controlled selection), `initialSort`, multi-column sort via Shift+click on sortable headers, `showHeaderFilterRow` (hide inline filters when using toolbar/advanced filters).
+
 ## Important Constraints
 
 - `Table` `toolbar` prop only accepts `TableToolbar` component

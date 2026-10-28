@@ -38,6 +38,12 @@ const TableMeta: Meta = {
   title: 'Components/Table/Examples',
   component: Table,
   parameters: {
+    docs: {
+      description: {
+        component:
+          'Copy-paste recipes: sorting, selection, sticky regions, loading states, and editable cells. One story per common product pattern.',
+      },
+    },
     viewMode: 'story',
     options: {
       showPanel: false,

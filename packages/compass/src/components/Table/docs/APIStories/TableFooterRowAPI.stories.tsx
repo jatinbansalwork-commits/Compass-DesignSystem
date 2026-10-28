@@ -11,7 +11,7 @@ import { Code } from '~components/Typography';
 import { Badge } from '~components/Badge';
 
 export default {
-  title: 'Components/Table/API',
+  title: 'Components/Table/Parts/Footer Row',
   component: TableFooterRow,
   args: {},
   argTypes: {

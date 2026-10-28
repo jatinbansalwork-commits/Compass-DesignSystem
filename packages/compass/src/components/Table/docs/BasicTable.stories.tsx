@@ -29,6 +29,14 @@ import { CheckIcon, CloseIcon } from '~components/Icons';
 export default {
   title: 'Components/Table',
   component: TableComponent,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Overview and props playground for `Table`. For a map of all Table stories, open **Guide** under this category.',
+      },
+    },
+  },
   args: {
     selectionType: 'none',
     rowDensity: 'normal',
@@ -63,7 +71,7 @@ export default {
         <StoryPageWrapper
           componentDescription="A table component helps in displaying data in a grid format, through rows and columns of cells. Table facilitates data organisation and allow users to: scan, sort, compare, and take action on large amounts of data."
           componentName="Table"
-/>
+        />
       ),
     },
   },

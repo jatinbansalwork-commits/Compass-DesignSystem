@@ -15,7 +15,7 @@ import { Badge } from '~components/Badge';
 import { useTheme } from '~components/CompassProvider';
 
 export default {
-  title: 'Components/Table/API',
+  title: 'Components/Table/Parts/Pagination',
   component: TablePagination,
   parameters: {
     docs: {

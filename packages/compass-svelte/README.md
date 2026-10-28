@@ -1,11 +1,7 @@
 <br/>
 
 <p align="center">
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/klearnow/compass/refs/heads/master/branding/compass-original-dark-mode.min.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/klearnow/compass/refs/heads/master/branding/compass-original.min.svg">
-  <img width="450px" alt="Compass Design System Logo" src="https://raw.githubusercontent.com/klearnow/compass/refs/heads/master/branding/compass-original.min.svg">
-</picture>
+  <a href="https://design.klearnow.com"><strong>Compass Design System</strong></a>
 </p>
 
 <br/>
