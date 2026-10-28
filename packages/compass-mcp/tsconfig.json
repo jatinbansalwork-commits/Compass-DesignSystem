@@ -14,5 +14,5 @@
     "sourceMap": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "base-compass-template"]
+  "exclude": ["node_modules", "base-compass-template", "**/__tests__/**", "**/*.test.ts"]
 }

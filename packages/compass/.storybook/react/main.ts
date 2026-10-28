@@ -92,6 +92,9 @@ const config: StorybookConfig = {
     const react = (await import('@vitejs/plugin-react')).default;
 
     return mergeConfig(config, {
+      server: {
+        allowedHosts: ['localhost', '127.0.0.1'],
+      },
       plugins: [
         compassI18nifyAlias(),
         react(),

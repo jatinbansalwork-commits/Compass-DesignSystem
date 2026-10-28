@@ -1,16 +1,19 @@
 {
-  "name": "@klearnow/compass-mcp",
-  "version": "1.33.0",
+  "name": "@jatin_ux/compass-mcp",
+  "version": "1.0.0",
   "description": "Model Context Protocol server for Compass",
   "main": "dist/exports.js",
   "type": "module",
-  "bin": "dist/server.js",
+  "bin": {
+    "compass-mcp": "dist/server.js"
+  },
   "publishConfig": {
     "access": "public"
   },
   "repository": {
     "type": "git",
-    "url": "ssh://git@github.com/klearnow/compass.git"
+    "url": "https://github.com/jatinbansalwork-commits/Compass-DesignSystem.git",
+    "directory": "packages/compass-mcp"
   },
   "files": [
     "dist",

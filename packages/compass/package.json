@@ -116,7 +116,7 @@
     "react-native:patch-hermes": "node scripts/patch-storybook-hermes.js",
     "react-native:storybook:start": "yarn react-native:patch-hermes && cross-env FRAMEWORK=REACT_NATIVE react-native start --reset-cache",
     "react": "yarn run react:storybook",
-    "react:storybook": "node ./scripts/linkKlearnowDeps.mjs && cross-env FRAMEWORK=REACT storybook dev -c ./.storybook/react -p 9011 --host 127.0.0.1 --no-open",
+    "react:storybook": "node ./scripts/linkKlearnowDeps.mjs && cross-env FRAMEWORK=REACT storybook dev -c ./.storybook/react -p 9011 --host localhost --no-open",
     "react:storybook:build": "bash ./scripts/buildStorybook.sh",
     "react:storybook:serve": "http-server storybook-site --port 9009 --silent",
     "react:storybook:serve:test": "wait-on http://127.0.0.1:9009/ && yarn test:react:interaction",

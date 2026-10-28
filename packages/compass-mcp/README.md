@@ -1,6 +1,6 @@
 # Compass MCP
 
-[![npm version](https://img.shields.io/npm/v/@klearnow/compass-mcp.svg)](https://www.npmjs.com/package/@klearnow/compass-mcp)
+[![npm version](https://img.shields.io/npm/v/@jatin_ux/compass-mcp.svg)](https://www.npmjs.com/package/@jatin_ux/compass-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](https://www.typescriptlang.org/)
 
@@ -50,7 +50,7 @@ Create or update your `mcp.json` file with:
   "mcpServers": {
     "compass-mcp": {
       "command": "npx",
-      "args": ["-y", "@klearnow/compass-mcp@latest"]
+      "args": ["-y", "@jatin_ux/compass-mcp@latest"]
     }
   }
 }
@@ -65,7 +65,7 @@ Add the following to `claude_desktop_config.json`:
   "mcpServers": {
     "compass-mcp": {
       "command": "npx",
-      "args": ["-y", "@klearnow/compass-mcp@latest"]
+      "args": ["-y", "@jatin_ux/compass-mcp@latest"]
     }
   }
 }

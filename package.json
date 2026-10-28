@@ -45,7 +45,7 @@
     "build": "npm-run-all --parallel build:*",
     "build:compass": "lerna run --scope @klearnow/compass build",
     "build:compass-core": "lerna run --scope @klearnow/compass-core build",
-    "build:compass-mcp": "lerna run --scope @klearnow/compass-mcp build",
+    "build:compass-mcp": "lerna run --scope @jatin_ux/compass-mcp build",
     "build:eslint-plugin-compass": "lerna run --scope eslint-plugin-compass build",
     "generate-docs-lockfile": "node packages/compass/scripts/generateDocsLockFile.mjs",
     "generate-icons": "node scripts/icons/generate.mjs",

@@ -1,9 +1,11 @@
 {
   "mcpServers": {
     "compass": {
-      "command": "node",
-      "args": ["/Users/jatinbansal/Downloads/Klear360-Master/packages/compass-mcp/dist/server.js"],
-      "description": "Compass Design System MCP — component/pattern docs, Figma-to-code, project scaffolding (@klearnow/compass-mcp)"
+      "command": "/Users/jatinbansal/.nvm/versions/node/v24.19.0/bin/node",
+      "args": [
+        "/Users/jatinbansal/Downloads/Klear360-Master/packages/compass-mcp/dist/server.js"
+      ],
+      "description": "Compass MCP — use full node path (nvm) so Cursor can start the server"
     }
   }
 }
