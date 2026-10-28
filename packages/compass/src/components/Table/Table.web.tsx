@@ -18,9 +18,11 @@ import { ComponentIds } from './componentIds';
 import {
   checkboxCellWidth,
   firstColumnStickyZIndex,
+  stickyHeaderColumnZIndex,
   refreshWrapperZIndex,
   tableBackgroundColor,
   tablePagination,
+  tableRow,
   classes,
 } from './tokens';
 import type {
@@ -78,11 +80,12 @@ const getTableHeaderCellCount = (children: (data: []) => React.ReactElement): nu
       const tableHeaderChildrenArray = React.isValidElement(tableHeader)
         ? React.Children.toArray(tableHeader.props.children)
         : null;
-      const tableHeaderRow = tableHeaderChildrenArray?.find(
+      const tableHeaderRows = tableHeaderChildrenArray?.filter(
         (child) => getComponentId(child) === ComponentIds.TableHeaderRow,
       );
-      const tableHeaderRowChildrenArray = React.isValidElement(tableHeaderRow)
-        ? React.Children.toArray(tableHeaderRow.props.children)
+      const leafTableHeaderRow = tableHeaderRows?.[tableHeaderRows.length - 1];
+      const tableHeaderRowChildrenArray = React.isValidElement(leafTableHeaderRow)
+        ? React.Children.toArray(leafTableHeaderRow.props.children)
         : null;
       const tableHeaderCells = tableHeaderRowChildrenArray
         ? tableHeaderRowChildrenArray.filter(
@@ -183,6 +186,11 @@ const _Table = <Item,>({
   isHeaderSticky,
   isFooterSticky,
   isFirstColumnSticky,
+  stickyColumnCount: stickyColumnCountProp,
+  stickyColumnWidths,
+  isLastColumnSticky,
+  trailingStickyColumnCount: trailingStickyColumnCountProp,
+  trailingStickyColumnWidths,
   rowDensity = 'normal',
   onSortChange,
   sortFunctions,
@@ -301,11 +309,43 @@ const _Table = <Item,>({
   const [hasHoverActions, setHasHoverActions] = React.useState(false);
   const tableRootComponent = children([]);
   const isVirtualized = getComponentId(tableRootComponent) === ComponentIds.VirtualizedTable;
-  // Need to make header is sticky if first column is sticky otherwise the first header cell will not be sticky
-  const shouldHeaderBeSticky = isVirtualized || isHeaderSticky || isFirstColumnSticky;
 
   const isMobile = useIsMobile();
   const lastHoverActionsColWidth = isMobile ? '1fr' : '0px';
+
+  const requestedStickyColumnCount = stickyColumnCountProp ?? (isFirstColumnSticky ? 1 : 0);
+  const requestedTrailingStickyColumnCount =
+    trailingStickyColumnCountProp ?? (isLastColumnSticky ? 1 : 0);
+
+  if (__DEV__) {
+    if (
+      requestedStickyColumnCount > 1 &&
+      (!stickyColumnWidths || stickyColumnWidths.length < requestedStickyColumnCount)
+    ) {
+      throwCompassError({
+        message:
+          '`stickyColumnWidths` must provide a pixel width for each of the `stickyColumnCount` columns when freezing more than one column.',
+        moduleName: 'Table',
+      });
+    }
+    if (
+      requestedTrailingStickyColumnCount > 1 &&
+      (!trailingStickyColumnWidths ||
+        trailingStickyColumnWidths.length < requestedTrailingStickyColumnCount)
+    ) {
+      throwCompassError({
+        message:
+          '`trailingStickyColumnWidths` must provide a pixel width for each of the `trailingStickyColumnCount` columns when freezing more than one column.',
+        moduleName: 'Table',
+      });
+    }
+  }
+
+  const stickyColumnCount = isMobile ? 0 : requestedStickyColumnCount;
+  const trailingStickyColumnCount = isMobile ? 0 : requestedTrailingStickyColumnCount;
+
+  const shouldHeaderBeSticky =
+    isVirtualized || isHeaderSticky || stickyColumnCount > 0 || trailingStickyColumnCount > 0;
 
   const {
     isEntering: isRefreshSpinnerEntering,
@@ -316,71 +356,83 @@ const _Table = <Item,>({
     transitionDuration: theme.motion.duration.quick,
   });
 
-  // Table Theme
   const columnCount = getTableHeaderCellCount(children);
-  const firstColumnStickyHeaderCellCSS = isFirstColumnSticky
-    ? `
-  &:nth-of-type(1) {
-    left: 0 !important;
+
+  const getStickyColumnsCSS = useCallback(
+    (zIndex: number): string => {
+      if (stickyColumnCount < 1 && trailingStickyColumnCount < 1) return '';
+
+      const isMultiSelect = selectionType === 'multiple';
+      const lastStickyBoxShadow = showBorderedCells
+        ? `box-shadow: 1px 0 0 0 ${getIn(theme.colors, tableRow.borderColor)} !important;`
+        : '';
+      const stickyRule = (domIndex: number, left: number, isLastSticky: boolean): string => `
+  &:nth-of-type(${domIndex}) {
+    left: ${left}px !important;
     position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
+    z-index: ${zIndex} !important;
+    ${isLastSticky ? lastStickyBoxShadow : ''}
   }
-  /* Higher z-index for sticky first column cells that also span rows to prevent stacking issues */
-  &:nth-of-type(1).${classes.HAS_ROW_SPANNING} {
-    z-index: 3 !important;
-  }
-  ${
-    selectionType === 'multiple' &&
-    `&:nth-of-type(2) {
-    left: ${checkboxCellWidth}px !important;
+  &:nth-of-type(${domIndex}).${classes.HAS_ROW_SPANNING} {
+    z-index: ${zIndex + 1} !important;
+  }`;
+
+      const rules: string[] = [];
+      let cumulativeLeft = 0;
+      if (isMultiSelect && stickyColumnCount > 0) {
+        rules.push(stickyRule(1, 0, false));
+        cumulativeLeft = checkboxCellWidth;
+      }
+      for (let i = 0; i < stickyColumnCount; i += 1) {
+        const domIndex = i + 1 + (isMultiSelect ? 1 : 0);
+        rules.push(stickyRule(domIndex, cumulativeLeft, i === stickyColumnCount - 1));
+        cumulativeLeft += Number.parseFloat(stickyColumnWidths?.[i] ?? '0');
+      }
+
+      if (trailingStickyColumnCount > 0) {
+        const trailingStickyRule = (
+          domIndexFromEnd: number,
+          right: number,
+          isFirstTrailingSticky: boolean,
+        ): string => `
+  &:nth-last-of-type(${domIndexFromEnd}) {
+    right: ${right}px !important;
     position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
+    z-index: ${zIndex} !important;
+    ${isFirstTrailingSticky ? lastStickyBoxShadow : ''}
   }
-  `
-  }`
-    : '';
-  const firstColumnStickyFooterCellCSS = isFirstColumnSticky
-    ? `
-  &:nth-of-type(1) {
-    left: 0 !important;
-    position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
-  }
-  /* Higher z-index for sticky first column cells that also span rows to prevent stacking issues */
-  &:nth-of-type(1).${classes.HAS_ROW_SPANNING} {
-    z-index: 3 !important;
-  }
-  ${
-    selectionType === 'multiple' &&
-    `&:nth-of-type(2) {
-    left: ${checkboxCellWidth}px !important;
-    position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
-  }
-  `
-  }`
-    : '';
-  const firstColumnStickyBodyCellCSS = isFirstColumnSticky
-    ? `
-  &:nth-of-type(1) {
-    left: 0 !important;
-    position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
-  }
-  /* Higher z-index for sticky first column cells that also span rows to prevent stacking issues */
-  &:nth-of-type(1).${classes.HAS_ROW_SPANNING} {
-    z-index: 3 !important;
-  }
-  ${
-    selectionType === 'multiple' &&
-    `&:nth-of-type(2) {
-    left: ${checkboxCellWidth}px !important;
-    position: sticky !important;
-    z-index: ${firstColumnStickyZIndex} !important;
-  }
-  `
-  }`
-    : '';
+  &:nth-last-of-type(${domIndexFromEnd}).${classes.HAS_ROW_SPANNING} {
+    z-index: ${zIndex + 1} !important;
+  }`;
+
+        const trailingDomOffset = hasHoverActions ? 1 : 0;
+        let cumulativeRight = 0;
+        for (let i = 0; i < trailingStickyColumnCount; i += 1) {
+          const domIndexFromEnd = i + 1 + trailingDomOffset;
+          rules.push(trailingStickyRule(domIndexFromEnd, cumulativeRight, i === 0));
+          cumulativeRight += Number.parseFloat(trailingStickyColumnWidths?.[i] ?? '0');
+        }
+      }
+
+      return rules.join('\n');
+    },
+    [
+      stickyColumnCount,
+      trailingStickyColumnCount,
+      selectionType,
+      stickyColumnWidths,
+      trailingStickyColumnWidths,
+      hasHoverActions,
+      showBorderedCells,
+      theme,
+    ],
+  );
+  const stickyColumnsCSS = useMemo(() => getStickyColumnsCSS(firstColumnStickyZIndex), [
+    getStickyColumnsCSS,
+  ]);
+  const stickyHeaderColumnsCSS = useMemo(() => getStickyColumnsCSS(stickyHeaderColumnZIndex), [
+    getStickyColumnsCSS,
+  ]);
 
   const tableTheme = useTableTheme({
     Table: `
@@ -401,28 +453,30 @@ const _Table = <Item,>({
     }
     --data-table-library_grid-template-columns: ${
       gridTemplateColumns
-        ? `${gridTemplateColumns} ${hasHoverActions ? lastHoverActionsColWidth : ''}`
+        ? `${selectionType === 'multiple' ? 'min-content' : ''} ${gridTemplateColumns} ${
+            hasHoverActions ? lastHoverActionsColWidth : ''
+          }`
         : ` ${
             selectionType === 'multiple' ? 'min-content' : ''
           } repeat(${columnCount},minmax(100px, 1fr)) ${
             hasHoverActions ? lastHoverActionsColWidth : ''
-          } !important;`
+          }`
     } !important;
     background-color: ${getIn(theme.colors, backgroundColor)};
+    isolation: isolate;
     `,
     HeaderCell: `
     position: ${shouldHeaderBeSticky ? 'sticky' : 'relative'};
-    
     top: ${shouldHeaderBeSticky ? '0' : undefined};
-    ${firstColumnStickyHeaderCellCSS}
+    ${stickyHeaderColumnsCSS}
     `,
     Cell: `
-    ${firstColumnStickyBodyCellCSS}
+    ${stickyColumnsCSS}
     `,
     FooterCell: `
     position: ${isFooterSticky ? 'sticky' : 'relative'};
     bottom: ${isFooterSticky ? '0' : undefined};
-    ${firstColumnStickyFooterCellCSS}
+    ${stickyColumnsCSS}
     `,
   });
 

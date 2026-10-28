@@ -2,6 +2,7 @@ import { AlertCircleIcon, CheckIcon } from '~components/Icons';
 import { size } from '~tokens/global';
 
 const firstColumnStickyZIndex = 2;
+const stickyHeaderColumnZIndex = 4;
 
 const refreshWrapperZIndex = 3;
 
@@ -141,6 +142,7 @@ export {
   refreshWrapperZIndex,
   tableBackgroundColor,
   firstColumnStickyZIndex,
+  stickyHeaderColumnZIndex,
   checkboxCellWidth,
   tableEditableCellRowDensityToInputSizeMap,
   validationStateToInputTrailingIconMap,

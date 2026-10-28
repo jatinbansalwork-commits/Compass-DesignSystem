@@ -185,9 +185,30 @@ type TableProps<Item> = {
   isFooterSticky?: boolean;
   /**
    * The isFirstColumnSticky prop determines whether the first column is sticky or not.
-   * The default value is `false`.
+   * The default value is `false`. Equivalent to `stickyColumnCount={1}`.
    **/
   isFirstColumnSticky?: boolean;
+  /**
+   * Number of leading columns (after any multi-select checkbox column) to freeze while scrolling.
+   * `isFirstColumnSticky` is shorthand for `stickyColumnCount={1}` without `stickyColumnWidths`.
+   **/
+  stickyColumnCount?: number;
+  /**
+   * Pixel width for each leading sticky column, in order. Required when `stickyColumnCount` > 1.
+   **/
+  stickyColumnWidths?: string[];
+  /**
+   * Whether the last data column is sticky. Equivalent to `trailingStickyColumnCount={1}`.
+   **/
+  isLastColumnSticky?: boolean;
+  /**
+   * Number of trailing columns (before hover-actions column) to freeze while scrolling.
+   **/
+  trailingStickyColumnCount?: number;
+  /**
+   * Pixel width for each trailing sticky column, in order. Required when `trailingStickyColumnCount` > 1.
+   **/
+  trailingStickyColumnWidths?: string[];
   /**
    * The rowDensity prop determines the density of the table.
    * The rowDensity prop can be 'compact', 'normal', or'comfortable'.
