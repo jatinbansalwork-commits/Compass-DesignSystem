@@ -282,7 +282,7 @@ const spanningNodes = [
 
 describe('<Table />', () => {
   it('should render table', () => {
-    const { container, getAllByRole } = renderWithTheme(
+    const { container, getAllByRole, queryAllByRole } = renderWithTheme(
       <Table data={{ nodes: nodes.slice(0, 5) }} toolbar={<TableToolbar />}>
         {(tableData) => (
           <>
@@ -323,11 +323,11 @@ describe('<Table />', () => {
       </Table>,
     );
     expect(container).toMatchSnapshot();
-    expect(getAllByRole('row')).toHaveLength(5);
+    expect(getAllByRole('row')).toHaveLength(6);
     expect(getAllByRole('rowgroup')).toHaveLength(3);
     expect(getAllByRole('columnheader')).toHaveLength(6);
     expect(getAllByRole('cell')).toHaveLength(30);
-    expect(getAllByRole('rowheader')).toHaveLength(1);
+    expect(queryAllByRole('rowheader')).toHaveLength(0);
     expect(getAllByRole('rowfooter')).toHaveLength(1);
     expect(getAllByRole('columnfooter')).toHaveLength(6);
   });
@@ -687,11 +687,11 @@ describe('<Table />', () => {
     const sortButton = getByLabelText('Toggle Sort');
     expect(sortButton).toBeInTheDocument();
     fireEvent.click(sortButton);
-    expect(getAllByRole('row')[0]).toHaveTextContent('pending');
+    expect(getAllByRole('row')[1]).toHaveTextContent('pending');
     expect(onSortChange).toHaveBeenCalledWith({ sortKey: 'STATUS', isSortReversed: false });
     fireEvent.click(sortButton);
     expect(onSortChange).toHaveBeenCalledWith({ sortKey: 'STATUS', isSortReversed: true });
-    expect(getAllByRole('row')[0]).toHaveTextContent('completed');
+    expect(getAllByRole('row')[1]).toHaveTextContent('completed');
   });
 
   it('should call onHover when mouse enters the row', async () => {
@@ -1092,12 +1092,12 @@ describe('<Table />', () => {
 
     // Check if page size picker works
     const selectInput = getByRole('combobox', { name: 'Select items per page' });
-    expect(getAllByRole('row')).toHaveLength(10);
+    expect(getAllByRole('row')).toHaveLength(11);
     expect(selectInput).toBeInTheDocument();
     await user.click(selectInput);
     await waitFor(() => expect(getByRole('listbox')).toBeVisible());
     await user.click(getByRole('option', { name: '25' }));
-    expect(getAllByRole('row')).toHaveLength(25);
+    expect(getAllByRole('row')).toHaveLength(26);
     await user.click(goForward5PagesButton);
     expect(onPageChange).toHaveBeenLastCalledWith({ page: 5 });
     const goBack5PagesButton = getByLabelText('Go back 5 pages');

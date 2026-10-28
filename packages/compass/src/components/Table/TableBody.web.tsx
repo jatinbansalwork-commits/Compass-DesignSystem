@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Body, Row, Cell } from '@table-library/react-table-library/table';
 import { Virtualized } from '@table-library/react-table-library/virtualized';
 import styled from 'styled-components';
-import { useTableContext } from './TableContext';
+import { useTableDataContext, useTableRowContext } from './TableContext';
 import { checkboxCellWidth, classes, tableRow } from './tokens';
 import { ComponentIds } from './componentIds';
 import type {
@@ -59,7 +59,7 @@ const StyledBody = styled(Body)<{
 });
 
 const _TableBody = <Item,>({ children, ...rest }: TableBodyProps<Item>): React.ReactElement => {
-  const { showStripedRows, selectionType } = useTableContext();
+  const { showStripedRows, selectionType } = useTableRowContext();
   const isSelectable = selectionType !== 'none';
 
   return (
@@ -136,7 +136,7 @@ const _TableCell = ({
   ...rest
 }: TableCellProps): React.ReactElement => {
   const isChildrenString = typeof children === 'string';
-  const { selectionType, rowDensity, showStripedRows, backgroundColor } = useTableContext();
+  const { selectionType, rowDensity, showStripedRows, backgroundColor } = useTableRowContext();
   const isSelectable = selectionType !== 'none';
 
   const hasRowSpan = Boolean(gridRowStart && gridRowEnd);
@@ -235,7 +235,7 @@ const StyledRow = styled(Row)<{
   $isGrouped: boolean;
   $isGroupHeader: boolean;
 }>(({ theme, $isSelectable, $isHoverable, $showBorderedCells, $isGrouped, $isGroupHeader }) => {
-  const { hasHoverActions, checkboxDisplay, selectionType } = useTableContext();
+  const { hasHoverActions, checkboxDisplay, selectionType } = useTableRowContext();
 
   const rowBackgroundTransition = `background-color ${makeMotionTime(
     getIn(theme.motion, tableRow.backgroundColorMotionDuration),
@@ -361,7 +361,7 @@ const _TableRow = <Item,>({
     isVirtualized,
     isGrouped,
     multiSelectTrigger,
-  } = useTableContext();
+  } = useTableRowContext();
   const isSelectable = selectionType !== 'none';
   const isMultiSelect = selectionType === 'multiple';
   const isSelected = selectedRows?.includes(item.id);
@@ -481,7 +481,8 @@ const _Virtulized = <Item,>({
   children,
 }: VirtualizedWrapperProps): React.ReactElement => {
   const [parsedHeader = null, parsedBody = null] = React.Children.toArray(children);
-  const { rowDensity, tableData } = useTableContext<Item>();
+  const { rowDensity } = useTableRowContext();
+  const { tableData } = useTableDataContext<Item>();
   const _tableRow = Number(tableRow.minHeight[rowDensity]);
 
   const _rowHeight = (item: TableNode<Item>, index: number): number => {

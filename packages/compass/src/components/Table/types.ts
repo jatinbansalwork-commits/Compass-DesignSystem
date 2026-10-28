@@ -20,6 +20,18 @@ type TableBackgroundColors = `surface.background.gray.${DotNotationToken<
   Theme['colors']['surface']['background']['gray']
 >}`;
 
+type TableSortDirection = 'asc' | 'desc';
+
+type TableSortOrderEntry = {
+  sortKey: string;
+  direction: TableSortDirection;
+};
+
+type TableColumnFilterConfig = {
+  type: 'dropdown' | 'multiselect';
+  options: { label: string; value: string }[];
+};
+
 type RowHeightType = number | ((item: TableLibraryTableNode, index: number) => number);
 
 /**
@@ -85,6 +97,10 @@ type TableHeaderRowProps = {
    * The header row is now always compact (36px height) regardless of this prop value.
    **/
   rowDensity?: TableProps<unknown>['rowDensity'];
+  /** @private */
+  _isLeafHeaderRow?: boolean;
+  /** @private */
+  _stickyTopOffsetPx?: number;
 } & DataAnalyticsAttribute;
 
 type TableHeaderCellProps = {
@@ -106,6 +122,8 @@ type TableHeaderCellProps = {
   textAlign?: 'left' | 'center' | 'right';
 
   _hasPadding?: boolean;
+  /** @private */
+  _stickyTopOffsetPx?: number;
 } & TableCellGridSpanningProps &
   DataAnalyticsAttribute;
 
@@ -260,6 +278,17 @@ type TableProps<Item> = {
    * @default 'always'
    */
   checkboxDisplay?: 'always' | 'on-hover';
+  filterFunctions?: Record<
+    string,
+    (item: TableNode<Item>, filterValue: string | string[]) => boolean
+  >;
+  filterConfig?: Record<string, TableColumnFilterConfig>;
+  columnFilterValues?: Record<string, string | string[]>;
+  defaultColumnFilterValues?: Record<string, string | string[]>;
+  onColumnFilterValuesChange?: (values: Record<string, string | string[]>) => void;
+  globalFilterValue?: string;
+  defaultGlobalFilterValue?: string;
+  onGlobalFilterValueChange?: (value: string) => void;
 } & DataAnalyticsAttribute &
   StyledPropsCompass;
 
@@ -547,6 +576,11 @@ type TableToolbarProps = {
   placement?: TableToolbarPlacement;
 } & DataAnalyticsAttribute;
 
+type TableToolbarSearchProps = {
+  placeholder?: string;
+  accessibilityLabel?: string;
+} & DataAnalyticsAttribute;
+
 type TableToolbarActionsProps = {
   children?: React.ReactNode;
 } & StyledPropsCompass &
@@ -662,7 +696,10 @@ export type {
   TablePaginationProps,
   TableToolbarProps,
   TableToolbarActionsProps,
+  TableToolbarSearchProps,
   TableToolbarPlacement,
+  TableColumnFilterConfig,
+  TableSortOrderEntry,
   TableBackgroundColors,
   TablePaginationType,
   TablePaginationCommonProps,

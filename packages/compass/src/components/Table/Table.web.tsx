@@ -12,8 +12,8 @@ import {
 import { useTree } from '@table-library/react-table-library/tree';
 import styled from 'styled-components';
 import usePresence from 'use-presence';
-import type { TableContextType } from './TableContext';
-import { TableContext } from './TableContext';
+import type { TableDataContextType, TableRowContextType } from './TableContext';
+import { TableDataContext, TableRowContext } from './TableContext';
 import { ComponentIds } from './componentIds';
 import {
   checkboxCellWidth,
@@ -26,6 +26,7 @@ import {
 import type {
   TableProps,
   TableNode,
+  TableData,
   Identifier,
   TablePaginationType,
   TableHeaderRowProps,
@@ -197,10 +198,95 @@ const _Table = <Item,>({
   backgroundColor = tableBackgroundColor,
   isGrouped = false,
   checkboxDisplay = 'always',
+  filterFunctions,
+  filterConfig = {},
+  columnFilterValues: columnFilterValuesProp,
+  defaultColumnFilterValues = {},
+  onColumnFilterValuesChange,
+  globalFilterValue: globalFilterValueProp,
+  defaultGlobalFilterValue = '',
+  onGlobalFilterValueChange,
   ...rest
 }: TableProps<Item>): React.ReactElement => {
   const { theme, colorScheme } = useTheme();
   const { isInsideListView } = useListViewContext();
+
+  const [internalGlobalFilterValue, setInternalGlobalFilterValue] = React.useState(
+    defaultGlobalFilterValue,
+  );
+  const globalFilterValue = globalFilterValueProp ?? internalGlobalFilterValue;
+
+  const setGlobalFilterValue = useCallback(
+    (value: string): void => {
+      if (globalFilterValueProp === undefined) {
+        setInternalGlobalFilterValue(value);
+      }
+      onGlobalFilterValueChange?.(value);
+    },
+    [globalFilterValueProp, onGlobalFilterValueChange],
+  );
+
+  const [internalColumnFilterValues, setInternalColumnFilterValues] = React.useState<
+    Record<string, string | string[]>
+  >(defaultColumnFilterValues);
+  const columnFilterValues = columnFilterValuesProp ?? internalColumnFilterValues;
+
+  const setColumnFilterValue = useCallback(
+    (key: string, value: string | string[]): void => {
+      const nextValues = { ...columnFilterValues, [key]: value };
+      if (columnFilterValuesProp === undefined) {
+        setInternalColumnFilterValues(nextValues);
+      }
+      onColumnFilterValuesChange?.(nextValues);
+    },
+    [columnFilterValues, columnFilterValuesProp, onColumnFilterValuesChange],
+  );
+
+  const filterableColumns = useMemo(() => Object.keys(filterFunctions ?? {}), [filterFunctions]);
+
+  const activeColumnFilters = useMemo(
+    () =>
+      Object.entries(columnFilterValues).filter(([, value]) =>
+        Array.isArray(value) ? value.length > 0 : Boolean(value),
+      ),
+    [columnFilterValues],
+  );
+
+  const applyFilters = useCallback(
+    (nodesToFilter: TableNode<Item>[]): TableNode<Item>[] => {
+      if (!filterFunctions || (activeColumnFilters.length === 0 && !globalFilterValue)) {
+        return nodesToFilter;
+      }
+      return nodesToFilter
+        .filter((node) => {
+          const passesColumnFilters = activeColumnFilters.every(([key, value]) => {
+            const filterFn = filterFunctions[key];
+            return filterFn ? filterFn(node, value) : true;
+          });
+          if (!passesColumnFilters) return false;
+          if (!globalFilterValue) return true;
+          return Object.values(filterFunctions).some((filterFn) =>
+            filterFn(node, globalFilterValue),
+          );
+        })
+        .map((node) => {
+          const nodeWithChildren = node as TableNode<Item> & { nodes?: TableNode<Item>[] };
+          return Array.isArray(nodeWithChildren.nodes)
+            ? { ...node, nodes: applyFilters(nodeWithChildren.nodes) }
+            : node;
+        });
+    },
+    [filterFunctions, activeColumnFilters, globalFilterValue],
+  );
+
+  const filteredData: TableData<Item> = useMemo(
+    () =>
+      activeColumnFilters.length > 0 || globalFilterValue
+        ? { nodes: applyFilters(data.nodes) }
+        : data,
+    [data, applyFilters, activeColumnFilters, globalFilterValue],
+  );
+
   const [selectedRows, setSelectedRows] = React.useState<TableNode<unknown>['id'][]>(
     selectionType !== 'none' ? defaultSelectedIds : [],
   );
@@ -341,9 +427,8 @@ const _Table = <Item,>({
   });
 
   useEffect(() => {
-    // Get the total number of items
-    setTotalItems(data.nodes.length);
-  }, [data.nodes]);
+    setTotalItems(filteredData.nodes.length);
+  }, [filteredData.nodes]);
 
   // Selection Logic
   const onSelectChange: MiddlewareFunction = (_, state): void => {
@@ -398,19 +483,30 @@ const _Table = <Item,>({
 
   const toggleAllRowsSelection = useMemo(
     () => (): void => {
-      if (selectedRows.length > 0) {
-        rowSelectConfig.fns.onRemoveAll();
-      } else if (isGrouped) {
-        rowSelectConfig.fns.onToggleAll({});
-      } else {
-        const ids = data.nodes
-          .map((item: TableNode<Item>) => (disabledRows.includes(item.id) ? null : item.id))
-          .filter(Boolean) as Identifier[];
+      if (isGrouped) {
+        if (selectedRows.length > 0) {
+          rowSelectConfig.fns.onRemoveAll();
+        } else {
+          rowSelectConfig.fns.onToggleAll({});
+        }
+        return;
+      }
 
-        rowSelectConfig.fns.onAddAll(ids);
+      const visibleSelectableIds = filteredData.nodes
+        .map((item: TableNode<Item>) => (disabledRows.includes(item.id) ? null : item.id))
+        .filter(Boolean) as Identifier[];
+      const isAllVisibleSelected =
+        visibleSelectableIds.length > 0 &&
+        visibleSelectableIds.every((id) => selectedRows.includes(id));
+
+      if (isAllVisibleSelected) {
+        rowSelectConfig.fns.onRemoveByIds(visibleSelectableIds);
+      } else {
+        const idsToAdd = visibleSelectableIds.filter((id) => !selectedRows.includes(id));
+        rowSelectConfig.fns.onAddByIds(idsToAdd, {});
       }
     },
-    [rowSelectConfig.fns, data.nodes, selectedRows, disabledRows],
+    [rowSelectConfig.fns, filteredData.nodes, selectedRows, disabledRows, isGrouped],
   );
 
   const tree = useTree(
@@ -439,7 +535,7 @@ const _Table = <Item,>({
   };
 
   const sort = useSort(
-    data,
+    filteredData,
     {
       onChange: handleSortChange,
     },
@@ -449,16 +545,21 @@ const _Table = <Item,>({
     },
   );
 
-  const currentSortedState: TableContextType<Item>['currentSortedState'] = useMemo(() => {
+  const currentSortedState: TableDataContextType<Item>['currentSortedState'] = useMemo(() => {
+    const sortKey = sort.state.sortKey;
+    const hasSort = Boolean(sortKey && sortKey !== 'NONE');
     return {
-      sortKey: sort.state.sortKey,
+      sortKey: hasSort ? sortKey : '',
       isSortReversed: sort.state.reverse,
       sortableColumns: Object.keys(sortFunctions ?? {}),
+      sortOrder: hasSort
+        ? [{ sortKey, direction: sort.state.reverse ? ('desc' as const) : ('asc' as const) }]
+        : [],
     };
   }, [sort.state, sortFunctions]);
 
   const toggleSort = useCallback(
-    (sortKey: string): void => {
+    (sortKey: string, _isMultiSort?: boolean): void => {
       sort.fns.onToggleSort({
         sortKey,
       });
@@ -477,7 +578,7 @@ const _Table = <Item,>({
       : undefined;
 
   const paginationConfig = usePagination(
-    data,
+    filteredData,
     {
       state: {
         page: 0,
@@ -522,77 +623,101 @@ const _Table = <Item,>({
     }
   }
 
-  // Table Context
-  const tableContext: TableContextType<Item> = useMemo(
+  const tableRowContext: TableRowContextType = useMemo(
     () => ({
       selectionType,
       selectedRows,
-      totalItems,
       toggleRowSelectionById,
       toggleAllRowsSelection,
       deselectAllRows,
       rowDensity,
-      toggleSort,
-      currentSortedState,
-      setPaginationPage,
-      setPaginationRowSize,
-      currentPaginationState,
       showStripedRows,
       disabledRows,
       setDisabledRows,
-      paginationType,
-      setPaginationType,
       backgroundColor,
       headerRowDensity,
       setHeaderRowDensity,
       showBorderedCells,
+      shouldHeaderBeSticky,
       hasHoverActions,
       setHasHoverActions,
       multiSelectTrigger,
       columnCount,
       gridTemplateColumns,
       isVirtualized,
-      tableData: data.nodes,
       isGrouped,
+      expandedRowIds: [],
+      toggleRowExpansionById: () => {},
       tableToolbarPlacement: toolbar?.props?.placement ?? 'inline',
       checkboxDisplay,
     }),
     [
       selectionType,
       selectedRows,
-      totalItems,
       toggleRowSelectionById,
       toggleAllRowsSelection,
       deselectAllRows,
       gridTemplateColumns,
       rowDensity,
-      toggleSort,
       columnCount,
-      currentSortedState,
-      setPaginationPage,
-      setPaginationRowSize,
-      currentPaginationState,
       showStripedRows,
       disabledRows,
       setDisabledRows,
-      paginationType,
-      setPaginationType,
       backgroundColor,
       headerRowDensity,
       setHeaderRowDensity,
       showBorderedCells,
+      shouldHeaderBeSticky,
       hasHoverActions,
       setHasHoverActions,
       multiSelectTrigger,
       isVirtualized,
-      data,
       isGrouped,
+      toolbar?.props?.placement,
       checkboxDisplay,
     ],
   );
 
+  const tableDataContext: TableDataContextType<Item> = useMemo(
+    () => ({
+      totalItems,
+      toggleSort,
+      currentSortedState,
+      setPaginationPage,
+      setPaginationRowSize,
+      currentPaginationState,
+      paginationType,
+      setPaginationType,
+      tableData: filteredData.nodes,
+      globalFilterValue,
+      setGlobalFilterValue,
+      columnFilterValues,
+      setColumnFilterValue,
+      filterableColumns,
+      filterConfig,
+    }),
+    [
+      totalItems,
+      toggleSort,
+      currentSortedState,
+      setPaginationPage,
+      setPaginationRowSize,
+      currentPaginationState,
+      paginationType,
+      setPaginationType,
+      filteredData.nodes,
+      globalFilterValue,
+      setGlobalFilterValue,
+      columnFilterValues,
+      setColumnFilterValue,
+      filterableColumns,
+      filterConfig,
+    ],
+  );
+
   return (
-    <TableContext.Provider value={tableContext}>
+    <TableRowContext.Provider value={tableRowContext}>
+      <TableDataContext.Provider value={tableDataContext}>
       <TableSurface
         colorScheme={colorScheme}
         borderRadius={isInsideListView ? 'none' : 'medium'}
@@ -673,7 +798,7 @@ const _Table = <Item,>({
             <StyledReactTable
               role="table"
               layout={{ fixedHeader: shouldHeaderBeSticky, horizontalScroll: true }}
-              data={data}
+              data={filteredData}
               // @ts-expect-error ignore this, theme clashes with styled-component's theme. We're using useTheme from blade to get actual theme
               theme={tableTheme}
               select={selectionType !== 'none' ? rowSelectConfig : null}
@@ -697,7 +822,8 @@ const _Table = <Item,>({
           </BaseBox>
         )}
       </TableSurface>
-    </TableContext.Provider>
+      </TableDataContext.Provider>
+    </TableRowContext.Provider>
   );
 };
 const Table = assignWithoutSideEffects(_Table, {
