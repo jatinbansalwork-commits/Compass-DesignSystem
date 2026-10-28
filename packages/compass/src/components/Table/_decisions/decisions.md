@@ -67,18 +67,17 @@ A table component helps in displaying data in a grid format, through rows and co
 
 ## Out of scope
 
-We don't have enough use-cases for the following features at Compass and hence scoped them out of our Table component. If you are aware of any of these features being used at Compass, please let us know by creating an issue - we will evaluate it and scope it for future releases.
+The following remain **out of core `Table` scope** (optional **Experience** add-ons or app patterns may still cover them). See `docs/STORYBOOK.md` and `experience/` for CompassDataTable.
 
-- Column Reordering
-- Column Resizing
-- Column Filtering
-- Search
-- Row Expansion
-- Nested Tables
-- Hiding Columns
-- Editable Rows
-- Table for React Native
-  - Mobile Apps will be using Lists instead of Tables to convey information
+- Column reorder / resize / visibility in **core** (Experience layer may provide toolbar UX; JSX column order stays app-owned)
+- Declarative `columns` config (composable JSX only)
+- Full row-level edit mode (cell-level editing is supported)
+- Built-in CSV export (Experience export button)
+- Full keyboard grid (roving cell focus) — row keyboard nav is optional in Experience
+- `isGrouped` + virtualization together
+- Table for React Native — use **List** on mobile
+
+**In scope (core):** column filtering (`filterFunctions`, header filter row), toolbar search (`TableToolbarSearch`, `globalFilterValue`), grouping/tree selection (`isGrouped`), multi-column sort (Shift+click), `initialSort`, controlled `selectedIds`.
 
 ## Anatomy
 

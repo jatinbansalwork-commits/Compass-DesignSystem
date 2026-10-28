@@ -24,6 +24,41 @@ export type {
   TableToolbarProps,
   TableToolbarSearchProps,
   TableColumnFilterConfig,
+  TableColumnConfig,
+  TableTitleDescriptionCellProps,
+  TableInitialSort,
+  TableSortOrderEntry,
   Identifier,
 } from './types';
 export { TableEditableCell, TableEditableDropdownCell } from './TableEditableCell';
+export { TableTitleDescriptionCell } from './TableTitleDescriptionCell';
+export {
+  CompassDataTable,
+  TableExperienceEmpty,
+  TableExperienceEmptyBody,
+  TableExperienceExportButton,
+  TableExperienceAdvancedFilters,
+  TableExperienceColumnToggle,
+  TableExperienceSelectionRoot,
+  TableExperienceRow,
+  useTableExperienceController,
+  applyInitialSort,
+  applyMultiSort,
+  exportTableToCsv,
+  downloadCsvFile,
+  getEmptyReason,
+  toggleExperienceSort,
+} from './experience';
+export type {
+  CompassDataTableProps,
+  TableExperienceController,
+  TableExperienceExportColumn,
+  TableExperienceEmptyCopy,
+  TableExperienceEmptyReason,
+  TableExperienceInitialSort,
+  TableExperienceFeatures,
+  TableExperienceColumnToggleOption,
+  TableExperienceFilterMatchMode,
+  UseTableExperienceControllerOptions,
+  UseTableExperienceControllerReturn,
+} from './experience';

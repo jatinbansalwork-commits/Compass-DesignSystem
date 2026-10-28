@@ -21,7 +21,7 @@ import { ActionList, ActionListItem } from '~components/ActionList';
 import { DropdownOverlay } from '~components/Dropdown';
 
 export default {
-  title: 'Components/Table/API',
+  title: 'Components/Table/Parts/Editable Cell',
   component: TableEditableCell,
   args: {},
   argTypes: {

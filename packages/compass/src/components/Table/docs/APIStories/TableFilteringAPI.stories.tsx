@@ -12,7 +12,7 @@ import { Code } from '~components/Typography';
 import { Badge } from '~components/Badge';
 
 export default {
-  title: 'Components/Table/API/Table Filtering',
+  title: 'Components/Table/Features/Filtering',
   tags: ['autodocs'],
   component: TableComponent,
   argTypes: {

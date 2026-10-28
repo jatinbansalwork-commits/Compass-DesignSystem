@@ -9,7 +9,7 @@ import {
   TableRow,
   TableCell,
   TableToolbar,
-  TableToolbarActions,
+  TableToolbarSearch,
   TablePagination,
 } from '../../Table';
 import { createTableData, formatDate, getStatusColor } from './exampleData';
@@ -17,9 +17,19 @@ import { Box } from '~components/Box';
 import { Code, Heading, Text } from '~components/Typography';
 import { Amount } from '~components/Amount';
 import { Badge } from '~components/Badge';
-import { TextInput } from '~components/TextInput';
 
 const allRows = createTableData(80);
+
+const filterFunctions = {
+  PAYMENT_ID: (item: (typeof allRows.nodes)[number], value: string | string[]) => {
+    const needle = Array.isArray(value) ? value.join(' ') : value;
+    return item.paymentId.toLowerCase().includes(needle.toLowerCase());
+  },
+  NAME: (item: (typeof allRows.nodes)[number], value: string | string[]) => {
+    const needle = Array.isArray(value) ? value.join(' ') : value;
+    return item.name.toLowerCase().includes(needle.toLowerCase());
+  },
+};
 
 const TableMeta: Meta = {
   title: 'Components/Table/Examples/Combined Features',
@@ -31,26 +41,9 @@ const TableMeta: Meta = {
   },
 };
 
-/**
- * Non-virtualized table combining toolbar search (client-side filter), sticky first column,
- * sticky header, and client pagination — the pattern teams use when column filter rows are
- * not required.
- */
+/** Sticky layout + header filter row + toolbar search + client pagination. */
 export const StickyFilterAndPagination = (): React.ReactElement => {
-  const [query, setQuery] = React.useState('');
-
-  const filteredData = React.useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return allRows;
-    return {
-      nodes: allRows.nodes.filter(
-        (row) =>
-          row.paymentId.toLowerCase().includes(normalized) ||
-          row.name.toLowerCase().includes(normalized) ||
-          row.status.toLowerCase().includes(normalized),
-      ),
-    };
-  }, [query]);
+  const [globalFilter, setGlobalFilter] = React.useState('');
 
   return (
     <Box
@@ -62,27 +55,22 @@ export const StickyFilterAndPagination = (): React.ReactElement => {
       <Box paddingBottom="spacing.4">
         <Heading>Sticky column + header, search filter, pagination</Heading>
         <Text>
-          Wide dataset with horizontal scroll, first column frozen, toolbar search filtering rows
-          before pagination. Compass `Table` does not expose column filter-row props here — this
-          mirrors how apps combine toolbar search with table layout props.
+          Wide dataset with horizontal scroll, first column frozen, per-column header filters, global
+          toolbar search, and pagination.
         </Text>
       </Box>
       <Table
-        data={filteredData}
+        data={allRows}
+        filterFunctions={filterFunctions}
+        globalFilterValue={globalFilter}
+        onGlobalFilterValueChange={setGlobalFilter}
         isHeaderSticky
         isFirstColumnSticky
         height="420px"
         gridTemplateColumns="minmax(140px, 160px) minmax(120px, 1fr) minmax(120px, 1fr) minmax(100px, 1fr) minmax(160px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)"
         toolbar={
           <TableToolbar title="Payments">
-            <TableToolbarActions>
-              <TextInput
-                label="Filter payments"
-                placeholder="Search ID, name, or status"
-                value={query}
-                onChange={({ value }) => setQuery(value ?? '')}
-              />
-            </TableToolbarActions>
+            <TableToolbarSearch placeholder="Search all columns" />
           </TableToolbar>
         }
         pagination={
@@ -98,8 +86,8 @@ export const StickyFilterAndPagination = (): React.ReactElement => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Name</TableHeaderCell>
+                <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
+                <TableHeaderCell headerKey="NAME">Name</TableHeaderCell>
                 <TableHeaderCell>Account</TableHeaderCell>
                 <TableHeaderCell>Method</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>

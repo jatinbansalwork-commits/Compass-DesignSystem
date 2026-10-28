@@ -14,7 +14,7 @@ import { Badge } from '~components/Badge';
 import { useTheme } from '~components/CompassProvider';
 
 export default {
-  title: 'Components/Table/API',
+  title: 'Components/Table/Parts/Toolbar',
   component: TableToolbar,
   parameters: {
     docs: {

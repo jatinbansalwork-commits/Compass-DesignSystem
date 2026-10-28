@@ -27,6 +27,11 @@ type TableSortOrderEntry = {
   direction: TableSortDirection;
 };
 
+type TableInitialSort = {
+  sortKey: string;
+  direction: TableSortDirection;
+};
+
 type TableColumnFilterConfig = {
   type: 'dropdown' | 'multiselect';
   options: { label: string; value: string }[];
@@ -129,10 +134,13 @@ type TableHeaderCellProps = {
 
 type TableProps<Item> = {
   /**
-   * The children of the Table component should be a function that returns TableHeader, TableBody and TableFooter components.
-   * The function will be called with the tableData prop.
+   * Composable table markup. Omit when using declarative `columns` instead (mutually exclusive).
    */
-  children: (tableData: TableNode<Item>[]) => React.ReactElement;
+  children?: (tableData: TableNode<Item>[]) => React.ReactElement;
+  /**
+   * Declarative columns — Table builds header/body from config. Mutually exclusive with `children`.
+   */
+  columns?: TableColumnConfig<Item>[];
   /**
    * The data prop is an object with a nodes property that is an array of objects.
    * Each object in the array is a row in the table.
@@ -277,6 +285,20 @@ type TableProps<Item> = {
    */
   defaultSelectedIds?: Identifier[];
   /**
+   * Controlled selected row ids. When set, selection state is driven by this prop and
+   * `onSelectionChange` still fires on user interaction.
+   */
+  selectedIds?: Identifier[];
+  /**
+   * Sort applied on mount before any header click. `sortKey` must exist in `sortFunctions`.
+   */
+  initialSort?: TableInitialSort;
+  /** Controlled expanded group row ids (`isGrouped`). */
+  expandedRowIds?: Identifier[];
+  /** Default expanded ids; defaults to all group-header ids. */
+  defaultExpandedRowIds?: Identifier[];
+  onExpandedRowIdsChange?: (ids: Identifier[]) => void;
+  /**
    * The backgroundColor prop determines the background color of the table.
    **/
   backgroundColor?: TableBackgroundColors | 'transparent';
@@ -310,6 +332,12 @@ type TableProps<Item> = {
   globalFilterValue?: string;
   defaultGlobalFilterValue?: string;
   onGlobalFilterValueChange?: (value: string) => void;
+  /**
+   * When `false`, skips the auto-injected per-column filter row under the header (filtering via
+   * `filterFunctions` / `columnFilterValues` still runs). Use with toolbar advanced filters.
+   * @default true
+   */
+  showHeaderFilterRow?: boolean;
 } & DataAnalyticsAttribute &
   StyledPropsCompass;
 
@@ -409,6 +437,25 @@ type TableCellProps = {
    **/
   backgroundColor?: TableBackgroundColors | 'transparent';
 } & TableCellGridSpanningProps &
+  DataAnalyticsAttribute;
+
+type TableColumnConfig<Item> = {
+  key: string;
+  header: React.ReactNode;
+  render: (item: TableNode<Item>, index: number) => React.ReactNode;
+  width?: string;
+  headerKey?: string;
+  textAlign?: TableCellProps['textAlign'];
+};
+
+type TableTitleDescriptionBehavior = 'truncate' | 'wrap';
+
+type TableTitleDescriptionCellProps = {
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  descriptionBehavior?: TableTitleDescriptionBehavior;
+  descriptionLines?: number;
+} & TestID &
   DataAnalyticsAttribute;
 
 type TableEditableCellProps = Pick<
@@ -721,6 +768,10 @@ export type {
   TableToolbarPlacement,
   TableColumnFilterConfig,
   TableSortOrderEntry,
+  TableInitialSort,
+  TableColumnConfig,
+  TableTitleDescriptionCellProps,
+  TableTitleDescriptionBehavior,
   TableBackgroundColors,
   TablePaginationType,
   TablePaginationCommonProps,

@@ -33,6 +33,7 @@ import { IconButton } from '~components/Button/IconButton';
 import { Dropdown, DropdownOverlay } from '~components/Dropdown';
 import { SelectInput } from '~components/Input/DropdownInputTriggers';
 import { ActionList, ActionListItem } from '~components/ActionList';
+import { VisuallyHidden } from '~components/VisuallyHidden';
 
 const SortButton = styled.button(({ theme }) => ({
   cursor: 'pointer',
@@ -357,11 +358,10 @@ const TableHeaderFilterRow = ({
                   isTableInputCell
                   id={`table-header-filter-${headerKey}`}
                   size="small"
-                  value={
-                    typeof columnFilterValues[headerKey] === 'string'
-                      ? columnFilterValues[headerKey]
-                      : ''
-                  }
+                  value={(() => {
+                    const filterValue = columnFilterValues[headerKey];
+                    return typeof filterValue === 'string' ? filterValue : '';
+                  })()}
                   onChange={({ value }) => setColumnFilterValue(headerKey, value ?? '')}
                   placeholder={`Filter ${labelText}`}
                   accessibilityLabel={`Filter by ${labelText}`}
@@ -414,7 +414,7 @@ const getFilterRowStickyTopOffsetPx = ({
 
 const _TableHeader = ({ children, ...rest }: TableHeaderRowProps): React.ReactElement => {
   const { tableToolbarPlacement } = useTableRowContext();
-  const { filterableColumns } = useTableDataContext();
+  const { filterableColumns, showHeaderFilterRow } = useTableDataContext();
   const { theme } = useTheme();
 
   // `TableHeader` may contain more than one `TableHeaderRow` (grouped multi-row headers - earlier
@@ -446,7 +446,7 @@ const _TableHeader = ({ children, ...rest }: TableHeaderRowProps): React.ReactEl
       {...makeAnalyticsAttribute(rest)}
     >
       {decoratedChildren}
-      {filterableColumns.length > 0 && (
+      {showHeaderFilterRow && filterableColumns.length > 0 && (
         <TableHeaderFilterRow
           headerRow={children}
           stickyTopOffsetPx={getFilterRowStickyTopOffsetPx({
@@ -626,8 +626,9 @@ const TableHeaderCellCheckbox = ({
           isDisabled={isDisabled}
           isIndeterminate={isIndeterminate}
           onChange={onChange}
-          accessibilityLabel="Select all rows"
-        />
+        >
+          <VisuallyHidden>Select all rows</VisuallyHidden>
+        </Checkbox>
       </BaseBox>
     </TableHeaderCell>
   );

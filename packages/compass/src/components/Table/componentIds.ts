@@ -5,6 +5,7 @@ const ComponentIds = {
   TableCell: 'TableCell',
   TableEditableCell: 'TableEditableCell',
   TableEditableSearchCell: 'TableEditableSearchCell',
+  TableTitleDescriptionCell: 'TableTitleDescriptionCell',
   TableToolbar: 'TableToolbar',
   TableToolbarActions: 'TableToolbarActions',
   TableToolbarSearch: 'TableToolbarSearch',

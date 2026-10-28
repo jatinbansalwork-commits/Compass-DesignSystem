@@ -12,7 +12,7 @@ import { Badge } from '~components/Badge';
 import { getStyledPropsArgTypes } from '~components/Box/BaseBox/storybookArgTypes';
 
 export default {
-  title: 'Components/Table/API/TableToolbarSearch',
+  title: 'Components/Table/Parts/Toolbar Search',
   tags: ['autodocs'],
   component: TableToolbarSearch,
   args: {

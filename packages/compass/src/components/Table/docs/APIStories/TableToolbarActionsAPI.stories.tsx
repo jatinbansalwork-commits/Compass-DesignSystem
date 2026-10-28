@@ -15,7 +15,7 @@ import { getStyledPropsArgTypes } from '~components/Box/BaseBox/storybookArgType
 import { useTheme } from '~components/CompassProvider';
 
 export default {
-  title: 'Components/Table/API',
+  title: 'Components/Table/Parts/Toolbar Actions',
   component: TableToolbarActions,
   argTypes: {
     ...getStyledPropsArgTypes(),

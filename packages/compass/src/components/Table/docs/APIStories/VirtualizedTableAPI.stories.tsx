@@ -13,7 +13,7 @@ import { Badge } from '~components/Badge';
 import { Button } from '~components/Button';
 
 export default {
-  title: 'Components/Table/API',
+  title: 'Components/Table/Features/Virtualized',
   component: TableVirtualizedWrapper,
   args: {},
   argTypes: {

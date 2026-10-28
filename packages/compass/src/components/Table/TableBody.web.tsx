@@ -30,6 +30,8 @@ import { size } from '~tokens/global';
 import { makeAccessible } from '~utils/makeAccessible';
 import { useIsomorphicLayoutEffect } from '~utils/useIsomorphicLayoutEffect';
 import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
+import { IconButton } from '~components/Button/IconButton';
+import { ChevronDownIcon, ChevronRightIcon } from '~components/Icons';
 const StyledBody = styled(Body)<{
   $isSelectable: boolean;
   $showStripedRows: boolean;
@@ -361,6 +363,8 @@ const _TableRow = <Item,>({
     isVirtualized,
     isGrouped,
     multiSelectTrigger,
+    expandedRowIds,
+    toggleRowExpansionById,
   } = useTableRowContext();
   const isSelectable = selectionType !== 'none';
   const isMultiSelect = selectionType === 'multiple';
@@ -405,6 +409,46 @@ const _TableRow = <Item,>({
     }
   }, [hasHoverActions]);
 
+  const isExpanded = expandedRowIds.includes(item.id);
+
+  const bodyCells = useMemo(() => {
+    if (!isGroupHeader || !isGrouped) {
+      return children;
+    }
+    const childArray = React.Children.toArray(children);
+    if (childArray.length === 0) {
+      return children;
+    }
+    const [firstChild, ...restChildren] = childArray;
+    if (!React.isValidElement(firstChild)) {
+      return children;
+    }
+    const firstElement = firstChild as React.ReactElement<{ children?: React.ReactNode }>;
+    const enhancedFirst = React.cloneElement(firstElement, {
+      children: (
+        <BaseBox display="flex" flexDirection="row" alignItems="center" gap="spacing.2">
+          <IconButton
+            icon={isExpanded ? ChevronDownIcon : ChevronRightIcon}
+            accessibilityLabel={isExpanded ? 'Collapse group' : 'Expand group'}
+            onClick={(event) => {
+              event.stopPropagation();
+              toggleRowExpansionById(item.id);
+            }}
+          />
+          {firstElement.props.children}
+        </BaseBox>
+      ),
+    });
+    return [enhancedFirst, ...restChildren];
+  }, [
+    children,
+    isExpanded,
+    isGroupHeader,
+    isGrouped,
+    item.id,
+    toggleRowExpansionById,
+  ]);
+
   return (
     <StyledRow
       disabled={isDisabled}
@@ -435,7 +479,7 @@ const _TableRow = <Item,>({
           isIndeterminate={isIndeterminate}
         />
       )}
-      {children}
+      {bodyCells}
       {hoverActions ? (
         <TableCell _hasPadding={false}>
           <BaseBox

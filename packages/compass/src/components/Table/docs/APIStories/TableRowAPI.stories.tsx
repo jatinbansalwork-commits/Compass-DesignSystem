@@ -12,7 +12,7 @@ import { CopyIcon, TrashIcon } from '~components/Icons';
 import { IconButton } from '~components/Button/IconButton';
 
 export default {
-  title: 'Components/Table/API',
+  title: 'Components/Table/Parts/Row',
   component: TableRow,
   args: {},
   argTypes: {

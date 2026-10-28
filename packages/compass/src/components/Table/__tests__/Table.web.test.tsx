@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { fireEvent, waitFor } from '@testing-library/react';
 import { Table } from '../Table';
 import { TableBody, TableCell, TableRow, TableVirtualizedWrapper } from '../TableBody';
@@ -1014,6 +1014,47 @@ describe('<Table />', () => {
     const deselectButton = getByText('Deselect');
     await user.click(deselectButton);
     expect(onSelectionChange).toHaveBeenCalledWith({ values: [], selectedIds: [] });
+  });
+
+  it('supports controlled selectedIds', async () => {
+    const onSelectionChange = jest.fn();
+    const user = userEvent.setup();
+    const ControlledTable = (): React.ReactElement => {
+      const [selectedIds, setSelectedIds] = React.useState<string[]>(['2']);
+      return (
+        <Table
+          data={{ nodes: nodes.slice(0, 5) }}
+          selectionType="multiple"
+          selectedIds={selectedIds}
+          onSelectionChange={({ selectedIds: ids }) => {
+            setSelectedIds(ids.map(String));
+            onSelectionChange({ selectedIds: ids });
+          }}
+        >
+          {(tableData) => (
+            <>
+              <TableHeader>
+                <TableHeaderRow>
+                  <TableHeaderCell>Payment ID</TableHeaderCell>
+                </TableHeaderRow>
+              </TableHeader>
+              <TableBody>
+                {tableData.map((tableItem, index) => (
+                  <TableRow item={tableItem} key={index}>
+                    <TableCell>{tableItem.paymentId}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </>
+          )}
+        </Table>
+      );
+    };
+    const { getByText } = renderWithTheme(<ControlledTable />);
+    expect(getByText('rzp02').closest('tr')).toHaveAttribute('aria-selected', 'true');
+    const thirdRow = getByText('rzp03').closest('td');
+    if (thirdRow) await user.click(thirdRow);
+    expect(onSelectionChange).toHaveBeenLastCalledWith({ selectedIds: ['2', '3'] });
   });
 
   it('should render table with client side pagination', async () => {

@@ -27,6 +27,7 @@ One line per component. Read `<Name>.md` in this directory for full props, const
 - **ChatMessage**: ChatMessage is a visual representation of a message in a chat interface.
 - **Checkbox**: Checkbox is a form control that allows users to select one or multiple options from a set of choices.
 - **Chip**: Chip and ChipGroup components enable users to make selections, filter content, and trigger actions through selectable elements.
+- **CitedFieldRow**: Label/value rows for extracted data with optional document or Track & Trace citation chips.
 - **Code**: The Code component is designed for displaying inline code snippets, token names, or variable names within text content.
 - **Collapsible**: Collapsible is a component that allows users to toggle the visibility of hidden content within a container.
 - **ColorInput**: ColorInput is a form input for picking a color.
@@ -67,6 +68,7 @@ One line per component. Read `<Name>.md` in this directory for full props, const
 - **ProgressBar**: A ProgressBar is a visual indicator that displays the progress of a process or task.
 - **QuickFilter**: QuickFilter and QuickFilterGroup components provide a user-friendly interface for displaying and selecting filterable options.
 - **Radio**: The Radio and RadioGroup components are used in forms when a user needs to select a single value from multiple options.
+- **ResizableSplit**: A controlled two-pane split with draggable separator, keyboard support, and clamped min widths for start and end panes.
 - **Klearsense**: Klearsense is a WebGL-powered component that renders an animated glass refraction effect with video/image textures, colorama color grading, displacement, bloom, and light sweep effects.
 - **KlearsenseGradient**: KlearsenseGradient renders an animated WebGL fluid gradient clipped to an SVG mask shape.
 - **SankeyChart**: SankeyChart is a flow diagram that shows how a quantity moves across multiple stages.

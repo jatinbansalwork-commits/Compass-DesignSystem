@@ -427,6 +427,22 @@ const componentData: ComponentStatusDataType = [
     },
   },
   {
+    name: 'ResizableSplit',
+    description:
+      'Controlled two-pane split layout with a draggable separator, keyboard resize, and clamped minimum pane widths.',
+    platform: 'web',
+    frameworks: {
+      react: {
+        status: 'released',
+        releasedIn: '12.130.0',
+        storybookLink: 'Components/ResizableSplit',
+      },
+      svelte: {
+        status: 'to-be-decided',
+      },
+    },
+  },
+  {
     name: 'Text',
     description:
       'Text component is used to display main content of the page. It is often clubbed with Title or Heading to display content in a hierarchical structure. It applies responsive styles automatically based on the device it is being rendered on.',
@@ -759,6 +775,22 @@ const componentData: ComponentStatusDataType = [
         status: 'released',
         releasedIn: '10.4.0',
         storybookLink: 'Components/Chip/Chip',
+      },
+      svelte: {
+        status: 'to-be-decided',
+      },
+    },
+  },
+  {
+    name: 'CitedFieldRow',
+    description:
+      'Label/value rows for extracted data with optional document or Track & Trace citation chips, for field tables inside cards.',
+    platform: 'web',
+    frameworks: {
+      react: {
+        status: 'released',
+        releasedIn: '12.130.0',
+        storybookLink: 'Components/CitedFieldRow',
       },
       svelte: {
         status: 'to-be-decided',

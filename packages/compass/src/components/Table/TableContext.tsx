@@ -92,6 +92,8 @@ export type TableDataContextType<Item> = {
   filterableColumns: string[];
   /** @see TableProps['filterConfig'] */
   filterConfig: Record<string, TableColumnFilterConfig>;
+  /** @see TableProps['showHeaderFilterRow'] */
+  showHeaderFilterRow: boolean;
 };
 
 const TableRowContext = React.createContext<TableRowContextType>({
@@ -139,6 +141,7 @@ const TableDataContext = React.createContext<TableDataContextType<unknown>>({
   setColumnFilterValue: () => {},
   filterableColumns: [],
   filterConfig: {},
+  showHeaderFilterRow: true,
 });
 
 const useTableRowContext = (): TableRowContextType => {

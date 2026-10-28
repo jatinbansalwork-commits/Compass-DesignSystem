@@ -14,7 +14,7 @@ import { Box } from '~components/Box';
 import { Amount } from '~components/Amount';
 
 const meta: Meta<TableProps<unknown>> = {
-  title: 'Components/Table/Grouping',
+  title: 'Components/Table/Features/Grouping',
   component: Table,
   parameters: {
     docs: {
@@ -135,6 +135,8 @@ const GroupingTableTemplate = ({
   gridColumnEnd,
   defaultSelectedIds,
   disabledIds,
+  expandedRowIds,
+  onExpandedRowIdsChange,
 }: {
   data: typeof sampleData;
   selectionType: 'none' | 'multiple';
@@ -143,6 +145,8 @@ const GroupingTableTemplate = ({
   gridColumnEnd?: number;
   defaultSelectedIds?: Identifier[];
   disabledIds?: Identifier[];
+  expandedRowIds?: Identifier[];
+  onExpandedRowIdsChange?: (ids: Identifier[]) => void;
 }): React.ReactElement => {
   return (
     <Table
@@ -152,6 +156,8 @@ const GroupingTableTemplate = ({
       onSelectionChange={onSelectionChange}
       showBorderedCells
       defaultSelectedIds={defaultSelectedIds}
+      expandedRowIds={expandedRowIds}
+      onExpandedRowIdsChange={onExpandedRowIdsChange}
     >
       {(tableData) => (
         <>
@@ -262,5 +268,24 @@ export const TableGroupingWithDisabledRows: StoryFn<TableProps<unknown>> = () =>
 };
 
 TableGroupingWithDisabledRows.storyName = 'Table Grouping with Disabled Rows';
+
+export const TableGroupingWithControlledExpansion: StoryFn<TableProps<unknown>> = () => {
+  const [expandedRowIds, setExpandedRowIds] = useState<Identifier[]>(['july13']);
+
+  return (
+    <Box>
+      <GroupingTableTemplate
+        data={sampleData}
+        selectionType="none"
+        expandedRowIds={expandedRowIds}
+        onExpandedRowIdsChange={setExpandedRowIds}
+        gridColumnStart={1}
+        gridColumnEnd={5}
+      />
+    </Box>
+  );
+};
+
+TableGroupingWithControlledExpansion.storyName = 'Controlled expansion';
 
 export default meta;

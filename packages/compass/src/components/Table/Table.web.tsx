@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Table as ReactTable } from '@table-library/react-table-library/table';
 import { useTheme as useTableTheme } from '@table-library/react-table-library/theme';
 import type { MiddlewareFunction } from '@table-library/react-table-library/types/common';
-import { useSort } from '@table-library/react-table-library/sort';
 import { usePagination } from '@table-library/react-table-library/pagination';
 import {
   SelectClickTypes,
@@ -32,7 +31,15 @@ import type {
   Identifier,
   TablePaginationType,
   TableHeaderRowProps,
+  TableSortOrderEntry,
 } from './types';
+import { applyMultiSort } from './sort/applyMultiSort';
+import { toggleTableSort } from './sort/toggleTableSort';
+import { collectGroupHeaderIds } from './utils/collectGroupHeaderIds';
+import {
+  buildTableFromColumnConfig,
+  gridTemplateColumnsFromConfig,
+} from './buildColumnsFromConfig';
 import { getTableBodyStyles } from './commonStyles';
 import { TableSurface } from './TableSurface.web';
 import { makeBorderSize, makeMotionTime, makeSpace } from '~utils';
@@ -51,7 +58,6 @@ import getIn from '~utils/lodashButBetter/get';
 import { makeAccessible } from '~utils/makeAccessible';
 import { useIsMobile } from '~utils/useIsMobile';
 import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
-import { useIsomorphicLayoutEffect } from '~utils/useIsomorphicLayoutEffect';
 import { useListViewContext } from '~components/ListView/ListViewContext';
 
 const rowSelectType: Record<
@@ -178,7 +184,8 @@ const StyledSkeletonRow = styled(BaseBox)<{ $columns: number; $isHeader?: boolea
 );
 
 const _Table = <Item,>({
-  children,
+  children: childrenProp,
+  columns,
   data,
   multiSelectTrigger = 'row',
   selectionType = 'none',
@@ -203,6 +210,11 @@ const _Table = <Item,>({
   isRefreshing = false,
   showBorderedCells = false,
   defaultSelectedIds = [],
+  selectedIds: selectedIdsProp,
+  initialSort,
+  expandedRowIds: expandedRowIdsProp,
+  defaultExpandedRowIds,
+  onExpandedRowIdsChange,
   backgroundColor = tableBackgroundColor,
   isGrouped = false,
   checkboxDisplay = 'always',
@@ -214,10 +226,34 @@ const _Table = <Item,>({
   globalFilterValue: globalFilterValueProp,
   defaultGlobalFilterValue = '',
   onGlobalFilterValueChange,
+  showHeaderFilterRow = true,
   ...rest
 }: TableProps<Item>): React.ReactElement => {
   const { theme, colorScheme } = useTheme();
   const { isInsideListView } = useListViewContext();
+
+  if (__DEV__) {
+    if (columns && childrenProp) {
+      throwCompassError({
+        message: 'Use either `columns` or `children` on Table, not both.',
+        moduleName: 'Table',
+      });
+    }
+    if (!columns && !childrenProp) {
+      throwCompassError({
+        message: 'Table requires `children` or `columns`.',
+        moduleName: 'Table',
+      });
+    }
+  }
+
+  const children =
+    childrenProp ??
+    ((tableData: TableNode<Item>[]) => buildTableFromColumnConfig(columns ?? [], tableData));
+
+  const resolvedGridTemplateColumns =
+    gridTemplateColumns ??
+    (columns?.length ? gridTemplateColumnsFromConfig(columns) : undefined);
 
   const [internalGlobalFilterValue, setInternalGlobalFilterValue] = React.useState(
     defaultGlobalFilterValue,
@@ -295,8 +331,33 @@ const _Table = <Item,>({
     [data, applyFilters, activeColumnFilters, globalFilterValue],
   );
 
-  const [selectedRows, setSelectedRows] = React.useState<TableNode<unknown>['id'][]>(
-    selectionType !== 'none' ? defaultSelectedIds : [],
+  const [sortOrder, setSortOrder] = React.useState<TableSortOrderEntry[]>(() =>
+    initialSort?.sortKey && sortFunctions?.[initialSort.sortKey]
+      ? [{ sortKey: initialSort.sortKey, direction: initialSort.direction }]
+      : [],
+  );
+
+  const sortedFilteredData: TableData<Item> = useMemo(() => {
+    if (!sortFunctions || sortOrder.length === 0) {
+      return filteredData;
+    }
+    return {
+      nodes: applyMultiSort(filteredData.nodes, sortOrder, sortFunctions),
+    };
+  }, [filteredData, sortFunctions, sortOrder]);
+
+  const [internalSelectedRows, setInternalSelectedRows] = React.useState<
+    TableNode<unknown>['id'][]
+  >(selectionType !== 'none' ? defaultSelectedIds : []);
+  const isSelectionControlled = selectedIdsProp !== undefined;
+  const selectedRows = isSelectionControlled ? selectedIdsProp : internalSelectedRows;
+  const setSelectedRows = useCallback(
+    (ids: Identifier[]): void => {
+      if (!isSelectionControlled) {
+        setInternalSelectedRows(ids);
+      }
+    },
+    [isSelectionControlled],
   );
   const [disabledRows, setDisabledRows] = React.useState<TableNode<unknown>['id'][]>([]);
   const [totalItems, setTotalItems] = React.useState(data.nodes.length || 0);
@@ -309,6 +370,14 @@ const _Table = <Item,>({
   const [hasHoverActions, setHasHoverActions] = React.useState(false);
   const tableRootComponent = children([]);
   const isVirtualized = getComponentId(tableRootComponent) === ComponentIds.VirtualizedTable;
+
+  if (__DEV__ && isGrouped && isVirtualized) {
+    throwCompassError({
+      message:
+        '`isGrouped` and virtualized tables are not supported together — collapsed groups will still render incorrectly.',
+      moduleName: 'Table',
+    });
+  }
 
   const isMobile = useIsMobile();
   const lastHoverActionsColWidth = isMobile ? '1fr' : '0px';
@@ -452,8 +521,8 @@ const _Table = <Item,>({
         : ''
     }
     --data-table-library_grid-template-columns: ${
-      gridTemplateColumns
-        ? `${selectionType === 'multiple' ? 'min-content' : ''} ${gridTemplateColumns} ${
+      resolvedGridTemplateColumns
+        ? `${selectionType === 'multiple' ? 'min-content' : ''} ${resolvedGridTemplateColumns} ${
             hasHoverActions ? lastHoverActionsColWidth : ''
           }`
         : ` ${
@@ -481,8 +550,8 @@ const _Table = <Item,>({
   });
 
   useEffect(() => {
-    setTotalItems(filteredData.nodes.length);
-  }, [filteredData.nodes]);
+    setTotalItems(sortedFilteredData.nodes.length);
+  }, [sortedFilteredData.nodes]);
 
   // Selection Logic
   const onSelectChange: MiddlewareFunction = (_, state): void => {
@@ -525,7 +594,7 @@ const _Table = <Item,>({
         rowSelectConfig.fns.onToggleById(id);
       }
     },
-    [rowSelectConfig.fns],
+    [rowSelectConfig.fns, selectionType, isGrouped],
   );
 
   const deselectAllRows = useMemo(
@@ -546,7 +615,7 @@ const _Table = <Item,>({
         return;
       }
 
-      const visibleSelectableIds = filteredData.nodes
+      const visibleSelectableIds = sortedFilteredData.nodes
         .map((item: TableNode<Item>) => (disabledRows.includes(item.id) ? null : item.id))
         .filter(Boolean) as Identifier[];
       const isAllVisibleSelected =
@@ -560,65 +629,91 @@ const _Table = <Item,>({
         rowSelectConfig.fns.onAddByIds(idsToAdd, {});
       }
     },
-    [rowSelectConfig.fns, filteredData.nodes, selectedRows, disabledRows, isGrouped],
+    [rowSelectConfig.fns, sortedFilteredData.nodes, selectedRows, disabledRows, isGrouped],
   );
+
+  const defaultExpandedIds = useMemo(
+    () =>
+      defaultExpandedRowIds ??
+      (isGrouped ? collectGroupHeaderIds(data.nodes) : []),
+    [data.nodes, defaultExpandedRowIds, isGrouped],
+  );
+
+  const [internalExpandedRowIds, setInternalExpandedRowIds] = React.useState<Identifier[]>(
+    defaultExpandedIds,
+  );
+
+  const expandedRowIds = expandedRowIdsProp ?? internalExpandedRowIds;
+
+  const onTreeChange: MiddlewareFunction = (_, state): void => {
+    const ids: Identifier[] = state.ids ?? [];
+    if (expandedRowIdsProp === undefined) {
+      setInternalExpandedRowIds(ids);
+    }
+    onExpandedRowIdsChange?.(ids);
+  };
 
   const tree = useTree(
     isGrouped ? data : { nodes: [] },
-    {},
+    isGrouped
+      ? {
+          state: { ids: expandedRowIds },
+          onChange: onTreeChange,
+        }
+      : {},
     {
-      // Disable row click expand/collapse (fallback enables unwanted expand/collapse on row click)
       clickType: undefined,
-      // Disable all indentation for flat appearance
       treeYLevel: undefined,
     },
   );
 
-  useIsomorphicLayoutEffect(() => {
-    if (isGrouped && tree?.fns.onToggleAll) {
-      tree.fns.onToggleAll({ ids: [] });
-    }
-  }, []);
-
-  // Sort Logic
-  const handleSortChange: MiddlewareFunction = (_, state) => {
-    onSortChange?.({
-      sortKey: state.sortKey,
-      isSortReversed: state.reverse,
-    });
-  };
-
-  const sort = useSort(
-    filteredData,
-    {
-      onChange: handleSortChange,
+  const toggleRowExpansionById = useCallback(
+    (id: Identifier): void => {
+      tree.fns.onToggleById(id);
     },
-    {
-      // @ts-expect-error ignore this, if sortFunctions is undefined, it will be ignored
-      sortFns: sortFunctions,
-    },
+    [tree.fns],
   );
 
   const currentSortedState: TableDataContextType<Item>['currentSortedState'] = useMemo(() => {
-    const sortKey = sort.state.sortKey;
-    const hasSort = Boolean(sortKey && sortKey !== 'NONE');
+    const primary = sortOrder[0];
     return {
-      sortKey: hasSort ? sortKey : '',
-      isSortReversed: sort.state.reverse,
+      sortKey: primary?.sortKey ?? '',
+      isSortReversed: primary?.direction === 'desc',
       sortableColumns: Object.keys(sortFunctions ?? {}),
-      sortOrder: hasSort
-        ? [{ sortKey, direction: sort.state.reverse ? ('desc' as const) : ('asc' as const) }]
-        : [],
+      sortOrder,
     };
-  }, [sort.state, sortFunctions]);
+  }, [sortOrder, sortFunctions]);
+
+  const onSortChangeRef = useRef(onSortChange);
+  onSortChangeRef.current = onSortChange;
+
+  const notifySortChange = useCallback((order: TableSortOrderEntry[]): void => {
+    const primary = order[0];
+    if (!primary) {
+      onSortChangeRef.current?.({ sortKey: '', isSortReversed: false });
+      return;
+    }
+    onSortChangeRef.current?.({
+      sortKey: primary.sortKey,
+      isSortReversed: primary.direction === 'desc',
+    });
+  }, []);
 
   const toggleSort = useCallback(
-    (sortKey: string, _isMultiSort?: boolean): void => {
-      sort.fns.onToggleSort({
-        sortKey,
+    (sortKey: string, isMultiSort?: boolean): void => {
+      if (!sortFunctions?.[sortKey]) {
+        return;
+      }
+      setSortOrder((current) => {
+        const next = toggleTableSort(current, sortKey, {
+          shiftKey: isMultiSort,
+          removableSort: true,
+        });
+        notifySortChange(next);
+        return next;
       });
     },
-    [sort.fns],
+    [sortFunctions, notifySortChange],
   );
 
   // Pagination
@@ -632,7 +727,7 @@ const _Table = <Item,>({
       : undefined;
 
   const paginationConfig = usePagination(
-    filteredData,
+    sortedFilteredData,
     {
       state: {
         page: 0,
@@ -697,11 +792,11 @@ const _Table = <Item,>({
       setHasHoverActions,
       multiSelectTrigger,
       columnCount,
-      gridTemplateColumns,
+      gridTemplateColumns: resolvedGridTemplateColumns,
       isVirtualized,
       isGrouped,
-      expandedRowIds: [],
-      toggleRowExpansionById: () => {},
+      expandedRowIds,
+      toggleRowExpansionById,
       tableToolbarPlacement: toolbar?.props?.placement ?? 'inline',
       checkboxDisplay,
     }),
@@ -711,7 +806,7 @@ const _Table = <Item,>({
       toggleRowSelectionById,
       toggleAllRowsSelection,
       deselectAllRows,
-      gridTemplateColumns,
+      resolvedGridTemplateColumns,
       rowDensity,
       columnCount,
       showStripedRows,
@@ -729,6 +824,8 @@ const _Table = <Item,>({
       isGrouped,
       toolbar?.props?.placement,
       checkboxDisplay,
+      expandedRowIds,
+      toggleRowExpansionById,
     ],
   );
 
@@ -742,13 +839,14 @@ const _Table = <Item,>({
       currentPaginationState,
       paginationType,
       setPaginationType,
-      tableData: filteredData.nodes,
+      tableData: sortedFilteredData.nodes,
       globalFilterValue,
       setGlobalFilterValue,
       columnFilterValues,
       setColumnFilterValue,
       filterableColumns,
       filterConfig,
+      showHeaderFilterRow,
     }),
     [
       totalItems,
@@ -759,13 +857,14 @@ const _Table = <Item,>({
       currentPaginationState,
       paginationType,
       setPaginationType,
-      filteredData.nodes,
+      sortedFilteredData.nodes,
       globalFilterValue,
       setGlobalFilterValue,
       columnFilterValues,
       setColumnFilterValue,
       filterableColumns,
       filterConfig,
+      showHeaderFilterRow,
     ],
   );
 
@@ -852,11 +951,11 @@ const _Table = <Item,>({
             <StyledReactTable
               role="table"
               layout={{ fixedHeader: shouldHeaderBeSticky, horizontalScroll: true }}
-              data={filteredData}
+              data={sortedFilteredData}
               // @ts-expect-error ignore this, theme clashes with styled-component's theme. We're using useTheme from blade to get actual theme
               theme={tableTheme}
               select={selectionType !== 'none' ? rowSelectConfig : null}
-              sort={sortFunctions ? sort : null}
+              sort={null}
               tree={isGrouped ? tree : null}
               $styledProps={{
                 height,
@@ -880,6 +979,37 @@ const _Table = <Item,>({
     </TableRowContext.Provider>
   );
 };
+
+/**
+ * Table — displays tabular data with optional sorting, filtering, selection, grouping, and
+ * virtualization. Compose with `TableHeader`, `TableBody`, `TableRow`, and `TableCell`, or use
+ * {@link CompassDataTable} for a Prime-style experience shell.
+ *
+ * @example
+ * ```tsx
+ * <Table data={{ nodes }} sortFunctions={sortFunctions}>
+ *   {(rows) => (
+ *     <>
+ *       <TableHeader>
+ *         <TableHeaderRow>
+ *           <TableHeaderCell headerKey="NAME">Name</TableHeaderCell>
+ *         </TableHeaderRow>
+ *       </TableHeader>
+ *       <TableBody>
+ *         {rows.map((row) => (
+ *           <TableRow key={row.id} item={row}>
+ *             <TableCell>{row.name}</TableCell>
+ *           </TableRow>
+ *         ))}
+ *       </TableBody>
+ *     </>
+ *   )}
+ * </Table>
+ * ```
+ *
+ * ----
+ * Design Storybook link — add URL when available (confirm path with design portal).
+ */
 const Table = assignWithoutSideEffects(_Table, {
   componentId: ComponentIds.Table,
 });

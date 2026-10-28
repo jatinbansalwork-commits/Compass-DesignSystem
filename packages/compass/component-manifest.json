@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-10-27T14:26:03.024Z",
+  "generatedAt": "2026-10-28T01:30:00.000Z",
   "components": [
     {
       "name": "Accordion",
@@ -218,6 +218,15 @@
       "hasJSDoc": true,
       "typesFiles": [
         "src/components/Chip/types.ts"
+      ]
+    },
+    {
+      "name": "CitedFieldRow",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 20,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/CitedFieldRow/types.ts"
       ]
     },
     {
@@ -502,6 +511,15 @@
       "documentedProps": 0,
       "hasJSDoc": false,
       "typesFiles": []
+    },
+    {
+      "name": "ResizableSplit",
+      "exportedFrom": "@klearnow/compass/components",
+      "documentedProps": 10,
+      "hasJSDoc": true,
+      "typesFiles": [
+        "src/components/ResizableSplit/types.ts"
+      ]
     },
     {
       "name": "RollingText",
