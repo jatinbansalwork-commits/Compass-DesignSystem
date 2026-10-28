@@ -75,6 +75,12 @@ const StyledBaseNativeButton = styled.button<
   Omit<StyledBaseInputProps, 'accessibilityProps' | 'setCurrentInteraction' | 'type'>
 >((props) => ({
   ...getWebInputStyles(props),
+  ...(props.isDropdownTrigger
+    ? {
+        display: 'flex',
+        alignItems: 'center',
+      }
+    : undefined),
 }));
 
 const StyledBaseDivWrapper = styled.div<

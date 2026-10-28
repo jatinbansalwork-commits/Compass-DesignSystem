@@ -211,15 +211,21 @@ const BaseInputTagSlot = ({
   }
 
   // tag height changes in mobile and desktop so we keep different paddings to make it look as expected
-  const paddingYWithTags = isMobile ? 'spacing.1' : 'spacing.2';
+  const paddingYWithTags = isInsideTableEditableCell
+    ? 'spacing.0'
+    : isMobile
+      ? 'spacing.1'
+      : 'spacing.2';
+  const paddingLeft = isInsideTableEditableCell ? 'spacing.3' : 'spacing.4';
 
   return (
     <TagSlotContainer
       ref={slotRef}
       className="tags-slot"
       paddingY={paddingYWithTags}
-      paddingLeft="spacing.4"
+      paddingLeft={paddingLeft}
       display="flex"
+      alignItems={isInsideTableEditableCell ? 'center' : undefined}
       flex="1"
       flexWrap={maxTagRows === 'single' ? 'nowrap' : 'wrap'}
       overflowX="auto"

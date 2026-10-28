@@ -421,8 +421,12 @@ export const BaseInputVisuals = ({
                 hasTrailingDropDown,
               })}
               display="flex"
-              alignItems="stretch"
-              alignSelf="stretch"
+              alignItems="center"
+              alignSelf={
+                hasTrailingInteractionElement && Boolean(onTrailingInteractionElementClick)
+                  ? 'stretch'
+                  : 'center'
+              }
               {...(!isReactNative() && { onClick: onTrailingInteractionElementClick })}
             >
               {trailingInteractionElement}
