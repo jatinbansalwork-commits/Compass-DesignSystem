@@ -3,7 +3,7 @@ export { SideNavLink } from './SideNavItems/SideNavLink';
 export { SideNavLevel } from './SideNavLevel';
 export { SideNavSection } from './SideNavSection';
 export { SideNavItem } from './SideNavItems/SideNavItem';
-export { SideNavPinItem } from './SideNavItems/SideNavPinItem.web';
+export { SideNavPinItem } from './SideNavItems/SideNavPinItem';
 export { SideNavFooter } from './SideNavFooter';
 export { SideNavBody } from './SideNavBody';
 export {
@@ -18,4 +18,4 @@ export type {
   SideNavItemProps,
   SideNavFooterProps,
 } from './types';
-export type { SideNavPinItemProps } from './SideNavItems/SideNavPinItem.web';
+export type { SideNavPinItemProps } from './SideNavItems/SideNavPinItem';
