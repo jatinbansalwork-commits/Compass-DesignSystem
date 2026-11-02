@@ -1,0 +1,281 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {
+  getKdesignComponentDocsHttpCallback,
+  getKdesignComponentDocsStdioCallback,
+} from '../getKdesignComponentDocs.js';
+import * as analyticsUtils from '../../utils/analyticsUtils.js';
+import * as skillUtils from '../../utils/skillUtils.js';
+import * as getKdesignDocsResponseText from '../../utils/getKdesignDocsResponseText.js';
+import * as generalUtils from '../../utils/generalUtils.js';
+import { SKILL_VERSION } from '../../utils/tokens.js';
+
+// Mock the analytics and utility functions
+vi.mock('../../utils/analyticsUtils.js', async () => {
+  const actual = await vi.importActual<typeof analyticsUtils>('../../utils/analyticsUtils.js');
+  return {
+    ...actual,
+    sendAnalytics: vi.fn(),
+  };
+});
+vi.mock('../../utils/skillUtils.js');
+vi.mock('../../utils/getKdesignDocsResponseText.js');
+vi.mock('../../utils/generalUtils.js', () => ({
+  getKdesignDocsList: vi.fn(() => ['Button', 'Accordion', 'Input']),
+}));
+
+// Create a mock context object for tool callbacks
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const createMockContext = (): any => ({
+  signal: new AbortController().signal,
+  requestId: 'test-request-id',
+  sendNotification: vi.fn().mockResolvedValue(undefined),
+  sendRequest: vi.fn().mockResolvedValue({}),
+});
+
+describe('getKdesignComponentDocs Tool', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Setup default mocks
+    vi.spyOn(generalUtils, 'getKdesignDocsList').mockReturnValue(['Button', 'Accordion', 'Input']);
+    vi.spyOn(skillUtils, 'shouldCreateOrUpdateSkill').mockReturnValue(undefined);
+  });
+
+  it('should return component docs for valid components', () => {
+    const mockCurrentProjectRootDirectory = '/Users/test/project';
+    const mockComponentsList = 'Button, Accordion';
+    const mockResponseText = 'Mock component documentation';
+
+    // Mock the getKdesignDocsResponseText function
+    vi.spyOn(getKdesignDocsResponseText, 'getKdesignDocsResponseText').mockReturnValue(
+      mockResponseText,
+    );
+
+    // Get the HTTP callback
+    const httpCallback = getKdesignComponentDocsHttpCallback;
+
+    // Call the tool callback
+    const result = httpCallback(
+      {
+        componentsList: mockComponentsList,
+        currentProjectRootDirectory: mockCurrentProjectRootDirectory,
+        clientName: 'cursor',
+        skillVersion: SKILL_VERSION,
+      },
+      createMockContext(),
+    );
+
+    // Verify analytics was called
+    expect(analyticsUtils.sendAnalytics).toHaveBeenCalledWith({
+      eventName: expect.any(String),
+      properties: {
+        toolName: 'get_kdesign_component_docs',
+        componentsList: mockComponentsList,
+        rootDirectoryName: 'project',
+        skillVersion: SKILL_VERSION,
+        clientName: 'cursor',
+      },
+    });
+
+    // Verify the result structure
+    expect(result).toHaveProperty('content');
+    if ('content' in result && !('isError' in result)) {
+      expect(result).toMatchObject({
+        content: [
+          {
+            type: 'text',
+            text: mockResponseText.trim(),
+          },
+        ],
+      });
+    }
+
+    // Verify getKdesignDocsResponseText was called with correct parameters
+    expect(getKdesignDocsResponseText.getKdesignDocsResponseText).toHaveBeenCalledWith({
+      docsList: mockComponentsList,
+      documentationType: 'components',
+    });
+  });
+
+  it('should return error for invalid components', () => {
+    const mockCurrentProjectRootDirectory = '/Users/test/project';
+    const mockComponentsList = 'InvalidComponent, AnotherInvalid';
+
+    // Get the HTTP callback
+    const httpCallback = getKdesignComponentDocsHttpCallback;
+
+    // Call the tool callback
+    const result = httpCallback(
+      {
+        componentsList: mockComponentsList,
+        currentProjectRootDirectory: mockCurrentProjectRootDirectory,
+        clientName: 'cursor',
+        skillVersion: SKILL_VERSION,
+      },
+      createMockContext(),
+    );
+
+    // Verify the result is an error
+    expect(result).toBeDefined();
+    expect(result).toHaveProperty('isError', true);
+    if ('isError' in result && result.isError) {
+      expect(result).toMatchObject({
+        content: [
+          {
+            type: 'text',
+            text: expect.any(String),
+          },
+        ],
+      });
+    }
+
+    // Verify analytics was not called for invalid components
+    expect(analyticsUtils.sendAnalytics).not.toHaveBeenCalled();
+  });
+
+  it('should return consistent component docs response (snapshot)', async () => {
+    const testProjectRootDirectory = '/Users/test/project';
+    const testComponentsList = 'Button, Accordion';
+
+    // Get the actual implementations (not mocked) to test real output
+    const actualGetKdesignDocsResponseText = await vi.importActual<typeof getKdesignDocsResponseText>(
+      '../../utils/getKdesignDocsResponseText.js',
+    );
+    const actualGeneralUtils = await vi.importActual<typeof generalUtils>(
+      '../../utils/generalUtils.js',
+    );
+
+    // Unmock analytics to allow the actual function to run, but we'll still spy on it
+    vi.restoreAllMocks();
+    vi.spyOn(analyticsUtils, 'sendAnalytics').mockImplementation(() => {
+      // Mock implementation that doesn't throw
+    });
+
+    if (actualGetKdesignDocsResponseText && actualGeneralUtils) {
+      // Temporarily replace the mocked functions with the actual ones
+      vi.spyOn(getKdesignDocsResponseText, 'getKdesignDocsResponseText').mockImplementation(
+        actualGetKdesignDocsResponseText.getKdesignDocsResponseText,
+      );
+      vi.spyOn(generalUtils, 'getKdesignDocsList').mockImplementation(
+        actualGeneralUtils.getKdesignDocsList,
+      );
+    }
+
+    // Mock skill as not needing update
+    vi.spyOn(skillUtils, 'shouldCreateOrUpdateSkill').mockReturnValue(undefined);
+
+    // Get the HTTP callback
+    const httpCallback = getKdesignComponentDocsHttpCallback;
+
+    // Call the tool callback with actual implementation
+    const result = httpCallback(
+      {
+        componentsList: testComponentsList,
+        currentProjectRootDirectory: testProjectRootDirectory,
+        clientName: 'cursor',
+        skillVersion: SKILL_VERSION,
+      },
+      createMockContext(),
+    );
+
+    // Snapshot test to ensure the output format remains consistent
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should return consistent component docs response for claude agent (snapshot)', async () => {
+    const testProjectRootDirectory = '/Users/test/project';
+    const testComponentsList = 'Button, Accordion';
+
+    // Get the actual implementations (not mocked) to test real output
+    const actualGetKdesignDocsResponseText = await vi.importActual<typeof getKdesignDocsResponseText>(
+      '../../utils/getKdesignDocsResponseText.js',
+    );
+    const actualGeneralUtils = await vi.importActual<typeof generalUtils>(
+      '../../utils/generalUtils.js',
+    );
+
+    // Unmock analytics to allow the actual function to run, but we'll still spy on it
+    vi.restoreAllMocks();
+    vi.spyOn(analyticsUtils, 'sendAnalytics').mockImplementation(() => {
+      // Mock implementation that doesn't throw
+    });
+
+    if (actualGetKdesignDocsResponseText && actualGeneralUtils) {
+      // Temporarily replace the mocked functions with the actual ones
+      vi.spyOn(getKdesignDocsResponseText, 'getKdesignDocsResponseText').mockImplementation(
+        actualGetKdesignDocsResponseText.getKdesignDocsResponseText,
+      );
+      vi.spyOn(generalUtils, 'getKdesignDocsList').mockImplementation(
+        actualGeneralUtils.getKdesignDocsList,
+      );
+    }
+
+    // Mock skill as not needing update
+    vi.spyOn(skillUtils, 'shouldCreateOrUpdateSkill').mockReturnValue(undefined);
+
+    // Get the HTTP callback
+    const httpCallback = getKdesignComponentDocsHttpCallback;
+
+    // Call the tool callback with actual implementation
+    const result = httpCallback(
+      {
+        componentsList: testComponentsList,
+        currentProjectRootDirectory: testProjectRootDirectory,
+        clientName: 'claude',
+        skillVersion: SKILL_VERSION,
+      },
+      createMockContext(),
+    );
+
+    // Snapshot test to ensure the output format remains consistent
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should return consistent component docs response for stdio transport', async () => {
+    const testProjectRootDirectory = '/Users/test/project';
+    const testComponentsList = 'Button, Accordion';
+
+    // Get the actual implementations (not mocked) to test real output
+    const actualGetKdesignDocsResponseText = await vi.importActual<typeof getKdesignDocsResponseText>(
+      '../../utils/getKdesignDocsResponseText.js',
+    );
+    const actualGeneralUtils = await vi.importActual<typeof generalUtils>(
+      '../../utils/generalUtils.js',
+    );
+
+    // Unmock analytics to allow the actual function to run, but we'll still spy on it
+    vi.restoreAllMocks();
+    vi.spyOn(analyticsUtils, 'sendAnalytics').mockImplementation(() => {
+      // Mock implementation that doesn't throw
+    });
+
+    if (actualGetKdesignDocsResponseText && actualGeneralUtils) {
+      // Temporarily replace the mocked functions with the actual ones
+      vi.spyOn(getKdesignDocsResponseText, 'getKdesignDocsResponseText').mockImplementation(
+        actualGetKdesignDocsResponseText.getKdesignDocsResponseText,
+      );
+      vi.spyOn(generalUtils, 'getKdesignDocsList').mockImplementation(
+        actualGeneralUtils.getKdesignDocsList,
+      );
+    }
+
+    // Mock skill as not needing update
+    vi.spyOn(skillUtils, 'shouldCreateOrUpdateSkill').mockReturnValue(undefined);
+
+    // Get the stdio callback
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stdioCallback = getKdesignComponentDocsStdioCallback;
+
+    // Call the tool callback with actual implementation
+    const result = stdioCallback(
+      {
+        componentsList: testComponentsList,
+        currentProjectRootDirectory: testProjectRootDirectory,
+        clientName: 'cursor',
+      },
+      createMockContext(),
+    );
+
+    // Snapshot test to ensure the output format remains consistent
+    expect(result).toMatchSnapshot();
+  });
+});

@@ -1,5 +1,5 @@
 {
-  "name": "Compass Token Publisher",
+  "name": "Kdesign Token Publisher",
   "id": "1661423237412340803",
   "api": "1.0.0",
   "main": "dist/plugin.js",
@@ -16,7 +16,7 @@
       "command": "devTokenNames"
     },
     {
-      "name": "Export Compass Icons",
+      "name": "Export Kdesign Icons",
       "command": "exportIcons"
     }
   ]

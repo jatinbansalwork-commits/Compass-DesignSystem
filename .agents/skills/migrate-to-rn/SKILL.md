@@ -1,6 +1,6 @@
 ---
 name: "migrate-to-rn"
-description: "Add React Native support (.native.tsx files) to Compass components that currently only have web implementations. Use when user says \"add native support to {Component}\", \"migrate {Component} to native\", or \"/migrate-to-rn\"."
+description: "Add React Native support (.native.tsx files) to Kdesign components that currently only have web implementations. Use when user says \"add native support to {Component}\", \"migrate {Component} to native\", or \"/migrate-to-rn\"."
 ---
 
 # migrate-to-rn
@@ -32,7 +32,7 @@ Use the Read tool to load:
 
 ## Pre-flight: Skill extras
 
-Assumes Compass dev already works (`yarn install`, Xcode, `pod install`, `yarn start:ios`, etc.).
+Assumes Kdesign dev already works (`yarn install`, Xcode, `pod install`, `yarn start:ios`, etc.).
 
 **Before Step 0**, verify these skill-only tools are on PATH:
 
@@ -58,7 +58,7 @@ User provides one or more component names (e.g., "add native support to Drawer" 
 
 ## Output
 
-- One PR per component on branch `feat/blade-rn/{Name}`
+- One PR per component on branch `feat/kdesign-rn/{Name}`
 - Artifacts in `.claude/worktrees/{Name}/.claude/artifacts/{Name}/`
 - Batch status in `.claude/artifacts/batch-status.md` (main checkout)
 
@@ -74,19 +74,19 @@ Extract component name(s). If multiple, process as a batch.
 
 For each component:
 ```bash
-ls packages/compass/src/components/{Name}/ > /dev/null 2>&1 && echo "EXISTS" || echo "NOT FOUND"
+ls packages/kdesign/src/components/{Name}/ > /dev/null 2>&1 && echo "EXISTS" || echo "NOT FOUND"
 ```
 
 If not found → report error, skip that component.
 
 ### 0.3 Check Native Status
 
-> Don't classify on bare `throwCompassError` — validation-only files (`Tabs`, `Avatar`, `AccordionButton`) are REAL. Use the Plan agent's genuine-stub detection so the gate and Plan phase agree.
+> Don't classify on bare `throwKdesignError` — validation-only files (`Tabs`, `Avatar`, `AccordionButton`) are REAL. Use the Plan agent's genuine-stub detection so the gate and Plan phase agree.
 
 ```bash
-# Genuine stub = small file whose body is essentially just a throwCompassError (no real render tree/hooks).
-# Validation-only files that use throwCompassError are large, so a line-count threshold separates them.
-grep -rl "throwCompassError" packages/compass/src/components/{Name}/ --include="*.native.tsx" | while read -r f; do
+# Genuine stub = small file whose body is essentially just a throwKdesignError (no real render tree/hooks).
+# Validation-only files that use throwKdesignError are large, so a line-count threshold separates them.
+grep -rl "throwKdesignError" packages/kdesign/src/components/{Name}/ --include="*.native.tsx" | while read -r f; do
   if [ "$(wc -l < "$f")" -lt 40 ]; then echo "STUB: $f"; else echo "REAL: $f"; fi
 done
 ```
@@ -115,7 +115,7 @@ This works because `agent-device` natively supports multi-worktree RN developmen
 
 For each component in the batch:
 ```bash
-git worktree add -B feat/blade-rn/{Name} .claude/worktrees/{Name} origin/master
+git worktree add -B feat/kdesign-rn/{Name} .claude/worktrees/{Name} origin/master
 ```
 
 ### 0.6 Ensure Dependencies in Worktrees
@@ -134,7 +134,7 @@ cp -Rc node_modules .claude/worktrees/{Name}/node_modules 2>/dev/null || (cd .cl
 The Storybook `.app` binary only needs to be built **once** — all worktrees share the same native code; only JS differs (served by each worktree's own Metro). Build from the first slot's worktree:
 
 ```bash
-cd .claude/worktrees/{Name1}/packages/compass && yarn start:ios
+cd .claude/worktrees/{Name1}/packages/kdesign && yarn start:ios
 ```
 
 This builds, installs, and launches the app on the first simulator (slot 1's device). Run via Bash tool with `run_in_background: true`.
@@ -148,19 +148,19 @@ For slots 2..N, the app is already installed on the first simulator. To get it o
 
 ```bash
 # Find the built .app from the Xcode derived data
-APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "blade.app" -path "*/Build/Products/Debug-iphonesimulator/*" -maxdepth 5 2>/dev/null | head -1)
+APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "kdesign.app" -path "*/Build/Products/Debug-iphonesimulator/*" -maxdepth 5 2>/dev/null | head -1)
 
 # For each additional slot i (2..N):
-agent-device open org.reactjs.native.example.blade \
+agent-device open org.reactjs.native.example.kdesign \
   --platform ios --device "{iOSDevice_i}" \
   --session rn-{Name_i} --metro-port {MetroPort_i} --relaunch
 ```
 
 If the app isn't found on a secondary simulator, install it explicitly:
 ```bash
-agent-device install org.reactjs.native.example.blade "$APP_PATH" \
+agent-device install org.reactjs.native.example.kdesign "$APP_PATH" \
   --platform ios --device "{iOSDevice_i}"
-agent-device open org.reactjs.native.example.blade \
+agent-device open org.reactjs.native.example.kdesign \
   --platform ios --device "{iOSDevice_i}" \
   --session rn-{Name_i} --metro-port {MetroPort_i} --relaunch
 ```
@@ -177,8 +177,8 @@ After the app is installed on all simulators, write the correct Metro port into 
 # Slot 1 (port 8081) — default, no override needed
 
 # For slots 2..N:
-xcrun simctl spawn "{iOSDevice_2}" defaults write org.reactjs.native.example.blade RCT_jsLocation "localhost:{MetroPort_2}"
-xcrun simctl spawn "{iOSDevice_3}" defaults write org.reactjs.native.example.blade RCT_jsLocation "localhost:{MetroPort_3}"
+xcrun simctl spawn "{iOSDevice_2}" defaults write org.reactjs.native.example.kdesign RCT_jsLocation "localhost:{MetroPort_2}"
+xcrun simctl spawn "{iOSDevice_3}" defaults write org.reactjs.native.example.kdesign RCT_jsLocation "localhost:{MetroPort_3}"
 # ... repeat for each additional slot
 ```
 
@@ -216,7 +216,7 @@ Agent(
     ALWAYS use absolute paths prefixed with the worktree.
     Read .claude/rules/rn-migration.md and .claude/rules/agent-base-directory.md first.
     
-    React source: {Worktree}/packages/compass/src/components/{Name}/
+    React source: {Worktree}/packages/kdesign/src/components/{Name}/
     Output artifacts to: {Worktree}/.claude/artifacts/{Name}/
     Templates at: {Worktree}/.claude/templates/
   "
@@ -279,7 +279,7 @@ Agent(
     Read .claude/rules/rn-migration.md and .claude/rules/agent-base-directory.md first.
     
     Migration plan: {Worktree}/.claude/artifacts/{Name}/rn-migration-plan.md
-    Web source: {Worktree}/packages/compass/src/components/{Name}/
+    Web source: {Worktree}/packages/kdesign/src/components/{Name}/
   "
 )
 ```
@@ -320,7 +320,7 @@ Agent(
     - Start Metro on port {MetroPort} (not 8081 unless that is your assigned port).
     - Use --session {SessionName} on ALL agent-device commands.
     - The app is already installed on your simulator by the orchestrator.
-    - Use: agent-device open org.reactjs.native.example.blade --platform ios --device \"{iOSDevice}\" --session {SessionName} --metro-port {MetroPort} --relaunch
+    - Use: agent-device open org.reactjs.native.example.kdesign --platform ios --device \"{iOSDevice}\" --session {SessionName} --metro-port {MetroPort} --relaunch
     - Do NOT run 'agent-device boot' — the open command boots the simulator.
     - Call agent-device / agent-browser directly (they are installed globally); do NOT prefix with 'npx' (npx re-resolves the package each call and can cause the app to blank/refresh).
   "
@@ -374,7 +374,7 @@ For each component that passed:
 
 ```bash
 # Stage only the component source — NOT the migration artifacts/screenshots in .claude/artifacts/.
-cd {Worktree} && git add packages/compass/src/components/{Name}
+cd {Worktree} && git add packages/kdesign/src/components/{Name}
 # Add any other intentionally-changed source files explicitly (e.g. storybook registration) — never `git add -A`.
 cd {Worktree} && git commit -m "feat(native): Add React Native support for {Name}
 
@@ -384,7 +384,7 @@ and react-native-reanimated.
 
 Co-Authored-By: Claude <noreply@anthropic.com>"
 
-cd {Worktree} && git push -u origin feat/blade-rn/{Name}
+cd {Worktree} && git push -u origin feat/kdesign-rn/{Name}
 
 cd {Worktree} && gh pr create \
   --title "feat(native): Add React Native support for {Name}" \
@@ -392,7 +392,7 @@ cd {Worktree} && gh pr create \
 ## Summary
 
 - Adds native implementation (.native.tsx) for {Name} component
-- Replaces throwCompassError stubs with real platform-specific rendering
+- Replaces throwKdesignError stubs with real platform-specific rendering
 - Uses styled-components/native + react-native-reanimated
 
 ## Changes

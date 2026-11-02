@@ -1,4 +1,4 @@
-# StyledPropsCompass Type Definitions
+# StyledPropsKdesign Type Definitions
 
 These are the types supported in components that accept styled props.
 
@@ -113,7 +113,7 @@ type GridProps = MakeObjectResponsive<
   >
 >;
 
-type StyledPropsCompass = Partial<
+type StyledPropsKdesign = Partial<
   MarginProps &
     Pick<FlexboxProps, 'alignSelf' | 'justifySelf' | 'placeSelf' | 'order'> &
     PositionProps &

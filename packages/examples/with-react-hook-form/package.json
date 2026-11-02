@@ -2,11 +2,11 @@
   "private": "true",
   "scripts": {
     "start": "react-scripts start",
-    "postinstall": "rm -rf node_modules/@klearnow/compass/node_modules"
+    "postinstall": "rm -rf node_modules/@klearnow/kdesign/node_modules"
   },
   "dependencies": {
     "@fontsource/lato": "^4.5.10",
-    "@klearnow/compass": "file:../../blade",
+    "@klearnow/kdesign": "file:../../kdesign",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
     "react": "^18.2.0",

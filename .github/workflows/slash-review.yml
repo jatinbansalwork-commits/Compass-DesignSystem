@@ -120,7 +120,7 @@ jobs:
         run: |
           echo "Requesting Slash review for PR #${PR_NUMBER} (${PR_URL})"
 
-          PROMPT="Review the pull request at ${PR_URL} using the /review-pr skill from the blade repo. shouldReviewUI=true, shouldRunHeadedBrowser=false, and shouldSubmitReview=true. Strictly use review-pr skill from blade repo only. Do not use any other skill."
+          PROMPT="Review the pull request at ${PR_URL} using the /review-pr skill from the kdesign repo. shouldReviewUI=true, shouldRunHeadedBrowser=false, and shouldSubmitReview=true. Strictly use review-pr skill from kdesign repo only. Do not use any other skill."
 
           # Temporarily disable set -e so the script doesn't die
           # before we can print the API response when node exits 1.

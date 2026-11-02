@@ -1,0 +1,17 @@
+{
+  "name": "@klearnow/kdesign-plugin",
+  "version": "1.33.1",
+  "private": true,
+  "description": "Kdesign Design System as a Claude Code plugin and cross-agent skills. Source of truth for the Kdesign knowledgebase.",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/klearnow/compass.git"
+  },
+  "scripts": {
+    "sync-version": "node ../../scripts/syncPluginManifestVersion.js",
+    "validate": "node ../../scripts/validateKdesignPlugin.mjs",
+    "test": "node --test tests/scripts.test.mjs hooks/__tests__/frameworks.test.mjs"
+  },
+  "author": "Klearnow",
+  "license": "MIT"
+}

@@ -96,8 +96,8 @@ const App = (): ReactElement => {
     if (hasBlockingErrors) return;
     await uploadTokens({
       orgName: 'razorpay',
-      repoName: 'blade',
-      workflowFileName: 'blade-tokens-upload.yml',
+      repoName: 'kdesign',
+      workflowFileName: 'kdesign-tokens-upload.yml',
       personalAccessToken,
       colorTokens,
     });
@@ -113,8 +113,8 @@ const App = (): ReactElement => {
     try {
       await uploadIcons({
         orgName: 'razorpay',
-        repoName: 'blade',
-        workflowFileName: 'blade-icons-upload.yml',
+        repoName: 'kdesign',
+        workflowFileName: 'kdesign-icons-upload.yml',
         personalAccessToken,
         icons: exportedIcons,
         targets: ['react'],
@@ -138,7 +138,7 @@ const App = (): ReactElement => {
         pluginMessage: {
           type: 'information',
           text: copied
-            ? '📋 Copied. Paste it into packages/compass/scripts/icons.json'
+            ? '📋 Copied. Paste it into packages/kdesign/scripts/icons.json'
             : '⛔️ Could not copy the icons',
         },
       },
@@ -193,7 +193,7 @@ const App = (): ReactElement => {
         <div className="app__scroll">
           <p className="intro">
             Opens a PR on klearnow/compass that generates these icons and checks them. Icons that
-            already match Compass are left out of it. Needs a GitHub personal access token.{' '}
+            already match Kdesign are left out of it. Needs a GitHub personal access token.{' '}
             {accessTokenLink}
           </p>
           <p className="label">Components ({exportedIcons.length})</p>
@@ -218,7 +218,7 @@ const App = (): ReactElement => {
             <button
               className="button button--secondary"
               onClick={onCopyIcons}
-              title="Copy the icons for packages/compass/scripts/icons.json and yarn generate-icons"
+              title="Copy the icons for packages/kdesign/scripts/icons.json and yarn generate-icons"
             >
               Copy JSON
             </button>

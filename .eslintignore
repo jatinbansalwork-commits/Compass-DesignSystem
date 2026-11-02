@@ -10,23 +10,23 @@ coverage
 **/build
 **/dist
 
-# klear360-mcp non-code directories
-packages/klear360-mcp/base-klear360-template/
-packages/klear360-mcp/knowledgebase/
-packages/klear360-mcp/cursorRules/
-packages/klear360/components.js
-packages/klear360/components.native.js
-packages/klear360/components.d.ts
-packages/klear360/tokens.js
-packages/klear360/tokens.native.js
-packages/klear360/tokens.d.ts
-packages/klear360/utils.js
-packages/klear360/utils.native.js
-packages/klear360/utils.d.ts
-# klear360-svelte: generated/ambient declaration files
-packages/klear360-svelte/src/**/*.d.ts
-# generated: klear360-svelte's bundled UnoCSS config (scripts/build-uno-config.mjs)
-packages/klear360-svelte/uno/config.js
+# kdesign-mcp non-code directories
+packages/kdesign-mcp/base-kdesign-template/
+packages/kdesign-mcp/knowledgebase/
+packages/kdesign-mcp/cursorRules/
+packages/kdesign/components.js
+packages/kdesign/components.native.js
+packages/kdesign/components.d.ts
+packages/kdesign/tokens.js
+packages/kdesign/tokens.native.js
+packages/kdesign/tokens.d.ts
+packages/kdesign/utils.js
+packages/kdesign/utils.native.js
+packages/kdesign/utils.d.ts
+# kdesign-svelte: generated/ambient declaration files
+packages/kdesign-svelte/src/**/*.d.ts
+# generated: kdesign-svelte's bundled UnoCSS config (scripts/build-uno-config.mjs)
+packages/kdesign-svelte/uno/config.js
 
 
 # misc

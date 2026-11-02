@@ -1,6 +1,6 @@
 import React from 'react';
-import { Menu, MenuItem, MenuOverlay, MenuHeader, MenuDivider, MenuFooter, Button, Box, Text, Link } from '@klearnow/compass/components';
-import { UserIcon, TestIcon, TicketIcon, ShareIcon, LogOutIcon, CopyIcon } from '@klearnow/compass/components';
+import { Menu, MenuItem, MenuOverlay, MenuHeader, MenuDivider, MenuFooter, Button, Box, Text, Link } from '@klearnow/kdesign/components';
+import { UserIcon, TestIcon, TicketIcon, ShareIcon, LogOutIcon, CopyIcon } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <Menu>

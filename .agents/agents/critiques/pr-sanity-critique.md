@@ -89,7 +89,7 @@ Add any `issues` from the output to `issues` as entries with only a `problem` fi
   ],
   "issues": [
     {
-      "problem": "Missing changeset bump for @klearnow/compass (packages/compass was modified)"
+      "problem": "Missing changeset bump for @klearnow/kdesign (packages/kdesign was modified)"
     }
   ]
 }

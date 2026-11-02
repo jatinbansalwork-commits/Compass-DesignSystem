@@ -1,30 +1,30 @@
-blade:
+kdesign:
   - changed-files:
-      - any-glob-to-any-file: ['packages/compass/**']
+      - any-glob-to-any-file: ['packages/kdesign/**']
 
-compass-svelte:
+kdesign-svelte:
   - changed-files:
-      - any-glob-to-any-file: ['packages/compass-svelte/**']
+      - any-glob-to-any-file: ['packages/kdesign-svelte/**']
 
-compass-core:
+kdesign-core:
   - changed-files:
-      - any-glob-to-any-file: ['packages/compass-core/**']
+      - any-glob-to-any-file: ['packages/kdesign-core/**']
 
-compass-mcp:
+kdesign-mcp:
   - changed-files:
-      - any-glob-to-any-file: ['packages/compass-mcp/**']
+      - any-glob-to-any-file: ['packages/kdesign-mcp/**']
 
-compass-plugin:
+kdesign-plugin:
   - changed-files:
-      - any-glob-to-any-file: ['packages/compass-plugin/**']
+      - any-glob-to-any-file: ['packages/kdesign-plugin/**']
 
 react-native:
   - changed-files:
       - any-glob-to-any-file:
-          - 'packages/compass/**/*.native.*'
-          - 'packages/compass/android/**'
-          - 'packages/compass/ios/**'
-          - 'packages/compass/.storybook/react-native/**'
+          - 'packages/kdesign/**/*.native.*'
+          - 'packages/kdesign/android/**'
+          - 'packages/kdesign/ios/**'
+          - 'packages/kdesign/.storybook/react-native/**'
 
 ci:
   - changed-files:
@@ -34,12 +34,12 @@ figma-plugins:
   - changed-files:
       - any-glob-to-any-file:
           - 'packages/plugin-figma-*/**'
-          - 'packages/plugin-blade-*/**'
+          - 'packages/plugin-kdesign-*/**'
           - 'packages/widget-figma-*/**'
 
-eslint-plugin-compass:
+eslint-plugin-kdesign:
   - changed-files:
-      - any-glob-to-any-file: ['packages/eslint-plugin-compass/**']
+      - any-glob-to-any-file: ['packages/eslint-plugin-kdesign/**']
 
 examples:
   - changed-files:

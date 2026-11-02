@@ -29,7 +29,7 @@
 
 ## 🔧 Critical Fix Applied (TEMPORARY - MUST REVERT)
 
-**File**: `packages/compass/package.json`
+**File**: `packages/kdesign/package.json`
 
 **Changes Made**:
 1. Added root-level `"types": "./build/types/components/index.d.ts"`
@@ -65,7 +65,7 @@ All preview files in `.design-sync/previews/` and successfully rebuilt.
 **Workflow per component:**
 1. Find examples: Check `*.stories.tsx`, `examples/`, README, tests
 2. Author `.design-sync/previews/<Name>.tsx` with 2-6 named exports
-3. Rebuild: `cd .ds-sync && node lib/preview-rebuild.mjs --config ../.design-sync/config.json --node-modules ../packages/compass/node_modules --out ../ds-bundle --components Button`
+3. Rebuild: `cd .ds-sync && node lib/preview-rebuild.mjs --config ../.design-sync/config.json --node-modules ../packages/kdesign/node_modules --out ../ds-bundle --components Button`
 4. Capture: `node package-capture.mjs --out ../ds-bundle --components Button`
 5. Grade: View sheet in `ds-bundle/_screenshots/review/`, write verdict to `.design-sync/.cache/review/Button.grade.json`
 6. Iterate until all cells grade "good"
@@ -136,7 +136,7 @@ Spawned 6 parallel subagents for remaining 26 components:
 - `.ds-sync/lib/preview-rebuild.mjs` - Scoped preview rebuilder
 
 ### Source Examples
-- `packages/compass/src/components/` - Component source & stories
+- `packages/kdesign/src/components/` - Component source & stories
 - Look for: `*.stories.tsx`, `examples/`, README.md, `*.test.tsx`
 
 ---
@@ -148,10 +148,10 @@ Spawned 6 parallel subagents for remaining 26 components:
 
 .ds-build-meta.json: 666 components (package)
 _ds_bundle.js: 7223 KB, syntax OK
-_ds_bundle.js header: window.Compass, 666 components, 160 inlined externals
+_ds_bundle.js header: window.Kdesign, 666 components, 160 inlined externals
 components/: 666 previews, 666 .prompt.md
 all .d.ts parse cleanly
-window.Compass: 686 exports (666 fn + 0 compound)
+window.Kdesign: 686 exports (666 fn + 0 compound)
 
 Render check: 663/666 clean; 3 need attention
 - 662 showing floor cards (unauthored - expected)
@@ -166,12 +166,12 @@ Contact sheets: 42 sheets in _screenshots/contact-sheet-1.png ... contact-sheet-
 
 ```bash
 # Navigate to repo
-cd /Users/saurav.rastogi/Downloads/saurav/RZP/development/blade
+cd /Users/saurav.rastogi/Downloads/saurav/RZP/development/kdesign
 
 # Rebuild specific components after authoring preview
 cd .ds-sync && node lib/preview-rebuild.mjs \
   --config ../.design-sync/config.json \
-  --node-modules ../packages/compass/node_modules \
+  --node-modules ../packages/kdesign/node_modules \
   --out ../ds-bundle \
   --components Button,TextInput,Alert
 
@@ -185,8 +185,8 @@ node storybook/http-serve.mjs ../ds-bundle
 # Full rebuild (after fixing issues)
 cd .ds-sync && node package-build.mjs \
   --config ../.design-sync/config.json \
-  --node-modules ../packages/compass/node_modules \
-  --entry ../packages/compass/components.js \
+  --node-modules ../packages/kdesign/node_modules \
+  --entry ../packages/kdesign/components.js \
   --out ../ds-bundle
 
 # Validate
@@ -224,16 +224,16 @@ Before upload, ensure:
 - **Fix**: Check `cfg.extraFonts` or `cfg.runtimeFontPrefixes`
 
 **Issue**: `[WORKSPACE_SIBLING]` errors
-- **Fix**: Build workspace dependencies: `pnpm -F "@klearnow/compass..." build`
+- **Fix**: Build workspace dependencies: `pnpm -F "@klearnow/kdesign..." build`
 
 ---
 
 ## 📚 References
 
 - **Design-sync skill**: `/Users/saurav.rastogi/.claude/skills/design-sync/non-storybook/SKILL.md`
-- **Compass package**: `packages/compass/`
-- **Component source**: `packages/compass/src/components/`
-- **Stories**: `packages/compass/src/components/**/*.stories.tsx`
+- **Kdesign package**: `packages/kdesign/`
+- **Component source**: `packages/kdesign/src/components/`
+- **Stories**: `packages/kdesign/src/components/**/*.stories.tsx`
 
 ---
 

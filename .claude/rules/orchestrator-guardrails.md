@@ -9,7 +9,7 @@ description: Enforce agent boundaries when the orchestrator is running a migrati
 1. **Set up worktrees + branches** via Bash tool (one per component):
 
    ```bash
-   git worktree add -B feat/blade-rn/{Name} .claude/worktrees/{Name} origin/master
+   git worktree add -B feat/kdesign-rn/{Name} .claude/worktrees/{Name} origin/master
    ```
 
 2. **Spawn agents in parallel** via the Agent tool, where the pipeline allows. To run a phase across N components in parallel, send **one message containing N Agent tool calls**:

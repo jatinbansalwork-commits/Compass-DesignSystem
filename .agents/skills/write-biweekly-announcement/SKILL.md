@@ -1,26 +1,26 @@
 ---
 name: write-biweekly-announcement
-description: Generate bi-weekly announcement posts for Compass Design System updates by analyzing changelog entries from the past two weeks
+description: Generate bi-weekly announcement posts for Kdesign Design System updates by analyzing changelog entries from the past two weeks
 disable-model-invocation: true
 ---
 
 # Bi-Weekly Announcement Rule
 
 ## Purpose
-Generate bi-weekly announcement posts for Compass Design System updates by analyzing changelog entries from the past two weeks.
+Generate bi-weekly announcement posts for Kdesign Design System updates by analyzing changelog entries from the past two weeks.
 
 ## Instructions
 
 ### 1. Data Collection
 - **Source**: Use ```git diff``` command to get the changes we shipped in last 2 week or n weeks.
-- **Scope**: Include   `packages/compass/` and `packages/compass-mcp/`
+- **Scope**: Include   `packages/kdesign/` and `packages/kdesign-mcp/`
 - **Time Period**: Calculate the date range for the past two weeks from the current date
 
 ### 2. Content Structure
 Follow this exact format for the announcement:
 
 ```
-:blade: Design System Enhancement Updates [Start Date - End Date]
+:kdesign: Design System Enhancement Updates [Start Date - End Date]
 :sparkles: Highlights
 
  New Components & Features:
@@ -39,7 +39,7 @@ for example -
 12.14.0 - QuickFilter: Add QuickFilters component
 
 
-:github: Check out Compass Releases for the Full Changelog
+:github: Check out Kdesign Releases for the Full Changelog
 ```
 
 ### 3. Content Guidelines
@@ -59,7 +59,7 @@ for example -
 ### 4. Analysis Process
 1. Calculate the two-week period from current date.
   you can use this git command ```  git diff HEAD@{2.weeks.ago} HEAD -- CHANGELOG.md ``` to get the diff. of changes. make sure you get all the diff from the bottom. and use these diff only to write the annoucement. 
-  make sure you run this command only on `changelog.md` for blade and compass-mcp projects
+  make sure you run this command only on `changelog.md` for kdesign and kdesign-mcp projects
 2. **Categorize Changes**: 
    - New components/features
    - Bug fixes
@@ -76,7 +76,7 @@ for example -
 
 ### 6. Example Output Format
 ```
-:blade:  Design System Enhancement Updates [8th Aug - 22nd Aug]
+:kdesign:  Design System Enhancement Updates [8th Aug - 22nd Aug]
 :sparkles: Highlights -
 :happy-cat:  New Components & Features:-
 Filled Icons: Introduced 49+ new filled icons.
@@ -95,17 +95,17 @@ Promotional Toast Flexibility: Made leading prop optional for better component c
 12.47.0 - Carousel: A new navigation button position has been added that allows the buttons to overlap with the carousel for a cleaner look.
 12.46.2 - ListView: We've improved the desktop experience for ListView by adding horizontal scrolling for filters and removing the distracting gradient overlay for a cleaner, more focused view.
 12.46.1 - Need more flexibility with your notifications? The leading prop for promotional toasts is now optional, giving you more control over your designs.
-:mcp: Compass MCP Updates -
-1.4.1 - Compass MCP: add constraints to component knowledgebase.
-:github: Check out Compass Releases for the Full Changelog
+:mcp: Kdesign MCP Updates -
+1.4.1 - Kdesign MCP: add constraints to component knowledgebase.
+:github: Check out Kdesign Releases for the Full Changelog
 
 ```
 
 ### 7. Tools to Use
 - **File Reading & Date Calculation**: 
-  For now just use compass-mcp and blade.
+  For now just use kdesign-mcp and kdesign.
   Calculate the two-week period from current date.
-  you can use this git command ```  git diff HEAD@{2.weeks.ago} HEAD -- CHANGELOG.md ``` to get the diff. of changes. make sure you get all the diff from the bottom. and use these diff only to write the annoucement. use this command only on blade and compass-mcp project
+  you can use this git command ```  git diff HEAD@{2.weeks.ago} HEAD -- CHANGELOG.md ``` to get the diff. of changes. make sure you get all the diff from the bottom. and use these diff only to write the annoucement. use this command only on kdesign and kdesign-mcp project
   make sure you only include changes that are done in given timeline
 - **Content Analysis**: Parse and categorize diff changes and include these only
 - **Formatting**: Follow the example given to you. it's going to be a slack message. so don't use markdown. just use txt format.

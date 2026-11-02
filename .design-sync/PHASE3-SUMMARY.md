@@ -198,10 +198,10 @@ All batches delivered **realistic domain content**:
 
 ### Build Reliability
 100% rebuild success rate demonstrates:
-- Correct import patterns from `@klearnow/compass/components`
+- Correct import patterns from `@klearnow/kdesign/components`
 - Valid JSX composition (no syntax errors)
 - Proper TypeScript types (no type errors in compilation)
-- Compatible with Compass's build pipeline
+- Compatible with Kdesign's build pipeline
 
 ---
 
@@ -246,7 +246,7 @@ Visual thumbnails: `ds-bundle/_screenshots/contact-sheet-{1-42}.png`
 - [ ] Test component search and usage
 
 ### 4. Cleanup & Commit (15 min)
-- [ ] **CRITICAL**: Revert `packages/compass/package.json` changes (temporary types field)
+- [ ] **CRITICAL**: Revert `packages/kdesign/package.json` changes (temporary types field)
 - [ ] Commit durable state to git:
   - `.design-sync/config.json`
   - `.design-sync/NOTES.md`

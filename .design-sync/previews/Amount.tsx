@@ -1,5 +1,5 @@
 import React from 'react';
-import { Amount } from '@klearnow/compass/components';
+import { Amount } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <Amount value={12500.45} />

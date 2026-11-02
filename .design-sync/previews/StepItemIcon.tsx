@@ -1,6 +1,6 @@
 import React from 'react';
-import { StepGroup, StepItem, StepItemIcon, StepItemIndicator } from '@klearnow/compass/components';
-import { CheckIcon, CloseIcon, InfoIcon } from '@klearnow/compass/components';
+import { StepGroup, StepItem, StepItemIcon, StepItemIndicator } from '@klearnow/kdesign/components';
+import { CheckIcon, CloseIcon, InfoIcon } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <StepGroup>

@@ -1,6 +1,6 @@
 {
-  "pkg": "@klearnow/compass",
-  "globalName": "Compass",
+  "pkg": "@klearnow/kdesign",
+  "globalName": "Kdesign",
   "shape": "package",
-  "buildCmd": "pnpm -F \"@klearnow/compass...\" build"
+  "buildCmd": "pnpm -F \"@klearnow/kdesign...\" build"
 }

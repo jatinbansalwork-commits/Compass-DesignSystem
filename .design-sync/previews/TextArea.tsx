@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextArea } from '@klearnow/compass/components';
+import { TextArea } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <TextArea

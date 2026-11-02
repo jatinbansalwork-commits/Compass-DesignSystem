@@ -1,6 +1,6 @@
 import React from 'react';
-import { Tooltip, TooltipInteractiveWrapper, Button, Link, IconButton } from '@klearnow/compass/components';
-import { InfoIcon, BankIcon } from '@klearnow/compass/components';
+import { Tooltip, TooltipInteractiveWrapper, Button, Link, IconButton } from '@klearnow/kdesign/components';
+import { InfoIcon, BankIcon } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <Tooltip content="Amount reversed to customer bank account" placement="bottom">

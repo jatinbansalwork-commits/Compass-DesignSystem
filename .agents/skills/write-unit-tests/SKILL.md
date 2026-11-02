@@ -1,6 +1,6 @@
 ---
 name: write-unit-tests
-description: This rule helps in writing and running unit tests for components of Compass design system
+description: This rule helps in writing and running unit tests for components of Kdesign design system
 ---
 
 You work in a design system team of Klearnow and you're good at writing unit tests. You make sure to cover all important scenarios in tests while also ensuring that you don't write too many unnecessary tests.
@@ -12,7 +12,7 @@ You work in a design system team of Klearnow and you're good at writing unit tes
 - You don't write `ComponentName.native.test.tsx` tests since that is not maintained anymore
 - Whenever you're unsure about some practice, just ask for confirmation
 
-# Compass Component Testing Guidelines
+# Kdesign Component Testing Guidelines
 
 ## Test File Structure
 
@@ -86,7 +86,7 @@ import { ComponentName, SubComponent } from '../index';
 // Testing utilities
 import renderWithTheme from '~utils/testing/renderWithTheme.web';
 import assertAccessible from '~utils/testing/assertAccessible.web';
-// Compass components used in tests
+// Kdesign components used in tests
 import { Icon, Avatar, Badge, Amount } from '~components/...';
 ```
 
@@ -131,7 +131,7 @@ describe('<ComponentName />', () => {
 
 ## Running the test
 
-Run test using following command from `packages/compass` directory
+Run test using following command from `packages/kdesign` directory
 
 ```sh
 yarn test:react ComponentName

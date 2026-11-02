@@ -26,7 +26,7 @@ Create `.design-sync/previews/NewComponent.tsx`:
 
 ```tsx
 import React from 'react';
-import { NewComponent } from '@klearnow/compass/components';
+import { NewComponent } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <NewComponent prop="value">Content</NewComponent>
@@ -52,7 +52,7 @@ If you deleted `.ds-sync/` after previous session:
 ```bash
 node .ds-sync/lib/preview-rebuild.mjs \
   --config .design-sync/config.json \
-  --node-modules packages/compass/node_modules \
+  --node-modules packages/kdesign/node_modules \
   --out ds-bundle \
   --components NewComponent
 ```
@@ -83,13 +83,13 @@ git push
 
 ## Full Rebuild (All Components)
 
-If you need to rebuild all 29 components (e.g., after Compass version upgrade):
+If you need to rebuild all 29 components (e.g., after Kdesign version upgrade):
 
 ```bash
 # Rebuild all previews
 node .ds-sync/lib/preview-rebuild.mjs \
   --config .design-sync/config.json \
-  --node-modules packages/compass/node_modules \
+  --node-modules packages/kdesign/node_modules \
   --out ds-bundle \
   --components $(cat .design-sync/core-components.md | grep "^-" | sed 's/^- //' | tr '\n' ',' | sed 's/,$//')
 
@@ -97,8 +97,8 @@ node .ds-sync/lib/preview-rebuild.mjs \
 cd .ds-sync
 node package-build.mjs \
   --config ../.design-sync/config.json \
-  --node-modules ../packages/compass/node_modules \
-  --entry ../packages/compass/components.js \
+  --node-modules ../packages/kdesign/node_modules \
+  --entry ../packages/kdesign/components.js \
   --out ../ds-bundle
 ```
 
@@ -188,16 +188,16 @@ ds-bundle/                   # Build output (7+ MB)
 
 ### Modified During Session (revert after)
 ```
-packages/compass/.storybook/react/main.ts  # May have temporary patches
-packages/compass/package.json              # Should be reverted (CRITICAL)
+packages/kdesign/.storybook/react/main.ts  # May have temporary patches
+packages/kdesign/package.json              # Should be reverted (CRITICAL)
 ```
 
 ## Version Compatibility
 
-**Compass version used**: 12.107.1  
+**Kdesign version used**: 12.107.1  
 **Converter version**: design-sync non-storybook converter (2026-06-19)
 
-If Compass is upgraded significantly:
+If Kdesign is upgraded significantly:
 1. Test rebuild with existing previews
 2. Check for breaking API changes in components
 3. Update affected preview files
@@ -214,4 +214,4 @@ Refer to:
 ---
 
 **Last Updated**: 2026-06-19  
-**Maintainer**: Compass team
+**Maintainer**: Kdesign team

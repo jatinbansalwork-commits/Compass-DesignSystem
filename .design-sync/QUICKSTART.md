@@ -6,17 +6,17 @@ Author rich previews for 29 core components, then upload to Claude Design.
 ## ⚡ Fastest Path
 
 ```bash
-cd /Users/saurav.rastogi/Downloads/saurav/RZP/development/blade
+cd /Users/saurav.rastogi/Downloads/saurav/RZP/development/kdesign
 
 # 1. Read the resume
 cat .design-sync/RESUME.md
 
 # 2. Start with Button preview
 # Author: .design-sync/previews/Button.tsx
-# Examples in: packages/compass/src/components/Button/Button/Button.stories.tsx
+# Examples in: packages/kdesign/src/components/Button/Button/Button.stories.tsx
 
 # 3. Rebuild just Button
-cd .ds-sync && node lib/preview-rebuild.mjs --config ../.design-sync/config.json --node-modules ../packages/compass/node_modules --out ../ds-bundle --components Button
+cd .ds-sync && node lib/preview-rebuild.mjs --config ../.design-sync/config.json --node-modules ../packages/kdesign/node_modules --out ../ds-bundle --components Button
 
 # 4. Capture & grade
 node package-capture.mjs --out ../ds-bundle --components Button

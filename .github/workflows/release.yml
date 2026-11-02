@@ -1,4 +1,4 @@
-name: Compass Release
+name: Kdesign Release
 
 on:
   workflow_dispatch:
@@ -28,8 +28,8 @@ jobs:
         run: npm install -g npm@11.5.1
       - name: Setup Cache & Install Dependencies
         uses: ./.github/actions/install-dependencies
-      - name: Build Compass Core
-        working-directory: packages/compass-core
+      - name: Build Kdesign Core
+        working-directory: packages/kdesign-core
         run: yarn build
       - name: Create Release Pull Request & Publish packages
         id: changesets
@@ -38,8 +38,8 @@ jobs:
         env:
           GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
-          BLADE_MCP_SENTRY_DSN: ${{ secrets.BLADE_MCP_SENTRY_DSN }}
-          BLADE_SEGMENT_KEY: ${{ secrets.BLADE_SEGMENT_KEY }}
+          KDESIGN_MCP_SENTRY_DSN: ${{ secrets.KDESIGN_MCP_SENTRY_DSN }}
+          KDESIGN_SEGMENT_KEY: ${{ secrets.KDESIGN_SEGMENT_KEY }}
         with:
           version: yarn version-packages
           publish: yarn release
@@ -50,13 +50,13 @@ jobs:
         env:
           GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
           # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          BLADE_MCP_SENTRY_DSN: ${{ secrets.BLADE_MCP_SENTRY_DSN }}
-          BLADE_SEGMENT_KEY: ${{ secrets.BLADE_SEGMENT_KEY }}
+          KDESIGN_MCP_SENTRY_DSN: ${{ secrets.KDESIGN_MCP_SENTRY_DSN }}
+          KDESIGN_SEGMENT_KEY: ${{ secrets.KDESIGN_SEGMENT_KEY }}
           PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
         run: yarn publish-npm
-      - name: Build Compass if not built by changeset
+      - name: Build Kdesign if not built by changeset
         if: steps.changesets.outputs.published == 'false'
-        working-directory: packages/compass
+        working-directory: packages/kdesign
         env:
           GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
         run: yarn build
@@ -66,8 +66,8 @@ jobs:
         with:
           token: ${{ env.GITHUB_ACCESS_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          workingDir: packages/compass
-          storybookBaseDir: packages/compass
+          workingDir: packages/kdesign
+          storybookBaseDir: packages/kdesign
           buildScriptName: react:storybook:build
           exitOnceUploaded: true
           onlyChanged: true
@@ -77,14 +77,14 @@ jobs:
           GITHUB_ACCESS_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_REF: ${{ github.ref }}
-      - name: Publish Compass Svelte to Chromatic
+      - name: Publish Kdesign Svelte to Chromatic
         uses: chromaui/action@v1
         if: steps.changesets.outputs.published == 'true' || github.event_name == 'workflow_dispatch' # run when the package is published via changeset or if a release is triggered manually.
         with:
           token: ${{ env.GITHUB_ACCESS_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_SVELTE_PROJECT_TOKEN }}
-          workingDir: packages/compass-svelte
-          storybookBaseDir: packages/compass-svelte
+          workingDir: packages/kdesign-svelte
+          storybookBaseDir: packages/kdesign-svelte
           buildScriptName: build-storybook
           exitOnceUploaded: true
           onlyChanged: true

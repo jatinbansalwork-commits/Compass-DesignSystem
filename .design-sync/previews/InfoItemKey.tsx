@@ -1,6 +1,6 @@
 import React from 'react';
-import { InfoGroup, InfoItem, InfoItemKey, InfoItemValue } from '@klearnow/compass/components';
-import { UserIcon, BankIcon, CheckIcon } from '@klearnow/compass/components';
+import { InfoGroup, InfoItem, InfoItemKey, InfoItemValue } from '@klearnow/kdesign/components';
+import { UserIcon, BankIcon, CheckIcon } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <InfoGroup>

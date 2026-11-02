@@ -16,11 +16,11 @@ on:
         type: string
   workflow_run:
     workflows:
-      - 'Compass Interaction Tests'
-      - 'Compass Bundle Size'
-      - 'Compass Chromatic'
-      - 'Compass Release'
-      - 'Agentic Compass Metrics'
+      - 'Kdesign Interaction Tests'
+      - 'Kdesign Bundle Size'
+      - 'Kdesign Chromatic'
+      - 'Kdesign Release'
+      - 'Agentic Kdesign Metrics'
     types: [completed]
     branches:
       - master
@@ -56,7 +56,7 @@ jobs:
         run: |
           WORKFLOW_RUN_URL="https://github.com/${REPOSITORY}/actions/runs/${RUN_ID}"
 
-          PROMPT="Failing CI checks detected on the master branch of the blade repository.
+          PROMPT="Failing CI checks detected on the master branch of the kdesign repository.
 
           Workflow run: ${WORKFLOW_RUN_URL}
 

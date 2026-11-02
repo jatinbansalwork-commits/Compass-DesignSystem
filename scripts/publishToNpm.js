@@ -46,7 +46,7 @@ try {
   // Now you can use the array of objects
   for (const pkg of publishedPackages) {
     const packagePath = getPackagePath(pkg.name);
-    console.log(`[compass]: Publishing ${pkg.name}@${pkg.version} on NPM ✨`);
+    console.log(`[kdesign]: Publishing ${pkg.name}@${pkg.version} on NPM ✨`);
 
     execa.commandSync('npm publish', {
       cwd: path.join(MONOREPO_ROOT, packagePath),

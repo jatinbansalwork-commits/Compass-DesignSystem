@@ -1,0 +1,40 @@
+name: Kdesign MCP Validate
+
+on:
+  pull_request:
+    paths:
+      - 'packages/kdesign-mcp/**'
+      - 'packages/kdesign-plugin/**'
+      - 'scripts/syncPluginManifestVersion.js'
+      - 'scripts/validateKdesignPlugin.mjs'
+      - '.github/workflows/kdesign-mcp-validate.yml'
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest # nosemgrep: non-self-hosted-runner
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v3
+      - name: Use Node v22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - name: Setup Cache & Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Validate Kdesign Plugin
+        run: yarn validate:kdesign-plugin
+      - name: Run Unit Tests
+        run: yarn test
+        working-directory: packages/kdesign-mcp
+      - name: Check Knowledgebase Ships In Tarball
+        run: |
+          rm -rf knowledgebase
+          npm pack --dry-run 2>&1 | grep 'knowledgebase/components/Button.md'
+        working-directory: packages/kdesign-mcp
+

@@ -35,11 +35,11 @@ Assemble the outputs from all critique agents into a single JSON object matching
         }
       ]
     },
-    "usage": "import { Button, Icon } from '@klearnow/compass/components';\n\n<Button leading={<Icon name=\"arrow-left\" />}>Back</Button>"
+    "usage": "import { Button, Icon } from '@klearnow/kdesign/components';\n\n<Button leading={<Icon name=\"arrow-left\" />}>Back</Button>"
   },
   "inlined-comments": [
     {
-      "file": "packages/compass/src/components/Foo/Foo.tsx",
+      "file": "packages/kdesign/src/components/Foo/Foo.tsx",
       "line": 42,
       "side": "RIGHT",
       "severity": "critical",
@@ -49,7 +49,7 @@ Assemble the outputs from all critique agents into a single JSON object matching
       "suggestion": "How to fix it."
     },
     {
-      "file": "packages/compass/src/components/Bar/Bar.tsx",
+      "file": "packages/kdesign/src/components/Bar/Bar.tsx",
       "line": 17,
       "side": "LEFT",
       "severity": "minor",

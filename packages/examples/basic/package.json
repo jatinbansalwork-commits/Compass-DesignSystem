@@ -2,15 +2,15 @@
   "private": "true",
   "scripts": {
     "start": "DISABLE_ESLINT_PLUGIN=true react-scripts start",
-    "build": "yarn build:compass && yarn build:app",
-    "build:compass": "cd ../../blade && yarn build",
+    "build": "yarn build:kdesign && yarn build:app",
+    "build:kdesign": "cd ../../kdesign && yarn build",
     "build:app": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "analyze:only": "source-map-explorer 'build/static/js/*.js' --gzip",
     "analyze": "yarn build && yarn analyze:only",
-    "postinstall": "rm -rf node_modules/@klearnow/compass/node_modules"
+    "postinstall": "rm -rf node_modules/@klearnow/kdesign/node_modules"
   },
   "dependencies": {
-    "@klearnow/compass": "file:../../blade",
+    "@klearnow/kdesign": "file:../../kdesign",
     "@fontsource/lato": "^4.5.10",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",

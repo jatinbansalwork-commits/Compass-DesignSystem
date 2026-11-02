@@ -1,6 +1,6 @@
 # Agentic Merge Ready
 #
-# Labels a PR `✨ Agentic Merge Ready ✨` when the required blade-validate
+# Labels a PR `✨ Agentic Merge Ready ✨` when the required kdesign-validate
 # checks are green AND comments are ready (none, or every visible thread is
 # Slash rocket / -1, and the review is not CHANGES_REQUESTED) AND CI is either
 # first-attempt green or red→green via a Slash commit. Human-fixed CI after a
@@ -8,7 +8,7 @@
 # resolve-comments skill does NOT mark threads resolved — we read reactions.
 #
 # A new commit (pull_request synchronize) drops the label immediately. The
-# label is earned again only when Compass Validate completes via workflow_run.
+# label is earned again only when Kdesign Validate completes via workflow_run.
 #
 # WHY workflow_run and NOT check_suite: GitHub does not fire check_suite for
 # Actions-created suites.
@@ -25,7 +25,7 @@ name: Agentic Repo / Agentic Merge Ready
 on:
   workflow_run:
     workflows:
-      - "Compass Validate"
+      - "Kdesign Validate"
       - "Agentic Repo / Slash Auto-Resolve PR Comments"
     types: [completed]
   pull_request:

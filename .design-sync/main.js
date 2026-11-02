@@ -5,7 +5,7 @@ import type { StorybookConfig } from '@storybook/react-vite';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const bladeRoot = resolve(__dirname, '../packages/compass');
+const kdesignRoot = resolve(__dirname, '../packages/kdesign');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -14,7 +14,7 @@ const config: StorybookConfig = {
     check: !isDevelopment,
     checkOptions: {
       typescript: {
-        configFile: resolve(bladeRoot, 'tsconfig-typecheck.web.json'),
+        configFile: resolve(kdesignRoot, 'tsconfig-typecheck.web.json'),
       },
     },
     reactDocgen: isDevelopment ? false : 'react-docgen-typescript',
@@ -25,11 +25,11 @@ const config: StorybookConfig = {
   },
 
   stories: [
-    '../../packages/compass/docs/**/*.mdx',
-    '../../packages/compass/docs/**/*.stories.@(ts|tsx|js|jsx)',
-    '../../packages/compass/src/**/*.mdx',
-    '../../packages/compass/src/**/*.stories.@(ts|tsx|js|jsx)',
-    '../../packages/compass/src/**/*.internal.stories.@(ts|tsx|js|jsx)',
+    '../../packages/kdesign/docs/**/*.mdx',
+    '../../packages/kdesign/docs/**/*.stories.@(ts|tsx|js|jsx)',
+    '../../packages/kdesign/src/**/*.mdx',
+    '../../packages/kdesign/src/**/*.stories.@(ts|tsx|js|jsx)',
+    '../../packages/kdesign/src/**/*.internal.stories.@(ts|tsx|js|jsx)',
   ],
 
   addons: [
@@ -48,7 +48,7 @@ const config: StorybookConfig = {
     GITHUB_REF: process.env.GITHUB_REF || '',
   }),
 
-  staticDirs: ['../../packages/compass/public'],
+  staticDirs: ['../../packages/kdesign/public'],
 
   viteFinal: async (config) => {
     const { mergeConfig } = await import('vite');
@@ -59,7 +59,7 @@ const config: StorybookConfig = {
       plugins: [
         react(),
         tsconfigPaths({
-          root: bladeRoot,
+          root: kdesignRoot,
         }),
       ],
       define: {
@@ -79,10 +79,10 @@ const config: StorybookConfig = {
           '.json',
         ],
         alias: {
-          '~utils': resolve(bladeRoot, 'src/utils'),
-          '~components': resolve(bladeRoot, 'src/components'),
-          '~tokens': resolve(bladeRoot, 'src/tokens'),
-          '~src': resolve(bladeRoot, 'src'),
+          '~utils': resolve(kdesignRoot, 'src/utils'),
+          '~components': resolve(kdesignRoot, 'src/components'),
+          '~tokens': resolve(kdesignRoot, 'src/tokens'),
+          '~src': resolve(kdesignRoot, 'src'),
         },
       },
     });

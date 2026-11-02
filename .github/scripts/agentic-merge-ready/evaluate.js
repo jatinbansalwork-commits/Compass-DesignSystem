@@ -7,8 +7,8 @@
  */
 
 const MERGE_READY_LABEL = '✨ Agentic Merge Ready ✨';
-// Required status checks on master that come from blade-validate.yml.
-const VALIDATE_WORKFLOW_FILE = 'blade-validate.yml';
+// Required status checks on master that come from kdesign-validate.yml.
+const VALIDATE_WORKFLOW_FILE = 'kdesign-validate.yml';
 const GATE_CHECK_NAMES = [
   'Validate Source Code',
   'Run Tests (1)',

@@ -16,7 +16,7 @@ runs:
           ~/.yarn
           ./node_modules
           ./packages/**/node_modules
-        key: ${{ runner.os }}-blade-${{ hashFiles('**/yarn.lock') }}
+        key: ${{ runner.os }}-kdesign-${{ hashFiles('**/yarn.lock') }}
 
     # cache miss - install packages with `yarn --frozen-lockfile`
     # cache hit - download packages from the cache and explicitly run postinstall script

@@ -1,10 +1,10 @@
 ---
 name: heal-pr
-description: Heal a Compass PR by fixing CI failures, missing changesets, and sanity issues. Use when a PR has failing CI or other sanity problems that need to be auto-fixed.
+description: Heal a Kdesign PR by fixing CI failures, missing changesets, and sanity issues. Use when a PR has failing CI or other sanity problems that need to be auto-fixed.
 disable-model-invocation: true
 ---
 
-# Heal Compass PR
+# Heal Kdesign PR
 
 ## Arguments
 

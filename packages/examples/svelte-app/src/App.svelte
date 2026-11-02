@@ -1,24 +1,24 @@
 <script lang="ts">
   import {
-    Klear360Provider,
+    KdesignProvider,
     Button,
     Heading,
     Link,
     Text,
     ToastContainer,
     showToast,
-  } from '@klearnow/klear360-svelte/components';
+  } from '@klearnow/kdesign-svelte/components';
   import Contact from './Contact.svelte';
   import PaymentMethods from './PaymentMethods.svelte';
   import Summary from './Summary.svelte';
 
-  // A merchant's brand reaches Klear360 through its token variables: the
+  // A merchant's brand reaches Kdesign through its token variables: the
   // standard theme is the fallback, so only what branding changes is set.
   const BRANDS = {
-    blade: undefined,
+    kdesign: undefined,
     plum: 'hsla(285, 60%, 42%, 1)',
   } as const;
-  let brand = $state<keyof typeof BRANDS>('blade');
+  let brand = $state<keyof typeof BRANDS>('kdesign');
 
   let method = $state<string | null>('upi');
 
@@ -41,12 +41,12 @@
   class="relative min-h-screen bg-surface-gray-subtle"
   style:--interactive-background-primary-default={BRANDS[brand]}
 >
-  <Klear360Provider>
+  <KdesignProvider>
     <main class="mx-auto flex max-w-[480px] flex-col gap-6 px-4 py-8">
       <header class="flex items-center justify-between">
         <Heading size="medium">Checkout</Heading>
-        <Link variant="button" onClick={() => (brand = brand === 'blade' ? 'plum' : 'blade')}>
-          {brand === 'blade' ? 'Try a brand colour' : 'Back to Klear360 blue'}
+        <Link variant="button" onClick={() => (brand = brand === 'kdesign' ? 'plum' : 'kdesign')}>
+          {brand === 'kdesign' ? 'Try a brand colour' : 'Back to Kdesign blue'}
         </Link>
       </header>
 
@@ -65,5 +65,5 @@
 
     <!-- Rendered once: it shows what showToast asks for. -->
     <ToastContainer />
-  </Klear360Provider>
+  </KdesignProvider>
 </div>

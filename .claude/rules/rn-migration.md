@@ -1,8 +1,8 @@
 ---
-description: Guidelines and patterns for adding React Native support (.native.tsx) to Compass components that currently only have web implementations.
+description: Guidelines and patterns for adding React Native support (.native.tsx) to Kdesign components that currently only have web implementations.
 ---
 
-# Compass React Native Migration — Critical Rules
+# Kdesign React Native Migration — Critical Rules
 
 > Include this file at the start of every agent prompt.
 
@@ -36,7 +36,7 @@ description: Guidelines and patterns for adding React Native support (.native.ts
 - Use `styled-components/native`: `import styled from 'styled-components/native'`
 - Styled components wrap RN primitives: `styled(View)`, `styled(Pressable)`, `styled(Animated.View)`
 - Style values are NUMBERS for dimensions: `width: 24` not `width: '24px'`
-- Use `useTheme()` from `~components/CompassProvider` for runtime token access
+- Use `useTheme()` from `~components/KdesignProvider` for runtime token access
 - Use `getIn(theme, 'path.to.token')` for deep token lookups
 - Use `useStyledProps(props)` for handling styled prop overrides (margin, padding, etc.)
 - `flexDirection` defaults to `'column'` in RN (not `'row'` like web CSS)
@@ -75,7 +75,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import getIn from '~utils/lodashButBetter/get';
-import { useTheme } from '~components/CompassProvider';
+import { useTheme } from '~components/KdesignProvider';
 
 const AnimatedX = ({ isActive, children }) => {
   const { theme } = useTheme();
@@ -129,7 +129,7 @@ type ComponentProps = {
 import { castNativeType } from '~utils';
 ```
 
-## Compass Components Available on Native (DO NOT reimplement)
+## Kdesign Components Available on Native (DO NOT reimplement)
 
 These already work cross-platform — import directly:
 - Box, BaseBox, View primitives
@@ -144,7 +144,7 @@ These already work cross-platform — import directly:
 - Modal, BottomSheet, Tooltip, Popover
 - Tabs, BottomNav, Carousel
 - Avatar, AvatarGroup
-- Icons (all from `@klearnow/compass/components`)
+- Icons (all from `@klearnow/kdesign/components`)
 
 ## Native Dependencies (common)
 
@@ -189,11 +189,11 @@ describe('<ComponentName />', () => {
 
 | Task | Command |
 |------|---------|
-| Native typecheck | `cd packages/compass && yarn types:typecheck:native` |
-| Native tests (all) | `cd packages/compass && yarn test:react-native` |
-| Native tests (one) | `cd packages/compass && yarn test:react-native {Name}` |
-| Update snapshots | `cd packages/compass && yarn test:react-native {Name} -u` |
-| Build native | `cd packages/compass && FRAMEWORK=REACT_NATIVE yarn build` |
+| Native typecheck | `cd packages/kdesign && yarn types:typecheck:native` |
+| Native tests (all) | `cd packages/kdesign && yarn test:react-native` |
+| Native tests (one) | `cd packages/kdesign && yarn test:react-native {Name}` |
+| Update snapshots | `cd packages/kdesign && yarn test:react-native {Name} -u` |
+| Build native | `cd packages/kdesign && FRAMEWORK=REACT_NATIVE yarn build` |
 
 ## Known Platform Gotchas (from past sessions)
 
@@ -209,9 +209,9 @@ describe('<ComponentName />', () => {
 
 ## Key References
 
-- Existing native patterns: `packages/compass/src/components/Button/BaseButton/StyledBaseButton.native.tsx`
-- Animation reference: `packages/compass/src/components/Switch/AnimatedThumb.native.tsx`
-- Test utility: `packages/compass/src/utils/testing/renderWithTheme.native.tsx`
-- Platform types: `packages/compass/src/utils/platform/platform.all.ts`
-- Theme access: `useTheme()` from `~components/CompassProvider`
-- Stub pattern: grep for `throwCompassError` in `.native.tsx` files
+- Existing native patterns: `packages/kdesign/src/components/Button/BaseButton/StyledBaseButton.native.tsx`
+- Animation reference: `packages/kdesign/src/components/Switch/AnimatedThumb.native.tsx`
+- Test utility: `packages/kdesign/src/utils/testing/renderWithTheme.native.tsx`
+- Platform types: `packages/kdesign/src/utils/platform/platform.all.ts`
+- Theme access: `useTheme()` from `~components/KdesignProvider`
+- Stub pattern: grep for `throwKdesignError` in `.native.tsx` files
