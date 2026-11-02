@@ -1061,14 +1061,13 @@ const _Table = <Item,>({
             flex={usesScrollBodyLayout ? 1 : undefined}
             width="100%"
             maxWidth="100%"
-            minWidth={0}
-            minHeight={usesScrollBodyLayout ? 0 : undefined}
+            minWidth="0px"
+            minHeight={usesScrollBodyLayout ? '0px' : undefined}
             display={usesScrollBodyLayout ? 'flex' : undefined}
             flexDirection={usesScrollBodyLayout ? 'column' : undefined}
             position="relative"
             {...getStyledProps(rest)}
             {...metaAttribute({ name: MetaConstants.Table })}
-            width={isVirtualized ? `100%` : undefined}
             {...makeAnalyticsAttribute(rest)}
           >
             {isRefreshSpinnerMounted && (

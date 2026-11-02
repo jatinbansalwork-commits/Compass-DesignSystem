@@ -294,6 +294,7 @@ const _Pagination = ({
                 _width={makeSize(pagination.pageSizeSelectWidth)}
               >
                 <SelectInput
+                  label="Items per page"
                   accessibilityLabel="Select items per page"
                   name="page-size"
                   size="small"

@@ -179,7 +179,6 @@ const StyledFilterHeaderCell = styled(HeaderCell)<{
     alignSelf: 'stretch',
     minWidth: 0,
     width: '100%',
-    boxSizing: 'border-box',
     backgroundColor: getIn(theme.colors, tableHeader.backgroundColor),
     borderBottomWidth: makeSpace(getIn(theme.border.width, tableHeader.borderBottomAndTopWidth)),
     borderBottomColor: getIn(theme.colors, tableHeader.borderBottomAndTopColor),
@@ -812,7 +811,7 @@ const _TableHeaderCell = ({
       <BaseBox
         display="flex"
         flexGrow={1}
-        minWidth={0}
+        minWidth="0px"
         overflow="hidden"
         width={isSelectAllColumn ? '100%' : undefined}
         alignItems="center"

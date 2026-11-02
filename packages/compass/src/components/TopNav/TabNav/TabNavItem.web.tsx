@@ -26,10 +26,10 @@ const isIconObjectProp = (
   return typeof icon === 'object' && icon !== null && 'default' in icon;
 };
 
-const isRayIcon = (icon?: TabNavIconProp): boolean => {
+const isKlearIconProp = (icon?: TabNavIconProp): boolean => {
   if (!icon) return false;
   const defaultIcon = isIconObjectProp(icon) ? icon.default : icon;
-  return defaultIcon === RayIcon;
+  return defaultIcon === KlearIcon;
 };
 
 const getGlowColor = ({
@@ -41,7 +41,7 @@ const getGlowColor = ({
   isPrimaryVariant: boolean;
   theme: Theme;
 }): string => {
-  if (isKlearIcon(icon) && !isPrimaryVariant) return theme.colors.surface.icon.onSea.onSubtle;
+  if (isKlearIconProp(icon) && !isPrimaryVariant) return theme.colors.surface.icon.onSea.onSubtle;
   if (isPrimaryVariant) return theme.colors.surface.icon.staticWhite.normal;
   return theme.colors.surface.background.primary.intense;
 };

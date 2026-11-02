@@ -88,7 +88,6 @@ const _TableToolbarSearch = ({
   const searchInput = (
     <SearchInput
       size="small"
-      isFullWidth
       value={globalFilterValue}
       onChange={({ value }) => setGlobalFilterValue(value ?? '')}
       placeholder={placeholder}
@@ -201,7 +200,6 @@ const _TableToolbar = ({
         alignItems="center"
         gap={tableToolbar.titleBlockGap}
         minHeight={makeSize(tableToolbar.minHeight)}
-        boxSizing="border-box"
       >
         <BaseBox display="flex" alignItems="center" flexShrink={0}>
           <BaseBox>
@@ -224,7 +222,7 @@ const _TableToolbar = ({
         <BaseBox
           display="flex"
           flex={1}
-          minWidth={0}
+          minWidth="0px"
           flexDirection="row"
           flexWrap={onMobile ? 'wrap' : 'nowrap'}
           alignItems="center"
