@@ -27,6 +27,10 @@ Settings is a pattern that provides a structured way to organize application con
 
 Dashboard Template is a full dashboard template with SideNav, TopNav and main workspace area. It also includes a navigation structure with sections and items implemented via react-router-dom. 
 
+## App Shell TopNav
+
+App Shell TopNav defines the KlearNow dashboard header: sticky 56px `TopNav` with Brand / Content / Actions on desktop and menu + brand | spacer | actions on mobile. The pattern doc lists every Compass component in the shell (TopNav slots, actions cluster, optional TabNav, SideNav, and Storybook helpers) with required vs optional roles.
+
 ## Spark Animation
 
 Spark Animation combines Klearsense (WebGL glass refraction background) and KlearsenseGradient (animated gradient icon mask) to create rich visual treatments for success states, loading screens, and branded moments. Use this pattern when you need animated WebGL backgrounds with coordinated icon overlays, asset preloading, and framer-motion entrance animations.

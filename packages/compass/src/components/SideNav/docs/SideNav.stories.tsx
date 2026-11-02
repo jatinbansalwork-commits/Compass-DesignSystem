@@ -18,6 +18,7 @@ import {
 import { TopNavBrandLogoPlaceholder } from '~components/TopNav/docs/TopNavBrandLogoPlaceholder';
 import { sideNavWithReactRouter } from './code';
 import StoryRouter from '~utils/storybook/StoryRouter';
+import { KlearNowAppShellExample } from './KlearNowAppShellNav';
 import { getStyledPropsArgTypes } from '~components/Box/BaseBox/storybookArgTypes';
 import { Box } from '~components/Box';
 import {
@@ -716,3 +717,22 @@ MobileSideNav.parameters = {
     defaultViewport: 'iPhone6',
   },
 };
+
+const KlearNowAppShellTemplate: StoryFn<typeof SideNav> = () => {
+  return <KlearNowAppShellExample />;
+};
+
+export const KlearNowAppShell = KlearNowAppShellTemplate.bind({});
+KlearNowAppShell.storyName = 'KlearNow App Shell';
+KlearNowAppShell.parameters = {
+  layout: 'fullscreen',
+  docs: {
+    description: {
+      story:
+        'Full KlearNow app shell: AppShellLayout, TopNav (App Shell pattern), pinned SideNav with L2 flyouts, dashboard home (Card metrics), and Transaction Manager workspace (Table). See compass-plugin **AppShellTopNav** pattern for the component map.',
+    },
+  },
+};
+KlearNowAppShell.decorators = [
+  StoryRouter(undefined, { initialEntries: ['/dashboard/transactions/active'] }),
+] as unknown;

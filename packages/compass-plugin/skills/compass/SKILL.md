@@ -63,7 +63,7 @@ Accordion, ActionList, Alert, Amount, AnimateInteractions, AnnouncementBanner, A
 
 ## Available patterns
 
-`references/patterns/<Name>.md`: Confirmation, CreationView, Dashboard, DetailedView, FormGroup, ListView, Settings, SparkAnimation. Summaries in `references/patterns/index.md`.
+`references/patterns/<Name>.md`: AppShellTopNav, Confirmation, CreationView, Dashboard, DetailedView, FormGroup, ListView, Settings, SparkAnimation. Summaries in `references/patterns/index.md`.
 
 ## General docs
 

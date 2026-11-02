@@ -47,10 +47,9 @@ import {
 } from '~components/SideNav/tokens';
 import BaseBox from '~components/Box/BaseBox';
 import {
-  AppShellMobileTopNav,
-  AppShellMobileTopNavBrandOnly,
   AppShellTopNavActions,
-} from '~components/SideNav/docs/appShellStoryShared';
+  AppShellTopNavSlots,
+} from './topNavAppShellPattern';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = (): void => {};
@@ -66,6 +65,14 @@ const DocsPage = (): React.ReactElement => {
       componentName="TopNav"
       componentDescription="The top navigation bar is positioned at the top of the screen that provides quick access to different products and user profile actions."
 >
+      <Title>App Shell pattern</Title>
+      <Alert
+        color="information"
+        title="App Shell TopNav"
+        description="KlearNow dashboard shells use a fixed three-slot layout: TopNavBrand | TopNavContent (empty when SideNav owns IA, or TabNav for multi-product) | TopNavActions. On mobile, render three grid cells: menu + logo, spacer, actions. See `topNavAppShellPattern.tsx` and the compass-plugin **AppShellTopNav** pattern doc. Stories: **Full Example**, **Minimal**, SideNav **KlearNow App Shell**."
+        isFullWidth
+        isDismissible={false}
+      />
       <Title>Usage (with React Router v6)</Title>
       <Alert
         color="notice"
@@ -204,25 +211,14 @@ const TopNavFullExample = ({ variant = 'primary' }: { variant?: 'primary' | 'neu
     <DashboardBackground background={dashboardBgColor}>
       <BaseBox>
         <TopNav variant={variant}>
-          {isMobile ? (
-            <AppShellMobileTopNav
-              variant={variant}
-              profile={topNavStoryProfile}
-              onOpenNavigation={() => {
-                setIsSideBarOpen(true);
-              }}
-            />
-          ) : (
-            <>
-              <TopNavBrand>
-                <TopNavBrandLogoPlaceholder />
-              </TopNavBrand>
-              <TopNavContent>{null}</TopNavContent>
-              <TopNavActions>
-                <AppShellTopNavActions profile={topNavStoryProfile} variant={variant} />
-              </TopNavActions>
-            </>
-          )}
+          <AppShellTopNavSlots
+            profile={topNavStoryProfile}
+            variant={variant}
+            isMobile={isMobile}
+            onOpenNavigation={() => {
+              setIsSideBarOpen(true);
+            }}
+          />
         </TopNav>
         <Box
           overflow="hidden"
@@ -284,19 +280,12 @@ const TopNavMinimalTemplate: StoryFn<typeof TopNav> = () => {
     <DashboardBackground background={shellBackground}>
       <BaseBox>
         <TopNav variant="primary">
-          {isMobile ? (
-            <AppShellMobileTopNavBrandOnly profile={topNavStoryProfile} variant="primary" />
-          ) : (
-            <>
-              <TopNavBrand>
-                <TopNavBrandLogoPlaceholder />
-              </TopNavBrand>
-              <TopNavContent>{null}</TopNavContent>
-              <TopNavActions>
-                <AppShellTopNavActions profile={topNavStoryProfile} variant="primary" />
-              </TopNavActions>
-            </>
-          )}
+          <AppShellTopNavSlots
+            profile={topNavStoryProfile}
+            variant="primary"
+            isMobile={isMobile}
+            mobileBrandOnly
+          />
         </TopNav>
         <Box
           overflow="hidden"
@@ -426,15 +415,13 @@ const TopNavWithButtonTemplate: StoryFn<typeof TopNav> = () => {
     <DashboardBackground background={shellBackground}>
       <BaseBox>
         <TopNav variant="primary">
-          {isMobile ? (
-            <AppShellMobileTopNavBrandOnly profile={topNavStoryProfile} variant="primary" />
-          ) : (
-            <>
-              <TopNavBrand>
-                <TopNavBrandLogoPlaceholder />
-              </TopNavBrand>
-              <TopNavContent>{null}</TopNavContent>
-              <TopNavActions>
+          <AppShellTopNavSlots
+            profile={topNavStoryProfile}
+            variant="primary"
+            isMobile={isMobile}
+            mobileBrandOnly
+            actions={
+              <>
                 <Button variant="primary" size="medium" icon={AnimatedKlearIcon}>
                   Klear Agent
                 </Button>
@@ -471,9 +458,9 @@ const TopNavWithButtonTemplate: StoryFn<typeof TopNav> = () => {
                     </MenuItem>
                   </MenuOverlay>
                 </Menu>
-              </TopNavActions>
-            </>
-          )}
+              </>
+            }
+          />
         </TopNav>
         <Box
           overflow="hidden"

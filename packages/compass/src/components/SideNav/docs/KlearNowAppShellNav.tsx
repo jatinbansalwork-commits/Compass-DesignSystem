@@ -33,21 +33,11 @@ import {
 } from '~components/Icons';
 import { Badge } from '~components/Badge';
 import { Box } from '~components/Box';
-import { Card, CardBody } from '~components/Card';
-import { Heading, Text } from '~components/Typography';
 import { Indicator } from '~components/Indicator';
-import { TopNavBrandLogoPlaceholder } from '~components/TopNav/docs/TopNavBrandLogoPlaceholder';
+import { KlearNowAppShellMainWorkspace } from './klearNowAppShellWorkspace';
 import { useIsMobile } from '~utils';
-import {
-  TopNav,
-  TopNavActions,
-  TopNavBrand,
-  TopNavContent,
-} from '~components/TopNav';
-import {
-  AppShellMobileTopNav,
-  AppShellTopNavActions,
-} from './appShellStoryShared';
+import { TopNav } from '~components/TopNav';
+import { AppShellTopNavSlots } from '~components/TopNav/docs/topNavAppShellPattern';
 import { AppShellLayout } from './dashboardLayoutShell';
 
 type KlearNowNavItem = {
@@ -290,56 +280,9 @@ const klearNowProfile = {
 } as const;
 
 const KlearNowDashboardMain = (): React.ReactElement => {
-  const location = useLocation();
-  const isHome = location.pathname === '/dashboard';
+  const { pathname } = useLocation();
 
-  return (
-    <Box padding="spacing.6" minHeight="100%">
-      {isHome ? (
-        <>
-          <Heading size="large" weight="semibold">
-            Dashboard
-          </Heading>
-          <Text marginTop="spacing.2" color="surface.text.gray.subtle">
-            Overview of your trade operations.
-          </Text>
-          <Box
-            display="flex"
-            flexDirection={{ base: 'column', m: 'row' }}
-            gap="spacing.4"
-            marginTop="spacing.6"
-          >
-            {[
-              { label: 'Active shipments', value: '128' },
-              { label: 'Pending customs entries', value: '14' },
-              { label: 'Documents awaiting review', value: '9' },
-            ].map((metric) => (
-              <Card key={metric.label} flex="1">
-                <CardBody>
-                  <Text size="small" color="surface.text.gray.subtle">
-                    {metric.label}
-                  </Text>
-                  <Heading marginTop="spacing.2" size="large">
-                    {metric.value}
-                  </Heading>
-                </CardBody>
-              </Card>
-            ))}
-          </Box>
-        </>
-      ) : (
-        <>
-          <Heading size="large" weight="semibold">
-            {location.pathname.split('/').filter(Boolean).slice(-1)[0]?.replace(/-/g, ' ') ??
-              'Page'}
-          </Heading>
-          <Text marginTop="spacing.2" color="surface.text.gray.subtle">
-            Active route: {location.pathname}
-          </Text>
-        </>
-      )}
-    </Box>
-  );
+  return <KlearNowAppShellMainWorkspace pathname={pathname} />;
 };
 
 type KlearNowAppShellSideNavProps = Pick<
@@ -365,6 +308,8 @@ const KlearNowAppShellSideNav = ({
       top="spacing.0"
       left="spacing.0"
       height="100%"
+      borderTopLeftRadius={{ base: 'none', m: 'large' }}
+      overflow={{ base: 'visible', m: 'hidden' }}
       isOpen={isOpen}
       onDismiss={onDismiss}
       isExpanded={isPinned ? true : false}
@@ -466,25 +411,14 @@ const KlearNowAppShellExample = ({
       }}
       topNav={
         <TopNav variant={topNavVariant}>
-          {isMobile ? (
-            <AppShellMobileTopNav
-              variant={topNavVariant}
-              profile={klearNowProfile}
-              onOpenNavigation={() => {
-                setIsSideBarOpen(true);
-              }}
-            />
-          ) : (
-            <>
-              <TopNavBrand>
-                <TopNavBrandLogoPlaceholder />
-              </TopNavBrand>
-              <TopNavContent>{null}</TopNavContent>
-              <TopNavActions>
-                <AppShellTopNavActions profile={klearNowProfile} variant={topNavVariant} />
-              </TopNavActions>
-            </>
-          )}
+          <AppShellTopNavSlots
+            profile={klearNowProfile}
+            variant={topNavVariant}
+            isMobile={isMobile}
+            onOpenNavigation={() => {
+              setIsSideBarOpen(true);
+            }}
+          />
         </TopNav>
       }
       sideNav={

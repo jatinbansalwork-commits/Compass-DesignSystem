@@ -6,6 +6,8 @@ TopNav
 
 The TopNav component is a navigation bar positioned at the top of the screen that provides quick access to products or app actions and the user profile. Use `TabNav` inside `TopNavContent` for multi-product switchers, or leave `TopNavContent` empty for single-app shells. TopNav has a responsive design that adapts well to different viewport sizes and integrates seamlessly with side navigation systems.
 
+For KlearNow dashboard shells (Brand | Content | Actions on desktop; menu + brand on mobile), follow the **App Shell TopNav** pattern in `references/patterns/AppShellTopNav.md`. Reference helpers live in `packages/compass/src/components/TopNav/docs/topNavAppShellPattern.tsx`.
+
 ## TypeScript Types
 
 Below are the props that the TopNav component and its subcomponents accept. These types allow you to properly configure each component to build a complete navigation system.

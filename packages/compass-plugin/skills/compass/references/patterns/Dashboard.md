@@ -33,7 +33,7 @@ The dashboard shell is composed of three structural regions:
 └───────────┴──────────────────────────────────────┘
 ```
 
-- **Top Nav** — Persistent horizontal bar; contains logo, primary product navigation tabs/links, and utility actions (search, notifications, account). Always fixed.
+- **Top Nav** — Persistent horizontal bar; contains logo, primary product navigation tabs/links, and utility actions (search, notifications, account). Always fixed. For KlearNow single-app shells, see **App Shell TopNav** pattern (empty center column when SideNav owns IA).
 - **Side Nav** — Persistent vertical navigation panel on the left. Always fixed. Depth and items vary by Architecture Level.
 - **Workspace Area** — The main scrollable region to the right of the Side Nav. All page content lives here.
 
