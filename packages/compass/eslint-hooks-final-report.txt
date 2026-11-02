@@ -1,0 +1,2 @@
+yarn run v1.22.22
+$ /Users/jatinbansal/Downloads/Klear360-Master/node_modules/.bin/eslint src/components src/hooks --rule '{"react-hooks/rules-of-hooks": "error", "react-hooks/exhaustive-deps": "warn"}' --ext .ts,.tsx --ignore-pattern '*.stories.tsx' --ignore-pattern '*.test.tsx'
