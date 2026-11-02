@@ -11,9 +11,11 @@ import {
   SideNavLevel,
   SideNavSection,
   SideNavFooter,
-  SideNavItem,
+  SideNavPinItem,
+  COLLAPSED_L1_WIDTH,
+  SIDE_NAV_EXPANDED_L1_WIDTH_BASE,
 } from '..';
-import { KlearnowLinesSvg, KlearnowLogo } from './KlearnowLogo';
+import { TopNavBrandLogoPlaceholder } from '~components/TopNav/docs/TopNavBrandLogoPlaceholder';
 import { sideNavWithReactRouter } from './code';
 import StoryRouter from '~utils/storybook/StoryRouter';
 import { getStyledPropsArgTypes } from '~components/Box/BaseBox/storybookArgTypes';
@@ -45,14 +47,11 @@ import {
   TransactionsIcon,
   WalletIcon,
   CustomersIcon,
-  TestIcon,
   GlobeIcon,
   DollarIcon,
-  RayIcon,
 } from '~components/Icons';
 import { Button } from '~components/Button';
 import { Tooltip } from '~components/Tooltip';
-import { Switch as CompassSwitch } from '~components/Switch';
 import StoryPageWrapper from '~utils/storybook/StoryPageWrapper';
 import { Sandbox } from '~utils/storybook/Sandbox';
 import { Skeleton } from '~components/Skeleton';
@@ -62,6 +61,8 @@ import { Text } from '~components/Typography';
 import { Alert } from '~components/Alert';
 import { Badge } from '~components/Badge';
 import { IconButton } from '~components/Button/IconButton';
+import { DashboardLayoutShell } from './dashboardLayoutShell';
+import { makeSize } from '~utils';
 
 const DocsPage = (): React.ReactElement => {
   return (
@@ -74,7 +75,7 @@ const DocsPage = (): React.ReactElement => {
         color="notice"
         title="State Management Note"
         description="SideNav component requires you to handle active link and active menu item on consumer end
-        since the component is detached from React Router. The example below includes some boilerplate in handling these active states using React Router v6. Make sure to test your edge cases while implementing. Checkout API Decision of SideNav for more details."
+        since the component is detached from React Router. The example below includes some boilerplate in handling these active states using React Router v6. For TopNav + SideNav together, use **Components/TopNav → Full Example**."
         isFullWidth
         isDismissible={false}
       />
@@ -113,50 +114,6 @@ const Page = ({ match }: { match: any }): React.ReactElement => (
     </pre>
   </Box>
 );
-
-const DashboardSkeleton = ({ children }: { children: React.ReactElement }): React.ReactElement => {
-  return (
-    <Box
-      paddingX="spacing.4"
-      backgroundColor="surface.background.gray.moderate"
-      height="100%"
-      display="flex"
-      flexDirection="column"
-    >
-      <Box position="relative" display="flex" height="56px" alignItems="center" width="100%">
-        <Box position="absolute" bottom="-10px" left="0px">
-          <KlearnowLinesSvg />
-        </Box>
-        <Box width={{ base: undefined, m: '264px' }} textAlign="center">
-          <KlearnowLogo />
-        </Box>
-        <Box flex="1" display={{ base: 'none', m: 'block' }}>
-          <Skeleton width="100%" height="12px" borderRadius="medium" />
-        </Box>
-        <Box flex="3" marginLeft="spacing.6" display={{ base: 'none', m: 'block' }}>
-          <Skeleton marginBottom="spacing.2" width="100%" height="12px" borderRadius="medium" />
-          <Skeleton width="100%" height="12px" borderRadius="medium" />
-        </Box>
-      </Box>
-      <Box
-        position="relative"
-        borderRadius="large"
-        overflow="hidden"
-        paddingTop="spacing.4"
-        flex="1"
-        borderWidth="thin"
-        borderColor="surface.border.gray.muted"
-        elevation="midRaised"
-        backgroundColor="surface.background.gray.intense"
-        borderBottomWidth="none"
-        borderBottomRightRadius="none"
-        borderBottomLeftRadius="none"
-      >
-        {children}
-      </Box>
-    </Box>
-  );
-};
 
 type ItemsType = Pick<
   SideNavLinkProps,
@@ -435,7 +392,16 @@ const SideNavExample = ({
   ...args
 }: SideNavProps & { showExampleContentPadding?: boolean }): React.ReactElement => {
   const [isMobileOpen, setIsMobileOpen] = React.useState(false);
-  const [isTestModeActive, setIsTestModeActive] = React.useState(false);
+  const [isPinned, setIsPinned] = React.useState(false);
+  const [isRailPeeking, setIsRailPeeking] = React.useState(false);
+  const [instantMainMarginOnPin, setInstantMainMarginOnPin] = React.useState(false);
+
+  React.useLayoutEffect(() => {
+    if (!instantMainMarginOnPin) {
+      return;
+    }
+    setInstantMainMarginOnPin(false);
+  }, [isPinned, instantMainMarginOnPin]);
 
   const location = useLocation();
 
@@ -454,8 +420,15 @@ const SideNavExample = ({
     <Box minHeight="500px">
       <SideNav
         {...args}
+        l2Variant={args.l2Variant ?? 'flyout'}
+        l3Variant={args.l3Variant ?? 'flyout'}
         isOpen={isMobileOpen}
         onDismiss={() => setIsMobileOpen(false)}
+        isExpanded={isPinned ? true : false}
+        isRailPeeking={isRailPeeking}
+        onRailPeekChange={({ isPeeking }) => {
+          setIsRailPeeking(isPeeking);
+        }}
         onVisibleLevelChange={({ visibleLevel }) => console.log(visibleLevel)}
       >
         <SideNavBody>
@@ -515,40 +488,49 @@ const SideNavExample = ({
           })}
         </SideNavBody>
         <SideNavFooter>
-          <SideNavItem
-            as="label"
-            title="Test Mode"
-            leading={TestIcon}
-            trailing={
-              <CompassSwitch
-                accessibilityLabel=""
-                size="small"
-                isChecked={isTestModeActive}
-                onChange={({ isChecked }) => {
-                  setIsTestModeActive(isChecked);
-                }}
-              />
-            }
+          <SideNavPinItem
+            isPinned={isPinned}
+            onPinChange={({ isPinned: nextPinned }) => {
+              if (nextPinned && isRailPeeking) {
+                setInstantMainMarginOnPin(true);
+                setIsRailPeeking(false);
+              }
+              setIsPinned(nextPinned);
+            }}
           />
-          <NavItem
-            title="Settings"
-            icon={SettingsIcon}
-            href="/settings/user"
-            activeOnLinks={['/settings/user', '/settings/account']}
-          >
-            <SideNavLevel>
-              <NavItem icon={UserIcon} title="User Settings" href="/settings/user" />
-              <NavItem icon={BoxIcon} title="Account Settings" href="/settings/account" />
-            </SideNavLevel>
-          </NavItem>
         </SideNavFooter>
       </SideNav>
 
       <Box
-        marginLeft={{ base: 'spacing.0', m: '300px' }}
+        position="relative"
+        marginLeft={{
+          base: 'spacing.0',
+          m: makeSize(isPinned ? SIDE_NAV_EXPANDED_L1_WIDTH_BASE : COLLAPSED_L1_WIDTH),
+        }}
+        style={{
+          transition: instantMainMarginOnPin
+            ? 'none'
+            : undefined,
+        }}
         paddingY={showExampleContentPadding ? { base: 'spacing.11', m: 'spacing.0' } : 'spacing.0'}
         paddingX={{ base: 'spacing.4', m: 'spacing.0' }}
       >
+        {!isPinned && isRailPeeking ? (
+          <Box
+            position="absolute"
+            top="spacing.0"
+            left="spacing.0"
+            right="spacing.0"
+            bottom="spacing.0"
+            zIndex={1}
+            backgroundColor="surface.background.primary.intense"
+            opacity="0.45"
+            aria-hidden
+            onClick={() => {
+              setIsRailPeeking(false);
+            }}
+          />
+        ) : null}
         <Button
           display={{ base: undefined, m: 'none' }}
           variant="tertiary"
@@ -560,7 +542,7 @@ const SideNavExample = ({
           zIndex="2"
         />
         <Switch>
-          {[...getAllHrefs(), '/settings/user', '/settings/account'].map((route) => (
+          {getAllHrefs().map((route) => (
             <Route key={route} path={route} component={Page} />
           ))}
         </Switch>
@@ -574,6 +556,14 @@ const SideNavTemplate: StoryFn<typeof SideNav> = ({ ...args }) => {
 };
 
 export const Default = SideNavTemplate.bind({});
+Default.storyName = 'Default';
+Default.parameters = {
+  docs: {
+    description: {
+      story: 'Basic SideNav with merchant-style nav data and React Router active states.',
+    },
+  },
+};
 
 export const CollapsibleSideNav: StoryFn<typeof SideNav> = ({ ...args }) => {
   const [isSideNavFullyExpanded, setIsSideNavFullyExpanded] = React.useState(true);
@@ -616,12 +606,7 @@ export const CollapsibleSideNav: StoryFn<typeof SideNav> = ({ ...args }) => {
               overflow="hidden"
             >
               {isBannerExpandedUI ? (
-                <Box display="flex" alignItems="center" gap="spacing.3">
-                  <RayIcon size="medium" />
-                  <Text truncateAfterLines={1} size="large" weight="semibold">
-                    Ray AI
-                  </Text>
-                </Box>
+                <TopNavBrandLogoPlaceholder tone="onSurface" />
               ) : null}
               <IconButton
                 onClick={handleSideNavToggle}
@@ -661,9 +646,18 @@ export const CollapsibleSideNav: StoryFn<typeof SideNav> = ({ ...args }) => {
   );
 };
 
+CollapsibleSideNav.storyName = 'Collapsible Side Nav (banner + chat)';
+CollapsibleSideNav.parameters = {
+  docs: {
+    description: {
+      story: 'Klear-style SideNav with a collapsible banner slot—not the KlearNow app shell.',
+    },
+  },
+};
+
 const ActivationCard = (): React.ReactElement => {
   return (
-    <Card href="/activate" padding="spacing.4" elevation="none">
+    <Card href="/activate" padding="spacing.4" elevation="none" width="100%">
       <CardBody>
         <Box display="flex" justifyContent="space-between" marginBottom="spacing.2">
           <Text size="medium" weight="semibold">
@@ -681,27 +675,37 @@ const ActivationCard = (): React.ReactElement => {
 
 export const DashboardLayout: StoryFn<typeof SideNav> = ({ ...args }) => {
   return (
-    <DashboardSkeleton>
+    <DashboardLayoutShell>
       <SideNavExample
         position="absolute"
         {...args}
         banner={<ActivationCard />}
         showExampleContentPadding={false}
       />
-    </DashboardSkeleton>
+    </DashboardLayoutShell>
   );
+};
+DashboardLayout.storyName = 'Dashboard layout';
+DashboardLayout.parameters = {
+  layout: 'fullscreen',
+  docs: {
+    description: {
+      story:
+        'Recommended SideNav-only layout: skeleton header, activation banner, and main content beside an absolute SideNav.',
+    },
+  },
 };
 
 export const MobileSideNav: StoryFn<typeof SideNav> = ({ ...args }) => {
   return (
-    <DashboardSkeleton>
+    <DashboardLayoutShell>
       <SideNavExample
         position="absolute"
         {...args}
         banner={<ActivationCard />}
         showExampleContentPadding={false}
       />
-    </DashboardSkeleton>
+    </DashboardLayoutShell>
   );
 };
 

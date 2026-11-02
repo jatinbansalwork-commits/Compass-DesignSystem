@@ -4,7 +4,7 @@ TopNav
 
 ## Description
 
-The TopNav component is a navigation bar positioned at the top of the screen that provides quick access to different products, search functionality, and user profile. TopNav always uses TabNav for multi-product navigation. TopNav has a responsive design that adapts well to different viewport sizes and integrates seamlessly with side navigation systems.
+The TopNav component is a navigation bar positioned at the top of the screen that provides quick access to products or app actions and the user profile. Use `TabNav` inside `TopNavContent` for multi-product switchers, or leave `TopNavContent` empty for single-app shells. TopNav has a responsive design that adapts well to different viewport sizes and integrates seamlessly with side navigation systems.
 
 ## TypeScript Types
 
@@ -101,6 +101,13 @@ type TopNavContentProps = {
 type TopNavActionsProps = {
   children: React.ReactNode;
 };
+
+type TopNavBrandedActionPillProps = {
+  icon: IconComponent;
+  label: string;
+  accessibilityLabel?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+} & TestID;
 
 // TabNav Types (Used within TopNav)
 type TabNavProps = {
@@ -200,16 +207,18 @@ type MenuTriggerProps = {
 
 **Do**
 
-- Use `TopNav` for multi-product or multi-module applications that need a brand header with horizontal navigation, search, and user menu.
+- Use `TopNav` for multi-product or multi-module applications that need a brand header with horizontal navigation and user menu.
 - Structure content using `TopNavBrand`, `TopNavContent`, and `TopNavActions` as direct children.
-- Use `TabNav` inside `TopNavContent` with the render prop pattern to handle responsive overflow into a "More" menu.
+- Use `TabNav` inside `TopNavContent` with the render prop pattern to handle responsive overflow into a "More" menu (multi-product apps).
+- Do use `TopNav` without `TabNav` for a single-app header — `TopNavContent` can be left empty or hold any single-line content; it does not require `TabNav`.
+- Use `TopNavBrandedActionPill` in `TopNavActions` for a product-branded call-to-action (icon + label, generic icon prop).
 - Handle mobile layout with conditional rendering — hide `TabNav` on mobile and show a simplified menu button layout.
 - Manage active state externally via React Router's `useLocation()`.
 
 **Don't**
 
 - Don't try to override the dark theme — `TopNav` always renders in dark mode internally.
-- Don't skip the `TabNav` render prop pattern — the simple children API is not supported.
+- Don't skip the `TabNav` render prop pattern when you *do* use `TabNav` — the simple children API is not supported for overflow handling.
 - Don't use `TopNav` as the primary deep navigation — pair it with `SideNav` for hierarchical navigation.
 - Don't put complex or multi-line content inside `TopNav` — it's designed for single-line items.
 - Don't use `TopNav` for mobile bottom navigation — use `BottomNav` for mobile-first persistent nav.
@@ -230,7 +239,6 @@ import {
   TabNavItems,
   TabNavItem,
   Box,
-  SearchInput,
   Button,
   Tooltip,
   Avatar,
@@ -243,12 +251,11 @@ import {
   Link as CompassLink,
   Badge,
   HomeIcon,
-  SearchIcon,
   ActivityIcon,
   AnnouncementIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  AcceptPaymentsIcon,
+  AcceptClearance queueIcon,
   KlearnowxPayrollIcon,
   ShoppingBagIcon,
   AwardIcon,
@@ -319,10 +326,10 @@ const AppNavigation = () => {
       description: 'Automate payroll with ease.',
     },
     {
-      title: 'Payments',
-      href: '/payments',
-      icon: AcceptPaymentsIcon,
-      description: 'Manage payments effortlessly.',
+      title: 'Clearance queue',
+      href: '/shipments',
+      icon: AcceptClearance queueIcon,
+      description: 'Manage shipments effortlessly.',
     },
     {
       title: 'Checkout',
@@ -455,7 +462,6 @@ const AppNavigation = () => {
           </TopNavContent>
 
           <TopNavActions>
-            <SearchInput placeholder="Search..." accessibilityLabel="Search across application" />
             <Tooltip content="View system status">
               <Button
                 variant="tertiary"
@@ -550,3 +556,42 @@ const MyTopNav = (): React.ReactElement => {
 
 export default MyTopNav;
 ```
+
+### Single-app header (no TabNav)
+
+For one product with a side rail and app-shell-style header, leave `TopNavContent` empty and compose actions with `TopNavBrandedActionPill` plus the existing profile `Menu` pattern:
+
+```tsx
+import {
+  TopNav,
+  TopNavBrand,
+  TopNavContent,
+  TopNavActions,
+  TopNavBrandedActionPill,
+  Menu,
+  MenuHeader,
+  MenuItem,
+  MenuOverlay,
+  IconButton,
+  Avatar,
+  KlearIcon,
+  MenuIcon,
+} from '@klearnow/compass/components';
+
+<TopNav variant="primary">
+  <TopNavBrand>
+    <IconButton icon={MenuIcon} accessibilityLabel="Open navigation" onClick={openDrawer} />
+    {/* brand logo slot — swap in your app logo (Storybook uses a dashed placeholder) */}
+  </TopNavBrand>
+  <TopNavContent>{null}</TopNavContent>
+  <TopNavActions>
+    <TopNavBrandedActionPill icon={KlearIcon} label="Klear Agent" onClick={openAgent} />
+    <Menu openInteraction="click">
+      <Avatar size="small" name="Jordan Lee" />
+      <MenuOverlay>{/* profile card, disabled Settings + Logout */}</MenuOverlay>
+    </Menu>
+  </TopNavActions>
+</TopNav>
+```
+
+Storybook reference: **Components/TopNav → Minimal**.

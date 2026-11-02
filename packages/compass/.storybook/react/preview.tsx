@@ -163,13 +163,18 @@ const StoryCanvas = ({
   children: React.ReactNode;
 }): React.ReactElement => {
   const isFullPage = hasFullPageExampleStories(context);
+  const isTopNavStory = context.kind.includes('/TopNav');
   return (
     <Box
       width="100%"
       height={context.viewMode === 'story' ? '100vh' : '100%'}
       overflow="auto"
       padding={isFullPage ? 'spacing.0' : 'spacing.8'}
-      backgroundColor="surface.background.gray.intense"
+      backgroundColor={
+        isFullPage && isTopNavStory
+          ? 'surface.background.primary.intense'
+          : 'surface.background.gray.intense'
+      }
       borderRadius={context.viewMode === 'story' ? 'none' : 'medium'}
     >
       {children}
@@ -210,7 +215,7 @@ export const globalTypes = {
       title: ' v1.1 - Compass',
       // Array of plain string values or MenuItem shape (see below)
       items: [
-        { value: '10', title: ' v10 - Old' },
+        { value: '10', title: ' v1 - KDesign' },
         { value: '1.1', title: ' v1.1 - Compass', default: true },
       ],
       dynamicTitle: true,

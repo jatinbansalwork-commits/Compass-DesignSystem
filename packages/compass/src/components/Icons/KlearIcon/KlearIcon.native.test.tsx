@@ -1,10 +1,10 @@
-import RayIcon from '.';
+import KlearIcon from '.';
 import renderWithTheme from '~utils/testing/renderWithTheme.native';
 
-describe('<RayIcon />', () => {
-  it('should render RayIcon', () => {
+describe('<KlearIcon />', () => {
+  it('should render KlearIcon', () => {
     const renderTree = renderWithTheme(
-      <RayIcon color="feedback.icon.neutral.intense" size="large" />,
+      <KlearIcon color="feedback.icon.neutral.intense" size="large" />,
     ).toJSON();
     expect(renderTree).toMatchSnapshot();
   });

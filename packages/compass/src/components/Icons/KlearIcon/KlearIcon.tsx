@@ -3,7 +3,7 @@ import type { IconComponent } from '../types';
 import useIconProps from '../hooks/useIconProps';
 import { assignWithoutSideEffects } from '~utils/assignWithoutSideEffects';
 
-const _RayIcon: IconComponent = ({ size, color, ...styledProps }) => {
+const _KlearIcon: IconComponent = ({ size, color, ...styledProps }) => {
   const { height, width, iconColor } = useIconProps({ size, color });
 
   return (
@@ -16,8 +16,8 @@ const _RayIcon: IconComponent = ({ size, color, ...styledProps }) => {
   );
 };
 
-const RayIcon = assignWithoutSideEffects(_RayIcon, {
-  componentId: 'RayIcon',
+const KlearIcon = assignWithoutSideEffects(_KlearIcon, {
+  componentId: 'KlearIcon',
 });
 
-export default RayIcon;
+export default KlearIcon;

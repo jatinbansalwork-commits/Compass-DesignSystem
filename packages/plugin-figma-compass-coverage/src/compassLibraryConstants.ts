@@ -2245,6 +2245,10 @@ export const compassThemeData = {
     prompt: {
       key: 'a55df402ea71c65e06188104cda27f127c735c7a',
     },
+    klear: {
+      key: '3738a81f081990524e89f5764eba74a64330fc60',
+    },
+    // Deprecated Figma library name; prefer `klear`.
     ray: {
       key: '3738a81f081990524e89f5764eba74a64330fc60',
     },

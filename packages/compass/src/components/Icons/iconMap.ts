@@ -316,7 +316,7 @@ import PrinterIconComponent from './PrinterIcon';
 import PromptIconComponent from './PromptIcon';
 import QRCodeIconComponent from './QRCodeIcon';
 import RadioIconComponent from './RadioIcon';
-import RayIconComponent from './RayIcon';
+import KlearIconComponent from './KlearIcon';
 import KlearnowIconComponent from './KlearnowBrandIcon';
 import CompassLogomarkIconComponent from './CompassLogomarkIcon';
 import KlearnowPayrollFilledIconComponent from './KlearnowPayrollFilledIcon';
@@ -771,7 +771,9 @@ const iconMap: Record<string, IconComponent> = {
   PromptIcon: PromptIconComponent,
   QRCodeIcon: QRCodeIconComponent,
   RadioIcon: RadioIconComponent,
-  RayIcon: RayIconComponent,
+  KlearIcon: KlearIconComponent,
+  // Deprecated alias — use KlearIcon.
+  RayIcon: KlearIconComponent,
   KlearnowIcon: KlearnowIconComponent,
   CompassLogomarkIcon: CompassLogomarkIconComponent,
   KlearnowPayrollFilledIcon: KlearnowPayrollFilledIconComponent,

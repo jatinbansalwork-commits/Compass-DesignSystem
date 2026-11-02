@@ -59,11 +59,49 @@ type SideNavProps = {
   /**
    * **Only applicable in desktop**
    *
-   * Controls whether SideNav should remain fully expanded.
-   * - `true` (default): existing behavior with hover-based temporary expansion.
-   * - `false`: keeps SideNav collapsed and disables hover/focus-based expansion.
+   * Controls the L1 rail expand/collapse mode:
+   * - `undefined`: default hover-peek and click-dock behavior (internal `isL1Collapsed` state).
+   * - `true`: force the rail fully expanded (labels visible) through navigations until set
+   *   otherwise — use with a consumer-owned pin toggle and `onExpandChange`.
+   * - `false`: icon-only rail (KlearNow unpinned). Hover, focus, or flyouts temporarily expand
+   *   labels via {@link SideNavProps.isRailPeeking} without changing this prop.
    */
   isExpanded?: boolean;
+
+  /**
+   * Controlled temporary rail expansion while `isExpanded` is `false` (app-shell peek).
+   * Omit for internal state; pair with `onRailPeekChange`.
+   */
+  isRailPeeking?: boolean;
+
+  /**
+   * Fired when the unpinned rail enters or leaves temporary expanded (peek) mode.
+   *
+   * **Only applicable on desktop when `isExpanded` is `false`.**
+   */
+  onRailPeekChange?: ({ isPeeking }: { isPeeking: boolean }) => void;
+
+  /**
+   * How L3 branch rows render on desktop.
+   *
+   * - `accordion` (default): inline expand/collapse under the L2 row.
+   * - `flyout`: portaled panel beside L2 (app-shell pattern). On mobile, always accordion.
+   *
+   * @default 'flyout'
+   */
+  l3Variant?: 'accordion' | 'flyout';
+
+  /**
+   * How L2 branch rows render on desktop when an L1 item has nested links.
+   *
+   * - `flyout` (default): portaled panel beside the L1 row (KlearNow app shell). L1 rail stays visible.
+   * - `column`: legacy full-height L2 column beside L1 (L1 collapses to icon rail when unpinned).
+   *
+   * On mobile, always drawer + inline L2.
+   *
+   * @default 'flyout'
+   */
+  l2Variant?: 'column' | 'flyout';
 
   /**
    * Banner slot for usecases like adding Activation Panel
@@ -208,14 +246,27 @@ type OnLinkActiveChangeArgs = {
   isFirstRender: boolean;
 };
 
+type SideNavL3Variant = NonNullable<SideNavProps['l3Variant']>;
+type SideNavL2Variant = NonNullable<SideNavProps['l2Variant']>;
+
 type SideNavContextType = {
   isL1Hovered?: boolean;
   isL1Collapsed?: boolean;
   isSideNavCollapsed?: boolean;
+  isForceExpanded?: boolean;
+  l2Variant?: SideNavL2Variant;
+  l3Variant?: SideNavL3Variant;
   setIsL1Collapsed?: (isL1Collapsed: boolean) => void;
   l2PortalContainerRef?: React.RefObject<HTMLDivElement>;
+  l3PortalContainerRef?: React.RefObject<HTMLDivElement>;
   onLinkActiveChange?: (args: OnLinkActiveChangeArgs) => void;
   closeMobileNav?: () => void;
+  openRailPeek?: () => void;
+  closeRailPeek?: () => void;
+  /** Clears a pending hover-close timeout (e.g. before pin toggle). */
+  cancelScheduledRailPeekClose?: () => void;
+  /** Pin while rail is peek-expanded — skip redundant expand transitions. */
+  notifyPinFromPeek?: () => void;
 };
 
 type NavLinkContextType = {

@@ -321,7 +321,7 @@ Every icon `@klearnow/compass-svelte/icons` exports, named as in Compass React. 
 - PromptIcon
 - QRCodeIcon
 - RadioIcon
-- RayIcon
+- KlearIcon
 - KlearnowIcon
 - KlearnowXIcon
 - KlearnowxPayrollFilledIcon

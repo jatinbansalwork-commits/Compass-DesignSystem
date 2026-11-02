@@ -1,4 +1,6 @@
 import { TopNav, TopNavBrand, TopNavContent } from '../TopNav';
+import { TopNavBrandedActionPill } from '../TopNavBrandedActionPill';
+import { KlearIcon } from '~components/Icons';
 import { TopNavExample } from './TopNavExample';
 import renderWithTheme from '~utils/testing/renderWithTheme';
 import assertAccessible from '~utils/testing/assertAccessible';
@@ -61,6 +63,13 @@ describe('TopNav', () => {
       </TopNav>,
     );
     expect(container).toMatchSnapshot();
+  });
+
+  test('renders TopNavBrandedActionPill with label and icon', () => {
+    const { getByRole } = renderWithTheme(
+      <TopNavBrandedActionPill icon={KlearIcon} label="Klear Agent" onClick={() => undefined} />,
+    );
+    expect(getByRole('button', { name: 'Klear Agent' })).toBeVisible();
   });
 
   test('explicit backgroundColor prop overrides variant', () => {

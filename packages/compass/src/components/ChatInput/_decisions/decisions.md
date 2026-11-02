@@ -304,7 +304,7 @@ import { ChatInput } from '@klearnow/compass/components';
 
 const ChatWithSuggestions = () => {
   const [suggestions, setSuggestions] = useState([
-    'Ask Ray anything related to Compass',
+    'Ask Klear anything related to Compass',
     'Show me recent transactions',
     'Help me set up webhooks',
   ]);

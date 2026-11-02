@@ -7,7 +7,7 @@ import { Heading } from '~components/Typography/Heading';
 import { Box } from '~components/Box';
 import { Sandbox } from '~utils/storybook/Sandbox';
 import StoryPageWrapper from '~utils/storybook/StoryPageWrapper';
-import { CopyIcon, RayIcon, ThumbsDownIcon, ThumbsUpIcon, ShareIcon } from '~components/Icons';
+import { CopyIcon, KlearIcon, ThumbsDownIcon, ThumbsUpIcon, ShareIcon } from '~components/Icons';
 import { Card, CardBody } from '~components/Card';
 import { Text } from '~components/Typography';
 import { Radio, RadioGroup } from '~components/Radio';
@@ -45,7 +45,7 @@ const Page = (): React.ReactElement => {
         
         function App() {
           return (
-            <ChatMessage senderType="self">Hi, from ray!</ChatMessage>
+            <ChatMessage senderType="self">Hi, from Klear!</ChatMessage>
           )
         }
 
@@ -56,7 +56,7 @@ const Page = (): React.ReactElement => {
       <Sandbox showConsole>
         {`
         import { ChatMessage } from '@klearnow/compass/components';
-        import { RayIcon } from '@klearnow/compass/components';
+        import { KlearIcon } from '@klearnow/compass/components';
 
         function App() {
           return (
@@ -69,7 +69,7 @@ const Page = (): React.ReactElement => {
                 'Preparing your response...',
                 'Almost there...',
               ]}
-              leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+              leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
             />
           )
         }
@@ -140,7 +140,7 @@ const ChatMessageSenderTypeTemplates: StoryFn<typeof ChatMessage> = () => {
       </ChatMessage>
       <ChatMessage
         senderType="other"
-        leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+        leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
       >
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
         labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
@@ -167,7 +167,7 @@ const SenderTypeWithAndWithoutIconsTemplate: StoryFn<typeof ChatMessage> = () =>
     <Box display="flex" flexDirection="column" gap="spacing.5">
       <ChatMessage
         senderType="other"
-        leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+        leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
       >
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
         labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
@@ -195,7 +195,7 @@ const ChatMessageLoadingTemplates: StoryFn<typeof ChatMessage> = () => {
         isLoading
         senderType="other"
         loadingText="Analyzing your response..."
-        leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+        leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
       />
     </Box>
   );
@@ -216,7 +216,7 @@ const ChatMessageRollingLoadingTextTemplate: StoryFn<typeof ChatMessage> = () =>
           'Preparing your response...',
           'Almost there...',
         ]}
-        leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+        leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
       />
     </Box>
   );
@@ -251,7 +251,7 @@ const ChatMessageBodyTemplates: StoryFn<typeof ChatMessage> = () => {
     <Box>
       <ChatMessage
         senderType="other"
-        leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+        leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
       >
         <Card>
           <CardBody>
@@ -369,7 +369,7 @@ const ChatMessageWithFooterActionsTemplate: StoryFn<typeof ChatMessage> = () => 
               />
             </Box>
           }
-          leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+          leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
         >
           This is a demo message
         </ChatMessage>
@@ -407,7 +407,7 @@ const ChatMessageWithCustomTypingAnimationTemplate: StoryFn<typeof ChatMessage> 
       <Box display="flex" flexDirection="column" alignContent="end" gap="4px" width="300px">
         <ChatMessage
           senderType="other"
-          leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+          leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
         >
           <Box>
             <TypingText text="This is a demo message." />
@@ -478,7 +478,7 @@ const ChatMessageWithSuggestedQuestionsTemplate: StoryFn<typeof ChatMessage> = (
     <Box display="flex" flexDirection="column" gap="spacing.3" maxWidth="400px">
       <ChatMessage
         senderType="other"
-        leading={<RayIcon size="large" color="surface.icon.onSea.onSubtle" />}
+        leading={<KlearIcon size="large" color="surface.icon.onSea.onSubtle" />}
         footerActions={<SuggestedQuestionList />}
       >
         <Box display="flex" flexDirection="column" gap="spacing.3">
@@ -588,7 +588,7 @@ const FullChatExampleTemplate: StoryFn<typeof ChatMessage> = () => {
 
         <ChatMessage
           senderType="other"
-          leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+          leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
           footerActions={footerActions}
         >
           <Box display="flex" flexDirection="column" gap="spacing.5" marginTop="spacing.2">
@@ -670,7 +670,7 @@ const FullChatExampleTemplate: StoryFn<typeof ChatMessage> = () => {
         <Box display="flex" flexDirection="column" gap="spacing.0">
           <ChatMessage
             senderType="other"
-            leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+            leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
           >
             <Box display="flex" flexDirection="column" gap="spacing.3" marginTop="spacing.2">
               <Text color="surface.text.gray.normal" size="medium">
@@ -920,12 +920,12 @@ const ChatMessageWithReasoningTracesTemplate: StoryFn<typeof ChatMessage> = () =
       {phase !== 'idle' && (
         <ChatMessage
           senderType="other"
-          leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+          leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
           isLoading={isLoading}
           loadingText={['Thinking...', 'Processing your request...']}
           reasoningTraces={visibleTraces.length > 0 ? visibleTraces : undefined}
           reasoningStatus={reasoningStatus}
-          reasoningTitle="Ray AI thought for 3secs"
+          reasoningTitle="Klear AI thought for 3secs"
         >
           {phase === 'done' ? (
             <Text color="surface.text.gray.normal" size="medium">
@@ -988,12 +988,12 @@ const ChatMessageWithUpfrontReasoningTracesTemplate: StoryFn<typeof ChatMessage>
       {phase !== 'idle' && (
         <ChatMessage
           senderType="other"
-          leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+          leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
           isLoading={phase === 'running'}
           loadingText={['Thinking...', 'Processing your request...']}
           reasoningTraces={REASONING_STEPS}
           reasoningStatus={reasoningStatus}
-          reasoningTitle="Ray AI thought for 3secs"
+          reasoningTitle="Klear AI thought for 3secs"
           reasoningActiveStepIndex={phase === 'running' ? activeStepIndex : undefined}
         >
           {phase === 'done' ? (

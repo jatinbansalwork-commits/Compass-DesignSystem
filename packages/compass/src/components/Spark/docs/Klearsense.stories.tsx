@@ -15,7 +15,7 @@ import StoryPageWrapper from '~utils/storybook/StoryPageWrapper';
 import { Box } from '~components/Box';
 import { Heading, Text } from '~components/Typography';
 import { Button } from '~components/Button';
-import { CheckIcon, RayIcon } from '~components/Icons';
+import { CheckIcon, KlearIcon } from '~components/Icons';
 import { List, ListItem, ListItemText } from '~components/List';
 import { ChatMessage } from '~components/ChatMessage';
 import { ChatInput } from '~components/ChatInput';
@@ -60,7 +60,7 @@ export const Zoomed: StoryFn<typeof KlearsenseComponent> = () => {
       <Box marginLeft="200px" position="relative" zIndex={1} maxWidth="500px">
         <ChatMessage
           senderType="other"
-          leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+          leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
           isLoading={true}
           loadingText={['Thinking...', 'Processing your request...']}
         >
@@ -639,7 +639,7 @@ const motionGStyle = {
   originY: '12px',
 } as React.CSSProperties;
 
-const RayRotate = ({ isRunning = true }: { isRunning?: boolean }) => {
+const KlearRotate = ({ isRunning = true }: { isRunning?: boolean }) => {
   return (
     <motion.g
       animate={isRunning ? 'start' : 'end'}
@@ -673,14 +673,14 @@ const RayRotate = ({ isRunning = true }: { isRunning?: boolean }) => {
 
 const RippleWaveAnimationTemplate: StoryFn<typeof KlearsenseComponent> = () => {
   const [assetsPreloaded, setAssetsPreloaded] = useState(false);
-  const [isRayAnimationRunning, setIsRayAnimationRunning] = useState(false);
+  const [isKlearAnimationRunning, setIsKlearAnimationRunning] = useState(false);
 
   useEffect(() => {
     preloadKlearsenseAssets('rippleWave')
       .then(() => {
         setAssetsPreloaded(true);
         requestAnimationFrame(() => {
-          setIsRayAnimationRunning(true);
+          setIsKlearAnimationRunning(true);
         });
       })
       .catch((error) => {
@@ -694,8 +694,8 @@ const RippleWaveAnimationTemplate: StoryFn<typeof KlearsenseComponent> = () => {
 
   return (
     <>
-      <Button onClick={() => setIsRayAnimationRunning(!isRayAnimationRunning)}>
-        {isRayAnimationRunning ? 'Stop Animation' : 'Start Animation'}
+      <Button onClick={() => setIsKlearAnimationRunning(!isKlearAnimationRunning)}>
+        {isKlearAnimationRunning ? 'Stop Animation' : 'Start Animation'}
       </Button>
       <Box display="flex" flexDirection="column" height="100vh">
         {/* Main area: shader + floating gradient editor panel */}
@@ -719,7 +719,7 @@ const RippleWaveAnimationTemplate: StoryFn<typeof KlearsenseComponent> = () => {
           >
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: isRayAnimationRunning ? 1 : 0 }}
+              animate={{ opacity: isKlearAnimationRunning ? 1 : 0 }}
               transition={{
                 duration: 0.5,
                 ease: 'easeInOut',
@@ -743,7 +743,7 @@ const RippleWaveAnimationTemplate: StoryFn<typeof KlearsenseComponent> = () => {
             viewBox="0 0 24 24"
             origin={[0.5, 0.5]}
           >
-            <RayRotate isRunning={isRayAnimationRunning} />
+            <KlearRotate isRunning={isKlearAnimationRunning} />
           </KlearsenseGradient>
         </Box>
       </Box>

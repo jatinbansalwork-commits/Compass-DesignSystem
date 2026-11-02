@@ -314,7 +314,9 @@ export { default as PrinterIcon } from './svg/printer.svg';
 export { default as PromptIcon } from './svg/prompt.svg';
 export { default as QRCodeIcon } from './svg/qr-code.svg';
 export { default as RadioIcon } from './svg/radio.svg';
-export { default as RayIcon } from './svg/ray.svg';
+export { default as KlearIcon } from './svg/klear.svg';
+/** @deprecated Renamed to `KlearIcon`. */
+export { default as RayIcon } from './svg/klear.svg';
 export { default as KlearnowIcon } from './svg/razorpay.svg';
 export { default as KlearnowXIcon } from './svg/razorpay-x.svg';
 export { default as KlearnowxPayrollIcon } from './svg/razorpayx-payroll.svg';

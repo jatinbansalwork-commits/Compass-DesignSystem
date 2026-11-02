@@ -18,7 +18,7 @@ import { getFocusRingStyles } from '~utils/getFocusRingStyles';
 import { useTheme } from '~components/CompassProvider';
 import type { Theme } from '~components/CompassProvider';
 import type { IconComponent } from '~components/Icons';
-import { RayIcon } from '~components/Icons';
+import { KlearIcon } from '~components/Icons';
 
 const isIconObjectProp = (
   icon: TabNavIconProp,
@@ -41,7 +41,7 @@ const getGlowColor = ({
   isPrimaryVariant: boolean;
   theme: Theme;
 }): string => {
-  if (isRayIcon(icon) && !isPrimaryVariant) return theme.colors.surface.icon.onSea.onSubtle;
+  if (isKlearIcon(icon) && !isPrimaryVariant) return theme.colors.surface.icon.onSea.onSubtle;
   if (isPrimaryVariant) return theme.colors.surface.icon.staticWhite.normal;
   return theme.colors.surface.background.primary.intense;
 };
