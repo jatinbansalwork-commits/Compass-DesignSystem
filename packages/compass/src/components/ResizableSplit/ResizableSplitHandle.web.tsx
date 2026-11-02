@@ -5,86 +5,107 @@ import {
   getHandleTrackStyles,
   getHandleGripStyles,
 } from './getResizableSplitHandleStyles';
+import type { HandleSizeConfig } from './handleSizeTokens';
+import type { ResizableSplitOrientation } from './types';
 import { ComponentIds } from './componentIds';
 import { metaAttribute, MetaConstants } from '~utils/metaAttribute';
 import { assignWithoutSideEffects } from '~utils/assignWithoutSideEffects';
 import DragHandleIcon from '~components/Icons/DragHandleIcon';
 import clamp from '~utils/lodashButBetter/clamp';
 
-const StyledHandleContainer = styled.div<{ $handleWidth: number; $isFocusVisible: boolean }>(
-  ({ theme, $handleWidth, $isFocusVisible }) =>
-    getHandleContainerStyles({ theme, handleWidth: $handleWidth, isFocusVisible: $isFocusVisible }),
+const StyledHandleContainer = styled.div<{
+  $handleTrackSize: number;
+  $orientation: ResizableSplitOrientation;
+  $isFocusVisible: boolean;
+}>(({ theme, $handleTrackSize, $orientation, $isFocusVisible }) =>
+  getHandleContainerStyles({
+    theme,
+    handleTrackSize: $handleTrackSize,
+    orientation: $orientation,
+    isFocusVisible: $isFocusVisible,
+  }),
 );
 
-const StyledTrack = styled.div<{ $isDragging: boolean }>(({ theme, $isDragging }) =>
-  getHandleTrackStyles({ theme, isDragging: $isDragging }),
+const StyledTrack = styled.div<{
+  $isDragging: boolean;
+  $orientation: ResizableSplitOrientation;
+}>(({ theme, $isDragging, $orientation }) =>
+  getHandleTrackStyles({ theme, isDragging: $isDragging, orientation: $orientation }),
 );
 
-const StyledGrip = styled.div<{ $isDragging: boolean }>(({ theme, $isDragging }) =>
-  getHandleGripStyles({ theme, isDragging: $isDragging }),
-);
+const StyledGrip = styled.div<{
+  $isDragging: boolean;
+  $orientation: ResizableSplitOrientation;
+  $grip: Pick<HandleSizeConfig, 'gripWidth' | 'gripHeight'>;
+}>(({ theme, $isDragging, $orientation, $grip }) => ({
+  ...getHandleGripStyles({ theme, isDragging: $isDragging, grip: $grip }),
+  ...( $orientation === 'vertical' ? { transform: 'rotate(90deg)' } : undefined),
+}));
 
 type ResizableSplitHandleProps = {
-  handleWidth: number;
+  orientation: ResizableSplitOrientation;
+  handleTrackSize: number;
+  gripConfig: HandleSizeConfig;
   step: number;
-  widthPx: number;
-  widthMinPx: number;
-  widthMaxPx: number;
+  endSizePx: number;
+  endSizeMinPx: number;
+  endSizeMaxPx: number;
   ariaValueNow: number;
   ariaValueMin: number;
   ariaValueMax: number;
   ariaValueText: string;
   accessibilityLabel: string;
-  onChange: (width: number) => void;
-  onVisualWidthChange: (width: number) => void;
-  onChangeEnd: (width: number) => void;
-  onDragCommit: (width: number) => void;
+  onChange: (size: number) => void;
+  onVisualEndSizeChange: (size: number) => void;
+  onChangeEnd: (size: number) => void;
+  onDragCommit: (size: number) => void;
   onReset: () => void;
-  getContainerRightEdge: () => number;
+  getEndSizeFromPointer: (clientX: number, clientY: number) => number;
 };
 
-const toAriaValueNow = (widthPx: number, widthMinPx: number, widthMaxPx: number): number => {
-  const range = widthMaxPx - widthMinPx;
+const toAriaValueNow = (sizePx: number, minPx: number, maxPx: number): number => {
+  const range = maxPx - minPx;
   if (range <= 0) return 0;
-  return Math.round(((widthPx - widthMinPx) / range) * 100);
+  return Math.round(((sizePx - minPx) / range) * 100);
 };
 
 const _ResizableSplitHandle = ({
-  handleWidth,
+  orientation,
+  handleTrackSize,
+  gripConfig,
   step,
-  widthPx,
-  widthMinPx,
-  widthMaxPx,
+  endSizePx,
+  endSizeMinPx,
+  endSizeMaxPx,
   ariaValueNow,
   ariaValueMin,
   ariaValueMax,
   ariaValueText,
   accessibilityLabel,
   onChange,
-  onVisualWidthChange,
+  onVisualEndSizeChange,
   onChangeEnd,
   onDragCommit,
   onReset,
-  getContainerRightEdge,
+  getEndSizeFromPointer,
 }: ResizableSplitHandleProps): React.ReactElement => {
   const [isDragging, setIsDragging] = useState(false);
   const isDraggingRef = useRef(false);
   const [isFocusVisible, setIsFocusVisible] = useState(false);
   const [dragPresentation, setDragPresentation] = useState<{
-    widthPx: number;
     ariaValueNow: number;
     ariaValueText: string;
   } | null>(null);
 
-  const latestWidthRef = useRef(widthPx);
-  latestWidthRef.current = widthPx;
+  const latestSizeRef = useRef(endSizePx);
+  latestSizeRef.current = endSizePx;
 
   const rafIdRef = useRef<number | null>(null);
-  const pendingWidthRef = useRef<number | null>(null);
+  const pendingSizeRef = useRef<number | null>(null);
 
-  const clampWidth = useCallback(
-    (value: number): number => clamp(value, widthMinPx, widthMaxPx),
-    [widthMinPx, widthMaxPx],
+  const clampSize = useCallback(
+    (value: number): number => clamp(value, endSizeMinPx, endSizeMaxPx),
+    [endSizeMinPx, endSizeMaxPx],
   );
 
   const cancelScheduledVisualUpdate = useCallback((): void => {
@@ -92,28 +113,28 @@ const _ResizableSplitHandle = ({
       cancelAnimationFrame(rafIdRef.current);
       rafIdRef.current = null;
     }
-    pendingWidthRef.current = null;
+    pendingSizeRef.current = null;
   }, []);
 
   const flushVisualUpdate = useCallback((): void => {
-    const pending = pendingWidthRef.current;
+    const pending = pendingSizeRef.current;
     rafIdRef.current = null;
-    pendingWidthRef.current = null;
+    pendingSizeRef.current = null;
     if (pending === null) return;
 
-    const clamped = clampWidth(pending);
-    latestWidthRef.current = clamped;
-    onVisualWidthChange(clamped);
+    const clamped = clampSize(pending);
+    latestSizeRef.current = clamped;
+    onVisualEndSizeChange(clamped);
+    const unit = orientation === 'vertical' ? 'tall' : 'wide';
     setDragPresentation({
-      widthPx: clamped,
-      ariaValueNow: toAriaValueNow(clamped, widthMinPx, widthMaxPx),
-      ariaValueText: `${Math.round(clamped)}px`,
+      ariaValueNow: toAriaValueNow(clamped, endSizeMinPx, endSizeMaxPx),
+      ariaValueText: `${Math.round(clamped)}px ${unit}`,
     });
-  }, [clampWidth, onVisualWidthChange, widthMaxPx, widthMinPx]);
+  }, [clampSize, endSizeMaxPx, endSizeMinPx, onVisualEndSizeChange, orientation]);
 
   const scheduleVisualUpdate = useCallback(
-    (rawWidth: number): void => {
-      pendingWidthRef.current = rawWidth;
+    (rawSize: number): void => {
+      pendingSizeRef.current = rawSize;
       if (rafIdRef.current !== null) return;
       rafIdRef.current = requestAnimationFrame(flushVisualUpdate);
     },
@@ -126,6 +147,8 @@ const _ResizableSplitHandle = ({
     };
   }, [cancelScheduledVisualUpdate]);
 
+  const dragCursor = orientation === 'horizontal' ? 'col-resize' : 'row-resize';
+
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>): void => {
     if (e.button != null && e.button !== 0) return;
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -133,13 +156,12 @@ const _ResizableSplitHandle = ({
     setIsDragging(true);
     setDragPresentation(null);
     document.body.style.userSelect = 'none';
-    document.body.style.cursor = 'col-resize';
+    document.body.style.cursor = dragCursor;
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>): void => {
     if (e.buttons === 0 || !isDraggingRef.current) return;
-    const newWidth = getContainerRightEdge() - e.clientX;
-    scheduleVisualUpdate(newWidth);
+    scheduleVisualUpdate(getEndSizeFromPointer(e.clientX, e.clientY));
   };
 
   const endDrag = (e: React.PointerEvent<HTMLDivElement>): void => {
@@ -151,34 +173,41 @@ const _ResizableSplitHandle = ({
     document.body.style.userSelect = '';
     document.body.style.cursor = '';
 
-    if (pendingWidthRef.current !== null) {
-      const clamped = clampWidth(pendingWidthRef.current);
-      latestWidthRef.current = clamped;
-      onVisualWidthChange(clamped);
+    if (pendingSizeRef.current !== null) {
+      const clamped = clampSize(pendingSizeRef.current);
+      latestSizeRef.current = clamped;
+      onVisualEndSizeChange(clamped);
     }
     cancelScheduledVisualUpdate();
-    onDragCommit(latestWidthRef.current);
+    onDragCommit(latestSizeRef.current);
+  };
+
+  const nudgeEndSize = (delta: number): void => {
+    const next = endSizePx + delta;
+    onChange(next);
+    onChangeEnd(next);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
-    if (e.key === 'ArrowLeft') {
+    const decreaseKeys =
+      orientation === 'horizontal' ? ['ArrowLeft'] : ['ArrowUp'];
+    const increaseKeys =
+      orientation === 'horizontal' ? ['ArrowRight'] : ['ArrowDown'];
+
+    if (decreaseKeys.includes(e.key)) {
       e.preventDefault();
-      const next = widthPx - step;
-      onChange(next);
-      onChangeEnd(next);
-    } else if (e.key === 'ArrowRight') {
+      nudgeEndSize(-step);
+    } else if (increaseKeys.includes(e.key)) {
       e.preventDefault();
-      const next = widthPx + step;
-      onChange(next);
-      onChangeEnd(next);
+      nudgeEndSize(step);
     } else if (e.key === 'Home') {
       e.preventDefault();
-      onChange(widthMaxPx);
-      onChangeEnd(widthMaxPx);
+      onChange(endSizeMaxPx);
+      onChangeEnd(endSizeMaxPx);
     } else if (e.key === 'End') {
       e.preventDefault();
-      onChange(widthMinPx);
-      onChangeEnd(widthMinPx);
+      onChange(endSizeMinPx);
+      onChangeEnd(endSizeMinPx);
     } else if (e.key === 'Enter') {
       e.preventDefault();
       onReset();
@@ -187,16 +216,18 @@ const _ResizableSplitHandle = ({
 
   const presentedAriaValueNow = dragPresentation?.ariaValueNow ?? ariaValueNow;
   const presentedAriaValueText = dragPresentation?.ariaValueText ?? ariaValueText;
+  const ariaOrientation = orientation === 'horizontal' ? 'horizontal' : 'vertical';
 
   return (
     <StyledHandleContainer
       {...metaAttribute({ name: MetaConstants.ResizableSplitHandle })}
-      $handleWidth={handleWidth}
+      $handleTrackSize={handleTrackSize}
+      $orientation={orientation}
       $isFocusVisible={isFocusVisible}
       role="separator"
       tabIndex={0}
       aria-label={accessibilityLabel}
-      aria-orientation="horizontal"
+      aria-orientation={ariaOrientation}
       aria-valuenow={presentedAriaValueNow}
       aria-valuemin={ariaValueMin}
       aria-valuemax={ariaValueMax}
@@ -207,13 +238,13 @@ const _ResizableSplitHandle = ({
       onPointerCancel={endDrag}
       onDoubleClick={onReset}
       onKeyDown={handleKeyDown}
-      onFocus={(e) => setIsFocusVisible(e.currentTarget.matches(':focus-visible'))}
+      onFocus={(ev) => setIsFocusVisible(ev.currentTarget.matches(':focus-visible'))}
       onBlur={() => setIsFocusVisible(false)}
     >
-      <StyledTrack $isDragging={isDragging} />
-      <StyledGrip $isDragging={isDragging}>
+      <StyledTrack $isDragging={isDragging} $orientation={orientation} />
+      <StyledGrip $isDragging={isDragging} $orientation={orientation} $grip={gripConfig}>
         <DragHandleIcon
-          size="small"
+          size={gripConfig.iconSize}
           color={isDragging ? 'interactive.icon.onPrimary.normal' : undefined}
         />
       </StyledGrip>

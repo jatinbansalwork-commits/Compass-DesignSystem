@@ -2,74 +2,90 @@ import type { CSSObject } from 'styled-components';
 import type { Theme } from '~components/CompassProvider';
 import { makeSize, makeSpace, castWebType, makeMotionTime } from '~utils';
 import { getFocusRingStyles } from '~utils/getFocusRingStyles';
-import { size } from '~tokens/global';
+import type { ResizableSplitOrientation } from './types';
+import type { HandleSizeConfig } from './handleSizeTokens';
 
-/**
- * The 12px (default) hit-target column between the two panes. `touch-action: none` stops a touch
- * drag from also scrolling the page - the same reason `BottomSheetGrabHandle` sets it.
- */
 const getHandleContainerStyles = ({
   theme,
-  handleWidth,
+  handleTrackSize,
+  orientation,
   isFocusVisible,
 }: {
   theme: Theme;
-  handleWidth: number;
+  handleTrackSize: number;
+  orientation: ResizableSplitOrientation;
   isFocusVisible: boolean;
-}): CSSObject => ({
-  position: 'relative',
-  flexShrink: 0,
-  width: makeSize(handleWidth),
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'col-resize',
-  touchAction: 'none',
-  userSelect: 'none',
-  outline: 'none',
-  ...(isFocusVisible ? getFocusRingStyles({ theme }) : undefined),
-});
+}): CSSObject => {
+  const isHorizontal = orientation === 'horizontal';
 
-/**
- * The 1px (2px on hover/focus/dragging) vertical track line, centered in the handle column.
- */
+  return {
+    position: 'relative',
+    flexShrink: 0,
+    ...(isHorizontal
+      ? { width: makeSize(handleTrackSize), height: '100%' }
+      : { height: makeSize(handleTrackSize), width: '100%' }),
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: isHorizontal ? 'col-resize' : 'row-resize',
+    touchAction: 'none',
+    userSelect: 'none',
+    outline: 'none',
+    ...(isFocusVisible ? getFocusRingStyles({ theme }) : undefined),
+  };
+};
+
 const getHandleTrackStyles = ({
   theme,
   isDragging,
+  orientation,
 }: {
   theme: Theme;
   isDragging: boolean;
-}): CSSObject => ({
-  position: 'absolute',
-  insetBlock: 0,
-  left: '50%',
-  width: isDragging ? '2px' : '1px',
-  transform: 'translateX(-50%)',
-  backgroundColor: isDragging
-    ? theme.colors.interactive.background.primary.default
-    : theme.colors.interactive.background.gray.faded,
-  transitionProperty: 'width, background-color',
-  transitionDuration: castWebType(makeMotionTime(theme.motion.duration.quick)),
-  transitionTimingFunction: castWebType(theme.motion.easing.standard),
-});
+  orientation: ResizableSplitOrientation;
+}): CSSObject => {
+  const isHorizontal = orientation === 'horizontal';
 
-/**
- * The small rounded-square grip containing the drag-handle (6-dot) icon, centered in the track.
- */
+  return {
+    position: 'absolute',
+    ...(isHorizontal
+      ? {
+          insetBlock: 0,
+          left: '50%',
+          width: isDragging ? '2px' : '1px',
+          transform: 'translateX(-50%)',
+        }
+      : {
+          insetInline: 0,
+          top: '50%',
+          height: isDragging ? '2px' : '1px',
+          transform: 'translateY(-50%)',
+        }),
+    backgroundColor: isDragging
+      ? theme.colors.interactive.background.primary.default
+      : theme.colors.interactive.background.gray.faded,
+    transitionProperty: isHorizontal ? 'width, background-color' : 'height, background-color',
+    transitionDuration: castWebType(makeMotionTime(theme.motion.duration.quick)),
+    transitionTimingFunction: castWebType(theme.motion.easing.standard),
+  };
+};
+
 const getHandleGripStyles = ({
   theme,
   isDragging,
+  grip,
 }: {
   theme: Theme;
   isDragging: boolean;
+  grip: Pick<HandleSizeConfig, 'gripWidth' | 'gripHeight'>;
 }): CSSObject => ({
   position: 'relative',
   zIndex: 1,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: makeSize(size[20]),
-  height: makeSize(size[32]),
+  width: makeSize(grip.gripWidth),
+  height: makeSize(grip.gripHeight),
   borderRadius: makeSpace(theme.border.radius.xsmall),
   borderWidth: makeSize(theme.border.width.thin),
   borderStyle: 'solid',

@@ -27,10 +27,10 @@ jest.mock('react-native', () => {
 
 const defaultResizeObserver = global.ResizeObserver;
 
-const mockResizeObserverWithWidth = (width: number): void => {
+const mockResizeObserverWithSize = (width: number, height = 500): void => {
   global.ResizeObserver = jest.fn().mockImplementation((callback) => ({
     observe: jest.fn(() => {
-      callback([{ contentRect: { width, height: 500 } } as ResizeObserverEntry]);
+      callback([{ contentRect: { width, height } } as ResizeObserverEntry]);
     }),
     unobserve: jest.fn(),
     disconnect: jest.fn(),
@@ -81,7 +81,7 @@ const renderSplit = (
 
 describe('ResizableSplit (web)', () => {
   beforeEach(() => {
-    mockResizeObserverWithWidth(1200);
+    mockResizeObserverWithSize(1200);
   });
 
   afterEach(() => {
@@ -162,6 +162,37 @@ describe('ResizableSplit (web)', () => {
     expect(onWidthChange).toHaveBeenCalledTimes(1);
     expect(onResizeEnd).toHaveBeenCalledTimes(1);
     expect(onWidthChange).toHaveBeenLastCalledWith(onResizeEnd.mock.calls[0][0]);
+  });
+
+  it('supports vertical orientation with ArrowDown keyboard resize', async () => {
+    mockResizeObserverWithSize(800, 600);
+    const onWidthChange = jest.fn();
+    render(
+      <CompassProvider themeTokens={compassTheme} colorScheme="light">
+        <div style={{ width: 800, height: 600 }}>
+          <ResizableSplit
+            orientation="vertical"
+            width={200}
+            minEndWidth={120}
+            minStartWidth={120}
+            onWidthChange={onWidthChange}
+            accessibilityLabel="Vertical resize"
+          >
+            <ResizableSplitPane>
+              <div>Top</div>
+            </ResizableSplitPane>
+            <ResizableSplitPane>
+              <div>Bottom</div>
+            </ResizableSplitPane>
+          </ResizableSplit>
+        </div>
+      </CompassProvider>,
+    );
+    const handle = screen.getByRole('separator', { name: 'Vertical resize' });
+    expect(handle).toHaveAttribute('aria-orientation', 'vertical');
+    handle.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    expect(onWidthChange).toHaveBeenCalledWith(216);
   });
 
   it('handle has correct APG separator ARIA role and attributes', () => {

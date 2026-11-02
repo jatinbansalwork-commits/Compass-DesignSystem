@@ -1,5 +1,8 @@
 import type React from 'react';
 import type { DataAnalyticsAttribute, TestID } from '~utils/types';
+import type { ResizableSplitHandleSize } from './handleSizeTokens';
+
+type ResizableSplitOrientation = 'horizontal' | 'vertical';
 
 type ResizableSplitProps = {
   /**
@@ -10,48 +13,56 @@ type ResizableSplitProps = {
    */
   children: React.ReactNode;
   /**
-   * The end pane's current width in pixels, or `null` to use the responsive default (see
-   * `computeDefaultWidth`). This component doesn't persist the value itself - the consumer owns
-   * storing/reading it (e.g. to `localStorage`), matching `onWidthChange`/`onResizeEnd` below.
+   * End-pane size in pixels along the split axis (`width` when horizontal, height when vertical),
+   * or `null` for the responsive default.
    */
   width: number | null;
   /**
-   * Updates the end-pane width backing `width`. Called on every keyboard step, when a pointer
+   * Updates the end-pane size backing `width`. Called on every keyboard step, when a pointer
    * drag *commits* (pointer up), and with `null` when the handle is double-clicked or reset.
-   * Pointer drags do not call this on every move — the split applies visual updates
-   * imperatively until release to avoid re-rendering heavy pane content each frame.
    */
   onWidthChange: (width: number | null) => void;
   /**
-   * Fired when a drag or keyboard interaction completes — pointer up after a drag, or after a
-   * single keyboard step. Prefer this for persisting width (e.g. `localStorage`). Not called
-   * when `width` becomes `null` (double-click reset).
+   * Fired when a drag or keyboard interaction completes. Prefer this for persisting size
+   * (e.g. `localStorage`). Not called when `width` becomes `null`.
    */
   onResizeEnd?: (width: number) => void;
   /**
-   * Computes the end pane's default width (px) from the split container's current total width,
-   * used whenever `width` is `null`. Tracked via `ResizeObserver`, so it reacts to the container
-   * resizing, not just the window. If omitted, defaults to a flat 40% of the container width.
+   * @default 'horizontal'
+   */
+  orientation?: ResizableSplitOrientation;
+  /**
+   * Preset handle hit target and grip scale. Overridden by explicit `handleWidth` when set.
+   * @default 'medium'
+   */
+  handleSize?: ResizableSplitHandleSize;
+  /**
+   * Default end-pane size from container size along the split axis (width or height).
+   * Takes precedence over `computeDefaultWidth` when provided.
+   */
+  computeDefaultSize?: (containerSize: number) => number;
+  /**
+   * Default end-pane width when `orientation="horizontal"` and `width` is `null`.
+   * @default 40% of container width
    */
   computeDefaultWidth?: (containerWidth: number) => number;
   /**
-   * Minimum width (px) the start pane is ever clamped to. Also the width the start pane is given
-   * when Home is pressed on the handle (see the ARIA separator's "primary pane smallest size"
-   * behavior) - the start pane is treated as the separator's primary pane.
+   * Default end-pane height when `orientation="vertical"` and `width` is `null`.
+   * @default 40% of container height
+   */
+  computeDefaultHeight?: (containerHeight: number) => number;
+  /**
+   * Minimum start-pane size (px) along the split axis.
    * @default 320
    */
   minStartWidth?: number;
   /**
-   * Minimum width (px) the end pane is ever clamped to - also the width given to the end pane
-   * when End is pressed on the handle.
+   * Minimum end-pane size (px) along the split axis.
    * @default 320
    */
   minEndWidth?: number;
   /**
-   * Width (px) of the draggable handle column between the panes. Included in the clamping math
-   * so the start pane never drops below `minStartWidth` purely because the handle's own width
-   * ate the space.
-   * @default 12
+   * Handle track size (px) along the split axis. Overrides `handleSize` when set.
    */
   handleWidth?: number;
   /**
@@ -59,18 +70,18 @@ type ResizableSplitProps = {
    * @default 16
    */
   step?: number;
-  /**
-   * Accessible label for the handle (`role="separator"`). Required, since there's no visible text
-   * label a `aria-labelledby` could point to by default.
-   */
   accessibilityLabel: string;
 } & TestID &
   DataAnalyticsAttribute;
 
 type ResizableSplitPaneProps = {
-  /** Pane content — first child is the start (flex) pane, second is the end (sized) pane. */
   children: React.ReactNode;
 } & TestID &
   DataAnalyticsAttribute;
 
-export type { ResizableSplitProps, ResizableSplitPaneProps };
+export type {
+  ResizableSplitProps,
+  ResizableSplitPaneProps,
+  ResizableSplitOrientation,
+  ResizableSplitHandleSize,
+};

@@ -2,7 +2,8 @@ import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ResizableSplitHandle } from './ResizableSplitHandle.web';
 import { ComponentIds } from './componentIds';
-import { buildGridTemplateColumns } from './gridTemplateColumns';
+import { buildSplitGridTemplate } from './splitLayout';
+import { HANDLE_SIZE_CONFIG, resolveHandleTrackSize } from './handleSizeTokens';
 import type { ResizableSplitProps, ResizableSplitPaneProps } from './types';
 import { metaAttribute, MetaConstants } from '~utils/metaAttribute';
 import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
@@ -10,13 +11,16 @@ import { assignWithoutSideEffects } from '~utils/assignWithoutSideEffects';
 import { useResize } from '~utils/useResize';
 import clamp from '~utils/lodashButBetter/clamp';
 
-const DEFAULT_MIN_PANE_WIDTH = 320;
-const DEFAULT_HANDLE_WIDTH = 12;
+const DEFAULT_MIN_PANE_SIZE = 320;
 const DEFAULT_STEP = 16;
 
-const StyledSplit = styled.div<{ $gridTemplateColumns: string }>(({ $gridTemplateColumns }) => ({
+const StyledSplit = styled.div<{
+  $gridTemplateColumns?: string;
+  $gridTemplateRows?: string;
+}>(({ $gridTemplateColumns, $gridTemplateRows }) => ({
   display: 'grid',
-  gridTemplateColumns: $gridTemplateColumns,
+  ...( $gridTemplateColumns ? { gridTemplateColumns: $gridTemplateColumns } : undefined),
+  ...( $gridTemplateRows ? { gridTemplateRows: $gridTemplateRows } : undefined),
   width: '100%',
   height: '100%',
   minWidth: 0,
@@ -43,16 +47,6 @@ const _ResizableSplitPane = ({
   </StyledPane>
 );
 
-/**
- * ResizableSplitPane — wraps one pane in a controlled {@link ResizableSplit} layout.
- *
- * @example
- * ```tsx
- * <ResizableSplitPane>
- *   <DocumentViewer />
- * </ResizableSplitPane>
- * ```
- */
 const ResizableSplitPane = memo(
   assignWithoutSideEffects(_ResizableSplitPane, {
     displayName: 'ResizableSplitPane',
@@ -61,147 +55,197 @@ const ResizableSplitPane = memo(
 );
 
 const defaultComputeDefaultWidth = (containerWidth: number): number => containerWidth * 0.4;
+const defaultComputeDefaultHeight = (containerHeight: number): number => containerHeight * 0.4;
+
+const clearInlineGrid = (el: HTMLDivElement | null): void => {
+  el?.style.removeProperty('grid-template-columns');
+  el?.style.removeProperty('grid-template-rows');
+};
+
+const applyInlineGrid = (
+  el: HTMLDivElement | null,
+  template: { gridTemplateColumns?: string; gridTemplateRows?: string },
+): void => {
+  if (!el) return;
+  if (template.gridTemplateColumns) {
+    el.style.gridTemplateColumns = template.gridTemplateColumns;
+  }
+  if (template.gridTemplateRows) {
+    el.style.gridTemplateRows = template.gridTemplateRows;
+  }
+};
 
 const _ResizableSplit = ({
   children,
   width,
   onWidthChange,
   onResizeEnd,
+  orientation = 'horizontal',
+  handleSize = 'medium',
+  computeDefaultSize,
   computeDefaultWidth = defaultComputeDefaultWidth,
-  minStartWidth = DEFAULT_MIN_PANE_WIDTH,
-  minEndWidth = DEFAULT_MIN_PANE_WIDTH,
-  handleWidth = DEFAULT_HANDLE_WIDTH,
+  computeDefaultHeight = defaultComputeDefaultHeight,
+  minStartWidth = DEFAULT_MIN_PANE_SIZE,
+  minEndWidth = DEFAULT_MIN_PANE_SIZE,
+  handleWidth,
   step = DEFAULT_STEP,
   accessibilityLabel,
   testID,
   ...rest
 }: ResizableSplitProps): React.ReactElement => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   const onContainerResize = useCallback((entry: ResizeObserverEntry) => {
-    setContainerWidth(entry.contentRect.width);
+    setContainerSize({
+      width: entry.contentRect.width,
+      height: entry.contentRect.height,
+    });
   }, []);
 
   useResize(containerRef, onContainerResize);
 
-  const maxEndWidth = Math.max(minEndWidth, containerWidth - minStartWidth - handleWidth);
+  const handleTrackSize = resolveHandleTrackSize(handleSize, handleWidth);
+  const gripConfig = HANDLE_SIZE_CONFIG[handleSize];
 
-  const clampEndWidth = useCallback(
-    (value: number): number => clamp(value, minEndWidth, maxEndWidth),
-    [minEndWidth, maxEndWidth],
+  const containerPrimarySize =
+    orientation === 'vertical' ? containerSize.height : containerSize.width;
+
+  const maxEndSize = Math.max(
+    minEndWidth,
+    containerPrimarySize - minStartWidth - handleTrackSize,
   );
 
-  const resolvedEndWidth =
-    width !== null ? clampEndWidth(width) : clampEndWidth(computeDefaultWidth(containerWidth));
+  const clampEndSize = useCallback(
+    (value: number): number => clamp(value, minEndWidth, maxEndSize),
+    [minEndWidth, maxEndSize],
+  );
+
+  const defaultEndSize = useCallback((): number => {
+    if (computeDefaultSize) {
+      return computeDefaultSize(containerPrimarySize);
+    }
+    if (orientation === 'vertical') {
+      return computeDefaultHeight(containerSize.height);
+    }
+    return computeDefaultWidth(containerSize.width);
+  }, [
+    computeDefaultSize,
+    computeDefaultHeight,
+    computeDefaultWidth,
+    containerPrimarySize,
+    containerSize.height,
+    containerSize.width,
+    orientation,
+  ]);
+
+  const resolvedEndSize =
+    width !== null ? clampEndSize(width) : clampEndSize(defaultEndSize());
+
+  const buildGrid = useCallback(
+    (endSize: number) =>
+      buildSplitGridTemplate({
+        orientation,
+        minStartSize: minStartWidth,
+        handleTrackSize,
+        endSize,
+      }),
+    [handleTrackSize, minStartWidth, orientation],
+  );
 
   const handleChange = useCallback(
-    (newWidth: number): void => {
-      onWidthChange(clampEndWidth(newWidth));
+    (newSize: number): void => {
+      onWidthChange(clampEndSize(newSize));
     },
-    [clampEndWidth, onWidthChange],
+    [clampEndSize, onWidthChange],
   );
 
   const handleChangeEnd = useCallback(
-    (newWidth: number): void => {
-      onResizeEnd?.(clampEndWidth(newWidth));
+    (newSize: number): void => {
+      onResizeEnd?.(clampEndSize(newSize));
     },
-    [clampEndWidth, onResizeEnd],
+    [clampEndSize, onResizeEnd],
   );
 
   const handleDragCommit = useCallback(
-    (newWidth: number): void => {
-      containerRef.current?.style.removeProperty('grid-template-columns');
-      const clamped = clampEndWidth(newWidth);
+    (newSize: number): void => {
+      clearInlineGrid(containerRef.current);
+      const clamped = clampEndSize(newSize);
       onWidthChange(clamped);
       onResizeEnd?.(clamped);
     },
-    [clampEndWidth, onResizeEnd, onWidthChange],
+    [clampEndSize, onResizeEnd, onWidthChange],
   );
 
   const handleReset = useCallback((): void => {
-    containerRef.current?.style.removeProperty('grid-template-columns');
+    clearInlineGrid(containerRef.current);
     onWidthChange(null);
   }, [onWidthChange]);
 
-  const applyVisualEndWidth = useCallback(
-    (newWidth: number): void => {
-      const clamped = clampEndWidth(newWidth);
-      const el = containerRef.current;
-      if (!el) return;
-      el.style.gridTemplateColumns = buildGridTemplateColumns(
-        minStartWidth,
-        handleWidth,
-        clamped,
-      );
+  const applyVisualEndSize = useCallback(
+    (newSize: number): void => {
+      applyInlineGrid(containerRef.current, buildGrid(clampEndSize(newSize)));
     },
-    [clampEndWidth, handleWidth, minStartWidth],
+    [buildGrid, clampEndSize],
   );
 
-  const getContainerRightEdge = useCallback((): number => {
-    return containerRef.current?.getBoundingClientRect().right ?? 0;
-  }, []);
+  const getEndSizeFromPointer = useCallback(
+    (clientX: number, clientY: number): number => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return resolvedEndSize;
+      if (orientation === 'vertical') {
+        return rect.bottom - clientY;
+      }
+      return rect.right - clientX;
+    },
+    [orientation, resolvedEndSize],
+  );
 
   const [startPane, endPane] = React.Children.toArray(children);
 
-  const gridTemplateColumns = useMemo(
-    () => buildGridTemplateColumns(minStartWidth, handleWidth, resolvedEndWidth),
-    [minStartWidth, handleWidth, resolvedEndWidth],
+  const gridTemplate = useMemo(
+    () => buildGrid(resolvedEndSize),
+    [buildGrid, resolvedEndSize],
   );
 
-  const valueRange = maxEndWidth - minEndWidth;
-  const valueNow = valueRange > 0 ? ((resolvedEndWidth - minEndWidth) / valueRange) * 100 : 0;
+  const valueRange = maxEndSize - minEndWidth;
+  const valueNow = valueRange > 0 ? ((resolvedEndSize - minEndWidth) / valueRange) * 100 : 0;
+  const sizeUnitLabel = orientation === 'vertical' ? 'tall' : 'wide';
 
   return (
     <StyledSplit
       ref={containerRef}
-      $gridTemplateColumns={gridTemplateColumns}
+      $gridTemplateColumns={gridTemplate.gridTemplateColumns}
+      $gridTemplateRows={gridTemplate.gridTemplateRows}
       {...metaAttribute({ name: MetaConstants.ResizableSplit, testID })}
       {...makeAnalyticsAttribute(rest)}
     >
       {startPane}
       <ResizableSplitHandle
-        handleWidth={handleWidth}
+        orientation={orientation}
+        handleTrackSize={handleTrackSize}
+        gripConfig={gripConfig}
         step={step}
-        widthPx={resolvedEndWidth}
-        widthMinPx={minEndWidth}
-        widthMaxPx={maxEndWidth}
+        endSizePx={resolvedEndSize}
+        endSizeMinPx={minEndWidth}
+        endSizeMaxPx={maxEndSize}
         ariaValueNow={Math.round(valueNow)}
         ariaValueMin={0}
         ariaValueMax={100}
-        ariaValueText={`${Math.round(resolvedEndWidth)}px`}
+        ariaValueText={`${Math.round(resolvedEndSize)}px ${sizeUnitLabel}`}
         accessibilityLabel={accessibilityLabel}
         onChange={handleChange}
-        onVisualWidthChange={applyVisualEndWidth}
+        onVisualEndSizeChange={applyVisualEndSize}
         onChangeEnd={handleChangeEnd}
         onDragCommit={handleDragCommit}
         onReset={handleReset}
-        getContainerRightEdge={getContainerRightEdge}
+        getEndSizeFromPointer={getEndSizeFromPointer}
       />
       {endPane}
     </StyledSplit>
   );
 };
 
-/**
- * ResizableSplit — controlled two-pane split with draggable separator, keyboard resize, and
- * clamped minimum widths. The consumer owns `width` state and persistence; this component owns
- * drag, clamp, focus, and ARIA separator behavior.
- *
- * @example
- * ```tsx
- * const [width, setWidth] = React.useState<number | null>(null);
- *
- * <ResizableSplit
- *   width={width}
- *   onWidthChange={setWidth}
- *   accessibilityLabel="Resize document and form"
- * >
- *   <ResizableSplitPane>Document viewer</ResizableSplitPane>
- *   <ResizableSplitPane>Form panel</ResizableSplitPane>
- * </ResizableSplit>
- * ```
- */
 const ResizableSplit = assignWithoutSideEffects(_ResizableSplit, {
   displayName: 'ResizableSplit',
   componentId: ComponentIds.ResizableSplit,

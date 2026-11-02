@@ -257,3 +257,141 @@ const ListAndMapTemplate: StoryFn<typeof ResizableSplit> = () => {
 
 export const ListAndMap = ListAndMapTemplate.bind({});
 ListAndMap.storyName = 'ListAndMap';
+
+const HandleSizesTemplate: StoryFn<typeof ResizableSplit> = () => {
+  const sizes = ['small', 'medium', 'large'] as const;
+
+  return (
+    <Box display="flex" flexDirection="column" gap="spacing.6">
+      {sizes.map((handleSize) => {
+        const SplitRow = (): React.ReactElement => {
+          const [width, setWidth] = React.useState<number | null>(null);
+          return (
+            <Box
+              height="220px"
+              borderWidth="thin"
+              borderStyle="solid"
+              borderColor="surface.border.gray.muted"
+            >
+              <ResizableSplit
+                handleSize={handleSize}
+                width={width}
+                onWidthChange={setWidth}
+                accessibilityLabel={`Resize panels with ${handleSize} handle`}
+              >
+                <ResizableSplitPane>
+                  <PaneContent label={`Start (${handleSize} handle)`} description="Flex pane." />
+                </ResizableSplitPane>
+                <ResizableSplitPane>
+                  <PaneContent label="End pane" description="Drag the handle to compare hit targets." />
+                </ResizableSplitPane>
+              </ResizableSplit>
+            </Box>
+          );
+        };
+        return (
+          <Box key={handleSize}>
+            <Heading size="xsmall" marginBottom="spacing.2">
+              handleSize=&quot;{handleSize}&quot;
+            </Heading>
+            <SplitRow />
+          </Box>
+        );
+      })}
+    </Box>
+  );
+};
+
+export const HandleSizes = HandleSizesTemplate.bind({});
+HandleSizes.storyName = 'HandleSizes';
+
+const VerticalOrientationTemplate: StoryFn<typeof ResizableSplit> = () => {
+  const [height, setHeight] = React.useState<number | null>(null);
+
+  return (
+    <Box
+      height="560px"
+      borderWidth="thin"
+      borderStyle="solid"
+      borderColor="surface.border.gray.muted"
+    >
+      <ResizableSplit
+        orientation="vertical"
+        width={height}
+        onWidthChange={setHeight}
+        minStartWidth={160}
+        minEndWidth={120}
+        accessibilityLabel="Resize top and bottom panels"
+      >
+        <ResizableSplitPane>
+          <PaneContent
+            label="Top pane"
+            description="Start pane — flexes vertically. Use Arrow Up/Down on the handle."
+          />
+        </ResizableSplitPane>
+        <ResizableSplitPane>
+          <PaneContent
+            label="Bottom pane"
+            description="End pane height is controlled by `width` (split-axis size in px)."
+          />
+        </ResizableSplitPane>
+      </ResizableSplit>
+    </Box>
+  );
+};
+
+export const VerticalOrientation = VerticalOrientationTemplate.bind({});
+VerticalOrientation.storyName = 'VerticalOrientation';
+
+VerticalOrientation.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  const handle = canvas.getByRole('separator', { name: 'Resize top and bottom panels' });
+  const before = handle.getAttribute('aria-valuetext');
+  handle.focus();
+  await userEvent.keyboard('{ArrowDown}');
+  await expect(handle.getAttribute('aria-valuetext')).not.toBe(before);
+};
+
+const STORAGE_KEY = 'resizable-split-story-width';
+
+const PersistedWidthTemplate: StoryFn<typeof ResizableSplit> = () => {
+  const [width, setWidth] = React.useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    return stored ? Number(stored) : null;
+  });
+
+  return (
+    <Box
+      height="500px"
+      borderWidth="thin"
+      borderStyle="solid"
+      borderColor="surface.border.gray.muted"
+    >
+      <ResizableSplit
+        width={width}
+        onWidthChange={setWidth}
+        onResizeEnd={(finalWidth) => {
+          window.localStorage.setItem(STORAGE_KEY, String(finalWidth));
+        }}
+        accessibilityLabel="Resize panels with persisted width"
+      >
+        <ResizableSplitPane>
+          <PaneContent
+            label="Persisted split"
+            description="End-pane width is saved to localStorage on pointer up / keyboard step (onResizeEnd)."
+          />
+        </ResizableSplitPane>
+        <ResizableSplitPane>
+          <PaneContent
+            label="End pane"
+            description={`Stored key: ${STORAGE_KEY}. Double-click the handle to reset.`}
+          />
+        </ResizableSplitPane>
+      </ResizableSplit>
+    </Box>
+  );
+};
+
+export const PersistedWidth = PersistedWidthTemplate.bind({});
+PersistedWidth.storyName = 'PersistedWidth';
