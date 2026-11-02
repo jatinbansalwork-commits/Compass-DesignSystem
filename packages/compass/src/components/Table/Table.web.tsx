@@ -20,9 +20,11 @@ import {
   stickyHeaderColumnZIndex,
   refreshWrapperZIndex,
   tableBackgroundColor,
+  tableHeader,
   tablePagination,
   tableRow,
   classes,
+  tableA11yRestoreRowHierarchyCSS,
 } from './tokens';
 import type {
   TableProps,
@@ -42,7 +44,7 @@ import {
 } from './buildColumnsFromConfig';
 import { getTableBodyStyles } from './commonStyles';
 import { TableSurface } from './TableSurface.web';
-import { makeBorderSize, makeMotionTime, makeSpace } from '~utils';
+import { getMediaQuery, makeBorderSize, makeMotionTime, makeSpace } from '~utils';
 import { getComponentId, isValidAllowedChildren } from '~utils/isValidAllowedChildren';
 import { throwCompassError } from '~utils/logger';
 import type { BoxProps } from '~components/Box';
@@ -111,6 +113,7 @@ const StyledReactTable = styled(ReactTable)<{
     isVirtualized?: boolean;
     isSelectable?: boolean;
     showStripedRows?: boolean;
+    needsScrollFlex?: boolean;
   };
 }>(({ $styledProps }) => {
   const { theme } = useTheme();
@@ -123,11 +126,33 @@ const StyledReactTable = styled(ReactTable)<{
   });
   const $isSelectable = $styledProps?.isSelectable;
   const $showStripedRows = $styledProps?.showStripedRows;
+  const usesBoundedScrollport =
+    !$styledProps?.isVirtualized &&
+    Boolean($styledProps?.height || $styledProps?.needsScrollFlex);
+
   return {
     '&&&': {
       ...styledPropsCSSObject,
       overflow: `${$styledProps?.isVirtualized ? 'unset' : 'auto'} !important`,
+      overflowX: `${$styledProps?.isVirtualized ? 'unset' : 'auto'} !important`,
+      minWidth: $styledProps?.isVirtualized ? undefined : '0',
+      ...(usesBoundedScrollport
+        ? {
+            width: '100% !important',
+            maxWidth: '100% !important',
+          }
+        : null),
+      flex: usesBoundedScrollport ? '1 1 auto' : undefined,
+      minHeight: usesBoundedScrollport ? '0' : undefined,
     },
+    ...(usesBoundedScrollport
+      ? {
+          '&&& [data-table-library_table]': {
+            width: 'max-content !important',
+            minWidth: '100% !important',
+          },
+        }
+      : null),
     ...($styledProps?.isVirtualized
       ? getTableBodyStyles({
           isVirtualized: $styledProps?.isVirtualized,
@@ -380,7 +405,7 @@ const _Table = <Item,>({
   }
 
   const isMobile = useIsMobile();
-  const lastHoverActionsColWidth = isMobile ? '1fr' : '0px';
+  const lastHoverActionsColWidth = isMobile ? 'minmax(120px, 1fr)' : '0fr';
 
   const requestedStickyColumnCount = stickyColumnCountProp ?? (isFirstColumnSticky ? 1 : 0);
   const requestedTrailingStickyColumnCount =
@@ -426,36 +451,80 @@ const _Table = <Item,>({
   });
 
   const columnCount = getTableHeaderCellCount(children);
+  const cellsPerRow =
+    columnCount + (selectionType === 'multiple' ? 1 : 0) + (hasHoverActions ? 1 : 0);
+  const hasHeaderFilterBand = showHeaderFilterRow && filterableColumns.length > 0;
+
+  /** Wide grids, filter bands, or sticky lanes need a scrollable min-content width (horizontal scroll). */
+  const needsWideTableLayout =
+    Boolean(resolvedGridTemplateColumns) ||
+    hasHeaderFilterBand ||
+    stickyColumnCount > 0 ||
+    trailingStickyColumnCount > 0;
+
+  /** Sticky / wide grids need a bounded scrollport; default height when the app omits `height`. */
+  const resolvedScrollHeight =
+    height ?? (needsWideTableLayout && !isVirtualized ? '480px' : undefined);
+
+  const usesScrollBodyLayout = Boolean(resolvedScrollHeight);
+
+  // @table-library flattens thead/tbody/tr via display:contents, so th/td in every row are
+  // siblings. Match column index in each row with a stride (e.g. 7n+1 for col 1 when 7 cells/row)
+  // so the auto-injected filter header row gets the same horizontal sticky as the label row.
+  const nthColumnSelector = (domIndex: number): string =>
+    cellsPerRow > 0 ? `${cellsPerRow}n+${domIndex}` : String(domIndex);
 
   const getStickyColumnsCSS = useCallback(
-    (zIndex: number): string => {
+    (zIndex: number, stickyBackgroundColor: typeof backgroundColor): string => {
       if (stickyColumnCount < 1 && trailingStickyColumnCount < 1) return '';
 
       const isMultiSelect = selectionType === 'multiple';
-      const lastStickyBoxShadow = showBorderedCells
-        ? `box-shadow: 1px 0 0 0 ${getIn(theme.colors, tableRow.borderColor)} !important;`
+      const stickySurface = getIn(theme.colors, stickyBackgroundColor);
+      const borderLineColor = getIn(theme.colors, tableRow.borderColor);
+      /** Divider on the right edge of the leading sticky block (before scrollable columns). */
+      const leadingLastStickyRightEdgeShadow = showBorderedCells
+        ? `box-shadow: 1px 0 0 0 ${borderLineColor} !important;`
         : '';
-      const stickyRule = (domIndex: number, left: number, isLastSticky: boolean): string => `
-  &:nth-of-type(${domIndex}) {
+      /** Divider on the left edge of the trailing sticky block (inset so sticky overflow does not clip it). */
+      const trailingFirstStickyLeftEdgeShadow = showBorderedCells
+        ? `box-shadow: inset 1px 0 0 0 ${borderLineColor} !important;`
+        : '';
+      const stickyRule = (
+        domIndex: number,
+        left: number,
+        isLastSticky: boolean,
+        widthPx?: string,
+      ): string => `
+  &:nth-of-type(${nthColumnSelector(domIndex)}) {
     left: ${left}px !important;
     position: sticky !important;
     z-index: ${zIndex} !important;
-    ${isLastSticky ? lastStickyBoxShadow : ''}
+    overflow: hidden !important;
+    background-color: ${stickySurface} !important;
+    ${
+      widthPx
+        ? `width: ${widthPx} !important; min-width: ${widthPx} !important; max-width: ${widthPx} !important;`
+        : ''
+    }
+    ${isLastSticky ? leadingLastStickyRightEdgeShadow : ''}
   }
-  &:nth-of-type(${domIndex}).${classes.HAS_ROW_SPANNING} {
+  &:nth-of-type(${nthColumnSelector(domIndex)}).${classes.HAS_ROW_SPANNING} {
     z-index: ${zIndex + 1} !important;
   }`;
 
       const rules: string[] = [];
       let cumulativeLeft = 0;
       if (isMultiSelect && stickyColumnCount > 0) {
-        rules.push(stickyRule(1, 0, false));
+        rules.push(stickyRule(1, 0, false, `${checkboxCellWidth}px`));
         cumulativeLeft = checkboxCellWidth;
       }
       for (let i = 0; i < stickyColumnCount; i += 1) {
         const domIndex = i + 1 + (isMultiSelect ? 1 : 0);
-        rules.push(stickyRule(domIndex, cumulativeLeft, i === stickyColumnCount - 1));
-        cumulativeLeft += Number.parseFloat(stickyColumnWidths?.[i] ?? '0');
+        const widthPx = stickyColumnWidths?.[i];
+        rules.push(
+          stickyRule(domIndex, cumulativeLeft, i === stickyColumnCount - 1, widthPx),
+        );
+        cumulativeLeft += Number.parseFloat(widthPx ?? '0');
       }
 
       if (trailingStickyColumnCount > 0) {
@@ -468,7 +537,9 @@ const _Table = <Item,>({
     right: ${right}px !important;
     position: sticky !important;
     z-index: ${zIndex} !important;
-    ${isFirstTrailingSticky ? lastStickyBoxShadow : ''}
+    overflow: hidden !important;
+    background-color: ${stickySurface} !important;
+    ${isFirstTrailingSticky ? trailingFirstStickyLeftEdgeShadow : ''}
   }
   &:nth-last-of-type(${domIndexFromEnd}).${classes.HAS_ROW_SPANNING} {
     z-index: ${zIndex + 1} !important;
@@ -494,14 +565,18 @@ const _Table = <Item,>({
       hasHoverActions,
       showBorderedCells,
       theme,
+      cellsPerRow,
+      backgroundColor,
     ],
   );
-  const stickyColumnsCSS = useMemo(() => getStickyColumnsCSS(firstColumnStickyZIndex), [
-    getStickyColumnsCSS,
-  ]);
-  const stickyHeaderColumnsCSS = useMemo(() => getStickyColumnsCSS(stickyHeaderColumnZIndex), [
-    getStickyColumnsCSS,
-  ]);
+  const stickyColumnsCSS = useMemo(
+    () => getStickyColumnsCSS(firstColumnStickyZIndex, backgroundColor),
+    [getStickyColumnsCSS, backgroundColor],
+  );
+  const stickyHeaderColumnsCSS = useMemo(
+    () => getStickyColumnsCSS(stickyHeaderColumnZIndex, tableHeader.backgroundColor),
+    [getStickyColumnsCSS],
+  );
 
   const tableTheme = useTableTheme({
     Table: `
@@ -522,21 +597,79 @@ const _Table = <Item,>({
     }
     --data-table-library_grid-template-columns: ${
       resolvedGridTemplateColumns
-        ? `${selectionType === 'multiple' ? 'min-content' : ''} ${resolvedGridTemplateColumns} ${
-            hasHoverActions ? lastHoverActionsColWidth : ''
-          }`
+        ? `${
+            selectionType === 'multiple'
+              ? stickyColumnCount > 0
+                ? `${checkboxCellWidth}px`
+                : 'min-content'
+              : ''
+          } ${resolvedGridTemplateColumns} ${hasHoverActions ? lastHoverActionsColWidth : ''}`
         : ` ${
-            selectionType === 'multiple' ? 'min-content' : ''
+            selectionType === 'multiple'
+              ? stickyColumnCount > 0
+                ? `${checkboxCellWidth}px`
+                : 'min-content'
+              : ''
           } repeat(${columnCount},minmax(100px, 1fr)) ${
             hasHoverActions ? lastHoverActionsColWidth : ''
           }`
     } !important;
     background-color: ${getIn(theme.colors, backgroundColor)};
     isolation: isolate;
+    ${isVirtualized ? '' : tableA11yRestoreRowHierarchyCSS}
+    ${
+      needsWideTableLayout
+        ? `
+    width: max-content;
+    min-width: 100%;
+    `
+        : ''
+    }
+    ${
+      hasHoverActions
+        ? `
+    @media ${getMediaQuery({ min: theme.breakpoints.m })} {
+      thead th:last-child,
+      tfoot th:last-child {
+        min-width: 0 !important;
+        max-width: 0 !important;
+        width: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        border-right-width: 0 !important;
+        pointer-events: none;
+      }
+    }
+    `
+        : ''
+    }
+    `,
+    Header: `
+    ${
+      hasHeaderFilterBand
+        ? `
+    row-gap: 0;
+    grid-row-gap: 0;
+    `
+        : ''
+    }
     `,
     HeaderCell: `
     position: ${shouldHeaderBeSticky ? 'sticky' : 'relative'};
-    top: ${shouldHeaderBeSticky ? '0' : undefined};
+    ${
+      shouldHeaderBeSticky && !hasHeaderFilterBand
+        ? 'top: 0;'
+        : ''
+    }
+    ${
+      hasHeaderFilterBand
+        ? `
+    box-sizing: border-box;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    `
+        : ''
+    }
     ${stickyHeaderColumnsCSS}
     `,
     Cell: `
@@ -793,6 +926,7 @@ const _Table = <Item,>({
       multiSelectTrigger,
       columnCount,
       gridTemplateColumns: resolvedGridTemplateColumns,
+      stickyColumnCount,
       isVirtualized,
       isGrouped,
       expandedRowIds,
@@ -807,6 +941,7 @@ const _Table = <Item,>({
       toggleAllRowsSelection,
       deselectAllRows,
       resolvedGridTemplateColumns,
+      stickyColumnCount,
       rowDensity,
       columnCount,
       showStripedRows,
@@ -875,6 +1010,7 @@ const _Table = <Item,>({
         colorScheme={colorScheme}
         borderRadius={isInsideListView ? 'none' : 'medium'}
         overflow="hidden"
+        minWidth={0}
         isInsideListView={isInsideListView ?? false}
         // Transparent when inside ListView so the gradient pseudo-elements
         // on ListViewSurface remain visible through the TableSurface.
@@ -922,11 +1058,16 @@ const _Table = <Item,>({
           </BaseBox>
         ) : (
           <BaseBox
-            flex={1}
+            flex={usesScrollBodyLayout ? 1 : undefined}
+            width="100%"
+            maxWidth="100%"
+            minWidth="0px"
+            minHeight={usesScrollBodyLayout ? '0px' : undefined}
+            display={usesScrollBodyLayout ? 'flex' : undefined}
+            flexDirection={usesScrollBodyLayout ? 'column' : undefined}
             position="relative"
             {...getStyledProps(rest)}
             {...metaAttribute({ name: MetaConstants.Table })}
-            width={isVirtualized ? `100%` : undefined}
             {...makeAnalyticsAttribute(rest)}
           >
             {isRefreshSpinnerMounted && (
@@ -947,10 +1088,22 @@ const _Table = <Item,>({
               </RefreshWrapper>
             )}
             {/* wrapping toolbar in BaseBox and passing the same analytics attributes as of table because in analytics POV, events triggered are from table */}
-            <BaseBox {...makeAnalyticsAttribute(rest)}>{toolbar}</BaseBox>
+            <BaseBox
+              width={needsWideTableLayout ? 'max-content' : '100%'}
+              minWidth="100%"
+              {...makeAnalyticsAttribute(rest)}
+            >
+              {toolbar}
+            </BaseBox>
             <StyledReactTable
               role="table"
-              layout={{ fixedHeader: shouldHeaderBeSticky, horizontalScroll: true }}
+              layout={{
+                fixedHeader: shouldHeaderBeSticky,
+                // Header filter row adds a second `.tr-header` band; horizontalScroll remeasures
+                // column widths from header cells and fights our explicit grid — disable it then.
+                horizontalScroll:
+                  !hasHeaderFilterBand && !resolvedGridTemplateColumns && !needsWideTableLayout,
+              }}
               data={sortedFilteredData}
               // @ts-expect-error ignore this, theme clashes with styled-component's theme. We're using useTheme from blade to get actual theme
               theme={tableTheme}
@@ -958,14 +1111,19 @@ const _Table = <Item,>({
               sort={null}
               tree={isGrouped ? tree : null}
               $styledProps={{
-                height,
+                height: resolvedScrollHeight,
                 width: isVirtualized ? `100%` : undefined,
                 isVirtualized,
                 isSelectable: selectionType !== 'none',
                 showStripedRows,
+                needsScrollFlex: usesScrollBodyLayout,
               }}
               pagination={hasPagination ? paginationConfig : null}
-              {...makeAccessible({ multiSelectable: selectionType === 'multiple' })}
+              {...(selectionType === 'multiple'
+                ? makeAccessible({ multiSelectable: true })
+                : selectionType === 'single'
+                  ? makeAccessible({ multiSelectable: false })
+                  : {})}
               {...metaAttribute({ name: MetaConstants.Table })}
               {...makeAnalyticsAttribute(rest)}
             >

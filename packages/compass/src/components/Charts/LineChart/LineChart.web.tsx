@@ -112,7 +112,7 @@ const Line: React.FC<ChartLineProps> = ({
     });
 
     return () => controls.stop();
-  }, [targetOpacity]);
+  }, [targetOpacity]); // eslint-disable-line react-hooks/exhaustive-deps -- animatedOpacity motion value managed by animate()
 
   const updateHoveredDataKey = useCallback(
     (key: string | null) => {

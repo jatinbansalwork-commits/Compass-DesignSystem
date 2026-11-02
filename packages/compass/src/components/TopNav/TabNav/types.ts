@@ -79,7 +79,7 @@ type TabNavItemProps = {
    * @example
    * ```jsx
    * <TabNavItem
-   *   title="Ray AI"
+   *   title="Klear AI"
    *   titleSuffix={<Badge size="small" color="positive">BETA</Badge>}
    * />
    * ```

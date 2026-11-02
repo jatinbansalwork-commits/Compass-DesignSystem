@@ -97,6 +97,21 @@ type UseTableExperienceControllerOptions<Item> = {
   filterableColumns?: TableExperienceColumnToggleOption[];
   /** Extra `grid-template-columns` segments after managed columns (e.g. Amount). */
   gridTrailingTemplateColumns?: string[];
+  /** Restored column layout (e.g. from localStorage). */
+  initialColumnOrder?: string[];
+  initialVisibleColumnKeys?: string[];
+  initialColumnWidths?: Record<string, number>;
+  /**
+   * How many **data** columns at the start of {@link experienceOrderedVisibleColumnKeys} stay
+   * frozen on horizontal scroll. Independent of how many columns have header filters.
+   *
+   * With `selectionType="multiple"`, {@link Table} also freezes the checkbox column — e.g.
+   * `stickyLeadingColumnCount={1}` → checkbox + first data column (often Shipment ID).
+   *
+   * When set with column resize/reorder, leading grid tracks use fixed `px` widths (must match
+   * `Table` `stickyColumnWidths`; see {@link buildExperienceStickyLeadingLayout}).
+   */
+  stickyLeadingColumnCount?: number;
 };
 
 type UseTableExperienceControllerReturn<Item> = TableExperienceController<Item> & {
@@ -119,11 +134,21 @@ type UseTableExperienceControllerReturn<Item> = TableExperienceController<Item> 
     setExperienceSelectedIds: (ids: Identifier[]) => void;
     experienceSelectedIds: Identifier[];
     experienceColumnOrder: string[];
+    /** Default column order from `filterableColumns` definition order. */
+    experienceDefaultColumnOrder: string[];
     setExperienceColumnOrder: (order: string[]) => void;
     experienceColumnWidths: Record<string, number>;
     setExperienceColumnWidth: (columnKey: string, widthPx: number) => void;
     experienceOrderedVisibleColumnKeys: string[];
     experienceGridTemplateColumns: string | undefined;
+    /** Same value passed to `useTableExperienceController` (`stickyLeadingColumnCount`). */
+    experienceStickyLeadingDataColumnCount: number;
+    /** First N keys in column order that participate in the sticky lane. */
+    experienceStickyLeadingColumnKeys: string[];
+    /** Pass-through for {@link TableProps.stickyColumnCount} when using experience layout. */
+    experienceStickyColumnCount: number;
+    /** Pass-through for {@link TableProps.stickyColumnWidths}. */
+    experienceStickyColumnWidths: string[];
   };
   selectedIds: Identifier[];
   /** Active experience multi-sort (Prime `multiSortMeta` equivalent). */
@@ -147,6 +172,11 @@ type CompassDataTableProps<Item> = Omit<
     showGlobalSearch?: boolean;
     searchPlaceholder?: string;
     searchAccessibilityLabel?: string;
+    searchVariant?: 'expanded' | 'collapsibleOnHover';
+    /** `icon` — icon-only toolbar actions with tooltips (Filters, Columns, …). */
+    toolbarActionVariant?: 'labeled' | 'icon';
+    /** When true, CSV export uses selected rows when any are selected. @default true */
+    exportPreferSelection?: boolean;
     exportColumns?: TableExperienceExportColumn<Item>[];
     exportFileName?: string;
     toolbarActions?: React.ReactNode;

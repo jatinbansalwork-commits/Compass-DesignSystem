@@ -102,7 +102,7 @@ function BasicMoveExample() {
     <Move motionTriggers={['mount']}>
       <Card>
         <CardHeader>
-          <CardHeaderLeading title="Welcome to Klearnow" subtitle="Get started with payments" />
+          <CardHeaderLeading title="Welcome to Klearnow" subtitle="Get started with shipments" />
         </CardHeader>
         <CardBody>
           <Text>This card animates in with a smooth motion when the component mounts.</Text>

@@ -104,7 +104,7 @@ import React from 'react';
 import { m as motion } from 'framer-motion';
 import { KlearsenseGradient } from '@klearnow/compass/components';
 
-const RayRotate = ({ isRunning = true }: { isRunning?: boolean }) => {
+const KlearRotate = ({ isRunning = true }: { isRunning?: boolean }) => {
   return (
     <motion.g
       animate={isRunning ? 'start' : 'end'}
@@ -149,7 +149,7 @@ const AnimatedGradientIcon = () => {
       viewBox="0 0 24 24"
       origin={[0.5, 0.5]}
     >
-      <RayRotate isRunning={true} />
+      <KlearRotate isRunning={true} />
     </KlearsenseGradient>
   );
 };

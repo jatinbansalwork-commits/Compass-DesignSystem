@@ -30,6 +30,7 @@ const _Popover = ({
   zIndex = componentZIndices.popover,
   title,
   titleLeading,
+  titleTrailing,
   footer,
   isOpen,
   defaultIsOpen,
@@ -78,7 +79,7 @@ const _Popover = ({
     lastOpenCallRef.current = now;
     controllableSetIsOpen(() => true);
     onOpenChange?.({ isOpen: true });
-  }, [controllableIsOpen, controllableSetIsOpen, onOpenChange]);
+  }, [controllableSetIsOpen, onOpenChange]);
 
   const handleClose = React.useCallback(() => {
     controllableSetIsOpen(() => false);
@@ -97,7 +98,7 @@ const _Popover = ({
       setIsVisible(true);
     }
     return () => clearTimeout(id);
-  }, [controllableIsOpen]);
+  }, [controllableIsOpen, theme.motion.duration.gentle]);
 
   const contextValue = React.useMemo(() => {
     return {
@@ -143,6 +144,7 @@ const _Popover = ({
               <PopoverContent
                 titleLeading={titleLeading}
                 title={title}
+                titleTrailing={titleTrailing}
                 footer={footer}
                 isVisible={controllableIsOpen}
                 ref={refs.setFloating}

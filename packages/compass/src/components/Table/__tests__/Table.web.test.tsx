@@ -323,13 +323,13 @@ describe('<Table />', () => {
       </Table>,
     );
     expect(container).toMatchSnapshot();
-    expect(getAllByRole('row')).toHaveLength(6);
+    expect(getAllByRole('row')).toHaveLength(7);
     expect(getAllByRole('rowgroup')).toHaveLength(3);
     expect(getAllByRole('columnheader')).toHaveLength(6);
-    expect(getAllByRole('cell')).toHaveLength(30);
+    expect(getAllByRole('cell')).toHaveLength(36);
     expect(queryAllByRole('rowheader')).toHaveLength(0);
-    expect(getAllByRole('rowfooter')).toHaveLength(1);
-    expect(getAllByRole('columnfooter')).toHaveLength(6);
+    expect(queryAllByRole('rowfooter')).toHaveLength(0);
+    expect(queryAllByRole('columnfooter')).toHaveLength(0);
   });
 
   it('should render table with compact rowDensity', () => {

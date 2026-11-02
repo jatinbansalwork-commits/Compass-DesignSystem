@@ -1,3 +1,4 @@
+import { applyTableStoryMeta } from '../tableStorybookMeta';
 import type { StoryFn, Meta } from '@storybook/react-vite';
 import type { TableData, TableProps } from '../../types';
 import { Table as TableComponent } from '../../Table';
@@ -13,7 +14,7 @@ import { Badge } from '~components/Badge';
 import { IconButton } from '~components/Button/IconButton';
 import { CopyIcon, TrashIcon } from '~components/Icons';
 
-export default {
+const storyMeta: Meta<TableProps<unknown>> = {
   title: 'Components/Table/Features/Striped Rows',
   component: TableComponent,
   args: {
@@ -35,7 +36,10 @@ export default {
       options: ['compact', 'normal', 'comfortable'],
     },
   },
-} as Meta<TableProps<unknown>>;
+};
+
+applyTableStoryMeta(storyMeta);
+export default storyMeta;
 
 type Item = {
   id: string;
@@ -46,78 +50,77 @@ type Item = {
   method: string;
   account: string;
 };
-
 const nodes: Item[] = [
   {
     id: '1',
-    paymentId: 'rzp001',
+    paymentId: 'KX-001',
     amount: 1000,
-    status: 'Completed',
+    status: 'Released',
     date: new Date(2024, 0, 15),
-    method: 'Bank Transfer',
+    method: 'Ocean',
     account: '1234567890',
   },
   {
     id: '2',
-    paymentId: 'rzp002',
+    paymentId: 'KX-002',
     amount: 2500,
-    status: 'Pending',
+    status: 'Exam hold',
     date: new Date(2024, 0, 16),
-    method: 'Credit Card',
+    method: 'Air',
     account: '0987654321',
   },
   {
     id: '3',
-    paymentId: 'rzp003',
+    paymentId: 'KX-003',
     amount: 500,
-    status: 'Failed',
+    status: 'Rejected',
     date: new Date(2024, 0, 17),
-    method: 'PayPal',
+    method: 'Truck',
     account: '1122334455',
   },
   {
     id: '4',
-    paymentId: 'rzp004',
+    paymentId: 'KX-004',
     amount: 3000,
-    status: 'Completed',
+    status: 'Released',
     date: new Date(2024, 0, 18),
-    method: 'Bank Transfer',
+    method: 'Ocean',
     account: '5566778899',
   },
   {
     id: '5',
-    paymentId: 'rzp005',
+    paymentId: 'KX-005',
     amount: 750,
-    status: 'Pending',
+    status: 'Exam hold',
     date: new Date(2024, 0, 19),
-    method: 'Credit Card',
+    method: 'Air',
     account: '9988776655',
   },
   {
     id: '6',
-    paymentId: 'rzp006',
+    paymentId: 'KX-006',
     amount: 1200,
-    status: 'Completed',
+    status: 'Released',
     date: new Date(2024, 0, 20),
-    method: 'PayPal',
+    method: 'Truck',
     account: '4433221100',
   },
   {
     id: '7',
-    paymentId: 'rzp007',
+    paymentId: 'KX-007',
     amount: 800,
-    status: 'Failed',
+    status: 'Rejected',
     date: new Date(2024, 0, 21),
-    method: 'Bank Transfer',
+    method: 'Ocean',
     account: '1357924680',
   },
   {
     id: '8',
-    paymentId: 'rzp008',
+    paymentId: 'KX-008',
     amount: 1500,
-    status: 'Completed',
+    status: 'Released',
     date: new Date(2024, 0, 22),
-    method: 'Credit Card',
+    method: 'Air',
     account: '2468013579',
   },
 ];
@@ -144,7 +147,7 @@ export const TableStripedSelection: StoryFn<typeof TableComponent> = () => (
             <Button variant="secondary" marginRight="spacing.3">
               Export
             </Button>
-            <Button>Payout</Button>
+            <Button>File entry</Button>
           </TableToolbarActions>
         </TableToolbar>
       }
@@ -162,11 +165,11 @@ export const TableStripedSelection: StoryFn<typeof TableComponent> = () => (
         <>
           <TableHeader>
             <TableHeaderRow>
-              <TableHeaderCell>Payment ID</TableHeaderCell>
-              <TableHeaderCell>Amount</TableHeaderCell>
-              <TableHeaderCell>Account</TableHeaderCell>
+              <TableHeaderCell>Shipment ID</TableHeaderCell>
+              <TableHeaderCell>Duty amount</TableHeaderCell>
+              <TableHeaderCell>HTS code</TableHeaderCell>
               <TableHeaderCell>Date</TableHeaderCell>
-              <TableHeaderCell>Method</TableHeaderCell>
+              <TableHeaderCell>MOT</TableHeaderCell>
               <TableHeaderCell>Status</TableHeaderCell>
             </TableHeaderRow>
           </TableHeader>
@@ -192,11 +195,11 @@ export const TableStripedSelection: StoryFn<typeof TableComponent> = () => (
                   <Badge
                     size="medium"
                     color={
-                      tableItem.status === 'Completed'
+                      tableItem.status === 'Released'
                         ? 'positive'
-                        : tableItem.status === 'Pending'
+                        : tableItem.status === 'Exam hold'
                         ? 'notice'
-                        : tableItem.status === 'Failed'
+                        : tableItem.status === 'Rejected'
                         ? 'negative'
                         : 'neutral'
                     }
@@ -232,11 +235,11 @@ export const TableStripedSelectionNoToolbarNoPagination: StoryFn<typeof TableCom
         <>
           <TableHeader>
             <TableHeaderRow>
-              <TableHeaderCell>Payment ID</TableHeaderCell>
-              <TableHeaderCell>Amount</TableHeaderCell>
-              <TableHeaderCell>Account</TableHeaderCell>
+              <TableHeaderCell>Shipment ID</TableHeaderCell>
+              <TableHeaderCell>Duty amount</TableHeaderCell>
+              <TableHeaderCell>HTS code</TableHeaderCell>
               <TableHeaderCell>Date</TableHeaderCell>
-              <TableHeaderCell>Method</TableHeaderCell>
+              <TableHeaderCell>MOT</TableHeaderCell>
               <TableHeaderCell>Status</TableHeaderCell>
             </TableHeaderRow>
           </TableHeader>
@@ -262,11 +265,11 @@ export const TableStripedSelectionNoToolbarNoPagination: StoryFn<typeof TableCom
                   <Badge
                     size="medium"
                     color={
-                      tableItem.status === 'Completed'
+                      tableItem.status === 'Released'
                         ? 'positive'
-                        : tableItem.status === 'Pending'
+                        : tableItem.status === 'Exam hold'
                         ? 'notice'
-                        : tableItem.status === 'Failed'
+                        : tableItem.status === 'Rejected'
                         ? 'negative'
                         : 'neutral'
                     }
@@ -302,11 +305,11 @@ export const TableStripedHoverNoSelection: StoryFn<typeof TableComponent> = () =
         <>
           <TableHeader>
             <TableHeaderRow>
-              <TableHeaderCell>Payment ID</TableHeaderCell>
-              <TableHeaderCell>Amount</TableHeaderCell>
-              <TableHeaderCell>Account</TableHeaderCell>
+              <TableHeaderCell>Shipment ID</TableHeaderCell>
+              <TableHeaderCell>Duty amount</TableHeaderCell>
+              <TableHeaderCell>HTS code</TableHeaderCell>
               <TableHeaderCell>Date</TableHeaderCell>
-              <TableHeaderCell>Method</TableHeaderCell>
+              <TableHeaderCell>MOT</TableHeaderCell>
               <TableHeaderCell>Status</TableHeaderCell>
             </TableHeaderRow>
           </TableHeader>
@@ -351,11 +354,11 @@ export const TableStripedHoverNoSelection: StoryFn<typeof TableComponent> = () =
                   <Badge
                     size="medium"
                     color={
-                      tableItem.status === 'Completed'
+                      tableItem.status === 'Released'
                         ? 'positive'
-                        : tableItem.status === 'Pending'
+                        : tableItem.status === 'Exam hold'
                         ? 'notice'
-                        : tableItem.status === 'Failed'
+                        : tableItem.status === 'Rejected'
                         ? 'negative'
                         : 'neutral'
                     }

@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
@@ -61,17 +62,13 @@ export const StickyColumns = (): React.ReactElement => {
   const onMobile = platform === 'onMobile';
 
   return (
-    <Box
-      backgroundColor="surface.background.gray.intense"
-      padding="spacing.5"
-      overflow="auto"
-      minHeight="400px"
-    >
+    <Box backgroundColor="surface.background.gray.intense" padding="spacing.5" maxWidth="100%">
       <Box paddingBottom="spacing.4">
         <Heading>Sticky Columns</Heading>
         <Text>
           Composable JSX table with three leading frozen columns, sorting, toolbar search,
-          column filters, selection, and pagination.
+          column filters, selection, and pagination. Scroll horizontally inside the table body —
+          leading columns stay pinned.
         </Text>
       </Box>
       <Table
@@ -79,6 +76,8 @@ export const StickyColumns = (): React.ReactElement => {
         gridTemplateColumns={GRID_TEMPLATE}
         stickyColumnCount={3}
         stickyColumnWidths={['140px', '150px', '220px']}
+        height="520px"
+        showBorderedCells
         isHeaderSticky
         sortFunctions={sortFunctions}
         onSortChange={action('onSortChange')}
@@ -88,8 +87,8 @@ export const StickyColumns = (): React.ReactElement => {
         onSelectionChange={({ selectedIds }) => setSelectedCount(selectedIds.length)}
         toolbar={
           <TableToolbar
-            title="Showing Transactions"
-            selectedTitle={`${selectedCount} Transaction${selectedCount > 1 ? 's' : ''} Selected`}
+            title="Showing shipments"
+            selectedTitle={`${selectedCount} shipment${selectedCount > 1 ? 's' : ''} Selected`}
           >
             <TableToolbarActions>
               <Button size="small" variant="secondary" marginRight="spacing.3" isFullWidth={onMobile}>
@@ -126,12 +125,7 @@ export const TrailingStickyColumns = (): React.ReactElement => {
     '150px 220px 200px 160px 150px 130px 220px 130px 140px 160px 160px 180px 140px';
 
   return (
-    <Box
-      backgroundColor="surface.background.gray.intense"
-      padding="spacing.5"
-      overflow="auto"
-      minHeight="400px"
-    >
+    <Box backgroundColor="surface.background.gray.intense" padding="spacing.5" maxWidth="100%">
       <Box paddingBottom="spacing.4">
         <Heading>Trailing Sticky Columns</Heading>
         <Text>
@@ -145,6 +139,8 @@ export const TrailingStickyColumns = (): React.ReactElement => {
         stickyColumnWidths={['150px', '220px']}
         trailingStickyColumnCount={1}
         trailingStickyColumnWidths={['140px']}
+        height="520px"
+        showBorderedCells
         isHeaderSticky
         sortFunctions={sortFunctions}
         onSortChange={action('onSortChange')}
@@ -155,4 +151,5 @@ export const TrailingStickyColumns = (): React.ReactElement => {
   );
 };
 
+applyTableRecipeMeta(TableMeta);
 export default TableMeta;

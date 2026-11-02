@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import {
@@ -21,13 +22,13 @@ import { Amount } from '~components/Amount';
 const sourceData = createTableData(30);
 
 const FILTER_COLUMNS = [
-  { key: 'PAYMENT_ID', label: 'Payment ID' },
+  { key: 'SHIPMENT_ID', label: 'Shipment ID' },
   { key: 'NAME', label: 'Name' },
   { key: 'STATUS', label: 'Status' },
 ];
 
 const filterFunctions = {
-  PAYMENT_ID: (item: (typeof sourceData.nodes)[number], value: string | string[]) => {
+  SHIPMENT_ID: (item: (typeof sourceData.nodes)[number], value: string | string[]) => {
     const needle = Array.isArray(value) ? value.join(' ') : value;
     return item.paymentId.toLowerCase().includes(needle.toLowerCase());
   },
@@ -42,7 +43,7 @@ const filterFunctions = {
 };
 
 const sortFunctions = {
-  PAYMENT_ID: (array: typeof sourceData.nodes) =>
+  SHIPMENT_ID: (array: typeof sourceData.nodes) =>
     [...array].sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
   NAME: (array: typeof sourceData.nodes) => [...array].sort((a, b) => a.name.localeCompare(b.name)),
   STATUS: (array: typeof sourceData.nodes) =>
@@ -51,7 +52,7 @@ const sortFunctions = {
 
 const EMPTY_GRID_COLUMN_END = 6;
 
-const meta: Meta = {
+const storyMeta: Meta = {
   title: 'Components/Table/Experience/CompassDataTable/02 Filters & Selection',
   tags: ['autodocs'],
   parameters: {
@@ -67,7 +68,7 @@ export const PrimeParityFeatures: StoryFn = () => {
     sortFunctions,
     filterableColumns: FILTER_COLUMNS,
     filterFieldExtractors: {
-      PAYMENT_ID: (row) => row.paymentId,
+      SHIPMENT_ID: (row) => row.paymentId,
       NAME: (row) => row.name,
       STATUS: (row) => row.status,
     },
@@ -101,7 +102,7 @@ export const PrimeParityFeatures: StoryFn = () => {
         {...controller.experienceProps}
         experienceApi={controller.experienceProps}
         isHeaderSticky
-        toolbarTitle="Payments"
+        toolbarTitle="Clearance queue"
         toolbarSelectedTitle={`${controller.selectedIds.length} selected`}
         pagination={
           <TablePagination defaultPageSize={10} showPageNumberSelector onPageChange={() => undefined} />
@@ -111,14 +112,14 @@ export const PrimeParityFeatures: StoryFn = () => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                {visible.has('PAYMENT_ID') ? (
-                  <TableHeaderCell headerKey="PAYMENT_ID">Payment ID</TableHeaderCell>
+                {visible.has('SHIPMENT_ID') ? (
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
                 ) : null}
                 {visible.has('NAME') ? <TableHeaderCell headerKey="NAME">Name</TableHeaderCell> : null}
                 {visible.has('STATUS') ? (
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                 ) : null}
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -129,7 +130,7 @@ export const PrimeParityFeatures: StoryFn = () => {
               />
               {tableData.map((row) => (
                 <TableExperienceRow key={row.id} item={row}>
-                  {visible.has('PAYMENT_ID') ? (
+                  {visible.has('SHIPMENT_ID') ? (
                     <TableCell>
                       <Code size="medium">{row.paymentId}</Code>
                     </TableCell>
@@ -155,4 +156,5 @@ export const PrimeParityFeatures: StoryFn = () => {
   );
 };
 
-export default meta;
+applyTableRecipeMeta(storyMeta);
+export default storyMeta;

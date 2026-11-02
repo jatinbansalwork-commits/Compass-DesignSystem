@@ -2,8 +2,17 @@ import React from 'react';
 import styled from 'styled-components';
 import { FloatingFocusManager, FloatingPortal, useFloating } from '@floating-ui/react';
 import { NavLinkContext, useNavLink, useSideNav } from '../SideNavContext';
-import { classes, getNavItemTransition, NAV_ITEM_HEIGHT } from '../tokens';
+import { NAV_ITEM_HEIGHT } from '../tokens';
 import type { SideNavLinkProps } from '../types';
+import { SideNavL2FlyoutLink } from './SideNavL2FlyoutLink.web';
+import { SideNavL3FlyoutLink } from './SideNavL3FlyoutLink.web';
+import {
+  HIDE_WHEN_COLLAPSED,
+  NavLinkIconTitle,
+  SHOW_ON_LINK_HOVER,
+  STYLED_NAV_LINK,
+  StyledNavLinkContainer,
+} from './SideNavLinkParts.web';
 import { makeBorderSize, makeSize, makeSpace } from '~utils';
 import { makeAccessible } from '~utils/makeAccessible';
 import { throwCompassError } from '~utils/logger';
@@ -11,132 +20,12 @@ import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
 import { TooltipifyComponent } from '~utils/TooltipifyComponent';
 import { useFirstRender } from '~utils/useFirstRender';
 import { useIsomorphicLayoutEffect } from '~utils/useIsomorphicLayoutEffect';
-import { useTruncationTitle } from '~utils/useTruncationTitle';
+import { useIsMobile } from '~utils/useIsMobile';
 import { Box } from '~components/Box';
 import BaseBox from '~components/Box/BaseBox';
 import { Collapsible, CollapsibleBody } from '~components/Collapsible';
 import { useCollapsible } from '~components/Collapsible/CollapsibleContext';
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from '~components/Icons';
-import { BaseText } from '~components/Typography/BaseText';
-import { Text } from '~components/Typography';
-import { getFocusRingStyles } from '~utils/getFocusRingStyles';
-
-const { SHOW_ON_LINK_HOVER, HIDE_WHEN_COLLAPSED, STYLED_NAV_LINK } = classes;
-
-const StyledNavLinkContainer = styled(BaseBox)<{ $hasDescription: boolean }>((props) => {
-  return {
-    width: '100%',
-    [`.${SHOW_ON_LINK_HOVER}`]: {
-      opacity: 0,
-      '&:focus-within, &:focus-visible': {
-        opacity: 1,
-      },
-    },
-    '&:hover': {
-      [`.${SHOW_ON_LINK_HOVER}`]: {
-        opacity: 1,
-      },
-
-      [`.${STYLED_NAV_LINK}`]: {
-        color: props.theme.colors.interactive.text.gray.normal,
-        backgroundColor: props.theme.colors.interactive.background.gray.default,
-      },
-    },
-    [`.${STYLED_NAV_LINK}`]: {
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      height: props.$hasDescription ? undefined : makeSize(NAV_ITEM_HEIGHT),
-      width: '100%',
-      textDecoration: 'none',
-      overflow: 'hidden',
-      flexWrap: 'nowrap',
-      cursor: 'pointer',
-      padding: `${makeSpace(props.theme.spacing[props.$hasDescription ? 3 : 0])} ${makeSpace(
-        props.theme.spacing[4],
-      )}`,
-      margin: `${makeSpace(props.theme.spacing[1])} ${makeSpace(props.theme.spacing[0])}`,
-      color: props.theme.colors.interactive.text.gray.subtle,
-      borderRadius: props.theme.border.radius.small,
-      borderWidth: makeBorderSize(props.theme.border.width.none),
-      backgroundColor: props.theme.colors.transparent,
-      transition: getNavItemTransition(props.theme),
-      '&[aria-current], &[aria-current]:hover': {
-        color: props.theme.colors.interactive.text.gray.normal,
-        backgroundColor: props.theme.colors.interactive.background.gray.fadedHighlighted,
-      },
-      '&:focus-visible': {
-        ...getFocusRingStyles({ theme: props.theme }),
-      },
-    },
-  };
-});
-
-const NavLinkIconTitle = ({
-  icon: Icon,
-  title,
-  description,
-  titleSuffix,
-  isActive,
-  trailing,
-  isL1Item,
-}: Pick<
-  SideNavLinkProps,
-  'title' | 'isActive' | 'trailing' | 'description' | 'icon' | 'titleSuffix'
-> & {
-  isL1Item: boolean;
-}): React.ReactElement => {
-  const { containerRef, textRef } = useTruncationTitle({ content: title });
-
-  return (
-    <Box width="100%" textAlign="left">
-      <Box display="flex" justifyContent="space-between" width="100%">
-        <Box display="flex" flexDirection="row" gap="spacing.3" alignItems="center">
-          {Icon ? (
-            <BaseBox display="flex" flexDirection="row" alignItems="center">
-              <Icon size="medium" color="currentColor" />
-            </BaseBox>
-          ) : null}
-          <Box ref={containerRef as never} flex="1" minWidth="spacing.0">
-            <BaseText
-              ref={textRef as never}
-              truncateAfterLines={1}
-              color="currentColor"
-              fontWeight={isActive ? 'semibold' : 'regular'}
-              fontSize={100}
-              lineHeight={100}
-              as="p"
-              className={isL1Item ? HIDE_WHEN_COLLAPSED : ''}
-            >
-              {title}
-            </BaseText>
-          </Box>
-          {titleSuffix ? (
-            <BaseBox display="flex" alignItems="center">
-              {titleSuffix}
-            </BaseBox>
-          ) : null}
-        </Box>
-        <Box display="flex" alignItems="center">
-          {trailing}
-        </Box>
-      </Box>
-      {!isL1Item && description ? (
-        <Text
-          size="small"
-          marginLeft="spacing.7"
-          textAlign="left"
-          weight="medium"
-          color={isActive ? 'interactive.text.gray.subtle' : 'interactive.text.gray.muted'}
-          truncateAfterLines={1}
-        >
-          {description}
-        </Text>
-      ) : null}
-    </Box>
-  );
-};
 
 const L3Trigger = ({
   title,
@@ -173,7 +62,7 @@ const L3Trigger = ({
 
   return (
     <TooltipifyComponent tooltip={tooltip}>
-      <StyledNavLinkContainer $hasDescription={Boolean(description)}>
+      <StyledNavLinkContainer $hasDescription={Boolean(description)} $isL1Item={false}>
         <BaseBox
           className={STYLED_NAV_LINK}
           as={href ? as : 'button'}
@@ -241,13 +130,20 @@ const SideNavLink = ({
     closeMobileNav,
     isL1Collapsed,
     isSideNavCollapsed,
+    isForceExpanded,
+    l2Variant,
+    l3Variant,
     setIsL1Collapsed,
+    closeRailPeek,
   } = useSideNav();
+  const isMobile = useIsMobile();
   const { level: _prevLevel } = useNavLink();
   const prevLevel = _prevLevel ?? 0;
   const currentLevel = prevLevel + 1;
   const isL2Trigger = Boolean(children) && currentLevel === 1;
   const isL3Trigger = Boolean(children) && currentLevel === 2;
+  const useColumnL2 = l2Variant !== 'flyout' || isMobile;
+  const useAccordionL3 = l3Variant !== 'flyout' || isMobile;
 
   if (__DEV__) {
     if (Boolean(children) && currentLevel >= 3) {
@@ -285,6 +181,54 @@ const SideNavLink = ({
 
   const shouldHideL1Item = currentLevel === 1 && !icon && isSideNavCollapsed;
 
+  if (isL2Trigger && !useColumnL2) {
+    return (
+      <NavLinkContext.Provider value={{ level: currentLevel, title }}>
+        <SideNavL2FlyoutLink
+          title={title}
+          description={description}
+          href={href}
+          children={children}
+          titleSuffix={titleSuffix}
+          trailing={trailing}
+          isActive={isActive}
+          icon={icon}
+          tooltip={tooltip}
+          as={as}
+          target={target}
+          onClick={onClick}
+          currentLevel={currentLevel}
+          isFirstRender={isFirstRender}
+          {...rest}
+        />
+      </NavLinkContext.Provider>
+    );
+  }
+
+  if (isL3Trigger && !useAccordionL3) {
+    return (
+      <NavLinkContext.Provider value={{ level: currentLevel, title }}>
+        <SideNavL3FlyoutLink
+          title={title}
+          description={description}
+          href={href}
+          children={children}
+          titleSuffix={titleSuffix}
+          trailing={trailing}
+          isActive={isActive}
+          icon={icon}
+          tooltip={tooltip}
+          as={as}
+          target={target}
+          onClick={onClick}
+          currentLevel={currentLevel}
+          isFirstRender={isFirstRender}
+          {...rest}
+        />
+      </NavLinkContext.Provider>
+    );
+  }
+
   return (
     <NavLinkContext.Provider value={{ level: currentLevel, title }}>
       {isL3Trigger ? (
@@ -310,6 +254,7 @@ const SideNavLink = ({
         <>
           <StyledNavLinkContainer
             $hasDescription={currentLevel !== 1 && Boolean(description)}
+            $isL1Item={currentLevel === 1}
             position="relative"
           >
             <TooltipifyComponent tooltip={tooltip}>
@@ -324,6 +269,7 @@ const SideNavLink = ({
                   // Close the mobile nav when item is clicked and its not trigger for next menu
                   if (!isL2Trigger) {
                     closeMobileNav?.();
+                    closeRailPeek?.();
                   }
 
                   if (isActive) {
@@ -350,6 +296,7 @@ const SideNavLink = ({
                 aria-current={isActive ? 'page' : undefined}
                 data-level={currentLevel}
                 data-l2trigger={isL2Trigger}
+                data-sidenav-row={currentLevel >= 2 ? '' : undefined}
                 {...makeAnalyticsAttribute(rest)}
               >
                 <NavLinkIconTitle
@@ -384,7 +331,7 @@ const SideNavLink = ({
           </StyledNavLinkContainer>
           {children ? (
             <FloatingPortal root={l2PortalContainerRef}>
-              {isActive && isL1Collapsed ? (
+              {isActive && (isL1Collapsed || isForceExpanded) ? (
                 <FloatingFocusManager modal={false} context={context} initialFocus={-1} returnFocus>
                   <BaseBox ref={refs.setFloating} height="100%">
                     {children}

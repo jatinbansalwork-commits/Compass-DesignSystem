@@ -21,8 +21,11 @@ const CompassDataTable = <Item,>({
   showGlobalSearch = true,
   searchPlaceholder = 'Search all columns',
   searchAccessibilityLabel = 'Search table',
+  searchVariant = 'expanded',
+  toolbarActionVariant = 'labeled',
   exportColumns,
   exportFileName = 'table-export',
+  exportPreferSelection = true,
   toolbarActions,
   pagination,
   data,
@@ -51,6 +54,10 @@ const CompassDataTable = <Item,>({
     setExperienceColumnWidth: _setExperienceColumnWidth,
     experienceOrderedVisibleColumnKeys: _experienceOrderedVisibleColumnKeys,
     experienceGridTemplateColumns: _experienceGridTemplateColumns,
+    experienceStickyLeadingDataColumnCount: _experienceStickyLeadingDataColumnCount,
+    experienceStickyLeadingColumnKeys: _experienceStickyLeadingColumnKeys,
+    experienceStickyColumnCount: _experienceStickyColumnCount,
+    experienceStickyColumnWidths: _experienceStickyColumnWidths,
     ...tablePropsForTable
   } = tableProps as typeof tableProps &
     Partial<NonNullable<CompassDataTableProps<Item>['experienceApi']>>;
@@ -71,10 +78,22 @@ const CompassDataTable = <Item,>({
     };
   }, []);
 
-  const exportRows = useMemo((): TableNode<Item>[] => data.nodes, [data.nodes]);
+  const selectedIdsForExport = experienceApi?.experienceSelectedIds ?? [];
+  const exportRows = useMemo((): TableNode<Item>[] => {
+    if (exportPreferSelection && selectedIdsForExport.length > 0) {
+      const idSet = new Set(selectedIdsForExport.map(String));
+      return data.nodes.filter((node) => idSet.has(String(node.id)));
+    }
+    return data.nodes;
+  }, [data.nodes, exportPreferSelection, selectedIdsForExport]);
+  const exportLabel =
+    exportPreferSelection && selectedIdsForExport.length > 0
+      ? `Export (${selectedIdsForExport.length})`
+      : 'Export';
 
   const features = experienceApi?.experienceFeatures;
   const rowIds = useMemo(() => data.nodes.map((node) => node.id), [data.nodes]);
+  const iconOnlyActions = toolbarActionVariant === 'icon';
 
   const toolbar = (
     <TableToolbar title={toolbarTitle} selectedTitle={toolbarSelectedTitle}>
@@ -82,6 +101,7 @@ const CompassDataTable = <Item,>({
         <TableToolbarSearch
           placeholder={searchPlaceholder}
           accessibilityLabel={searchAccessibilityLabel}
+          variant={searchVariant}
         />
       ) : null}
       {(features?.advancedFilters ||
@@ -90,39 +110,45 @@ const CompassDataTable = <Item,>({
         exportColumns?.length ||
         toolbarActions) && (
         <TableToolbarActions>
-        {features?.advancedFilters && experienceApi ? (
-          <TableExperienceAdvancedFilters
-            columns={experienceApi.experienceFilterableColumns}
-            columnFilterValues={tablePropsForTable.columnFilterValues ?? {}}
-            filterMatchModes={experienceApi.experienceFilterMatchModes}
-            onApply={experienceApi.applyAdvancedFilters}
-            onClear={() => {
-              experienceApi.applyAdvancedFilters({ columnFilterValues: {}, filterMatchModes: {} });
-            }}
-          />
-        ) : null}
-        {features?.columnToggle && experienceApi ? (
-          <TableExperienceColumnToggle
-            columns={experienceApi.experienceFilterableColumns}
-            visibleColumnKeys={experienceApi.experienceVisibleColumnKeys}
-            onVisibleColumnKeysChange={experienceApi.setExperienceVisibleColumnKeys}
-          />
-        ) : null}
-        {features?.columnReorder && experienceApi ? (
-          <TableExperienceColumnReorder
-            columns={experienceApi.experienceFilterableColumns}
-            columnOrder={experienceApi.experienceColumnOrder}
-            onColumnOrderChange={experienceApi.setExperienceColumnOrder}
-          />
-        ) : null}
-        {exportColumns?.length ? (
-          <TableExperienceExportButton
-            rows={exportRows}
-            columns={exportColumns}
-            fileName={exportFileName}
-          />
-        ) : null}
-        {toolbarActions}
+          {features?.advancedFilters && experienceApi ? (
+            <TableExperienceAdvancedFilters
+              columns={experienceApi.experienceFilterableColumns}
+              columnFilterValues={tablePropsForTable.columnFilterValues ?? {}}
+              filterMatchModes={experienceApi.experienceFilterMatchModes}
+              onApply={experienceApi.applyAdvancedFilters}
+              onClear={() => {
+                experienceApi.applyAdvancedFilters({ columnFilterValues: {}, filterMatchModes: {} });
+              }}
+              iconOnly={iconOnlyActions}
+            />
+          ) : null}
+          {features?.columnToggle && experienceApi ? (
+            <TableExperienceColumnToggle
+              columns={experienceApi.experienceFilterableColumns}
+              visibleColumnKeys={experienceApi.experienceVisibleColumnKeys}
+              onVisibleColumnKeysChange={experienceApi.setExperienceVisibleColumnKeys}
+              iconOnly={iconOnlyActions}
+            />
+          ) : null}
+          {features?.columnReorder && experienceApi ? (
+            <TableExperienceColumnReorder
+              columns={experienceApi.experienceFilterableColumns}
+              columnOrder={experienceApi.experienceColumnOrder}
+              defaultColumnOrder={experienceApi.experienceDefaultColumnOrder}
+              onColumnOrderChange={experienceApi.setExperienceColumnOrder}
+              iconOnly={iconOnlyActions}
+            />
+          ) : null}
+          {exportColumns?.length ? (
+            <TableExperienceExportButton
+              rows={exportRows}
+              columns={exportColumns}
+              fileName={exportFileName}
+              label={exportLabel}
+              iconOnly={iconOnlyActions}
+            />
+          ) : null}
+          {toolbarActions}
         </TableToolbarActions>
       )}
     </TableToolbar>
@@ -144,6 +170,16 @@ const CompassDataTable = <Item,>({
     features?.advancedFilters &&
     (features.hideInlineHeaderFiltersWhenAdvanced ?? true);
 
+  const {
+    stickyColumnCount: stickyColumnCountProp,
+    stickyColumnWidths: stickyColumnWidthsProp,
+    ...tablePropsRest
+  } = tablePropsForTable;
+  const stickyColumnCount =
+    stickyColumnCountProp ?? experienceApi?.experienceStickyColumnCount;
+  const stickyColumnWidths =
+    stickyColumnWidthsProp ?? experienceApi?.experienceStickyColumnWidths;
+
   const tableElement = (
     <Table
       data={data}
@@ -157,7 +193,9 @@ const CompassDataTable = <Item,>({
       gridTemplateColumns={
         experienceApi?.experienceGridTemplateColumns ?? gridTemplateColumnsProp
       }
-      {...tablePropsForTable}
+      {...tablePropsRest}
+      stickyColumnCount={stickyColumnCount}
+      stickyColumnWidths={stickyColumnWidths}
     >
       {children}
     </Table>

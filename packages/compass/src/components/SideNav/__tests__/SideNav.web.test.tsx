@@ -1,4 +1,5 @@
-import { SideNavExample, SideNavL4NestingErrorExample } from './SideNavExample';
+import userEvent from '@testing-library/user-event';
+import { SideNavExample, SideNavFlyoutL3Example, SideNavL4NestingErrorExample } from './SideNavExample';
 import renderWithTheme from '~utils/testing/renderWithTheme';
 import assertAccessible from '~utils/testing/assertAccessible';
 
@@ -25,6 +26,27 @@ describe('SideNav', () => {
       '[Compass: SideNavLink]: SideNav only supports nesting upto L3 but L4 nesting was found. Check the nesting of your SideNavLevel items',
     );
     mockConsoleError.mockRestore();
+  });
+
+  test('should keep L1 expanded through navigation when isExpanded is true', async () => {
+    const user = userEvent.setup();
+    const { getByRole } = renderWithTheme(
+      <SideNavExample display="block" isExpanded={true} initialEntries={['/home']} />,
+    );
+
+    await user.click(getByRole('link', { name: 'L2 Trigger' }));
+    expect(getByRole('link', { name: 'L2 Item' })).toBeVisible();
+    await user.click(getByRole('link', { name: 'Gateway' }));
+    expect(getByRole('link', { name: 'Gateway' })).toHaveAttribute('aria-current', 'page');
+    expect(getByRole('link', { name: 'Gateway' })).toBeVisible();
+  });
+
+  test('should render L3 flyout branch trigger for flyout variant', () => {
+    const { getByRole } = renderWithTheme(
+      <SideNavFlyoutL3Example display="block" initialEntries={['/l2-item']} />,
+    );
+
+    expect(getByRole('button', { name: 'L3 Trigger' })).toHaveAttribute('data-sidenav-branch');
   });
 
   test('should keep L3 Item selected based on URL', () => {

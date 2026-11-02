@@ -1,3 +1,4 @@
+import { applyTableFlagshipRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta } from '@storybook/react-vite';
 import { within, userEvent, expect } from 'storybook/test';
@@ -20,7 +21,7 @@ import { Badge } from '~components/Badge';
 const data = createTableData(25);
 
 const sortFunctions = {
-  PAYMENT_ID: (array: typeof data.nodes) =>
+  SHIPMENT_ID: (array: typeof data.nodes) =>
     [...array].sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
   AMOUNT: (array: typeof data.nodes) => [...array].sort((a, b) => a.amount - b.amount),
 };
@@ -61,8 +62,8 @@ export const KeyboardWalkthrough = (): React.ReactElement => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
+                <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
               </TableHeaderRow>
@@ -94,10 +95,13 @@ export const KeyboardWalkthrough = (): React.ReactElement => {
 
 KeyboardWalkthrough.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
+  await expect(canvas.getByRole('table')).toBeVisible();
+  await expect(canvas.getAllByRole('columnheader').length).toBeGreaterThan(0);
   await userEvent.tab();
   const sortButtons = canvas.getAllByRole('button');
   await expect(sortButtons.length).toBeGreaterThan(0);
   await expect(sortButtons[0]).toHaveFocus();
 };
 
+applyTableFlagshipRecipeMeta(TableMeta);
 export default TableMeta;

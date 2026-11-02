@@ -219,7 +219,7 @@ export const navItemsJSON: NavSection[] = [
       },
       {
         icon: LayoutIcon,
-        title: 'Account Settings (medium)',
+        title: 'HTS code Settings (medium)',
         href: '/app/layout-complexity/account-settings',
       },
       {
@@ -265,7 +265,7 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   KlearnowxPayrollIcon,
-  AcceptPaymentsIcon,
+  AcceptClearance queueIcon,
   MagicCheckoutIcon,
   AwardIcon,
   KlearnowXIcon,
@@ -355,17 +355,17 @@ const TopNavComponent = () => {
               Home
             </CompassLink>
             <Heading textAlign="center" size="small" weight="semibold">
-              Payments
+              Clearance queue
             </Heading>
             <Menu openInteraction="click">
               <Avatar size="medium" name="Anurag Hazra" />
               <MenuOverlay>
                 <MenuHeader title="Profile" />
                 <Box display="flex" gap="spacing.4" padding="spacing.4" alignItems="center">
-                  <Avatar size="medium" name="John Doe" />
+                  <Avatar size="medium" name="Schlumberger USA Inc." />
                   <Box display="flex" flexDirection="column" gap="spacing.2">
                     <Text size="medium" weight="semibold">
-                      John Doe
+                      Schlumberger USA Inc.
                     </Text>
                     <Text size="xsmall" color="surface.text.gray.muted">
                       Klearnow Trusted Merchant
@@ -391,9 +391,9 @@ const TopNavComponent = () => {
                 items={[
                   {
                     href: '/app',
-                    title: 'Payments',
-                    icon: AcceptPaymentsIcon,
-                    description: 'Manage payments effortlessly.',
+                    title: 'Clearance queue',
+                    icon: AcceptClearance queueIcon,
+                    description: 'Manage shipments effortlessly.',
                   },
                   {
                     href: '/banking',
@@ -489,7 +489,7 @@ const TopNavComponent = () => {
             </TopNavContent>
             <TopNavActions>
               <SearchInput
-                placeholder="Search in payments"
+                placeholder="Search in shipments"
                 accessibilityLabel="Search Across Klearnow"
               />
               <Tooltip content="View Ecosystem Health">
@@ -503,10 +503,10 @@ const TopNavComponent = () => {
                 <MenuOverlay>
                   <MenuHeader title="Profile" />
                   <Box display="flex" gap="spacing.4" padding="spacing.4" alignItems="center">
-                    <Avatar size="medium" name="John Doe" />
+                    <Avatar size="medium" name="Schlumberger USA Inc." />
                     <Box display="flex" flexDirection="column" gap="spacing.2">
                       <Text size="medium" weight="semibold">
-                        John Doe
+                        Schlumberger USA Inc.
                       </Text>
                       <Text size="xsmall" color="surface.text.gray.muted">
                         Klearnow Trusted Merchant
@@ -758,7 +758,7 @@ const SideNavComponent = ({ isOpen, onDismiss }) => {
           >
             <SideNavLevel>
               <NavLink icon={UserIcon} title="User Settings" href="/settings/user" />
-              <NavLink icon={BoxIcon} title="Account Settings" href="/settings/account" />
+              <NavLink icon={BoxIcon} title="HTS code Settings" href="/settings/account" />
             </SideNavLevel>
           </NavLink>
         </SideNavFooter>

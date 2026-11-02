@@ -85,10 +85,10 @@ const AnimatedCardExample = () => {
           <Box overflow="auto">
             <Box padding="spacing.6">
               <Heading as="h2" weight="regular">
-                Payment Pages
+                Shipment Pages
               </Heading>
               <Heading marginY="spacing.4" size="large" as="h3">
-                Accept payments{' '}
+                Accept shipments{' '}
                 <Heading size="large" as="span" color="surface.text.primary.normal">
                   without coding on a custom branded store
                 </Heading>

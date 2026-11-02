@@ -235,7 +235,7 @@ const AdvancedListExample = () => {
           </List>
         </ListItem>
         <ListItem>
-          <ListItemLink href="#payment-methods">Payment Methods</ListItemLink>
+          <ListItemLink href="#payment-methods">Shipment Methods</ListItemLink>
           <List variant="ordered" size="small">
             <ListItem>
               <ListItemText>
@@ -266,7 +266,7 @@ const AdvancedListExample = () => {
             </ListItem>
             <ListItem>
               <ListItemText>
-                Payment errors are marked as
+                Shipment errors are marked as
                 <ListItemText as="span" weight="semibold" color="feedback.text.negative.intense">
                   {' failed '}
                 </ListItemText>

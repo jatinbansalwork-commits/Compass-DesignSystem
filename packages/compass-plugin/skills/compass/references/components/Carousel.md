@@ -241,7 +241,7 @@ const BasicCarouselExample = () => {
     },
     {
       id: '4',
-      title: 'Simplified Refunds',
+      title: 'Simplified Consumption entrys',
       quote: 'Processing refunds has become a breeze with the dashboard.',
       author: 'Vikram Singh',
       company: 'TravelEasy',
@@ -522,7 +522,7 @@ import {
 } from '@klearnow/compass/components';
 
 const MultiItemSelectableCarouselExample = () => {
-  const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
+  const [selectedShipment, setSelectedShipment] = useState<string | null>(null);
 
   const paymentMethods = [
     { id: 'card', name: 'Credit/Debit Card', icon: CreditCardIcon },
@@ -534,17 +534,17 @@ const MultiItemSelectableCarouselExample = () => {
   ];
 
   const handleSelect = (id: string) => {
-    setSelectedPayment(id === selectedPayment ? null : id);
+    setSelectedShipment(id === selectedShipment ? null : id);
   };
 
   return (
     <Box padding="spacing.5">
       <Heading size="medium" marginBottom="spacing.5">
-        Payment Methods
+        Shipment Methods
       </Heading>
 
       <Carousel
-        accessibilityLabel="Payment methods carousel"
+        accessibilityLabel="Shipment methods carousel"
         visibleItems={3}
         navigationButtonPosition="side"
         navigationButtonVariant="stroked"
@@ -554,7 +554,7 @@ const MultiItemSelectableCarouselExample = () => {
         data-analytics="payment-methods-carousel"
       >
         {paymentMethods.map((method) => {
-          const isSelected = selectedPayment === method.id;
+          const isSelected = selectedShipment === method.id;
           const Icon = method.icon;
 
           return (
@@ -596,7 +596,7 @@ const MultiItemSelectableCarouselExample = () => {
         })}
       </Carousel>
 
-      {selectedPayment && (
+      {selectedShipment && (
         <Box
           padding="spacing.4"
           backgroundColor="surface.background.gray.subtle"
@@ -604,7 +604,7 @@ const MultiItemSelectableCarouselExample = () => {
           marginTop="spacing.4"
         >
           <Text>
-            Selected payment method: {paymentMethods.find((m) => m.id === selectedPayment)?.name}
+            Selected payment method: {paymentMethods.find((m) => m.id === selectedShipment)?.name}
           </Text>
         </Box>
       )}
@@ -629,7 +629,7 @@ const AutoPlayProductCarouselExample = () => {
     { id: 2, name: 'Enterprise Solution', description: 'For large organizations' },
     { id: 3, name: 'Starter Package', description: 'Perfect for small businesses' },
     { id: 4, name: 'Custom Solution', description: 'Tailored to your needs' },
-    { id: 5, name: 'Mobile Package', description: 'Optimize for mobile payments' },
+    { id: 5, name: 'Mobile Package', description: 'Optimize for mobile shipments' },
   ];
 
   return (
@@ -729,7 +729,7 @@ const CarouselWithPeekExample = () => {
   return (
     <Box padding="spacing.5">
       <Carousel
-        accessibilityLabel="Payment features with peek"
+        accessibilityLabel="Shipment features with peek"
         visibleItems={1}
         carouselItemWidth={{ base: '80%', m: '80%' }}
         snapAlign="center"

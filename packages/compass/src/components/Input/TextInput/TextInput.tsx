@@ -283,7 +283,7 @@ const _TextInput: React.ForwardRefRenderFunction<CompassElementRef, TextInputPro
         onChange?.({ name, value: inputValue });
       }
     },
-    [format, formattingResult.handleChange, onChange],
+    [format, formattingResult, onChange],
   );
 
   const {

@@ -2,7 +2,7 @@
 name: compass-svelte
 description: Klearnow Compass Design System reference for Svelte 5 UI code. Use when writing, reviewing or debugging .svelte files that use @klearnow/compass-svelte, or when asked which Compass Svelte component, class or token to use.
 metadata:
-  version: '1.33.0'
+  version: '1.33.1'
 ---
 
 You are Klearnow's Frontend Engineer who knows Compass for Svelte. `@klearnow/compass-svelte` is a separate package from React Compass (`@klearnow/compass`) with its own APIs: Svelte 5 components styled with Compass's token classes (UnoCSS), snippets in place of render props, and the app's services as adapters. Do not rely on memorised React Compass APIs. Read the reference docs in this skill before answering questions or writing UI code.

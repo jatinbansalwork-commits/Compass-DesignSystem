@@ -148,15 +148,15 @@ import { Alert } from '@klearnow/compass/components';
 function StandardAlertExample() {
   return (
     <Alert
-      title="International Payments Only"
-      description="Currently you can only accept payments in international currencies using PayPal. You cannot accept payments in INR (₹) using PayPal."
+      title="International Clearance queue Only"
+      description="Currently you can only accept shipments in international currencies using Truck. You cannot accept shipments in INR (₹) using Truck."
       color="information"
       emphasis="subtle"
       isDismissible={true}
       onDismiss={() => console.log('Alert dismissed')}
       actions={{
         primary: {
-          text: 'Enable International Payments',
+          text: 'Enable International Clearance queue',
           onClick: () => console.log('Primary action clicked'),
         },
         secondary: {
@@ -252,7 +252,7 @@ function FullWidthAlertExample() {
     <Box position="relative" width="100%">
       <Alert
         title="System Notification"
-        description="Currently you can only accept payments in international currencies using PayPal."
+        description="Currently you can only accept shipments in international currencies using Truck."
         color="information"
         isFullWidth={true}
         actions={{

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Footer, FooterRow, FooterCell } from '@table-library/react-table-library/table';
+import { Footer, HeaderRow, HeaderCell } from '@table-library/react-table-library/table';
 import styled from 'styled-components';
 import { tableFooter, tableRow, classes } from './tokens';
 import { ComponentIds } from './componentIds';
@@ -44,7 +44,8 @@ const TableFooter = assignWithoutSideEffects(_TableFooter, {
   componentId: ComponentIds.TableFooter,
 });
 
-const StyledFooterRow = styled(FooterRow)<{ $showBorderedCells: boolean }>(
+/** Use {@link HeaderRow} — library `FooterRow` hardcodes invalid `role="rowfooter"`. */
+const StyledFooterRow = styled(HeaderRow)<{ $showBorderedCells: boolean }>(
   ({ theme, $showBorderedCells }) => ({
     '& th': $showBorderedCells
       ? {
@@ -63,6 +64,7 @@ const _TableFooterRow = ({ children, ...rest }: TableFooterRowProps): React.Reac
   const { showBorderedCells } = useTableRowContext();
   return (
     <StyledFooterRow
+      role="row"
       {...metaAttribute({ name: MetaConstants.TableFooterRow })}
       {...makeAnalyticsAttribute(rest)}
       $showBorderedCells={showBorderedCells}
@@ -76,7 +78,8 @@ const TableFooterRow = assignWithoutSideEffects(_TableFooterRow, {
   componentId: ComponentIds.TableFooterRow,
 });
 
-const StyledFooterCell = styled(FooterCell)<{
+/** Use {@link HeaderCell} — library `FooterCell` hardcodes invalid `role="columnfooter"`. */
+const StyledFooterCell = styled(HeaderCell)<{
   $backgroundColor: TableBackgroundColors;
   $rowDensity: NonNullable<TableProps<unknown>['rowDensity']>;
   $textAlign?: string;
@@ -123,6 +126,8 @@ const _TableFooterCell = ({
 
   return (
     <StyledFooterCell
+      isFooter
+      role="cell"
       className={hasRowSpan ? classes.HAS_ROW_SPANNING : ''}
       gridColumnStart={gridColumnStart}
       gridColumnEnd={gridColumnEnd}

@@ -1,5 +1,7 @@
 # ADR-002: ThemeContext and useTheme export path
 
+> **Status update:** Pending team decision. See `team-meeting-brief.md`. Target meeting date: this week (2026-10-28).
+
 **Status:** Proposed  
 **Date:** 2026-10-27  
 **Owner:** 

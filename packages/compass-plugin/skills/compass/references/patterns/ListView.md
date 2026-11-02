@@ -43,10 +43,10 @@ The pattern is assembled in two steps:
 ├─ Side Navigation (240px) ─┬─ Content Area (968px) ────────────────────────┤
 │  • Home                   │  Page Title                    Link 2 | Link 1│
 │  ◉ Transactions           │  ──────────────────────────────── [+ Button]  │
-│  • Settlements            │  [Payments tab] [Orders tab]                  │
+│  • Settlements            │  [Clearance queue tab] [Orders tab]                  │
 │  • Reports                │                                               │
 │  ─ PAYMENTS PRODUCTS ─    │  ┌─ List View Card ──────────────────────────┐│
-│  • Payment Link           │  │ Quick Filters         [Search] [🔍 Button] ││
+│  • Shipment Link           │  │ Quick Filters         [Search] [🔍 Button] ││
 │  • Affordability          │  │ Filter chips (Parameter ˅) × N            ││
 │  • QR code                │  │                                            ││
 │  +13 more                 │  │ ┌─ Table Slot ───────────────────────────┐ ││
@@ -65,7 +65,7 @@ The pattern is assembled in two steps:
 | **Compass Component** | `TopNavigation` |
 | **Logo** | Klearnow wordmark (left-aligned) |
 | **Tab Nav** | Multiple tab items; active tab has white underline bar with glow effect |
-| **Search Input** | Placeholder: "Search in payments"; 180px wide; dark theme |
+| **Search Input** | Placeholder: "Search in shipments"; 180px wide; dark theme |
 | **Icon Buttons** | 2× icon buttons (notification / settings); 32×32px |
 | **Avatar** | Initials-based Avatar; 28px diameter, rounded |
 
@@ -126,13 +126,13 @@ The table body is a **slot** — replace it with your Compass `Table` instance.
 ┌────────────────────────────────────────────────────────┐
 │  Transactions                                          │
 │  ─────────────────                                     │
-│  [Payments] [Orders]                                   │
+│  [Clearance queue] [Orders]                                   │
 ├────────────────────────────────────────────────────────┤
-│  [🔍 Payment ID, Ref ID, etc.         ]  │ [filter ▽] │
+│  [🔍 Shipment ID, Ref ID, etc.         ]  │ [filter ▽] │
 ├────────────────────────────────────────────────────────┤
-│  ⬤ All 320   ○ Captured 300   ○ Failed                 │
+│  ⬤ All 320   ○ Captured 300   ○ Rejected                 │
 ├─ Table ────────────────────────────────────────────────┤
-│  Payment ID          Bank RRN                          │
+│  Shipment ID          Bank RRN                          │
 │  plink_uin68fdwisk…  8765976350893467                  │
 │  ────────────────────────────────────────              │
 │  Showing 10 of 240  [10 ˅] rows/page  [‹][›]          │
@@ -176,7 +176,7 @@ List View
 │   └── Right Section (Search, Icon Buttons, Avatar)
 ├── [Desktop only] Side Navigation
 │   ├── Main nav items
-│   ├── Section groups (Payments Products, Banking Products)
+│   ├── Section groups (Clearance queue Products, Banking Products)
 │   └── Footer (Test Mode switch, Settings)
 ├── Content Area
 │   ├── Page Title + Action Group (Links + Button)
@@ -243,7 +243,7 @@ import {
 import type { TableData, DatesRangeValue } from '@klearnow/compass/components';
 import { useBreakpoint, useTheme } from '@klearnow/compass/utils';
 
-type PaymentItem = {
+type ShipmentItem = {
   id: string;
   paymentId: string;
   amount: number;
@@ -260,30 +260,30 @@ type PaymentItem = {
 };
 
 const MethodFilterValues = [
-  { key: 'bank-transfer', title: 'Bank Transfer' },
-  { key: 'credit-card', title: 'Credit Card' },
-  { key: 'paypal', title: 'PayPal' },
+  { key: 'bank-transfer', title: 'Ocean' },
+  { key: 'credit-card', title: 'Air' },
+  { key: 'paypal', title: 'Truck' },
 ];
 
-const nodes: PaymentItem[] = [
+const nodes: ShipmentItem[] = [
   ...Array.from({ length: 30 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+    paymentId: `KX-${Math.floor(Math.random() * 1000000)}`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    status: ['Released', 'Exam hold', 'Rejected'][Math.floor(Math.random() * 3)],
     date: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
+    type: ['Formal entry', 'Consumption entry'][Math.floor(Math.random() * 2)],
     method: MethodFilterValues[Math.floor(Math.random() * 3)],
     bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
     account: Math.floor(Math.random() * 1000000000).toString(),
-    name: ['John Doe', 'Jane Doe', 'Bob Smith', 'Alice Smith'][Math.floor(Math.random() * 4)],
+    name: ['Schlumberger USA Inc.', 'Jane Doe', 'Bob Smith', 'Alice Smith'][Math.floor(Math.random() * 4)],
   })),
 ];
 
-const quickFilters = ['All', 'Pending', 'Failed', 'Completed'];
-const filterChipQuickFilters = ['Pending', 'Failed', 'Completed'];
+const quickFilters = ['All', 'Exam hold', 'Rejected', 'Released'];
+const filterChipQuickFilters = ['Exam hold', 'Rejected', 'Released'];
 
-const data: TableData<PaymentItem> = { nodes };
+const data: TableData<ShipmentItem> = { nodes };
 
 function BasicListViewExample() {
   const [listViewTableData, setListViewTableData] = useState(data);
@@ -300,9 +300,9 @@ function BasicListViewExample() {
   };
 
   const getQuickFilterData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: string,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value || value === 'All') {
       return { nodes: data.nodes };
     }
@@ -310,9 +310,9 @@ function BasicListViewExample() {
   };
 
   const getSearchedData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: string,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value) {
       return { nodes: data.nodes };
     }
@@ -320,9 +320,9 @@ function BasicListViewExample() {
   };
 
   const getMethodFilterData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: string,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value) {
       return { nodes: data.nodes };
     }
@@ -330,9 +330,9 @@ function BasicListViewExample() {
   };
 
   const getFilterRangeData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: DatesRangeValue,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value?.[0]) {
       return { nodes: data.nodes };
     }
@@ -379,7 +379,7 @@ function BasicListViewExample() {
         <SearchInput
           label=""
           value={searchValue}
-          placeholder="Search for Payment ID"
+          placeholder="Search for Shipment ID"
           onChange={({ value }) => handleSearchChange(value)}
           onClearButtonClick={handleSearchClear}
         />
@@ -418,7 +418,7 @@ function BasicListViewExample() {
                 <SearchInput
                   label=""
                   value={searchValue}
-                  placeholder="Search for Payment ID"
+                  placeholder="Search for Shipment ID"
                   onChange={({ value }) => handleSearchChange(value)}
                   onClearButtonClick={handleSearchClear}
                 />
@@ -524,9 +524,9 @@ function BasicListViewExample() {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">Payment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
                   <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
-                  <TableHeaderCell headerKey="ACCOUNT">Account</TableHeaderCell>
+                  <TableHeaderCell headerKey="ACCOUNT">HTS code</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
                   <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
@@ -588,11 +588,11 @@ function BasicListViewExample() {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
-                            : tableItem.status === 'Failed'
+                            : tableItem.status === 'Rejected'
                             ? 'negative'
                             : 'primary'
                         }
@@ -678,10 +678,10 @@ import {
 import type { TableData, DatesRangeValue, Identifier } from '@klearnow/compass/components';
 import { useBreakpoint, useTheme } from '@klearnow/compass/utils';
 
-// Using the same PaymentItem type and data from previous example
-// ... (PaymentItem type, MethodFilterValues, nodes, data definitions)
+// Using the same ShipmentItem type and data from previous example
+// ... (ShipmentItem type, MethodFilterValues, nodes, data definitions)
 
-type PaymentItem = {
+type ShipmentItem = {
   id: string;
   paymentId: string;
   amount: number;
@@ -698,30 +698,30 @@ type PaymentItem = {
 };
 
 const MethodFilterValues = [
-  { key: 'bank-transfer', title: 'Bank Transfer' },
-  { key: 'credit-card', title: 'Credit Card' },
-  { key: 'paypal', title: 'PayPal' },
+  { key: 'bank-transfer', title: 'Ocean' },
+  { key: 'credit-card', title: 'Air' },
+  { key: 'paypal', title: 'Truck' },
 ];
 
-const nodes: PaymentItem[] = [
+const nodes: ShipmentItem[] = [
   ...Array.from({ length: 30 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+    paymentId: `KX-${Math.floor(Math.random() * 1000000)}`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    label: `Payment ${i + 1}`,
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    label: `Shipment ${i + 1}`,
+    status: ['Released', 'Exam hold', 'Rejected'][Math.floor(Math.random() * 3)],
     date: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
+    type: ['Formal entry', 'Consumption entry'][Math.floor(Math.random() * 2)],
     method: MethodFilterValues[Math.floor(Math.random() * 3)],
     bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
     account: Math.floor(Math.random() * 1000000000).toString(),
-    name: ['John Doe', 'Jane Doe', 'Bob Smith', 'Alice Smith'][Math.floor(Math.random() * 4)],
+    name: ['Schlumberger USA Inc.', 'Jane Doe', 'Bob Smith', 'Alice Smith'][Math.floor(Math.random() * 4)],
   })),
 ];
 
-const data: TableData<PaymentItem> = { nodes };
+const data: TableData<ShipmentItem> = { nodes };
 
-const filterChipQuickFilters = ['Pending', 'Failed', 'Completed'];
+const filterChipQuickFilters = ['Exam hold', 'Rejected', 'Released'];
 
 function ComprehensiveListViewExample() {
   const [listViewTableData, setListViewTableData] = useState(data);
@@ -739,9 +739,9 @@ function ComprehensiveListViewExample() {
   };
 
   const getQuickFilterData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     values?: string[],
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!values?.length) {
       return { nodes: data.nodes };
     }
@@ -749,9 +749,9 @@ function ComprehensiveListViewExample() {
   };
 
   const getSearchedData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: string,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value) {
       return { nodes: data.nodes };
     }
@@ -759,9 +759,9 @@ function ComprehensiveListViewExample() {
   };
 
   const getMethodFilterData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: string,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value) {
       return { nodes: data.nodes };
     }
@@ -769,9 +769,9 @@ function ComprehensiveListViewExample() {
   };
 
   const getFilterRangeData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: DatesRangeValue,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value?.[0]) {
       return { nodes: data.nodes };
     }
@@ -837,7 +837,7 @@ function ComprehensiveListViewExample() {
         <SearchInput
           label=""
           value={searchValue}
-          placeholder="Search for Payment ID"
+          placeholder="Search for Shipment ID"
           onChange={({ value }) => handleSearchChange(value)}
           onClearButtonClick={handleSearchClear}
         />
@@ -900,7 +900,7 @@ function ComprehensiveListViewExample() {
                   <SearchInput
                     label=""
                     value={searchValue}
-                    placeholder="Search for Payment ID"
+                    placeholder="Search for Shipment ID"
                     onChange={({ value }) => handleSearchChange(value)}
                     onClearButtonClick={handleSearchClear}
                     trailing={
@@ -909,8 +909,8 @@ function ComprehensiveListViewExample() {
                         <DropdownOverlay>
                           <ActionList>
                             <ActionListItem title="All Methods" value="all" />
-                            <ActionListItem title="Bank Transfer" value="bank" />
-                            <ActionListItem title="Credit Card" value="card" />
+                            <ActionListItem title="Ocean" value="bank" />
+                            <ActionListItem title="Air" value="card" />
                             <ActionListItem title="UPI" value="upi" />
                           </ActionList>
                         </DropdownOverlay>
@@ -1058,7 +1058,7 @@ function ComprehensiveListViewExample() {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">Payment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
                   <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
                   <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
@@ -1086,11 +1086,11 @@ function ComprehensiveListViewExample() {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
-                            : tableItem.status === 'Failed'
+                            : tableItem.status === 'Rejected'
                             ? 'negative'
                             : 'primary'
                         }
@@ -1149,10 +1149,10 @@ import {
 } from '@klearnow/compass/components';
 import type { TableData, DatesRangeValue } from '@klearnow/compass/components';
 
-// Using the same PaymentItem type and data from previous examples
-// ... (PaymentItem type, MethodFilterValues, nodes, data definitions)
+// Using the same ShipmentItem type and data from previous examples
+// ... (ShipmentItem type, MethodFilterValues, nodes, data definitions)
 
-type PaymentItem = {
+type ShipmentItem = {
   id: string;
   paymentId: string;
   amount: number;
@@ -1169,30 +1169,30 @@ type PaymentItem = {
 };
 
 const MethodFilterValues = [
-  { key: 'bank-transfer', title: 'Bank Transfer' },
-  { key: 'credit-card', title: 'Credit Card' },
-  { key: 'paypal', title: 'PayPal' },
+  { key: 'bank-transfer', title: 'Ocean' },
+  { key: 'credit-card', title: 'Air' },
+  { key: 'paypal', title: 'Truck' },
 ];
 
-const quickFilters = ['All', 'Pending', 'Failed', 'Completed'];
+const quickFilters = ['All', 'Exam hold', 'Rejected', 'Released'];
 
-const nodes: PaymentItem[] = [
+const nodes: ShipmentItem[] = [
   ...Array.from({ length: 30 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+    paymentId: `KX-${Math.floor(Math.random() * 1000000)}`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    label: `Payment ${i + 1}`,
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    label: `Shipment ${i + 1}`,
+    status: ['Released', 'Exam hold', 'Rejected'][Math.floor(Math.random() * 3)],
     date: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
+    type: ['Formal entry', 'Consumption entry'][Math.floor(Math.random() * 2)],
     method: MethodFilterValues[Math.floor(Math.random() * 3)],
     bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
     account: Math.floor(Math.random() * 1000000000).toString(),
-    name: ['John Doe', 'Jane Doe', 'Bob Smith', 'Alice Smith'][Math.floor(Math.random() * 4)],
+    name: ['Schlumberger USA Inc.', 'Jane Doe', 'Bob Smith', 'Alice Smith'][Math.floor(Math.random() * 4)],
   })),
 ];
 
-const data: TableData<PaymentItem> = { nodes };
+const data: TableData<ShipmentItem> = { nodes };
 
 function MinimalListViewExample() {
   const [listViewTableData, setListViewTableData] = useState(data);
@@ -1208,9 +1208,9 @@ function MinimalListViewExample() {
   };
 
   const getQuickFilterData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: string,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value || value === 'All') {
       return { nodes: data.nodes };
     }
@@ -1218,9 +1218,9 @@ function MinimalListViewExample() {
   };
 
   const getMethodFilterData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: string,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value) {
       return { nodes: data.nodes };
     }
@@ -1228,9 +1228,9 @@ function MinimalListViewExample() {
   };
 
   const getFilterRangeData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: DatesRangeValue,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value?.[0]) {
       return { nodes: data.nodes };
     }
@@ -1294,7 +1294,7 @@ function MinimalListViewExample() {
           >
             <Dropdown selectionType="single">
               <FilterChipSelectInput
-                label="Payment Method"
+                label="Shipment Method"
                 value={methodFilter}
                 onChange={({ values }) => {
                   const value = values[0];
@@ -1344,7 +1344,7 @@ function MinimalListViewExample() {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">Payment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
                   <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
                   <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
@@ -1376,11 +1376,11 @@ function MinimalListViewExample() {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
-                            : tableItem.status === 'Failed'
+                            : tableItem.status === 'Rejected'
                             ? 'negative'
                             : 'primary'
                         }

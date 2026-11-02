@@ -135,7 +135,7 @@ All modal variants share the same shell structure: Header + Body Slot + Footer w
 ┌──────────────────────────────┐
 │ Page / Flow Title         ×  │
 ├──────────────────────────────┤
-│ ‹  2/3  Payment Details  ▾ › │  ← Step navigator
+│ ‹  2/3  Shipment Details  ▾ › │  ← Step navigator
 │ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ │  ← Progress bar
 ├──────────────────────────────┤
 │  [ Form content area ]       │
@@ -308,7 +308,7 @@ function SingleStepCreationView() {
     } else {
       setAlert({
         type: 'negative',
-        title: 'QR Generation Failed',
+        title: 'QR Generation Rejected',
         description: 'Please fill all the fields correctly',
       });
       setIsQrGenerated(false);
@@ -347,8 +347,8 @@ function SingleStepCreationView() {
                 validationState={errors.qrUsage ? 'error' : 'none'}
                 errorText={errors.qrUsage}
               >
-                <Radio value="single">Single Payment</Radio>
-                <Radio value="multiple">Multiple Payments</Radio>
+                <Radio value="single">Single Shipment</Radio>
+                <Radio value="multiple">Multiple Clearance queue</Radio>
               </RadioGroup>
 
               <RadioGroup
@@ -522,7 +522,7 @@ const purchaseOrders = [
     number: 'PO-2024-001',
     date: '2024-03-15',
     amount: 15000,
-    status: 'Pending',
+    status: 'Exam hold',
     items: 5,
     vendor: 'ABC Suppliers',
   },
@@ -561,7 +561,7 @@ function MultiStepCreationView({
   const [showStepGroup, setShowStepGroup] = React.useState(false);
   const [selectedVendor, setSelectedVendor] = React.useState<string | null>(null);
   const [selectedPO, setSelectedPO] = React.useState<string | null>(null);
-  const [completedSteps, setCompletedSteps] = React.useState<number[]>([]);
+  const [completedSteps, setReleasedSteps] = React.useState<number[]>([]);
   const [isDatePickerOpen, setIsDatePickerOpen] = React.useState<boolean>(false);
   const [errors, setErrors] = React.useState<{
     vendor?: string;
@@ -632,7 +632,7 @@ function MultiStepCreationView({
   const handleNextStep = (): void => {
     if (currentStep < steps.length) {
       if (validateStep(currentStep)) {
-        setCompletedSteps((prev) => [...prev, currentStep]);
+        setReleasedSteps((prev) => [...prev, currentStep]);
         setCurrentStep(currentStep + 1);
         if (currentStep === 3) {
           setAlert({
@@ -644,7 +644,7 @@ function MultiStepCreationView({
       } else if (currentStep === 3) {
         setAlert({
           type: 'negative',
-          title: 'Validation Failed',
+          title: 'Validation Rejected',
           description: 'Please fix the errors in the form and try again.',
         });
       }
@@ -680,7 +680,7 @@ function MultiStepCreationView({
     setCurrentStep(1);
     setSelectedVendor(null);
     setSelectedPO(null);
-    setCompletedSteps([]);
+    setReleasedSteps([]);
     setErrors({});
     setAlert(null);
     setGrnDetails({
@@ -1819,7 +1819,7 @@ function FlowSelectionModal({ cardCount = 3 }) {
       value: 'quickpay',
       title: 'Quick Pay Button',
       subtitle:
-        'Accepting fixed price payments? Customers make quick payments of fixed price through this button',
+        'Accepting fixed price shipments? Customers make quick shipments of fixed price through this button',
       icon: ZapIcon,
     },
     {
@@ -1882,7 +1882,7 @@ function FlowSelectionModal({ cardCount = 3 }) {
             Pick a Button Type
           </Heading>
           <Text color="surface.text.gray.muted" size="small" weight="regular">
-            Pick a button which meets your requirements and get a head start on collecting payments
+            Pick a button which meets your requirements and get a head start on collecting shipments
             or you could build your own
           </Text>
         </Box>
@@ -2163,7 +2163,7 @@ function SingleStepFormModal() {
                     </Chip>
                   ))}
                 </ChipGroup>
-                <ChipGroup label="Refund processing time">
+                <ChipGroup label="Consumption entry processing time">
                   {shippingTime.map((time) => (
                     <Chip key={time.value} value={time.value}>
                       {time.label}

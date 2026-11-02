@@ -1,0 +1,1 @@
+export { buildGridTemplateColumns } from './splitLayout';

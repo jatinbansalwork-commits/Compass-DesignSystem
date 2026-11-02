@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta } from '@storybook/react-vite';
 import {
@@ -21,7 +22,7 @@ import { Badge } from '~components/Badge';
 const allRows = createTableData(80);
 
 const filterFunctions = {
-  PAYMENT_ID: (item: (typeof allRows.nodes)[number], value: string | string[]) => {
+  SHIPMENT_ID: (item: (typeof allRows.nodes)[number], value: string | string[]) => {
     const needle = Array.isArray(value) ? value.join(' ') : value;
     return item.paymentId.toLowerCase().includes(needle.toLowerCase());
   },
@@ -64,12 +65,14 @@ export const StickyFilterAndPagination = (): React.ReactElement => {
         filterFunctions={filterFunctions}
         globalFilterValue={globalFilter}
         onGlobalFilterValueChange={setGlobalFilter}
+        showBorderedCells
         isHeaderSticky
         isFirstColumnSticky
+        stickyColumnWidths={['160px']}
         height="420px"
-        gridTemplateColumns="minmax(140px, 160px) minmax(120px, 1fr) minmax(120px, 1fr) minmax(100px, 1fr) minmax(160px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)"
+        gridTemplateColumns="160px minmax(120px, 1fr) minmax(120px, 1fr) minmax(100px, 1fr) minmax(160px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)"
         toolbar={
-          <TableToolbar title="Payments">
+          <TableToolbar title="Clearance queue">
             <TableToolbarSearch placeholder="Search all columns" />
           </TableToolbar>
         }
@@ -86,13 +89,13 @@ export const StickyFilterAndPagination = (): React.ReactElement => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
+                <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
                 <TableHeaderCell headerKey="NAME">Name</TableHeaderCell>
-                <TableHeaderCell>Account</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>HTS code</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -123,4 +126,5 @@ export const StickyFilterAndPagination = (): React.ReactElement => {
   );
 };
 
+applyTableRecipeMeta(TableMeta);
 export default TableMeta;

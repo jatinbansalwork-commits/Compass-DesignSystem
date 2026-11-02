@@ -177,6 +177,7 @@ const _OTPInput: React.ForwardRefRenderFunction<HTMLInputElement[], OTPInputProp
   const isLabelLeftPositioned = labelPosition === 'left';
   const { inputId, helpTextId, errorTextId, successTextId } = useFormId('otp');
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- inputRefs populated while rendering OTP cells; not memoizable without refactor
   useImperativeHandle(
     incomingRef,
     () => {

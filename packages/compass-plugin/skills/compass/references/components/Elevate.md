@@ -164,10 +164,10 @@ const CoordinatedAnimationExample = () => {
             <CardBody>
               <Box padding="spacing.6">
                 <Heading as="h2" weight="regular">
-                  Payment Pages
+                  Shipment Pages
                 </Heading>
                 <Heading marginY="spacing.4" size="large" as="h3">
-                  Accept payments without coding on a custom branded store
+                  Accept shipments without coding on a custom branded store
                 </Heading>
                 <Text>
                   Hover over this card to see coordinated animations. While the card elevates, the

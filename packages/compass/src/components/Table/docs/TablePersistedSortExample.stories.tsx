@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta } from '@storybook/react-vite';
 import {
@@ -56,7 +57,7 @@ const applySortPrefs = (
         return a.date.getTime() - b.date.getTime();
       case 'STATUS':
         return a.status.localeCompare(b.status);
-      case 'PAYMENT_ID':
+      case 'SHIPMENT_ID':
       default:
         return a.paymentId.localeCompare(b.paymentId);
     }
@@ -67,7 +68,7 @@ const applySortPrefs = (
 };
 
 const sortFunctions = {
-  PAYMENT_ID: (array: TableExampleItem[]) =>
+  SHIPMENT_ID: (array: TableExampleItem[]) =>
     [...array].sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
   AMOUNT: (array: TableExampleItem[]) => [...array].sort((a, b) => a.amount - b.amount),
   DATE: (array: TableExampleItem[]) => [...array].sort((a, b) => a.date.getTime() - b.date.getTime()),
@@ -159,8 +160,8 @@ export const PersistedSortRoundTrip = (): React.ReactElement => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
+                <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
                 <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
                 <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
               </TableHeaderRow>
@@ -190,4 +191,5 @@ export const PersistedSortRoundTrip = (): React.ReactElement => {
   );
 };
 
+applyTableRecipeMeta(TableMeta);
 export default TableMeta;

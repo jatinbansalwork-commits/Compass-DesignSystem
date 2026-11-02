@@ -9,14 +9,14 @@ import {
   Button,
   Badge,
   // Icons import
-  AcceptPaymentsIcon,
+  AcceptClearance queueIcon,
   ArrowRightIcon,
 } from '@klearnow/compass/components';
 
 <>
   {/* Components with icon prop */}
-  <Button icon={AcceptPaymentsIcon}>Button with Icon</Button>
-  <Badge icon={AcceptPaymentsIcon}>Badge with Icon</Badge>
+  <Button icon={AcceptClearance queueIcon}>Button with Icon</Button>
+  <Badge icon={AcceptClearance queueIcon}>Badge with Icon</Badge>
   {/* Icons as standalone components */}
   <ArrowRightIcon size="small" color="surface.icon.primary.normal" />
 </>;
@@ -32,8 +32,8 @@ import {
 
 | Icon Name | Description |
 |-----------|-------------|
-| AcceptPaymentsIcon | Klearnow product icon for accepting payments |
-| AcceptPaymentsFilledIcon | Filled variant of AcceptPaymentsIcon |
+| AcceptClearance queueIcon | Klearnow product icon for accepting shipments |
+| AcceptClearance queueFilledIcon | Filled variant of AcceptClearance queueIcon |
 | ActivityIcon | Heart-rate/pulse line representing activity or health monitoring |
 | AgentStudioIcon | AI agent or bot represented as a monitor with eyes and a sparkle |
 | AddressBookIcon | Contact book for managing addresses or contacts |
@@ -72,12 +72,12 @@ import {
 | ArrowUpRightIcon | Arrow pointing up-right (diagonal) |
 | AtSignIcon | @ symbol for email or mentions |
 | AttachmentIcon | Paperclip for file attachments |
-| AutomateAccountingIcon | Klearnow product icon for automated accounting |
+| AutomateHTS codeingIcon | Klearnow product icon for automated accounting |
 | AutomatePayrollIcon | Klearnow product icon for payroll automation |
 | AutomatePayrollFilledIcon | Filled variant of AutomatePayrollIcon |
 | AwardIcon | Ribbon/medal award icon for achievements |
-| BankAccountVerificationIcon | Klearnow product icon for bank account verification |
-| BankAccountVerificationFilledIcon | Filled variant of BankAccountVerificationIcon |
+| BankHTS codeVerificationIcon | Klearnow product icon for broker account verification |
+| BankHTS codeVerificationFilledIcon | Filled variant of BankHTS codeVerificationIcon |
 | BankIcon | Bank building for financial institutions |
 | BarChartAltIcon | Alternative bar chart for data visualization |
 | BarChartIcon | Bar chart for data/statistics visualization |
@@ -105,8 +105,8 @@ import {
 | BriefcaseIcon | Briefcase for business or work |
 | BugIcon | Bug for error reporting or debugging |
 | BuildingIcon | Office building for company or organization |
-| BulkPayoutsIcon | Klearnow product icon for bulk payouts |
-| BulkPayoutsFilledIcon | Filled variant of BulkPayoutsIcon |
+| BulkFormal entrysIcon | Klearnow product icon for bulk payouts |
+| BulkFormal entrysFilledIcon | Filled variant of BulkFormal entrysIcon |
 | BusinessBankingIcon | Klearnow product icon for business banking |
 | BusinessSpendManagementIcon | Klearnow product icon for business spend management |
 | BusinessSpendManagementFilledIcon | Filled variant of BusinessSpendManagementIcon |
@@ -151,7 +151,7 @@ import {
 | CompanyRegistrationFilledIcon | Filled variant of CompanyRegistrationIcon |
 | CompassIcon | Compass for navigation or direction |
 | ConfettiIcon | Confetti/celebration particles |
-| ContactlessPaymentIcon | NFC/contactless payment tap symbol |
+| ContactlessShipmentIcon | NFC/contactless payment tap symbol |
 | CookieIcon | Cookie for browser cookies or consent |
 | CopyIcon | Copy icon for duplicating content |
 | CopyrightIcon | Copyright symbol (©) |
@@ -165,13 +165,13 @@ import {
 | CornerUpRightIcon | Arrow curving up then right |
 | CpuIcon | CPU/processor chip |
 | CreditCardFilledIcon | Filled variant of CreditCardIcon |
-| CreditCardIcon | Credit/debit card for payments |
+| CreditCardIcon | Credit/debit card for shipments |
 | CreditsAndLoansIcon | Klearnow product icon for credits and loans |
 | CreditsAndLoansFilledIcon | Filled variant of CreditsAndLoansIcon |
 | CropIcon | Crop tool for image editing |
 | CrosshairIcon | Crosshair/target reticle |
-| CurrentAccountIcon | Klearnow product icon for current account |
-| CurrentAccountFilledIcon | Filled variant of CurrentAccountIcon |
+| CurrentHTS codeIcon | Klearnow product icon for current account |
+| CurrentHTS codeFilledIcon | Filled variant of CurrentHTS codeIcon |
 | CustomersIcon | People/users representing customers |
 | CutIcon | Scissors for cut operation |
 | DashboardIcon | Dashboard/gauge for overview or control panel |
@@ -179,8 +179,8 @@ import {
 | DiamondBlocksIcon | Diamond/rhombus block shape for layout or design patterns |
 | DigitalLendingIcon | Klearnow product icon for digital lending |
 | DigitalLendingFilledIcon | Filled variant of DigitalLendingIcon |
-| DisbursePaymentsIcon | Klearnow product icon for disbursing payments |
-| DisbursePaymentsFilledIcon | Filled variant of DisbursePaymentsIcon |
+| DisburseClearance queueIcon | Klearnow product icon for disbursing shipments |
+| DisburseClearance queueFilledIcon | Filled variant of DisburseClearance queueIcon |
 | DiscIcon | Disc/CD for media or storage |
 | DollarIcon | Dollar currency symbol ($) |
 | DollarsIcon | Multiple dollar signs for money/revenue |
@@ -199,8 +199,8 @@ import {
 | EngageIcon | Klearnow Engage product icon for customer engagement |
 | EngageFilledIcon | Filled variant of EngageIcon |
 | EqualsIcon | Equals sign (=) |
-| EscrowAccountIcon | Klearnow product icon for escrow accounts |
-| EscrowAccountFilledIcon | Filled variant of EscrowAccountIcon |
+| EscrowHTS codeIcon | Klearnow product icon for escrow accounts |
+| EscrowHTS codeFilledIcon | Filled variant of EscrowHTS codeIcon |
 | ExportIcon | Export/share arrow for exporting data |
 | ExternalLinkIcon | Arrow pointing out of a box for opening external links |
 | EyeIcon | Eye for visibility or show/view action |
@@ -245,8 +245,8 @@ import {
 | InstagramIcon | Instagram social media logo |
 | InstantSettlementIcon | Klearnow product icon for instant settlements |
 | InstantSettlementFilledIcon | Filled variant of InstantSettlementIcon |
-| InternationalPaymentsIcon | Klearnow product icon for international payments |
-| InternationalPaymentsFilledIcon | Filled variant of InternationalPaymentsIcon |
+| InternationalClearance queueIcon | Klearnow product icon for international shipments |
+| InternationalClearance queueFilledIcon | Filled variant of InternationalClearance queueIcon |
 | InvoicesIcon | Klearnow product icon for invoices |
 | InvoicesFilledIcon | Filled variant of InvoicesIcon |
 | ItalicIcon | Italic text formatting (I) |
@@ -294,7 +294,7 @@ import {
 | MoreVerticalIcon | Three vertical dots for more options |
 | MoveIcon | Four-directional arrows for moving/dragging |
 | MusicIcon | Music note for audio or music |
-| MyAccountIcon | Person silhouette for account/profile |
+| MyHTS codeIcon | Person silhouette for account/profile |
 | NavigationIcon | Navigation arrow/pointer |
 | NoSignalIcon | No signal/connectivity indicator |
 | OctagonIcon | Octagon shape (like a stop sign) |
@@ -305,17 +305,17 @@ import {
 | PaperclipIcon | Paperclip for attachments |
 | PauseCircleIcon | Pause symbol in circle |
 | PauseIcon | Pause (two vertical bars) for media controls |
-| PaymentButtonIcon | Klearnow product icon for payment buttons |
-| PaymentButtonFilledIcon | Filled variant of PaymentButtonIcon |
-| PaymentButtonsIcon | Klearnow product icon for payment buttons (alternate) |
-| PaymentGatewayIcon | Klearnow product icon for payment gateway |
-| PaymentGatewayFilledIcon | Filled variant of PaymentGatewayIcon |
-| PaymentLinkIcon | Klearnow product icon for payment links |
-| PaymentLinkFilledIcon | Filled variant of PaymentLinkIcon |
-| PaymentLinksIcon | Klearnow product icon for payment links (alternate) |
-| PaymentPagesIcon | Klearnow product icon for payment pages |
-| PaymentPagesFilledIcon | Filled variant of PaymentPagesIcon |
-| PayoutLinkIcon | Klearnow product icon for payout links |
+| ShipmentButtonIcon | Klearnow product icon for payment buttons |
+| ShipmentButtonFilledIcon | Filled variant of ShipmentButtonIcon |
+| ShipmentButtonsIcon | Klearnow product icon for payment buttons (alternate) |
+| ShipmentGatewayIcon | Klearnow product icon for payment gateway |
+| ShipmentGatewayFilledIcon | Filled variant of ShipmentGatewayIcon |
+| ShipmentLinkIcon | Klearnow product icon for payment links |
+| ShipmentLinkFilledIcon | Filled variant of ShipmentLinkIcon |
+| ShipmentLinksIcon | Klearnow product icon for payment links (alternate) |
+| ShipmentPagesIcon | Klearnow product icon for payment pages |
+| ShipmentPagesFilledIcon | Filled variant of ShipmentPagesIcon |
+| Formal entryLinkIcon | Klearnow product icon for payout links |
 | PayrollAddonsIcon | Klearnow product icon for payroll add-ons |
 | PayrollAddonsFilledIcon | Filled variant of PayrollAddonsIcon |
 | PayrollForCaIcon | Klearnow product icon for payroll for chartered accountants |
@@ -348,7 +348,7 @@ import {
 | PromptIcon | Prompt/terminal cursor for command input |
 | QRCodeIcon | QR code for scanning |
 | RadioIcon | Radio/broadcast for streaming |
-| RayIcon | Klearnow Ray product icon |
+| KlearIcon | Klear agent / product mark |
 | KlearnowIcon | Klearnow logo |
 | KlearnowXIcon | KlearnowX business banking product logo |
 | KlearnowxPayrollIcon | Klearnow Payroll product icon |
@@ -365,7 +365,7 @@ import {
 | RouteFilledIcon | Filled variant of RouteIcon |
 | RoutesIcon | Multiple route paths |
 | RupeeIcon | Indian Rupee currency symbol (₹) |
-| RupeesIcon | Multiple Rupee symbols for money/payments |
+| RupeesIcon | Multiple Rupee symbols for money/shipments |
 | SaasIcon | Klearnow product icon for SaaS solutions |
 | SaasFilledIcon | Filled variant of SaasIcon |
 | SaveIcon | Floppy disk for saving |
@@ -416,8 +416,8 @@ import {
 | TabletIcon | Tablet device |
 | TagIcon | Label tag for categorization or pricing |
 | TargetIcon | Bullseye target for goals or objectives |
-| TaxPaymentsIcon | Klearnow product icon for tax payments |
-| TaxPaymentsFilledIcon | Filled variant of TaxPaymentsIcon |
+| TaxClearance queueIcon | Klearnow product icon for tax shipments |
+| TaxClearance queueFilledIcon | Filled variant of TaxClearance queueIcon |
 | TestIcon | Test tube or testing indicator |
 | ThermometerIcon | Thermometer for temperature |
 | ThumbsDownIcon | Thumbs down for dislike or rejection |
@@ -443,10 +443,10 @@ import {
 | UmbrellaIcon | Umbrella for protection or insurance |
 | UnderlineIcon | Underline text formatting (U) |
 | UnlockIcon | Unlocked padlock for open access |
-| UpiAutopayIcon | Klearnow product icon for UPI Autopay recurring payments |
+| UpiAutopayIcon | Klearnow product icon for UPI Autopay recurring shipments |
 | UpiAutopayFilledIcon | Filled variant of UpiAutopayIcon |
 | UpiFilledIcon | Filled variant of UpiIcon |
-| UpiIcon | UPI (Unified Payments Interface) logo |
+| UpiIcon | UPI (Unified Clearance queue Interface) logo |
 | UploadCloudIcon | Cloud with upload arrow |
 | UploadIcon | Upload arrow for sending files |
 | UserCheckIcon | Person with checkmark for verified user |
@@ -456,8 +456,8 @@ import {
 | UserPlusIcon | Person with plus sign for adding user |
 | UserXIcon | Person with X for blocked or removed user |
 | UsersIcon | Multiple people for groups or teams |
-| VendorPaymentsIcon | Klearnow product icon for vendor payments |
-| VendorPaymentsFilledIcon | Filled variant of VendorPaymentsIcon |
+| VendorClearance queueIcon | Klearnow product icon for vendor shipments |
+| VendorClearance queueFilledIcon | Filled variant of VendorClearance queueIcon |
 | VerticalBlocksIcon | Vertically arranged block shapes for layout representation |
 | VideoIcon | Video camera for recording |
 | VideoOffIcon | Disabled video camera |
@@ -471,7 +471,7 @@ import {
 | VolumeOffIcon | Speaker turned off |
 | VolumeOnIcon | Speaker turned on |
 | WalletFilledIcon | Filled variant of WalletIcon |
-| WalletIcon | Wallet for payments or money |
+| WalletIcon | Wallet for shipments or money |
 | WatchIcon | Wristwatch or smartwatch |
 | WhatsAppIcon | WhatsApp messaging platform logo |
 | WifiIcon | WiFi connectivity signal |

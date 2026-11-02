@@ -269,6 +269,8 @@ const BaseInputTagSlot = ({
       )}
       <BaseBox
         marginTop={hasTags ? '-4px' : undefined}
+        display={isInsideTableEditableCell ? 'flex' : undefined}
+        alignItems={isInsideTableEditableCell ? 'center' : undefined}
         minWidth={
           hasTags && renderAs === 'button'
             ? undefined

@@ -67,6 +67,9 @@ const config: StorybookConfig = {
     '../../src/**/*.stories.@(ts|tsx|js|jsx)',
     '../../src/**/*.internal.stories.@(ts|tsx|js|jsx)',
     '!../../src/storybook-recipes/**/*.stories.@(ts|tsx|js|jsx)',
+    // Merchant SideNav demos removed; KlearNow shell code remains in SideNav/docs for app use.
+    '!../../src/components/SideNav/docs/SideNav.stories.tsx',
+    '!../../src/components/SideNav/docs/SideNavlink.stories.tsx',
   ],
 
   addons: [getAbsolutePath('@storybook/addon-docs'), getAbsolutePath('@storybook/addon-a11y')],

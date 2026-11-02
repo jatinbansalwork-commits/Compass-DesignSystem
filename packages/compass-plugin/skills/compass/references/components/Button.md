@@ -186,10 +186,10 @@ import {
   ShieldIcon,
 } from '@klearnow/compass/components';
 
-const PaymentFormExample = () => {
+const ShipmentFormExample = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handlePayment = () => {
+  const handleShipment = () => {
     setIsProcessing(true);
     // Simulate payment processing
     setTimeout(() => {
@@ -206,7 +206,7 @@ const PaymentFormExample = () => {
       maxWidth="500px"
     >
       <Heading size="large" marginBottom="spacing.4">
-        Complete Payment
+        Complete Shipment
       </Heading>
 
       <Text marginBottom="spacing.5">
@@ -222,7 +222,7 @@ const PaymentFormExample = () => {
         iconPosition="right"
         isFullWidth
         isLoading={isProcessing}
-        onClick={handlePayment}
+        onClick={handleShipment}
         marginBottom="spacing.4"
         testID="pay-button"
         data-analytics="payment-button-click"
@@ -273,7 +273,7 @@ const PaymentFormExample = () => {
   );
 };
 
-export default PaymentFormExample;
+export default ShipmentFormExample;
 ```
 
 ### Interactive Button with State Management

@@ -315,7 +315,7 @@ function AsyncAutoCompleteExample() {
 
         setCities(filteredCities);
       } catch (err) {
-        setError('Failed to fetch cities. Please try again.');
+        setError('Rejected to fetch cities. Please try again.');
       } finally {
         setIsLoading(false);
       }

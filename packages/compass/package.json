@@ -1,7 +1,7 @@
 {
   "name": "@klearnow/compass",
   "description": "The Klearnow Compass design system",
-  "version": "12.130.0",
+  "version": "12.131.0",
   "main": "./build/lib/web/production/components/index.js",
   "module": "./build/lib/web/production/components/index.js",
   "types": "./components.d.ts",

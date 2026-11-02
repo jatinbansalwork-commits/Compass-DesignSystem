@@ -234,7 +234,7 @@ function MyStepGroup() {
         marker={<StepItemIcon icon={HeartIcon} color="neutral" />}
         trailing={
           <Badge color="neutral" size="medium">
-            Pending
+            Exam hold
           </Badge>
         }
       />
@@ -258,7 +258,7 @@ function InteractiveStepGroup() {
     {
       title: 'Introduction',
       timestamp: 'Mon, 15th Oct’23 | 12:00pm',
-      description: 'Introduction to Klearnow Payment Gateway',
+      description: 'Introduction to Klearnow Shipment Gateway',
     },
     {
       title: 'Personal Details',
@@ -393,7 +393,7 @@ function NestedStepGroup() {
               title="Documents Approval"
               trailing={
                 <Badge color="neutral" size="medium">
-                  Pending
+                  Exam hold
                 </Badge>
               }
             />
@@ -405,7 +405,7 @@ function NestedStepGroup() {
         title="Decision from the Bank"
         trailing={
           <Badge color="neutral" size="medium">
-            Pending
+            Exam hold
           </Badge>
         }
       />

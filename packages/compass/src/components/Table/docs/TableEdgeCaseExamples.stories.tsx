@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React, { useMemo, useState } from 'react';
 import type { Meta } from '@storybook/react-vite';
 import {
@@ -24,7 +25,7 @@ const allPayments = createTableData(48);
 const emptyPayments = createTableData(0);
 
 const sortFunctions = {
-  PAYMENT_ID: (array: typeof allPayments.nodes) =>
+  SHIPMENT_ID: (array: typeof allPayments.nodes) =>
     [...array].sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
 };
 
@@ -67,7 +68,7 @@ export const SelectionAcrossPages = (): React.ReactElement => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell>Payment ID</TableHeaderCell>
+                <TableHeaderCell>Shipment ID</TableHeaderCell>
                 <TableHeaderCell>Name</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
               </TableHeaderRow>
@@ -102,7 +103,7 @@ const emptyTableBody = (
     <TableHeader>
       <TableHeaderRow>
         <TableHeaderCell headerKey="NAME">Name</TableHeaderCell>
-        <TableHeaderCell>Amount</TableHeaderCell>
+        <TableHeaderCell>Duty amount</TableHeaderCell>
       </TableHeaderRow>
     </TableHeader>
     <TableBody>
@@ -144,7 +145,7 @@ export const NoResultsAfterFilter = (): React.ReactElement => (
       filterFunctions={filterFunctions}
       columnFilterValues={{ NAME: '___no-match___' }}
       toolbar={
-        <TableToolbar title="Payments">
+        <TableToolbar title="Clearance queue">
           <TableToolbarSearch />
         </TableToolbar>
       }
@@ -215,7 +216,7 @@ export const MultiColumnSortWithShift = (): React.ReactElement => {
               <TableHeaderRow>
                 <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                 <TableHeaderCell headerKey="NAME">Name</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -240,4 +241,5 @@ export const MultiColumnSortWithShift = (): React.ReactElement => {
   );
 };
 
+applyTableRecipeMeta(TableMeta);
 export default TableMeta;

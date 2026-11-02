@@ -145,12 +145,12 @@ import {
   Box,
   Text,
   HomeIcon,
-  PaymentGatewayIcon,
+  ShipmentGatewayIcon,
   TransactionsIcon,
-  PaymentLinkIcon,
-  PaymentPagesIcon,
+  ShipmentLinkIcon,
+  ShipmentPagesIcon,
   MenuDotsIcon,
-  CurrentAccountIcon,
+  CurrentHTS codeIcon,
   KlearnowIcon,
 } from '@klearnow/compass/components';
 
@@ -225,9 +225,9 @@ const MobileAppExample = () => {
       icon: HomeIcon,
     },
     {
-      title: 'Payments',
-      href: '/payments',
-      icon: PaymentGatewayIcon,
+      title: 'Clearance queue',
+      href: '/shipments',
+      icon: ShipmentGatewayIcon,
     },
     {
       title: 'Transactions',
@@ -237,7 +237,7 @@ const MobileAppExample = () => {
     {
       title: 'Links',
       href: '/payment-links',
-      icon: PaymentLinkIcon,
+      icon: ShipmentLinkIcon,
     },
   ];
 
@@ -246,12 +246,12 @@ const MobileAppExample = () => {
     {
       title: 'Pages',
       href: '/payment-pages',
-      icon: PaymentPagesIcon,
+      icon: ShipmentPagesIcon,
     },
     {
-      title: 'Account',
+      title: 'HTS code',
       href: '/account',
-      icon: CurrentAccountIcon,
+      icon: CurrentHTS codeIcon,
     },
     {
       title: 'Settings',
@@ -265,11 +265,11 @@ const MobileAppExample = () => {
       {/* Routes configuration */}
       <Routes>
         <Route path="/" element={<PageContent title="Home" />} />
-        <Route path="/payments" element={<PageContent title="Payments" />} />
+        <Route path="/shipments" element={<PageContent title="Clearance queue" />} />
         <Route path="/transactions" element={<PageContent title="Transactions" />} />
-        <Route path="/payment-links" element={<PageContent title="Payment Links" />} />
-        <Route path="/payment-pages" element={<PageContent title="Payment Pages" />} />
-        <Route path="/account" element={<PageContent title="Account" />} />
+        <Route path="/payment-links" element={<PageContent title="Shipment Links" />} />
+        <Route path="/payment-pages" element={<PageContent title="Shipment Pages" />} />
+        <Route path="/account" element={<PageContent title="HTS code" />} />
         <Route path="/settings" element={<PageContent title="Settings" />} />
       </Routes>
 

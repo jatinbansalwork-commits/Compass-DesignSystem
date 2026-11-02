@@ -201,7 +201,7 @@ const AvatarExample = () => {
   const renderImageAvatars = () => (
     <Box display="flex" gap="spacing.4" alignItems="center">
       <Avatar
-        name="John Doe"
+        name="Schlumberger USA Inc."
         src="https://example.com/profile.jpg"
         size="medium"
         variant="circle"
@@ -224,7 +224,7 @@ const AvatarExample = () => {
   // Letter avatars showing color variations
   const renderLetterAvatars = () => (
     <Box display="flex" gap="spacing.4" alignItems="center">
-      <Avatar name="John Doe" color="primary" size="small" />
+      <Avatar name="Schlumberger USA Inc." color="primary" size="small" />
       <Avatar name="Jane Smith" color="positive" size="medium" />
       <Avatar name="Bob Miller" color="negative" size="large" />
     </Box>
@@ -272,7 +272,7 @@ const InteractiveAvatarExample = () => {
 
   // User data
   const users = [
-    { id: 1, name: 'John Doe', color: 'primary' },
+    { id: 1, name: 'Schlumberger USA Inc.', color: 'primary' },
     { id: 2, name: 'Jane Smith', color: 'positive' },
     { id: 3, name: 'Bob Miller', color: 'negative' },
     { id: 4, name: 'Alice Walker', color: 'primary' },
@@ -322,7 +322,7 @@ import { Avatar, AvatarGroup, Box } from '@klearnow/compass/components';
 const AvatarGroupExample = () => {
   // Team members data
   const teamMembers = [
-    { name: 'John Doe', color: 'primary' },
+    { name: 'Schlumberger USA Inc.', color: 'primary' },
     { name: 'Jane Smith', color: 'positive' },
     { name: 'Bob Miller', color: 'negative' },
     { name: 'Alice Walker', color: 'primary' },
@@ -371,7 +371,7 @@ const InteractiveAvatarGroupExample = () => {
 
   // Team members data
   const teamMembers = [
-    { id: 1, name: 'John Doe', color: 'primary' },
+    { id: 1, name: 'Schlumberger USA Inc.', color: 'primary' },
     { id: 2, name: 'Jane Smith', color: 'positive' },
     { id: 3, name: 'Bob Miller', color: 'negative' },
     { id: 4, name: 'Alice Walker', color: 'primary' },

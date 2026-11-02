@@ -316,7 +316,7 @@ export type CompassIconName =
   | 'prompt'
   | 'qr-code'
   | 'radio'
-  | 'ray'
+  | 'klear'
   | 'razorpay'
   | 'razorpay-x'
   | 'razorpayx-payroll'

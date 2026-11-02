@@ -7,6 +7,7 @@ import {
   SideNavLink,
   SideNavItem,
   SideNavLevel,
+  SideNavPinItem,
 } from '../index';
 import type { SideNavLinkProps, SideNavProps } from '../index';
 import { Indicator } from '~components/Indicator';
@@ -54,10 +55,25 @@ const NavLink = (
   );
 };
 
-const SideNavExample = ({
-  initialEntries = ['/home'],
+const SideNavFlyoutL3Example = ({
+  initialEntries = ['/l3-item'],
   ...args
 }: Omit<SideNavProps, 'children'> & { initialEntries?: string[] }): React.ReactElement => {
+  return <SideNavExample initialEntries={initialEntries} l3Variant="flyout" {...args} />;
+};
+
+const SideNavExample = ({
+  initialEntries = ['/home'],
+  showPinFooterExample,
+  isPinActive,
+  onPinToggle,
+  ...args
+}: Omit<SideNavProps, 'children'> & {
+  initialEntries?: string[];
+  showPinFooterExample?: boolean;
+  isPinActive?: boolean;
+  onPinToggle?: () => void;
+}): React.ReactElement => {
   return (
     <MemoryRouter initialEntries={initialEntries}>
       <SideNav {...args} data-analytics-side-nav="demo-item">
@@ -94,17 +110,28 @@ const SideNavExample = ({
           </SideNavSection>
         </SideNavBody>
         <SideNavFooter>
-          <SideNavItem
-            leading={
-              <Indicator
-                emphasis="intense"
-                color="positive"
-                accessibilityLabel="Positive Indicator"
-              />
-            }
-            title="Test Mode"
-            trailing={<Switch accessibilityLabel="Test Mode" />}
-          />
+          {showPinFooterExample ? (
+            <SideNavPinItem
+              isPinned={Boolean(isPinActive)}
+              onPinChange={({ isPinned: nextPinned }) => {
+                if (nextPinned !== Boolean(isPinActive)) {
+                  onPinToggle?.();
+                }
+              }}
+            />
+          ) : (
+            <SideNavItem
+              leading={
+                <Indicator
+                  emphasis="intense"
+                  color="positive"
+                  accessibilityLabel="Positive Indicator"
+                />
+              }
+              title="Test Mode"
+              trailing={<Switch accessibilityLabel="Test Mode" />}
+            />
+          )}
         </SideNavFooter>
       </SideNav>
     </MemoryRouter>
@@ -114,7 +141,7 @@ const SideNavExample = ({
 const SideNavL4NestingErrorExample = (): React.ReactElement => {
   return (
     <MemoryRouter initialEntries={['/four']}>
-      <SideNav>
+      <SideNav l2Variant="column" l3Variant="accordion">
         <SideNavBody>
           <NavLink href="/" title="Home L1">
             <SideNavLevel>
@@ -135,4 +162,4 @@ const SideNavL4NestingErrorExample = (): React.ReactElement => {
   );
 };
 
-export { SideNavExample, SideNavL4NestingErrorExample };
+export { SideNavExample, SideNavFlyoutL3Example, SideNavL4NestingErrorExample };

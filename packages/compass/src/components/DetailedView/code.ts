@@ -39,18 +39,18 @@ const nodes: Item[] = [
     id: (i + 1).toString(),
     paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
+    type: ['Formal entry', 'Consumption entry', 'Temporary import'][Math.floor(Math.random() * 3)],
     method: ['Bank Transfer', 'Credit Card', 'PayPal'][
       Math.floor(Math.random() * 3)
     ],
-    bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    bank: ['Meridian Customs', 'Pacific Rim Brokerage', 'Harborline Brokers'][Math.floor(Math.random() * 3)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
     name: [
       'Anurag Hazra',
       'Gaurav Tewari',
@@ -103,7 +103,7 @@ const TableExample = ({ onRowClick }) => {
       sortFunctions={{
         ID: (array) => array.sort((a, b) => Number(a.id) - Number(b.id)),
         AMOUNT: (array) => array.sort((a, b) => a.amount - b.amount),
-        PAYMENT_ID: (array) =>
+        SHIPMENT_ID: (array) =>
           array.sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
         DATE: (array) =>
           array.sort((a, b) => a.date.getTime() - b.date.getTime()),
@@ -124,11 +124,11 @@ const TableExample = ({ onRowClick }) => {
         <>
           <TableHeader>
             <TableHeaderRow>
-              <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-              <TableHeaderCell headerKey="NAME">Account Holder</TableHeaderCell>
-              <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
+              <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+              <TableHeaderCell headerKey="NAME">Importer</TableHeaderCell>
+              <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
               <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-              <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+              <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
               <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
             </TableHeaderRow>
           </TableHeader>
@@ -155,11 +155,11 @@ const TableExample = ({ onRowClick }) => {
                   <Badge
                     size="medium"
                     color={
-                      tableItem.status === 'Completed'
+                      tableItem.status === 'Released'
                         ? 'positive'
-                        : tableItem.status === 'Pending'
+                        : tableItem.status === 'Exam hold'
                         ? 'notice'
-                        : tableItem.status === 'Failed'
+                        : tableItem.status === 'Rejected'
                         ? 'negative'
                         : 'primary'
                     }
@@ -180,14 +180,14 @@ const Timeline = ({ status }: { status: string }): React.ReactElement => {
   return (
     <StepGroup orientation="vertical" size="medium">
       <StepItem
-        title="Payment Initiated"
+        title="Entry filed"
         stepProgress={
-          ['Completed', 'Pending', 'Failed'].includes(status) ? 'full' : 'none'
+          ['Released', 'Exam hold', 'Rejected'].includes(status) ? 'full' : 'none'
         }
         marker={
           <StepItemIndicator
             color={
-              ['Completed', 'Pending', 'Failed'].includes(status)
+              ['Released', 'Exam hold', 'Rejected'].includes(status)
                 ? 'positive'
                 : 'neutral'
             }
@@ -198,7 +198,7 @@ const Timeline = ({ status }: { status: string }): React.ReactElement => {
         <CollapsibleLink>Show More</CollapsibleLink>
         <CollapsibleBody>
           <StepItem
-            title="Payment Processing"
+            title="CBP review"
             stepProgress={
               ['Completed', 'Failed'].includes(status) ? 'full' : 'start'
             }
@@ -213,16 +213,16 @@ const Timeline = ({ status }: { status: string }): React.ReactElement => {
             }
           />
           <StepItem
-            title={status === 'Failed' ? 'Payment Failed' : 'Payment Completed'}
+            title={status === 'Rejected' ? 'Entry rejected' : 'Released by CBP'}
             stepProgress={
               ['Completed', 'Failed'].includes(status) ? 'full' : 'none'
             }
             marker={
               <StepItemIndicator
                 color={
-                  status === 'Failed'
+                  status === 'Rejected'
                     ? 'negative'
-                    : status === 'Completed'
+                    : status === 'Released'
                     ? 'positive'
                     : 'neutral'
                 }
@@ -334,7 +334,7 @@ const DetailedViewDrawer = ({ isOpen, onDismiss, onUnmount, selectedItem }) => {
       <DrawerHeader
         title="Settlements"
         color={
-          selectedItem?.status === 'Completed'
+          selectedItem?.status === 'Released'
             ? 'positive'
             : selectedItem?.status === 'Pending'
             ? 'notice'
@@ -365,7 +365,7 @@ const DetailedViewDrawer = ({ isOpen, onDismiss, onUnmount, selectedItem }) => {
               <Badge
                 size="medium"
                 color={
-                  selectedItem?.status === 'Completed'
+                  selectedItem?.status === 'Released'
                     ? 'positive'
                     : selectedItem?.status === 'Pending'
                     ? 'notice'
@@ -380,7 +380,7 @@ const DetailedViewDrawer = ({ isOpen, onDismiss, onUnmount, selectedItem }) => {
           highlights={
             <>
               <DetailedViewHighlight
-                title="Payment ID"
+                title="Shipment ID"
                 value={selectedItem?.paymentId}
               />
               <DetailedViewHighlight
@@ -440,8 +440,8 @@ const DetailedViewDrawer = ({ isOpen, onDismiss, onUnmount, selectedItem }) => {
                 <Amount value={0} />
               </KeyValueItem>
 
-              {/* Payment Link ID */}
-              <KeyValueItem label="Payment Link ID">
+              {/* Entry number */}
+              <KeyValueItem label="Entry number">
                 <Box
                   display="flex"
                   gap="spacing.2"
@@ -461,14 +461,14 @@ const DetailedViewDrawer = ({ isOpen, onDismiss, onUnmount, selectedItem }) => {
               </KeyValueItem>
 
               {/* Payment For */}
-              <KeyValueItem label="Payment for">
+              <KeyValueItem label="Importer of record">
                 <Text variant="body" size="medium">
                   {selectedItem?.type}
                 </Text>
               </KeyValueItem>
 
-              {/* Partial Payment */}
-              <KeyValueItem label="Partial Payment">
+              {/* Split entry */}
+              <KeyValueItem label="Split entry">
                 <Text variant="body" size="medium">
                   Enabled
                 </Text>

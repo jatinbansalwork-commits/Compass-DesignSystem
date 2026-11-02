@@ -98,6 +98,7 @@ export const MetaConstants = {
   TopNavBrand: 'top-nav-brand',
   TopNavContent: 'top-nav-content',
   TopNavActions: 'top-nav-actions',
+  TopNavBrandedActionPill: 'top-nav-branded-action-pill',
   TabNav: 'tab-nav',
   TabNavItems: 'tab-nav-items',
   TabNavItem: 'tab-nav-item',

@@ -2,6 +2,7 @@ export * from './getColorScheme';
 export * from './getMediaQuery';
 export * from './getPlatformType';
 export * from './useBreakpoint';
+export * from './useIsMobile';
 export * from './useColorScheme';
 export * from './useInterval';
 export * from './platform';

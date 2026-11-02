@@ -106,6 +106,8 @@ type TableHeaderRowProps = {
   _isLeafHeaderRow?: boolean;
   /** @private */
   _stickyTopOffsetPx?: number;
+  /** @private When a header filter band exists, pins this label row to a fixed grid row. */
+  _gridRowStart?: number;
 } & DataAnalyticsAttribute;
 
 type TableHeaderCellProps = {
@@ -197,7 +199,11 @@ type TableProps<Item> = {
    **/
   isFirstColumnSticky?: boolean;
   /**
-   * Number of leading columns (after any multi-select checkbox column) to freeze while scrolling.
+   * Number of leading **data** columns (after any multi-select checkbox column) to freeze while
+   * scrolling horizontally. The checkbox column is sticky on its own when `selectionType` is
+   * `"multiple"` and does not count toward this number — e.g. `stickyColumnCount={1}` freezes
+   * checkbox + the first data column.
+   *
    * `isFirstColumnSticky` is shorthand for `stickyColumnCount={1}` without `stickyColumnWidths`.
    **/
   stickyColumnCount?: number;
@@ -647,6 +653,11 @@ type TableToolbarProps = {
 type TableToolbarSearchProps = {
   placeholder?: string;
   accessibilityLabel?: string;
+  /**
+   * `collapsibleOnHover` — search icon by default; expands on hover (stays open while filter has value).
+   * @default 'expanded'
+   */
+  variant?: 'expanded' | 'collapsibleOnHover';
 } & DataAnalyticsAttribute;
 
 type TableToolbarActionsProps = {

@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta } from '@storybook/react-vite';
 import { Table, TablePagination } from '../index';
@@ -15,8 +16,8 @@ type Row = (typeof data.nodes)[number];
 const columns: TableColumnConfig<Row>[] = [
   {
     key: 'id',
-    header: 'Payment ID',
-    headerKey: 'PAYMENT_ID',
+    header: 'Shipment ID',
+    headerKey: 'SHIPMENT_ID',
     width: 'minmax(140px, 180px)',
     render: (row) => row.paymentId,
   },
@@ -37,13 +38,13 @@ const columns: TableColumnConfig<Row>[] = [
   },
   {
     key: 'amount',
-    header: 'Amount',
+    header: 'Duty amount',
     textAlign: 'right',
     render: (row) => <Amount value={row.amount} />,
   },
 ];
 
-const meta: Meta = {
+const storyMeta: Meta = {
   title: 'Components/Table/Features/Columns Config',
   tags: ['autodocs'],
   parameters: { chromatic: { disableSnapshot: true } },
@@ -66,4 +67,5 @@ export const TableDrivenByColumnsConfig = (): React.ReactElement => (
   </Box>
 );
 
-export default meta;
+applyTableRecipeMeta(storyMeta);
+export default storyMeta;

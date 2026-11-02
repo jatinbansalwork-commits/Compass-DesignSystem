@@ -103,9 +103,9 @@ module.exports = {
         'plugin:@typescript-eslint/recommended-requiring-type-checking',
         'plugin:prettier/recommended',
       ],
-      plugins: ['@typescript-eslint', 'jsx-a11y', 'no-only-tests', 'blade'],
+      plugins: ['@typescript-eslint', 'jsx-a11y', 'no-only-tests', 'compass'],
       rules: {
-        'blade/no-cross-platform-imports': ['error', { ignoreImportsPattern: 'renderWithSSR' }],
+        'compass/no-cross-platform-imports': ['error', { ignoreImportsPattern: 'renderWithSSR' }],
         'import/no-cycle': ['error', { maxDepth: 4, ignoreExternal: false }],
         'import/no-deprecated': 'off',
         'react/jsx-uses-react': 'off',
@@ -197,6 +197,28 @@ module.exports = {
       files: ['packages/klear360/**/*.{ts,tsx,js}'],
       rules: {
         'import/no-extraneous-dependencies': 'off',
+      },
+    },
+    {
+      // Compass component prop types — warn when new exported props ship without JSDoc (ADR-007)
+      files: [
+        'packages/compass/src/components/**/types.ts',
+        'packages/compass/src/components/**/*.types.ts',
+      ],
+      plugins: ['jsdoc'],
+      rules: {
+        'jsdoc/require-jsdoc': [
+          'warn',
+          {
+            publicOnly: true,
+            require: {
+              FunctionDeclaration: false,
+              MethodDefinition: false,
+              ClassDeclaration: false,
+            },
+            contexts: ['TSPropertySignature'],
+          },
+        ],
       },
     },
   ],

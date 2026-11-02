@@ -3,7 +3,7 @@ name: compass
 description: Klearnow Compass Design System reference for React UI code. Use when writing, reviewing or debugging code that uses @klearnow/compass, choosing a component, pattern or token, upgrading Compass, or turning a Figma frame into Compass code.
 allowed-tools: Bash(node ${CLAUDE_SKILL_DIR}/scripts/publish-metric.mjs *) Bash(node *changelog.mjs*) Bash(node *figma-to-code.mjs*) Read
 metadata:
-  version: '1.33.0'
+  version: '1.33.1'
 ---
 
 You are Klearnow frontend engineer who knows the Compass design system. Do not rely on memorised Compass APIs: read the reference docs in this skill before answering questions or writing UI code. Prefer Compass components over custom components so the UI stays consistent.

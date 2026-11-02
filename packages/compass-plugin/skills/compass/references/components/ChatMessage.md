@@ -175,7 +175,7 @@ import {
   ChipGroup,
   Chip,
   Button,
-  RayIcon,
+  KlearIcon,
   ThumbsUpIcon,
   ThumbsDownIcon,
   SendIcon,
@@ -205,7 +205,7 @@ const ComprehensiveChatExample = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
-  const [failedMessage, setFailedMessage] = useState({
+  const [failedMessage, setRejectedMessage] = useState({
     id: '4',
     text: 'I am using React for a web application',
     senderType: 'self',
@@ -214,7 +214,7 @@ const ComprehensiveChatExample = () => {
   });
 
   const handleRetry = () => {
-    setFailedMessage((prev) => ({ ...prev, failed: false }));
+    setRejectedMessage((prev) => ({ ...prev, failed: false }));
     // Simulate sending message again
     setTimeout(() => {
       setMessages((prevMessages) => [
@@ -293,7 +293,7 @@ const ComprehensiveChatExample = () => {
                 messageType={isLastFromSender ? 'last' : 'default'}
                 leading={
                   showLeadingIcon ? (
-                    <RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />
+                    <KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />
                   ) : undefined
                 }
                 wordBreak="break-word"
@@ -327,7 +327,7 @@ const ComprehensiveChatExample = () => {
             );
           })}
 
-          {/* Failed message */}
+          {/* Rejected message */}
           {failedMessage.failed && (
             <ChatMessage
               senderType="self"
@@ -336,7 +336,7 @@ const ComprehensiveChatExample = () => {
               errorText="Message not sent. Tap to retry."
               onClick={handleRetry}
               testID="failed-message"
-              aria-label={`Failed message: ${failedMessage.text}. Tap to retry sending.`}
+              aria-label={`Rejected message: ${failedMessage.text}. Tap to retry sending.`}
             >
               {failedMessage.text}
               <Text
@@ -357,7 +357,7 @@ const ComprehensiveChatExample = () => {
               isLoading
               senderType="other"
               loadingText="Typing a response..."
-              leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+              leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
               aria-label="Support agent is typing a response"
             />
           )}
@@ -366,7 +366,7 @@ const ComprehensiveChatExample = () => {
         {/* Interactive question with radio options */}
         <ChatMessage
           senderType="other"
-          leading={<RayIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
+          leading={<KlearIcon size="xlarge" color="surface.icon.onSea.onSubtle" />}
           messageType="last"
           aria-label="Support agent: What kind of business do you run?"
         >

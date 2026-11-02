@@ -126,40 +126,31 @@ const Page = (): React.ReactElement => {
       };
       
       const MethodFilterValues = [
-        { key: 'bank-transfer', title: 'Bank Transfer' },
-        { key: 'credit-card', title: 'Credit Card' },
-        { key: 'paypal', title: 'PayPal' },
+        { key: 'ocean', title: 'Ocean' },
+        { key: 'air', title: 'Air' },
+        { key: 'truck', title: 'Truck' },
       ];
       
       const nodes = [
         ...Array.from({ length: 30 }, (_, i) => ({
           id: (i + 1).toString(),
-          paymentId: Math.floor(Math.random() * 1000000),
+          paymentId: 'KX-' + String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0'),
           amount: Number((Math.random() * 10000).toFixed(2)),
-          status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+          status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
           date: new Date(
             2025,
             Math.floor(Math.random() * 12),
             Math.floor(Math.random() * 28) + 1
           ),
-          type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
+          type: ['Formal entry', 'Consumption entry', 'Temporary import'][Math.floor(Math.random() * 3)],
           method: MethodFilterValues[Math.floor(Math.random() * 3)],
-          bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
-          account: Math.floor(Math.random() * 1000000000).toString(),
-          name: [
-            'John Doe',
-            'Jane Doe',
-            'Bob Smith',
-            'Alice Smith',
-            'John Smith',
-            'Jane Smith',
-            'Bob Doe',
-            'Alice Doe',
-          ][Math.floor(Math.random() * 8)],
+          bank: ['Meridian Customs', 'Pacific Rim Brokerage', 'Harborline Brokers'][Math.floor(Math.random() * 3)],
+          account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
+          name: ['Schlumberger USA Inc.', 'BASF Agricultural Solutions', 'Pacific Rim Trading Co.', 'Meridian Customs Brokers'][Math.floor(Math.random() * 4)],
         })),
       ];
-      const quickFilters = ['All', 'Pending', 'Failed', 'Completed'];
-      const filterChipQuickFilters = ['Pending', 'Failed', 'Completed'];
+      const quickFilters = ['All', 'Exam hold', 'Rejected', 'Released'];
+      const filterChipQuickFilters = ['Exam hold', 'Rejected', 'Released'];
      
       const data: TableData<Item> = {
         nodes,
@@ -301,7 +292,7 @@ const Page = (): React.ReactElement => {
                   setListViewTableData(dateRangeFilterData);
                   setSearchValue('');
                 }}
-                searchValuePlaceholder="Search for Payment Id"
+                searchValuePlaceholder="Search shipment ID (KX-)"
                 selectedFiltersCount={
                   (methodFilter ? 1 : 0) +
                   (Array.isArray(filterDateRange) && filterDateRange[0] ? 1 : 0) +
@@ -460,11 +451,11 @@ const Page = (): React.ReactElement => {
                   <>
                     <TableHeader>
                       <TableHeaderRow>
-                        <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                        <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
-                        <TableHeaderCell headerKey="ACCOUNT">Account</TableHeaderCell>
+                        <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                        <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
+                        <TableHeaderCell headerKey="ACCOUNT">HTS code</TableHeaderCell>
                         <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-                        <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+                        <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
                         <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                       </TableHeaderRow>
                     </TableHeader>
@@ -522,11 +513,11 @@ const Page = (): React.ReactElement => {
                             <Badge
                               size="medium"
                               color={
-                                tableItem.status === 'Completed'
+                                tableItem.status === 'Released'
                                   ? 'positive'
-                                  : tableItem.status === 'Pending'
+                                  : tableItem.status === 'Exam hold'
                                   ? 'notice'
-                                  : tableItem.status === 'Failed'
+                                  : tableItem.status === 'Rejected'
                                   ? 'negative'
                                   : 'primary'
                               }
@@ -581,48 +572,39 @@ export default {
 } as Meta<ListViewProps>;
 
 const MethodFilterValues = [
-  { key: 'bank-transfer', title: 'Bank Transfer' },
-  { key: 'credit-card', title: 'Credit Card' },
-  { key: 'paypal', title: 'PayPal' },
+  { key: 'ocean', title: 'Ocean' },
+  { key: 'air', title: 'Air' },
+  { key: 'truck', title: 'Truck' },
 ];
 
 const nodes: Item[] = [
   ...Array.from({ length: 20 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+    paymentId: `KX-${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
     date: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
+    type: ['Formal entry', 'Consumption entry', 'Temporary import'][Math.floor(Math.random() * 3)],
     method: MethodFilterValues[Math.floor(Math.random() * 3)],
-    bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
-    name: [
-      'John Doe',
-      'Jane Doe',
-      'Bob Smith',
-      'Alice Smith',
-      'John Smith',
-      'Jane Smith',
-      'Bob Doe',
-      'Alice Doe',
-    ][Math.floor(Math.random() * 8)],
+    bank: ['Meridian Customs', 'Pacific Rim Brokerage', 'Harborline Brokers'][Math.floor(Math.random() * 3)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
+    name: ['Schlumberger USA Inc.', 'BASF Agricultural Solutions', 'Pacific Rim Trading Co.', 'Meridian Customs Brokers'][Math.floor(Math.random() * 4)],
   })),
   // to make sure one item from last week's date is always present
   {
     id: '21',
-    paymentId: 'rzp123456',
+    paymentId: 'KX-100456',
     amount: 1000,
-    status: 'Pending',
+    status: 'Exam hold',
     date: new Date(new Date().setDate(new Date().getDate() - 4)),
-    type: 'Payout',
+    type: 'Formal entry',
     method: {
-      key: 'bank-transfer',
-      title: 'Bank Transfer',
+      key: 'ocean',
+      title: 'Ocean',
     },
-    bank: 'HDFC',
-    account: '1234567890',
-    name: 'John Doe',
+    bank: 'Meridian Customs',
+    account: '8471.30.0100',
+    name: 'Schlumberger USA Inc.',
   },
 ];
 
@@ -645,13 +627,13 @@ const data: TableData<Item> = {
   nodes,
 };
 
-const quickFilters = ['All', 'Pending', 'Failed', 'Completed'];
-const filterChipQuickFilters = ['Pending', 'Failed', 'Completed'];
+const quickFilters = ['All', 'Exam hold', 'Rejected', 'Released'];
+const filterChipQuickFilters = ['Exam hold', 'Rejected', 'Released'];
 
 const extendedStatusFilters = [
-  'Pending',
-  'Failed',
-  'Completed',
+  'Exam hold',
+  'Rejected',
+  'Released',
   'Processing',
   'Authorized',
   'Captured',
@@ -735,7 +717,7 @@ const DefaultExample: StoryFn<typeof ListView> = (args) => {
         <SearchInput
           label=""
           value={searchValue}
-          placeholder="Search for Payment Id"
+          placeholder="Search shipment ID (KX-)"
           onChange={({ value }) => handleSearchChange(value)}
           onClearButtonClick={handleSearchClear}
         />
@@ -779,7 +761,7 @@ const DefaultExample: StoryFn<typeof ListView> = (args) => {
                 <SearchInput
                   label=""
                   value={searchValue}
-                  placeholder="Search for Payment Id"
+                  placeholder="Search shipment ID (KX-)"
                   onChange={({ value }) => handleSearchChange(value)}
                   onClearButtonClick={handleSearchClear}
                 />
@@ -897,11 +879,11 @@ const DefaultExample: StoryFn<typeof ListView> = (args) => {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                  <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
-                  <TableHeaderCell headerKey="ACCOUNT">Account</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
+                  <TableHeaderCell headerKey="ACCOUNT">HTS code</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-                  <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+                  <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                 </TableHeaderRow>
               </TableHeader>
@@ -963,11 +945,11 @@ const DefaultExample: StoryFn<typeof ListView> = (args) => {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
-                            : tableItem.status === 'Failed'
+                            : tableItem.status === 'Rejected'
                             ? 'negative'
                             : 'primary'
                         }
@@ -1038,9 +1020,9 @@ const ControlledExample: StoryFn<typeof ListView> = (args) => {
       }),
     };
   };
-  const [selectedQuickFilter, setSelectedQuickFilter] = useState<string>('Completed');
+  const [selectedQuickFilter, setSelectedQuickFilter] = useState<string>('Released');
   const [searchValue, setSearchValue] = useState<string | undefined>('');
-  const [methodFilter, setMethodFilter] = useState<string | undefined>('paypal');
+  const [methodFilter, setMethodFilter] = useState<string | undefined>('truck');
   const [filterDateRange, setFilterDateRange] = useState<DatesRangeValue | undefined>(undefined);
   const [listViewTableData, setListViewTableData] = useState(() => {
     const filteredQuickFilterData = getQuickFilterData(data, selectedQuickFilter);
@@ -1073,7 +1055,7 @@ const ControlledExample: StoryFn<typeof ListView> = (args) => {
         <SearchInput
           label=""
           value={searchValue}
-          placeholder="Search for Payment Id"
+          placeholder="Search shipment ID (KX-)"
           onChange={({ value }) => handleSearchChange(value)}
           onClearButtonClick={handleSearchClear}
         />
@@ -1117,7 +1099,7 @@ const ControlledExample: StoryFn<typeof ListView> = (args) => {
                 <SearchInput
                   label=""
                   value={searchValue}
-                  placeholder="Search for Payment Id"
+                  placeholder="Search shipment ID (KX-)"
                   onChange={({ value }) => handleSearchChange(value)}
                   onClearButtonClick={handleSearchClear}
                 />
@@ -1235,11 +1217,11 @@ const ControlledExample: StoryFn<typeof ListView> = (args) => {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                  <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
-                  <TableHeaderCell headerKey="ACCOUNT">Account</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
+                  <TableHeaderCell headerKey="ACCOUNT">HTS code</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-                  <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+                  <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                 </TableHeaderRow>
               </TableHeader>
@@ -1298,11 +1280,11 @@ const ControlledExample: StoryFn<typeof ListView> = (args) => {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
-                            : tableItem.status === 'Failed'
+                            : tableItem.status === 'Rejected'
                             ? 'negative'
                             : 'primary'
                         }
@@ -1406,7 +1388,7 @@ const WithBulkActionExample: StoryFn<typeof ListView> = (args) => {
         <SearchInput
           label=""
           value={searchValue}
-          placeholder="Search for Payment Id"
+          placeholder="Search shipment ID (KX-)"
           onChange={({ value }) => handleSearchChange(value)}
           onClearButtonClick={handleSearchClear}
         />
@@ -1451,7 +1433,7 @@ const WithBulkActionExample: StoryFn<typeof ListView> = (args) => {
                   <SearchInput
                     label=""
                     value={searchValue}
-                    placeholder="Search for Payment Id"
+                    placeholder="Search shipment ID (KX-)"
                     onChange={({ value }) => handleSearchChange(value)}
                     onClearButtonClick={handleSearchClear}
                   />
@@ -1605,11 +1587,11 @@ const WithBulkActionExample: StoryFn<typeof ListView> = (args) => {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                  <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
-                  <TableHeaderCell headerKey="ACCOUNT">Account</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
+                  <TableHeaderCell headerKey="ACCOUNT">HTS code</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-                  <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+                  <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                 </TableHeaderRow>
               </TableHeader>
@@ -1648,11 +1630,11 @@ const WithBulkActionExample: StoryFn<typeof ListView> = (args) => {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
-                            : tableItem.status === 'Failed'
+                            : tableItem.status === 'Rejected'
                             ? 'negative'
                             : 'primary'
                         }
@@ -1700,20 +1682,20 @@ const MultiSelectQuickFilter: StoryFn<typeof ListView> = (args) => {
     }
 
     const statusMap: Record<string, string[]> = {
-      Pending: ['Pending'],
-      Failed: ['Failed'],
-      Completed: ['Completed'],
-      Processing: ['Pending'],
-      Authorized: ['Completed'],
-      Captured: ['Completed'],
-      Refunded: ['Failed'],
-      Disputed: ['Failed'],
-      Cancelled: ['Failed'],
-      Expired: ['Failed'],
-      Rejected: ['Failed'],
-      Waiting: ['Pending'],
-      Review: ['Pending'],
-      Hold: ['Pending'],
+      Pending: ['Exam hold'],
+      Failed: ['Rejected'],
+      Released: ['Released'],
+      Processing: ['Exam hold'],
+      'In process': ['Released'],
+      Sent: ['Released'],
+      Refunded: ['Rejected'],
+      Disputed: ['Rejected'],
+      Cancelled: ['Rejected'],
+      Expired: ['Rejected'],
+      Rejected: ['Rejected'],
+      Waiting: ['Exam hold'],
+      Review: ['Exam hold'],
+      Hold: ['Exam hold'],
     };
 
     const mappedStatuses = statusMap[value] || [value];
@@ -1725,20 +1707,20 @@ const MultiSelectQuickFilter: StoryFn<typeof ListView> = (args) => {
     }
 
     const statusMap: Record<string, string[]> = {
-      Pending: ['Pending'],
-      Failed: ['Failed'],
-      Completed: ['Completed'],
-      Processing: ['Pending'],
-      Authorized: ['Completed'],
-      Captured: ['Completed'],
-      Refunded: ['Failed'],
-      Disputed: ['Failed'],
-      Cancelled: ['Failed'],
-      Expired: ['Failed'],
-      Rejected: ['Failed'],
-      Waiting: ['Pending'],
-      Review: ['Pending'],
-      Hold: ['Pending'],
+      Pending: ['Exam hold'],
+      Failed: ['Rejected'],
+      Released: ['Released'],
+      Processing: ['Exam hold'],
+      'In process': ['Released'],
+      Sent: ['Released'],
+      Refunded: ['Rejected'],
+      Disputed: ['Rejected'],
+      Cancelled: ['Rejected'],
+      Expired: ['Rejected'],
+      Rejected: ['Rejected'],
+      Waiting: ['Exam hold'],
+      Review: ['Exam hold'],
+      Hold: ['Exam hold'],
     };
 
     const allMappedStatuses = values.flatMap((value) => statusMap[value] || [value]);
@@ -1812,7 +1794,7 @@ const MultiSelectQuickFilter: StoryFn<typeof ListView> = (args) => {
         <SearchInput
           label=""
           value={searchValue}
-          placeholder="Search for Payment Id"
+          placeholder="Search shipment ID (KX-)"
           onChange={({ value }) => handleSearchChange(value)}
           onClearButtonClick={handleSearchClear}
         />
@@ -1880,7 +1862,7 @@ const MultiSelectQuickFilter: StoryFn<typeof ListView> = (args) => {
                 <SearchInput
                   label=""
                   value={searchValue}
-                  placeholder="Search for Payment Id"
+                  placeholder="Search shipment ID (KX-)"
                   onChange={({ value }) => handleSearchChange(value)}
                   onClearButtonClick={handleSearchClear}
                 />
@@ -2006,11 +1988,11 @@ const MultiSelectQuickFilter: StoryFn<typeof ListView> = (args) => {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                  <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
-                  <TableHeaderCell headerKey="ACCOUNT">Account</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
+                  <TableHeaderCell headerKey="ACCOUNT">HTS code</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-                  <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+                  <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                 </TableHeaderRow>
               </TableHeader>
@@ -2069,11 +2051,11 @@ const MultiSelectQuickFilter: StoryFn<typeof ListView> = (args) => {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
-                            : tableItem.status === 'Failed'
+                            : tableItem.status === 'Rejected'
                             ? 'negative'
                             : 'primary'
                         }
@@ -2138,8 +2120,8 @@ const WithoutSearchExample: StoryFn<typeof ListView> = (args) => {
       }),
     };
   };
-  const [selectedQuickFilter, setSelectedQuickFilter] = useState<string>('Completed');
-  const [methodFilter, setMethodFilter] = useState<string | undefined>('paypal');
+  const [selectedQuickFilter, setSelectedQuickFilter] = useState<string>('Released');
+  const [methodFilter, setMethodFilter] = useState<string | undefined>('truck');
   const [filterDateRange, setFilterDateRange] = useState<DatesRangeValue | undefined>(undefined);
   const [listViewTableData, setListViewTableData] = useState(() => {
     const filteredQuickFilterData = getQuickFilterData(data, selectedQuickFilter);
@@ -2286,11 +2268,11 @@ const WithoutSearchExample: StoryFn<typeof ListView> = (args) => {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                  <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
-                  <TableHeaderCell headerKey="ACCOUNT">Account</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
+                  <TableHeaderCell headerKey="ACCOUNT">HTS code</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-                  <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+                  <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                 </TableHeaderRow>
               </TableHeader>
@@ -2349,11 +2331,11 @@ const WithoutSearchExample: StoryFn<typeof ListView> = (args) => {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
-                            : tableItem.status === 'Failed'
+                            : tableItem.status === 'Rejected'
                             ? 'negative'
                             : 'primary'
                         }
@@ -2482,7 +2464,7 @@ const WithDropDownSearchExample: StoryFn<typeof ListView> = (args) => {
         <SearchInput
           label=""
           value={searchValue}
-          placeholder="Search for Payment Id"
+          placeholder="Search shipment ID (KX-)"
           onChange={({ value }) => handleSearchChange(value)}
           onClearButtonClick={handleSearchClear}
           trailing={searchTrailing}
@@ -2527,7 +2509,7 @@ const WithDropDownSearchExample: StoryFn<typeof ListView> = (args) => {
                 <SearchInput
                   label=""
                   value={searchValue}
-                  placeholder="Search for Payment Id"
+                  placeholder="Search shipment ID (KX-)"
                   onChange={({ value }) => handleSearchChange(value)}
                   onClearButtonClick={handleSearchClear}
                   trailing={searchTrailing}
@@ -2637,11 +2619,11 @@ const WithDropDownSearchExample: StoryFn<typeof ListView> = (args) => {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                  <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
-                  <TableHeaderCell headerKey="ACCOUNT">Account</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
+                  <TableHeaderCell headerKey="ACCOUNT">HTS code</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-                  <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+                  <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                 </TableHeaderRow>
               </TableHeader>
@@ -2703,11 +2685,11 @@ const WithDropDownSearchExample: StoryFn<typeof ListView> = (args) => {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
-                            : tableItem.status === 'Failed'
+                            : tableItem.status === 'Rejected'
                             ? 'negative'
                             : 'primary'
                         }

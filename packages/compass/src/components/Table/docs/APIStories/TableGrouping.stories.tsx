@@ -1,3 +1,4 @@
+import { applyTableStoryMeta } from '../tableStorybookMeta';
 import React, { useState } from 'react';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import {
@@ -13,7 +14,7 @@ import type { TableProps, Identifier } from '../../types';
 import { Box } from '~components/Box';
 import { Amount } from '~components/Amount';
 
-const meta: Meta<TableProps<unknown>> = {
+const storyMeta: Meta<TableProps<unknown>> = {
   title: 'Components/Table/Features/Grouping',
   component: Table,
   parameters: {
@@ -50,7 +51,7 @@ const sampleData = {
         },
         {
           id: 'july13-netbanking',
-          method: 'Net Banking',
+          method: 'Ocean',
           amount: 30000,
           fees: 2750,
           total: 32750,
@@ -83,7 +84,7 @@ const sampleData = {
         },
         {
           id: 'july12-netbanking',
-          method: 'Net Banking',
+          method: 'Ocean',
           amount: 20000,
           fees: 1150,
           total: 21150,
@@ -116,7 +117,7 @@ const sampleData = {
         },
         {
           id: 'july11-netbanking',
-          method: 'Net Banking',
+          method: 'Ocean',
           amount: 15000,
           fees: 850,
           total: 15850,
@@ -163,8 +164,8 @@ const GroupingTableTemplate = ({
         <>
           <TableHeader>
             <TableHeaderRow>
-              <TableHeaderCell>Payment Method</TableHeaderCell>
-              <TableHeaderCell>Amount</TableHeaderCell>
+              <TableHeaderCell>MOT</TableHeaderCell>
+              <TableHeaderCell>Duty amount</TableHeaderCell>
               <TableHeaderCell>Fees</TableHeaderCell>
               <TableHeaderCell>Total</TableHeaderCell>
             </TableHeaderRow>
@@ -288,4 +289,5 @@ export const TableGroupingWithControlledExpansion: StoryFn<TableProps<unknown>> 
 
 TableGroupingWithControlledExpansion.storyName = 'Controlled expansion';
 
-export default meta;
+applyTableStoryMeta(storyMeta);
+export default storyMeta;

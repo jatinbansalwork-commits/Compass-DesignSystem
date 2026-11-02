@@ -38,7 +38,7 @@ const StyledFileUploadWrapper = ({
       duration,
       easing: castNativeType(easingFn),
     });
-  }, [isActive, duration, easingFn]);
+  }, [isActive, duration, easingFn]); // eslint-disable-line react-hooks/exhaustive-deps -- progress reanimated shared value
 
   const borderColor = getIn(
     theme.colors,

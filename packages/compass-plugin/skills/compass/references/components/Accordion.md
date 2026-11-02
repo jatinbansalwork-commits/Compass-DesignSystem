@@ -458,7 +458,7 @@ const CustomContentAccordionExample = () => {
 };
 ```
 
-### Payment Method Selection Example
+### Shipment Method Selection Example
 
 A real-world example showing how to use Accordion for payment method selection.
 
@@ -474,12 +474,12 @@ import {
   Badge,
 } from '@klearnow/compass/components';
 
-const PaymentMethodsAccordion = () => {
+const ShipmentMethodsAccordion = () => {
   return (
     <Box maxWidth={{ base: '100%', s: '480px' }}>
       <Accordion variant="filled" defaultExpandedIndex={0}>
         <AccordionItem>
-          <AccordionItemHeader title="UPI Payment" subtitle="Pay directly from your bank account" />
+          <AccordionItemHeader title="UPI Shipment" subtitle="Pay directly from your broker account" />
           <AccordionItemBody>
             <TextInput label="UPI ID" placeholder="username@upi" />
             <Button marginTop="spacing.4" isFullWidth>
@@ -490,7 +490,7 @@ const PaymentMethodsAccordion = () => {
 
         <AccordionItem>
           <AccordionItemHeader
-            title="Credit Card"
+            title="Air"
             subtitle="Secure card payment"
             titleSuffix={<Badge color="positive">No Extra Charge</Badge>}
           />
@@ -509,7 +509,7 @@ const PaymentMethodsAccordion = () => {
         <AccordionItem>
           <AccordionItemHeader
             title="Net Banking"
-            subtitle="Pay using your bank account"
+            subtitle="Pay using your broker account"
             titleSuffix={<Badge color="positive">5% Cashback</Badge>}
           />
           <AccordionItemBody>

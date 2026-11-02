@@ -101,7 +101,7 @@ export const useFormattedInput = ({
         setInternalValue(newFormatted);
       }
     }
-  }, [userValue, pattern]);
+  }, [userValue, pattern, defaultValue, internalValue]);
 
   // Apply calculated cursor position after value updates
   useEffect(() => {

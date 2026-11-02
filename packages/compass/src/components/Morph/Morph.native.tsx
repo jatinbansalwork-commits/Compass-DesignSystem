@@ -273,7 +273,7 @@ const Morph = ({ children, layoutId }: MorphProps): React.ReactElement => {
         rafIdRef.current = null;
       }
     };
-  }, [playHandoffIfNeeded]);
+  }, [playHandoffIfNeeded]); // eslint-disable-line react-hooks/exhaustive-deps -- layoutId/opacity/easing reanimated handoff lifecycle
 
   const animatedStyle = useAnimatedStyle(() => {
     const style: ViewStyle = {

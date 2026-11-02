@@ -253,8 +253,8 @@ function ComprehensiveTagExample() {
     }>
   >([
     { id: '1', text: 'Unpaid', icon: FileTextIcon },
-    { id: '2', text: 'Pending', icon: TagIcon },
-    { id: '3', text: 'Completed', icon: CalendarIcon },
+    { id: '2', text: 'Exam hold', icon: TagIcon },
+    { id: '3', text: 'Released', icon: CalendarIcon },
     { id: '4', text: 'Disabled', icon: BellIcon, isDisabled: true },
   ]);
 

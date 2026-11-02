@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta } from '@storybook/react-vite';
 import {
@@ -32,7 +33,7 @@ const TableMeta: Meta = {
 
 export const ColumnAggregateFooter = (): React.ReactElement => {
   const totalAmount = tableData.nodes.reduce((sum, row) => sum + row.amount, 0);
-  const completedCount = tableData.nodes.filter((row) => row.status === 'Completed').length;
+  const completedCount = tableData.nodes.filter((row) => row.status === 'Released').length;
   const averageAmount = totalAmount / tableData.nodes.length;
 
   return (
@@ -45,7 +46,7 @@ export const ColumnAggregateFooter = (): React.ReactElement => {
       <Box paddingBottom="spacing.4">
         <Heading>Footer totals row</Heading>
         <Text>
-          Business-style summary: sum and average of amounts, count of completed payments — built
+          Business-style summary: sum and average of amounts, count of completed shipments — built
           with `TableFooter` / `TableFooterCell`, not a separate component.
         </Text>
       </Box>
@@ -57,7 +58,7 @@ export const ColumnAggregateFooter = (): React.ReactElement => {
                 <TableHeaderCell>ID</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -84,15 +85,32 @@ export const ColumnAggregateFooter = (): React.ReactElement => {
                 <TableFooterCell>—</TableFooterCell>
                 <TableFooterCell>{completedCount} completed</TableFooterCell>
                 <TableFooterCell>
-                  <Box display="flex" flexDirection="column" gap="spacing.1">
-                    <Text size="small" weight="semibold">
-                      Sum
-                    </Text>
-                    <Amount value={totalAmount} />
-                    <Text size="small" weight="semibold">
-                      Average
-                    </Text>
-                    <Amount value={Number(averageAmount.toFixed(2))} />
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    alignItems="flex-start"
+                    justifyContent="space-between"
+                    gap="spacing.6"
+                    width="100%"
+                    paddingTop="spacing.3"
+                    paddingBottom="spacing.3"
+                  >
+                    <Box display="flex" flexDirection="column" gap="spacing.2" flex={1}>
+                      <Text size="small" color="surface.text.gray.muted">
+                        Sum
+                      </Text>
+                      <Amount value={totalAmount} type="body" weight="semibold" />
+                    </Box>
+                    <Box display="flex" flexDirection="column" gap="spacing.2" flex={1}>
+                      <Text size="small" color="surface.text.gray.muted">
+                        Average
+                      </Text>
+                      <Amount
+                        value={Number(averageAmount.toFixed(2))}
+                        type="body"
+                        weight="semibold"
+                      />
+                    </Box>
                   </Box>
                 </TableFooterCell>
               </TableFooterRow>
@@ -104,4 +122,5 @@ export const ColumnAggregateFooter = (): React.ReactElement => {
   );
 };
 
+applyTableRecipeMeta(TableMeta);
 export default TableMeta;

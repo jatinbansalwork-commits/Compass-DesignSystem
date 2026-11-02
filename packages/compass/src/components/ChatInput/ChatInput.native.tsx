@@ -122,7 +122,7 @@ const _ChatInput: React.ForwardRefRenderFunction<CompassElementRef, ChatInputPro
         },
       );
     }
-  }, [isError]);
+  }, [isError]); // eslint-disable-line react-hooks/exhaustive-deps -- errorProgress reanimated shared value
 
   // Mirror web's `bottom: calc(100% - 12px)` — overlap the input card by spacing.4 (12px)
   // so the banner's square bottom edge tucks behind the input and the shapes read as one.

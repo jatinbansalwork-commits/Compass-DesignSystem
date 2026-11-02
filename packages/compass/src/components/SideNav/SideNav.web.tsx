@@ -3,9 +3,12 @@ import styled from 'styled-components';
 import { SideNavContext } from './SideNavContext';
 import {
   classes,
+  COLLAPSED_L1_LINK_WIDTH,
+  COLLAPSED_L1_ROW_MARGIN_Y,
   COLLAPSED_L1_WIDTH,
   HOVER_AGAIN_DELAY,
   L1_EXIT_HOVER_DELAY,
+  NAV_ITEM_HEIGHT,
   SKIP_NAV_ID,
   TRANSITION_CLEANUP_DELAY,
   SIDE_NAV_EXPANDED_L1_WIDTH_BASE,
@@ -14,6 +17,7 @@ import {
 import type { SideNavContextType, SideNavProps } from './types';
 import type { CompassElementRef } from '~utils/types';
 import { size as sizeTokens } from '~tokens/global';
+import type { Theme } from '~components/CompassProvider';
 import { makeBorderSize, makeMotionTime, makeSize, makeSpace } from '~utils';
 import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
 import { metaAttribute, MetaConstants } from '~utils/metaAttribute';
@@ -29,6 +33,7 @@ const {
   HIDE_WHEN_COLLAPSED,
   TRANSITIONING,
   L1_ITEM_WRAPPER,
+  STYLED_NAV_LINK,
 } = classes;
 
 const MobileL1Container = styled(BaseBox)(() => {
@@ -39,6 +44,49 @@ const MobileL1Container = styled(BaseBox)(() => {
   };
 });
 
+/** Icon-only rail: center L1 rows and remove hidden labels from layout (pin / `isExpanded` collapse). */
+const getCollapsedL1RailInteractionStyles = (theme: Theme): Record<string, unknown> => {
+  const rowMarginY = makeSize(COLLAPSED_L1_ROW_MARGIN_Y);
+
+  return {
+    [`& > .${L1_ITEM_WRAPPER}`]: {
+      padding: makeSpace(theme.spacing[0]),
+    },
+    [`&:not(.${TRANSITIONING}) .${STYLED_NAV_LINK}`]: {
+      boxSizing: 'border-box',
+      width: COLLAPSED_L1_LINK_WIDTH,
+      height: makeSize(NAV_ITEM_HEIGHT),
+      minHeight: makeSize(NAV_ITEM_HEIGHT),
+      margin: `${rowMarginY} auto`,
+      padding: makeSpace(theme.spacing[0]),
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    [`&:not(.${TRANSITIONING}) .${STYLED_NAV_LINK} > div:first-of-type`]: {
+      width: 'auto',
+    },
+    [`&:not(.${TRANSITIONING}) .${STYLED_NAV_LINK} > div:first-of-type > div:first-of-type`]: {
+      justifyContent: 'center',
+      width: 'auto',
+      gap: makeSpace(theme.spacing[0]),
+    },
+    [`&:not(.${TRANSITIONING}) .${L1_ITEM_WRAPPER} button`]: {
+      boxSizing: 'border-box',
+      width: COLLAPSED_L1_LINK_WIDTH,
+      height: makeSize(NAV_ITEM_HEIGHT),
+      minHeight: makeSize(NAV_ITEM_HEIGHT),
+      margin: `${rowMarginY} auto`,
+      padding: makeSpace(theme.spacing[0]),
+    },
+    [`&:not(.${TRANSITIONING}) .${HIDE_WHEN_COLLAPSED}`]: {
+      display: 'none',
+    },
+    [`&:not(.${TRANSITIONING}) .${SHOW_WHEN_COLLAPSED}`]: {
+      display: 'initial',
+    },
+  };
+};
+
 const StyledL1Menu = styled(BaseBox)<{ $isSideNavExpandable: boolean }>((props) => {
   const quick = makeMotionTime(props.theme.motion.duration.quick);
   const xmoderate = makeMotionTime(props.theme.motion.duration.xmoderate);
@@ -47,8 +95,12 @@ const StyledL1Menu = styled(BaseBox)<{ $isSideNavExpandable: boolean }>((props) 
   const l1Expand = `width ${xmoderate} ${easing.entrance}`;
   const l1Collapse = `width ${quick} ${easing.exit}`;
 
+  const collapsedL1RailStyles = getCollapsedL1RailInteractionStyles(props.theme);
+
   const textVisibilityProps = props.$isSideNavExpandable
-    ? {}
+    ? {
+        [`&.${COLLAPSED}`]: collapsedL1RailStyles,
+      }
     : {
         [`.${SHOW_WHEN_COLLAPSED}`]: {
           display: 'none',
@@ -56,15 +108,7 @@ const StyledL1Menu = styled(BaseBox)<{ $isSideNavExpandable: boolean }>((props) 
         [`&.${COLLAPSED}`]: {
           width: makeSize(COLLAPSED_L1_WIDTH),
           transition: l1Collapse,
-          [`& > .${L1_ITEM_WRAPPER}`]: {
-            padding: `${makeSpace(props.theme.spacing[3])} ${makeSpace(props.theme.spacing[3])}`,
-          },
-          [`&:not(.${TRANSITIONING}) .${HIDE_WHEN_COLLAPSED}`]: {
-            display: 'none',
-          },
-          [`&:not(.${TRANSITIONING}) .${SHOW_WHEN_COLLAPSED}`]: {
-            display: 'initial',
-          },
+          ...collapsedL1RailStyles,
         },
       };
 
@@ -73,13 +117,16 @@ const StyledL1Menu = styled(BaseBox)<{ $isSideNavExpandable: boolean }>((props) 
     // the overall sidenav expands and collapses in this case. No need transition here
     transition: props.$isSideNavExpandable ? 'none' : l1Expand,
     [`& > .${L1_ITEM_WRAPPER}`]: {
-      padding: makeSpace(props.theme.spacing[3]),
+      padding: makeSpace(props.theme.spacing[2]),
     },
     ...textVisibilityProps,
   };
 });
 
-const StyledSideNavContainer = styled(BaseBox)<{ $isSideNavExpandable: boolean }>((props) => {
+const StyledSideNavContainer = styled(BaseBox)<{
+  $isSideNavExpandable: boolean;
+  $suppressWidthTransition: boolean;
+}>((props) => {
   const quick = makeMotionTime(props.theme.motion.duration.quick);
   const xmoderate = makeMotionTime(props.theme.motion.duration.xmoderate);
   const easing = props.theme.motion.easing;
@@ -91,21 +138,16 @@ const StyledSideNavContainer = styled(BaseBox)<{ $isSideNavExpandable: boolean }
     return {};
   }
 
+  const collapsedL1RailStyles = getCollapsedL1RailInteractionStyles(props.theme);
+
+  const widthTransition = props.$suppressWidthTransition ? 'none' : sideNavExpand;
+
   return {
-    transition: sideNavExpand,
+    transition: widthTransition,
     [`&.${COLLAPSED}`]: {
       width: makeSize(COLLAPSED_L1_WIDTH),
-      transition: sideNavCollapse,
-      [`&:not(.${TRANSITIONING}) .${HIDE_WHEN_COLLAPSED}`]: {
-        opacity: '0',
-        pointerEvents: 'none',
-        transition: `opacity ${quick} ${easing.exit}`,
-      },
-      [`&:not(.${TRANSITIONING}) .${SHOW_WHEN_COLLAPSED}`]: {
-        opacity: '1',
-        pointerEvents: 'auto',
-        transition: `opacity ${quick} ${easing.entrance}`,
-      },
+      transition: props.$suppressWidthTransition ? 'none' : sideNavCollapse,
+      ...collapsedL1RailStyles,
     },
     [`.${SHOW_WHEN_COLLAPSED}`]: {
       opacity: '0',
@@ -191,29 +233,96 @@ const _SideNav = (
     backgroundColor = 'surface.background.gray.moderate',
     testID,
     isExpanded: _isExpanded,
+    isRailPeeking: _isRailPeeking,
+    onRailPeekChange,
+    l2Variant = 'flyout',
+    l3Variant = 'flyout',
     ...rest
   }: SideNavProps,
   ref: React.Ref<CompassElementRef>,
 ): React.ReactElement => {
   const l2PortalContainerRef = React.useRef(null);
+  const l3PortalContainerRef = React.useRef<HTMLDivElement>(null);
   const l1ContainerRef = React.useRef<HTMLDivElement>(null);
   const timeoutIdsRef = React.useRef<NodeJS.Timeout[]>([]);
   const mouseOverTimeoutRef = React.useRef<NodeJS.Timeout>();
   const prevIsSideNavCollapsedRef = React.useRef<boolean>();
+  const skipNextControlledExpandTransitionRef = React.useRef(false);
+  const [suppressWidthTransition, setSuppressWidthTransition] = React.useState(false);
   const [isL1Collapsed, setIsL1Collapsed] = React.useState(false);
   const [isMobileL2Open, setIsMobileL2Open] = React.useState(false);
   const [isL1Hovered, setIsL1Hovered] = React.useState(false);
+  const [internalRailPeeking, setInternalRailPeeking] = React.useState(false);
   const [isHoverAgainEnabled, setIsHoverAgainEnabled] = React.useState(true);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const [l2DrawerTitle, setL2DrawerTitle] = React.useState('');
 
   const isMobile = useIsMobile();
   const isSideNavCollapsed = _isExpanded === false;
+  const isForceExpanded = _isExpanded === true;
+  const isRailPeekingControlled = _isRailPeeking !== undefined;
+  const isRailPeeking = isRailPeekingControlled ? _isRailPeeking : internalRailPeeking;
+  const isRailVisuallyCollapsed = isSideNavCollapsed && !isRailPeeking;
 
-  const effectiveIsL1Collapsed = isMobile ? isMobileL2Open : isSideNavCollapsed || isL1Collapsed;
+  const setRailPeeking = React.useCallback(
+    (isPeeking: boolean): void => {
+      if (!isRailPeekingControlled) {
+        setInternalRailPeeking(isPeeking);
+      }
+      onRailPeekChange?.({ isPeeking });
+    },
+    [isRailPeekingControlled, onRailPeekChange],
+  );
 
-  const effectiveIsL1Hovered = isSideNavCollapsed ? false : isL1Hovered;
-  const sideNavWidth = isSideNavCollapsed
+  const openRailPeek = React.useCallback((): void => {
+    if (isMobile || !isSideNavCollapsed) {
+      return;
+    }
+    if (mouseOverTimeoutRef.current) {
+      clearTimeout(mouseOverTimeoutRef.current);
+      mouseOverTimeoutRef.current = undefined;
+    }
+    setRailPeeking(true);
+  }, [isMobile, isSideNavCollapsed, setRailPeeking]);
+
+  const closeRailPeek = React.useCallback((): void => {
+    if (isMobile || !isSideNavCollapsed || !isRailPeeking) {
+      return;
+    }
+    setRailPeeking(false);
+  }, [isMobile, isRailPeeking, isSideNavCollapsed, setRailPeeking]);
+
+  const scheduleCloseRailPeek = React.useCallback((): void => {
+    if (isMobile || !isSideNavCollapsed) {
+      return;
+    }
+    if (mouseOverTimeoutRef.current) {
+      clearTimeout(mouseOverTimeoutRef.current);
+    }
+    mouseOverTimeoutRef.current = setTimeout(() => {
+      setRailPeeking(false);
+    }, L1_EXIT_HOVER_DELAY);
+  }, [isMobile, isSideNavCollapsed, setRailPeeking]);
+
+  const cancelScheduledRailPeekClose = React.useCallback((): void => {
+    if (mouseOverTimeoutRef.current) {
+      clearTimeout(mouseOverTimeoutRef.current);
+      mouseOverTimeoutRef.current = undefined;
+    }
+  }, []);
+
+  const notifyPinFromPeek = React.useCallback((): void => {
+    skipNextControlledExpandTransitionRef.current = true;
+    setSuppressWidthTransition(true);
+    cancelScheduledRailPeekClose();
+  }, [cancelScheduledRailPeekClose]);
+
+  const effectiveIsL1Collapsed = isMobile
+    ? isMobileL2Open
+    : isSideNavCollapsed || (isForceExpanded ? false : isL1Collapsed);
+
+  const effectiveIsL1Hovered = isSideNavCollapsed ? isRailPeeking : isL1Hovered;
+  const sideNavWidth = isRailVisuallyCollapsed
     ? makeSize(COLLAPSED_L1_WIDTH)
     : {
         base: makeSize(SIDE_NAV_EXPANDED_L1_WIDTH_BASE),
@@ -250,6 +359,16 @@ const _SideNav = (
       return;
     }
 
+    if (l2Variant === 'flyout') {
+      onVisibleLevelChange?.({ visibleLevel: 2 });
+      return;
+    }
+
+    if (isForceExpanded) {
+      onVisibleLevelChange?.({ visibleLevel: 2 });
+      return;
+    }
+
     if (!isL1Collapsed) {
       setIsL1Collapsed(true);
       onVisibleLevelChange?.({ visibleLevel: 2 });
@@ -264,6 +383,7 @@ const _SideNav = (
     }
 
     if (isSideNavCollapsed) {
+      openRailPeek();
       return;
     }
 
@@ -285,11 +405,12 @@ const _SideNav = (
 
     if (isL1ItemActive) {
       if (args.isL2Trigger) {
-        // Click on L2 Trigger
         collapseL1(args.title);
 
+        const skipL1CollapseTransition = l2Variant === 'flyout' && !isMobile;
+
         // `args.isFirstRender` checks if the item that triggered this change, triggered it during first render or during subsequent change
-        if (!args.isFirstRender) {
+        if (!args.isFirstRender && !skipL1CollapseTransition) {
           startL1Transition();
           setIsL1Hovered(false);
           setIsHoverAgainEnabled(false);
@@ -309,15 +430,31 @@ const _SideNav = (
   const contextValue = React.useMemo(
     () => ({
       l2PortalContainerRef,
+      l3PortalContainerRef,
+      l2Variant,
+      l3Variant,
+      isForceExpanded,
       onLinkActiveChange,
       closeMobileNav,
+      openRailPeek,
+      closeRailPeek,
+      cancelScheduledRailPeekClose,
+      notifyPinFromPeek,
       isL1Collapsed: effectiveIsL1Collapsed,
       setIsL1Collapsed,
       isL1Hovered: effectiveIsL1Hovered,
       isSideNavCollapsed,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [effectiveIsL1Collapsed, effectiveIsL1Hovered, isSideNavCollapsed, isMobile],
+    [
+      effectiveIsL1Collapsed,
+      effectiveIsL1Hovered,
+      isSideNavCollapsed,
+      isForceExpanded,
+      l2Variant,
+      l3Variant,
+      isMobile,
+    ],
   );
 
   React.useEffect(() => {
@@ -330,10 +467,10 @@ const _SideNav = (
   }, []);
 
   React.useEffect(() => {
-    if (!isMobile && isSideNavCollapsed && isL1Hovered) {
-      setIsL1Hovered(false);
+    if (isForceExpanded && isRailPeeking) {
+      setRailPeeking(false);
     }
-  }, [isMobile, isSideNavCollapsed, isL1Hovered]);
+  }, [isForceExpanded, isRailPeeking, setRailPeeking]);
 
   React.useEffect(() => {
     const prevIsSideNavCollapsed = prevIsSideNavCollapsedRef.current;
@@ -344,6 +481,15 @@ const _SideNav = (
     }
 
     if (prevIsSideNavCollapsed !== isSideNavCollapsed) {
+      const isControlledExpand = prevIsSideNavCollapsed && !isSideNavCollapsed;
+      if (isControlledExpand && skipNextControlledExpandTransitionRef.current) {
+        skipNextControlledExpandTransitionRef.current = false;
+        onExpandChange?.({ isExpanded: true });
+        requestAnimationFrame(() => {
+          setSuppressWidthTransition(false);
+        });
+        return;
+      }
       startL1Transition();
       onExpandChange?.({ isExpanded: !isSideNavCollapsed });
     }
@@ -383,8 +529,9 @@ const _SideNav = (
       ) : (
         <StyledSideNavContainer
           $isSideNavExpandable={typeof _isExpanded !== 'undefined'}
+          $suppressWidthTransition={suppressWidthTransition}
           ref={ref as never}
-          className={isSideNavCollapsed ? COLLAPSED : ''}
+          className={isRailVisuallyCollapsed ? COLLAPSED : ''}
           position="fixed"
           backgroundColor={backgroundColor}
           height="100%"
@@ -406,7 +553,7 @@ const _SideNav = (
             }
 
             onExpandTransitionEnd?.({
-              isExpanded: !isSideNavCollapsed,
+              isExpanded: !isRailVisuallyCollapsed,
             });
           }}
         >
@@ -414,7 +561,7 @@ const _SideNav = (
           <BaseBox position="relative" display="block" flex="1" width="100%">
             <StyledL2PortalContainer
               position="absolute"
-              display={isSideNavCollapsed ? 'none' : 'block'}
+              display={isSideNavCollapsed || l2Variant === 'flyout' ? 'none' : 'block'}
               backgroundColor={backgroundColor}
               height="100%"
               width="100%"
@@ -464,6 +611,7 @@ const _SideNav = (
               // 6. But in case of unhover/leave, we don't want to trigger mouseOut for all child components individually. We want 1 hover out of L1 menu. Thus we use `onMouseLeave`
               onMouseOver={() => {
                 if (!isMobile && isSideNavCollapsed) {
+                  openRailPeek();
                   return;
                 }
                 if (mouseOverTimeoutRef.current) {
@@ -476,6 +624,7 @@ const _SideNav = (
               }}
               onMouseLeave={() => {
                 if (!isMobile && isSideNavCollapsed) {
+                  scheduleCloseRailPeek();
                   return;
                 }
                 if (isL1Collapsed && isL1Hovered) {

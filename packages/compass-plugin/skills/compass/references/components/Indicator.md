@@ -59,7 +59,7 @@ Where:
 
 **Do**
 
-- Use `Indicator` for showing the status or condition of an entity (e.g., "Online", "Pending", "Error").
+- Use `Indicator` for showing the status or condition of an entity (e.g., "Online", "Exam hold", "Error").
 - Always provide `accessibilityLabel` when using Indicator without visible `children` text — color alone is not accessible.
 - Use `children` to display a visible text label alongside the dot for clarity.
 - Use `emphasis="intense"` when the indicator needs stronger visual prominence with a background circle.

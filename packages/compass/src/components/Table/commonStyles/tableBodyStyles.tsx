@@ -47,6 +47,9 @@ const getTableBodyStyles = ({
         overflow: 'hidden !important',
       },
       // for virtualized table, we need to apply some styles to tbody
+      tbody: {
+        display: 'block !important',
+      },
       'tbody > div': {
         display: 'block !important',
       },

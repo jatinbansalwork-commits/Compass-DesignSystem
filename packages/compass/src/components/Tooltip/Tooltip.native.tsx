@@ -80,7 +80,7 @@ const _Tooltip = ({
       setIsVisible(true);
     }
     return () => clearTimeout(id);
-  }, [isOpen]);
+  }, [isOpen, theme.motion.duration.gentle]);
 
   return (
     <TooltipContext.Provider value={true}>

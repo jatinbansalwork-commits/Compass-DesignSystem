@@ -2,7 +2,20 @@ import React from 'react';
 import styled from 'styled-components';
 // eslint-disable-next-line import/extensions -- @table-library/react-table-library's package.json "exports" map requires the explicit .js extension on this subpath
 import { Header, HeaderRow, HeaderCell } from '@table-library/react-table-library/table';
-import { checkboxCellWidth, tableHeader, tableRow, classes } from './tokens';
+import {
+  TABLE_HEADER_COMPACT_ROW_HEIGHT_PX,
+  getFilterRowStickyTopOffsetPx,
+} from './headerLayoutConstants';
+import {
+  checkboxCellWidth,
+  tableHeader,
+  tableHeaderBand,
+  tableIcons,
+  tableRow,
+  classes,
+  stickyHeaderColumnZIndex,
+} from './tokens';
+import { tableHeaderPresentationCellA11yProps } from './tableHeaderPresentationCellA11y';
 import { useTableRowContext, useTableDataContext } from './TableContext';
 import { ComponentIds } from './componentIds';
 import type {
@@ -42,8 +55,8 @@ const SortButton = styled.button(({ theme }) => ({
   // negative margin cancels it out in layout, so the icon, the label beside it and the header
   // row height stay exactly where they were. The focus ring (an outline on this button) wraps
   // the full hit area.
-  padding: makeSpace(theme.spacing[1]),
-  margin: `-${makeSpace(theme.spacing[1])}`,
+  padding: makeSpace(getIn(theme, tableHeaderBand.sortHitAreaPadding)),
+  margin: `-${makeSpace(getIn(theme, tableHeaderBand.sortHitAreaPadding))}`,
   borderRadius: theme.border.radius.small,
   background: 'transparent',
   display: 'flex',
@@ -90,9 +103,9 @@ const SortIcon = ({
   return (
     <SortButton
       {...metaAttribute({ name: MetaConstants.TableSortButton })}
-      {...makeAccessible({ label: 'Toggle Sort', role: 'button' })}
+      {...makeAccessible({ label: 'Toggle Sort' })}
     >
-      <svg width={20} height={20} fill="none">
+      <svg width={tableHeaderBand.sortIconSizePx} height={tableHeaderBand.sortIconSizePx} fill="none">
         <path
           fill={upArrowColor}
           d="M10.59 2.251a.817.817 0 0 0-1.18 0L5.245 6.537a.875.875 0 0 0 0 1.212.817.817 0 0 0 1.179 0L10 4.069l3.577 3.68a.817.817 0 0 0 1.179 0 .874.874 0 0 0 0-1.212L10.589 2.25Z"
@@ -113,13 +126,23 @@ const SortIcon = ({
   );
 };
 
-const StyledHeader = styled(Header)<{ $tableToolbarPlacement: TableToolbarPlacement }>(
-  ({ $tableToolbarPlacement }) => ({
+const StyledHeader = styled(Header)<{
+  $tableToolbarPlacement: TableToolbarPlacement;
+  $headerFilterGridRowCount?: number;
+}>(
+  ({ $tableToolbarPlacement, $headerFilterGridRowCount }) => ({
     '&&&': {
       '& tr:first-child th': {
         borderTop: 'none',
       },
       display: $tableToolbarPlacement === 'overlay' ? 'none' : undefined,
+      ...($headerFilterGridRowCount != null
+        ? {
+            rowGap: 0,
+            gridRowGap: 0,
+            gridTemplateRows: `repeat(${$headerFilterGridRowCount}, ${TABLE_HEADER_COMPACT_ROW_HEIGHT_PX}px)`,
+          }
+        : {}),
     },
   }),
 );
@@ -127,30 +150,77 @@ const StyledHeader = styled(Header)<{ $tableToolbarPlacement: TableToolbarPlacem
 const StyledFilterHeaderCell = styled(HeaderCell)<{
   $backgroundColor: TableBackgroundColors;
   $stickyTopOffsetPx?: number;
-}>(({ theme, $backgroundColor, $stickyTopOffsetPx }) => ({
+  $showBorderedCells?: boolean;
+  /** Required for filter band row — @table-library does not map `gridRowStart` to CSS `grid-row`. */
+  $gridRow?: string;
+}>(({ theme, $backgroundColor, $stickyTopOffsetPx, $showBorderedCells, $gridRow }) => ({
   '&&&': {
-    // Same sticky-offset mechanism as `StyledHeaderCell` (grouped multi-row headers) - pins the
-    // filter row directly below the label row(s) instead of also sticking to `top: 0` and sliding
-    // over them on vertical scroll.
-    ...($stickyTopOffsetPx ? { top: `${$stickyTopOffsetPx}px` } : {}),
+    gridRow: $gridRow,
+    // When any column is filterable the whole filter band sticks below the label row(s) — including
+    // empty spacer cells so the row reads as one unit on vertical scroll (not just inputs).
+    boxSizing: 'border-box',
+    height: makeSize(TABLE_HEADER_COMPACT_ROW_HEIGHT_PX),
+    minHeight: makeSize(TABLE_HEADER_COMPACT_ROW_HEIGHT_PX),
+    maxHeight: makeSize(TABLE_HEADER_COMPACT_ROW_HEIGHT_PX),
+    ...($stickyTopOffsetPx != null
+      ? {
+          position: 'sticky',
+          // Win over Table theme HeaderCell `top: 0` so this band sticks below label row(s).
+          top: `${$stickyTopOffsetPx}px !important`,
+          // Below horizontal sticky header cells (theme) so scrolled filters slide under the
+          // frozen lane instead of painting on top of it.
+          zIndex: stickyHeaderColumnZIndex - 1,
+        }
+      : {}),
     display: 'flex',
     alignItems: 'center',
-    height: '100%',
-    backgroundColor: getIn(theme.colors, $backgroundColor),
+    // Stretch to the grid row height so empty spacer cells share the same bottom border as
+    // filter inputs (alignSelf: start left shorter empty cells misaligned — see filter row).
+    alignSelf: 'stretch',
+    minWidth: 0,
+    width: '100%',
+    backgroundColor: getIn(theme.colors, tableHeader.backgroundColor),
     borderBottomWidth: makeSpace(getIn(theme.border.width, tableHeader.borderBottomAndTopWidth)),
     borderBottomColor: getIn(theme.colors, tableHeader.borderBottomAndTopColor),
     borderBottomStyle: 'solid',
+    ...($showBorderedCells
+      ? {
+          borderRightWidth: makeSpace(getIn(theme.border.width, tableRow.borderBottomWidth)),
+          borderRightColor: getIn(theme.colors, tableRow.borderColor),
+          borderRightStyle: 'solid',
+        }
+      : {}),
     // No horizontal cell padding here - the input already carries its own inset (see the
     // `marginX` on its wrapping BaseBox below), matching TableEditableCell's flush-cell
     // convention. Padding on both would stack (previously 12px cell + 12px icon-slot padding
     // = 24px before the icon, noticeably more than TableEditableCell's 16px).
     paddingLeft: 0,
     paddingRight: 0,
-    paddingTop: makeSpace(getIn(theme.spacing, '2')),
-    paddingBottom: makeSpace(getIn(theme.spacing, '2')),
+    // Flush to the label row above — vertical padding here stacked with the label border and
+    // read as an empty band between "Importer" and the Search control.
+    paddingTop: 0,
+    paddingBottom: 0,
     // The input itself renders flush/borderless (`isTableInputCell`) same as TableEditableCell,
     // so the cell - not the input - is what shows the focus ring while typing/clearing.
     '&:focus-within': getFocusRingStyles({ theme, negativeOffset: true }),
+    '& > div': {
+      minWidth: 0,
+      width: '100%',
+    },
+    '& input': {
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+    },
+    // SelectInput / dropdown triggers in the filter band share the same truncation rules.
+    '& [data-compass-component="styled-base-input-wrapper"]': {
+      minWidth: 0,
+    },
+    '& [data-compass-component="styled-base-input-wrapper"] input': {
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+    },
   },
 }));
 
@@ -207,6 +277,54 @@ const StyledHeaderRow = styled(HeaderRow)<{
  * one is always the leaf/column row that lines up 1:1 with body columns, so that's the one used
  * here (see `getTableHeaderCellCount` in `Table.web.tsx` for the same convention).
  */
+const humanizeHeaderKey = (headerKey: string): string =>
+  headerKey
+    .split('_')
+    .map((part) => (part ? part.charAt(0).toUpperCase() + part.slice(1).toLowerCase() : part))
+    .join(' ');
+
+/** Header labels are often compositional (resize handles, info icons) — flatten for a11y only. */
+const getTableHeaderFilterLabelText = (
+  label: React.ReactNode,
+  headerKey?: string,
+): string => {
+  if (typeof label === 'string' && label.trim()) {
+    return label.trim();
+  }
+  if (typeof label === 'number') {
+    return String(label);
+  }
+  if (Array.isArray(label)) {
+    const parts = label
+      .map((child) => getTableHeaderFilterLabelText(child, headerKey))
+      .filter(Boolean);
+    if (parts.length > 0) {
+      return parts.join(' ');
+    }
+  }
+  if (React.isValidElement(label)) {
+    const childLabel = getTableHeaderFilterLabelText(
+      (label.props as { children?: React.ReactNode }).children,
+      headerKey,
+    );
+    if (childLabel) {
+      return childLabel;
+    }
+  }
+  if (headerKey) {
+    return humanizeHeaderKey(headerKey);
+  }
+  return 'column';
+};
+
+/** Column title sits in the row above — keep filter ghosts short so they truncate cleanly. */
+const getTableHeaderFilterTextPlaceholder = (_labelText: string): string => 'Search';
+
+const getTableHeaderFilterPickerPlaceholder = (
+  _labelText: string,
+  type: TableColumnFilterConfig['type'],
+): string => (type === 'multiselect' ? 'Any' : 'All');
+
 const getHeaderCellsMeta = (
   headerRow: React.ReactNode,
 ): { headerKey?: string; label: React.ReactNode }[] => {
@@ -253,17 +371,24 @@ const TableHeaderFilterDropdownCell = ({
   onChange: (value: string | string[]) => void;
 }): React.ReactElement => {
   const isMultiselect = config.type === 'multiselect';
+  const filterInputId = `table-header-filter-${headerKey}`;
+  const filterLabelText = `Filter by ${labelText}`;
   return (
-    <BaseBox flex={1} marginX="spacing.2">
+    <BaseBox flex={1} marginX={tableHeaderBand.filterCellInsetX} minWidth="0px" width="100%">
+      <VisuallyHidden>
+        <label htmlFor={filterInputId}>{filterLabelText}</label>
+      </VisuallyHidden>
       <Dropdown selectionType={isMultiselect ? 'multiple' : 'single'} _width="100%">
         <SelectInput
-          testID={`table-header-filter-${headerKey}`}
+          id={filterInputId}
+          testID={filterInputId}
           size="small"
           isTableInputCell
           value={value ?? (isMultiselect ? [] : '')}
           onChange={({ values }) => onChange(isMultiselect ? values : values[0] ?? '')}
-          placeholder={`Filter ${labelText}`}
-          accessibilityLabel={`Filter by ${labelText}`}
+          placeholder={getTableHeaderFilterPickerPlaceholder(labelText, config.type)}
+          label={filterLabelText}
+          accessibilityLabel={filterLabelText}
         />
         <DropdownOverlay>
           <ActionList>
@@ -288,9 +413,11 @@ const TableHeaderFilterDropdownCell = ({
 const TableHeaderFilterRow = ({
   headerRow,
   stickyTopOffsetPx,
+  labelRowCount,
 }: {
   headerRow: React.ReactNode;
   stickyTopOffsetPx?: number;
+  labelRowCount: number;
 }): React.ReactElement => {
   const {
     filterableColumns,
@@ -304,42 +431,69 @@ const TableHeaderFilterRow = ({
     hasHoverActions,
     showBorderedCells,
     shouldHeaderBeSticky,
+    gridTemplateColumns,
+    columnCount,
+    isVirtualized,
   } = useTableRowContext();
   const cellsMeta = getHeaderCellsMeta(headerRow);
   // See `_TableHeaderRow`'s `cellStickyTopOffsetPx` - only meaningful once cells are sticky.
   const cellStickyTopOffsetPx = shouldHeaderBeSticky ? stickyTopOffsetPx : undefined;
+  const selectColumnOffset = selectionType === 'multiple' ? 1 : 0;
+  const filterGridRowStart = labelRowCount + 1;
+  const filterGridRowValue = `${filterGridRowStart} / ${filterGridRowStart + 1}`;
+  const lockColumnWidths = Boolean(gridTemplateColumns);
+
+  const getFilterCellGridColumnStart = (columnIndex: number): number =>
+    columnIndex + 1 + selectColumnOffset;
+  const getFilterCellGridColumnEnd = (columnIndex: number): number =>
+    columnIndex + 2 + selectColumnOffset;
 
   return (
     // See the real header row's own `role="row"` override below for why this is explicit.
     <StyledHeaderRow
       role="row"
       $showBorderedCells={showBorderedCells}
-      $gridTemplateColumns={undefined}
-      $hasHoverActions={false}
+      $gridTemplateColumns={gridTemplateColumns}
+      $hasHoverActions={hasHoverActions}
       $selectionType={selectionType}
-      $columnCount={0}
+      $columnCount={columnCount}
+      $isVirtualized={isVirtualized}
       {...metaAttribute({ name: MetaConstants.TableHeaderRow })}
     >
       {selectionType === 'multiple' && (
         // Purely a grid-alignment spacer (no filter for the checkbox column) - excluded from the
         // accessibility tree rather than announced as an empty column header.
         <StyledFilterHeaderCell
-          role="presentation"
+          {...tableHeaderPresentationCellA11yProps}
+          stiff={lockColumnWidths}
+          gridColumnStart={1}
+          gridColumnEnd={2}
+          gridRowStart={filterGridRowStart}
+          gridRowEnd={filterGridRowStart + 1}
+          $gridRow={filterGridRowValue}
           $backgroundColor={backgroundColor}
           $stickyTopOffsetPx={cellStickyTopOffsetPx}
+          $showBorderedCells={showBorderedCells}
         />
       )}
       {cellsMeta.map(({ headerKey, label }, index) => {
         const isFilterable = headerKey && filterableColumns.includes(headerKey);
-        const labelText = typeof label === 'string' ? label : headerKey ?? `Column ${index + 1}`;
+        const labelText = getTableHeaderFilterLabelText(label, headerKey) || `Column ${index + 1}`;
         return (
           <StyledFilterHeaderCell
             key={headerKey ?? index}
             // Non-filterable columns render an empty spacer cell to keep grid alignment - give it
             // `role="presentation"` so it isn't announced as an empty column header.
-            role={isFilterable ? undefined : 'presentation'}
+            {...(isFilterable ? { role: 'columnheader' as const } : tableHeaderPresentationCellA11yProps)}
+            stiff={lockColumnWidths}
+            gridColumnStart={getFilterCellGridColumnStart(index)}
+            gridColumnEnd={getFilterCellGridColumnEnd(index)}
+            gridRowStart={filterGridRowStart}
+            gridRowEnd={filterGridRowStart + 1}
+            $gridRow={filterGridRowValue}
             $backgroundColor={backgroundColor}
             $stickyTopOffsetPx={cellStickyTopOffsetPx}
+            $showBorderedCells={showBorderedCells}
           >
             {isFilterable && headerKey && filterConfig[headerKey] ? (
               <TableHeaderFilterDropdownCell
@@ -353,30 +507,45 @@ const TableHeaderFilterRow = ({
               // Flush/borderless input filling the cell edge-to-edge (`isTableInputCell`), same
               // treatment as TableEditableCell's body-row inputs - the cell's own `:focus-within`
               // (see StyledFilterHeaderCell) shows the ring instead of the input itself.
-              <BaseBox flex={1} marginX="spacing.2">
-                <BaseInput
-                  isTableInputCell
-                  id={`table-header-filter-${headerKey}`}
-                  size="small"
-                  value={(() => {
-                    const filterValue = columnFilterValues[headerKey];
-                    return typeof filterValue === 'string' ? filterValue : '';
-                  })()}
-                  onChange={({ value }) => setColumnFilterValue(headerKey, value ?? '')}
-                  placeholder={`Filter ${labelText}`}
-                  accessibilityLabel={`Filter by ${labelText}`}
-                  leadingIcon={SearchIcon}
-                  trailingInteractionElement={
-                    columnFilterValues[headerKey] ? (
-                      <IconButton
-                        size="medium"
-                        icon={CloseIcon}
-                        accessibilityLabel={`Clear ${labelText} filter`}
-                        onClick={() => setColumnFilterValue(headerKey, '')}
-                      />
-                    ) : undefined
-                  }
-                />
+              <BaseBox flex={1} marginX={tableHeaderBand.filterCellInsetX} minWidth="0px" width="100%">
+                {(() => {
+                  const filterInputId = `table-header-filter-${headerKey}`;
+                  const filterLabelText = `Filter by ${labelText}`;
+                  const filterValue = columnFilterValues[headerKey];
+                  const hasFilterValue =
+                    typeof filterValue === 'string'
+                      ? filterValue.length > 0
+                      : Array.isArray(filterValue) && filterValue.length > 0;
+                  return (
+                    <>
+                      <VisuallyHidden>
+                        <label htmlFor={filterInputId}>{filterLabelText}</label>
+                      </VisuallyHidden>
+                      <BaseInput
+                      isTableInputCell
+                      id={filterInputId}
+                      size="small"
+                      value={typeof filterValue === 'string' ? filterValue : ''}
+                      onChange={({ value }) => setColumnFilterValue(headerKey, value ?? '')}
+                      placeholder={getTableHeaderFilterTextPlaceholder(labelText)}
+                      label={filterLabelText}
+                      hideLabelText
+                      accessibilityLabel={filterLabelText}
+                      trailingIcon={hasFilterValue ? undefined : SearchIcon}
+                      trailingInteractionElement={
+                        hasFilterValue ? (
+                          <IconButton
+                            size={tableIcons.control}
+                            icon={CloseIcon}
+                            accessibilityLabel={`Clear ${labelText} filter`}
+                            onClick={() => setColumnFilterValue(headerKey, '')}
+                          />
+                        ) : undefined
+                      }
+                    />
+                    </>
+                  );
+                })()}
               </BaseBox>
             ) : null}
           </StyledFilterHeaderCell>
@@ -384,38 +553,25 @@ const TableHeaderFilterRow = ({
       })}
       {hasHoverActions && (
         <StyledFilterHeaderCell
-          role="presentation"
+          {...tableHeaderPresentationCellA11yProps}
+          stiff={lockColumnWidths}
+          gridColumnStart={columnCount + selectColumnOffset + 1}
+          gridColumnEnd={columnCount + selectColumnOffset + 2}
+          gridRowStart={filterGridRowStart}
+          gridRowEnd={filterGridRowStart + 1}
+          $gridRow={filterGridRowValue}
           $backgroundColor={backgroundColor}
           $stickyTopOffsetPx={cellStickyTopOffsetPx}
+          $showBorderedCells={showBorderedCells}
         />
       )}
     </StyledHeaderRow>
   );
 };
 
-// Header rows are always rendered at the compact density (36px), regardless of `rowDensity` - see
-// the `rowDensity` deprecation note on `TableHeaderRowProps`. Grouped multi-row headers use this
-// fixed height to stack each row's sticky `top` below the one(s) above it.
-const HEADER_ROW_HEIGHT_PX = Number(tableRow.minHeight.compact);
-
-/**
- * Sticky `top` for the auto-injected filter row: the combined height of the label row(s) above
- * it. Each label row sits at `rowIndex * HEADER_ROW_HEIGHT_PX` (see `_TableHeader`), and the last
- * one also renders its own bottom border below that fixed height - so the filter row starts right
- * after it rather than covering it.
- */
-const getFilterRowStickyTopOffsetPx = ({
-  labelRowCount,
-  borderWidthPx,
-}: {
-  labelRowCount: number;
-  borderWidthPx: number;
-}): number => Math.max(labelRowCount, 1) * HEADER_ROW_HEIGHT_PX + borderWidthPx;
-
 const _TableHeader = ({ children, ...rest }: TableHeaderRowProps): React.ReactElement => {
   const { tableToolbarPlacement } = useTableRowContext();
   const { filterableColumns, showHeaderFilterRow } = useTableDataContext();
-  const { theme } = useTheme();
 
   // `TableHeader` may contain more than one `TableHeaderRow` (grouped multi-row headers - earlier
   // rows are group-label rows spanning leaf columns via `gridColumnStart`/`gridColumnEnd`, see
@@ -428,13 +584,22 @@ const _TableHeader = ({ children, ...rest }: TableHeaderRowProps): React.ReactEl
     return indices;
   }, []);
   const isMultiRowHeader = headerRowIndices.length > 1;
-  const decoratedChildren = isMultiRowHeader
+  const willShowFilterRow = showHeaderFilterRow && filterableColumns.length > 0;
+  // Label row(s) need an explicit stacked `top` (including `0`) whenever a filter row sits below —
+  // otherwise only the filter row gets `top` from styled props and the column-title row scrolls away.
+  const shouldDecorateHeaderRowStickyOffsets = isMultiRowHeader || willShowFilterRow;
+  const decoratedChildren = shouldDecorateHeaderRowStickyOffsets
     ? childrenArray.map((child, index) => {
         const rowPosition = headerRowIndices.indexOf(index);
         if (rowPosition === -1 || !React.isValidElement(child)) return child;
         return React.cloneElement(child, {
-          _isLeafHeaderRow: rowPosition === headerRowIndices.length - 1,
-          _stickyTopOffsetPx: rowPosition * HEADER_ROW_HEIGHT_PX,
+          ...(isMultiRowHeader && {
+            _isLeafHeaderRow: rowPosition === headerRowIndices.length - 1,
+          }),
+          _stickyTopOffsetPx: isMultiRowHeader
+            ? rowPosition * TABLE_HEADER_COMPACT_ROW_HEIGHT_PX
+            : 0,
+          ...(willShowFilterRow ? { _gridRowStart: rowPosition + 1 } : {}),
         } as Partial<TableHeaderRowProps>);
       })
     : children;
@@ -442,6 +607,9 @@ const _TableHeader = ({ children, ...rest }: TableHeaderRowProps): React.ReactEl
   return (
     <StyledHeader
       $tableToolbarPlacement={tableToolbarPlacement}
+      $headerFilterGridRowCount={
+        willShowFilterRow ? headerRowIndices.length + 1 : undefined
+      }
       {...metaAttribute({ name: MetaConstants.TableHeader })}
       {...makeAnalyticsAttribute(rest)}
     >
@@ -449,10 +617,8 @@ const _TableHeader = ({ children, ...rest }: TableHeaderRowProps): React.ReactEl
       {showHeaderFilterRow && filterableColumns.length > 0 && (
         <TableHeaderFilterRow
           headerRow={children}
-          stickyTopOffsetPx={getFilterRowStickyTopOffsetPx({
-            labelRowCount: headerRowIndices.length,
-            borderWidthPx: getIn(theme.border.width, tableHeader.borderBottomAndTopWidth),
-          })}
+          labelRowCount={headerRowIndices.length}
+          stickyTopOffsetPx={getFilterRowStickyTopOffsetPx(headerRowIndices.length)}
         />
       )}
     </StyledHeader>
@@ -482,42 +648,107 @@ const StyledHeaderCell = styled(HeaderCell)<{
     $textAlign,
     $gridRow,
     $stickyTopOffsetPx,
-  }) => ({
-    '&&&': {
-      display: $textAlign ? 'flex' : 'block',
-      justifyContent: $textAlign ? 'space-between' : 'initial',
+  }) => {
+    const usesHorizontalHeaderLayout = Boolean($textAlign || $isSortable);
+    const headerCellPaddingX = makeSpace(getIn(theme, tableHeaderBand.cellPaddingX));
+    const cellPaddingLeft = $hasPadding ? headerCellPaddingX : undefined;
+    const cellPaddingRight = $hasPadding ? headerCellPaddingX : undefined;
+    const usesHeaderFilterGrid = Boolean($gridRow);
+    const compactHeaderHeight = makeSize(TABLE_HEADER_COMPACT_ROW_HEIGHT_PX);
+    const usesFlexHeaderCell = usesHorizontalHeaderLayout || usesHeaderFilterGrid;
+    const filterGridInnerWrapper = {
+      backgroundColor: 'transparent',
+      display: 'flex',
+      flexDirection: 'row' as const,
+      alignItems: 'center',
+      flex: 1,
+      alignSelf: 'stretch',
+      minWidth: 0,
+      width: '100%',
       height: '100%',
-      backgroundColor: getIn(theme.colors, $backgroundColor),
+      minHeight: '100%',
+    };
+    return {
+    '&&&': {
+      display: usesFlexHeaderCell ? 'flex' : 'block',
+      alignItems: usesFlexHeaderCell ? 'center' : undefined,
+      justifyContent: usesHorizontalHeaderLayout ? 'space-between' : 'initial',
+      // Grid tracks are explicit — do not let header content expand past the column (breaks sticky lanes).
+      minWidth: 0,
+      maxWidth: '100%',
+      overflow: 'hidden',
+      alignSelf: 'stretch',
+      boxSizing: 'border-box',
+      ...(usesHeaderFilterGrid
+        ? {
+            height: compactHeaderHeight,
+            minHeight: compactHeaderHeight,
+            maxHeight: compactHeaderHeight,
+            paddingTop: 0,
+            paddingBottom: 0,
+            borderTopWidth: 0,
+            borderTopStyle: 'none',
+          }
+        : {
+            minHeight: makeSize(getIn(size, tableRow.minHeight[$rowDensity])),
+          }),
+      ...(usesHorizontalHeaderLayout && !usesHeaderFilterGrid
+        ? { paddingLeft: cellPaddingLeft, paddingRight: cellPaddingRight }
+        : {}),
+      backgroundColor: getIn(theme.colors, tableHeader.backgroundColor),
       borderBottomWidth: makeSpace(getIn(theme.border.width, tableHeader.borderBottomAndTopWidth)),
-      borderTopWidth: makeSpace(getIn(theme.border.width, tableHeader.borderBottomAndTopWidth)),
       borderBottomColor: getIn(theme.colors, tableHeader.borderBottomAndTopColor),
-      borderTopColor: getIn(theme.colors, tableHeader.borderBottomAndTopColor),
       borderBottomStyle: 'solid',
-      borderTopStyle: 'solid',
+      ...(usesHeaderFilterGrid
+        ? {}
+        : {
+            borderTopWidth: makeSpace(getIn(theme.border.width, tableHeader.borderBottomAndTopWidth)),
+            borderTopColor: getIn(theme.colors, tableHeader.borderBottomAndTopColor),
+            borderTopStyle: 'solid',
+          }),
       cursor: $isSortable ? 'pointer' : 'auto',
       gridRow: $gridRow,
       // Grouped multi-row headers only - stacks this row's sticky position below the row(s) above
       // it (each fixed at the compact 36px header row height) instead of every row independently
       // sticking to `top: 0` and overlapping each other.
-      ...($stickyTopOffsetPx ? { top: `${$stickyTopOffsetPx}px` } : {}),
-      '> div': {
-        backgroundColor: getIn(theme.colors, tableHeader.backgroundColor),
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: $textAlign ? $textAlign : 'space-between',
-        alignItems: 'center',
-        height: '100%',
-        paddingLeft: $hasPadding
-          ? makeSpace(getIn(theme, tableRow.paddingLeft[$rowDensity]))
-          : undefined,
-        paddingRight: $hasPadding
-          ? makeSpace(getIn(theme, tableRow.paddingRight[$rowDensity]))
-          : undefined,
-        minHeight: makeSize(getIn(size, tableRow.minHeight[$rowDensity])),
-      },
+      ...($stickyTopOffsetPx != null
+        ? { top: `${$stickyTopOffsetPx}px !important` }
+        : {}),
+      // @table-library wraps cell content in a single direct `div` — treat it as the flex row for
+      // sortable headers (label + sort). Do not style every nested div (BaseBox) the same way.
+      '> div': usesHeaderFilterGrid
+        ? {
+            ...filterGridInnerWrapper,
+            justifyContent: $textAlign ? $textAlign : 'flex-start',
+            paddingLeft: cellPaddingLeft,
+            paddingRight: cellPaddingRight,
+          }
+        : usesHorizontalHeaderLayout
+          ? {
+              backgroundColor: 'transparent',
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              flex: 1,
+              alignSelf: 'stretch',
+              minWidth: 0,
+              width: '100%',
+              minHeight: '100%',
+            }
+          : {
+              backgroundColor: 'transparent',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: $textAlign ? $textAlign : 'space-between',
+              alignItems: 'center',
+              minHeight: makeSize(getIn(size, tableRow.minHeight[$rowDensity])),
+              paddingLeft: cellPaddingLeft,
+              paddingRight: cellPaddingRight,
+            },
       '&:focus-visible': getFocusRingStyles({ theme, negativeOffset: true }),
     },
-  }),
+  };
+  },
 );
 
 const _TableHeaderCell = ({
@@ -535,11 +766,13 @@ const _TableHeaderCell = ({
   const { toggleSort, currentSortedState } = useTableDataContext();
   const { backgroundColor, rowDensity, headerRowDensity } = useTableRowContext();
   const isChildrenString = typeof children === 'string';
+  const isSelectAllColumn = headerKey === 'SELECT';
   const isSortable =
     headerKey && Boolean(currentSortedState.sortableColumns?.find((key) => key === headerKey));
 
-  const hasRowSpan = Boolean(gridRowStart && gridRowEnd);
-  const gridRowValue = hasRowSpan ? `${gridRowStart} / ${gridRowEnd}` : undefined;
+  const hasGridRowPlacement = gridRowStart != null && gridRowEnd != null;
+  const gridRowValue = hasGridRowPlacement ? `${gridRowStart} / ${gridRowEnd}` : undefined;
+  const hasMultiRowSpan = hasGridRowPlacement && gridRowEnd - gridRowStart > 1;
 
   const sortOrderIndex = currentSortedState.sortOrder.findIndex(
     (entry) => entry.sortKey === headerKey,
@@ -555,8 +788,9 @@ const _TableHeaderCell = ({
 
   return (
     <StyledHeaderCell
+      role="columnheader"
       tabIndex={0}
-      className={hasRowSpan ? classes.HAS_ROW_SPANNING : ''}
+      className={hasMultiRowSpan ? classes.HAS_ROW_SPANNING : ''}
       gridColumnStart={gridColumnStart}
       gridColumnEnd={gridColumnEnd}
       $gridRow={gridRowValue}
@@ -574,7 +808,15 @@ const _TableHeaderCell = ({
       {...metaAttribute({ name: MetaConstants.TableHeaderCell })}
       {...makeAnalyticsAttribute(rest)}
     >
-      <BaseBox display="flex" flexGrow={1} justifyContent={textAlign}>
+      <BaseBox
+        display="flex"
+        flexGrow={1}
+        minWidth="0px"
+        overflow="hidden"
+        width={isSelectAllColumn ? '100%' : undefined}
+        alignItems="center"
+        justifyContent={isSelectAllColumn ? 'center' : textAlign}
+      >
         {isChildrenString ? (
           <Text size="small" weight="medium" color="surface.text.gray.muted">
             {children}
@@ -584,7 +826,11 @@ const _TableHeaderCell = ({
         )}
       </BaseBox>
       {isSortable && (
-        <BaseBox paddingLeft="spacing.2" backgroundColor="transparent" flexShrink={0}>
+        <BaseBox
+          paddingLeft={tableHeaderBand.sortIconGap}
+          backgroundColor="transparent"
+          flexShrink={0}
+        >
           <SortIcon sortDirection={sortDirection} priority={sortPriority} />
         </BaseBox>
       )}
@@ -606,20 +852,37 @@ const TableHeaderCellCheckbox = ({
   isDisabled,
   isIndeterminate,
   onChange,
+  gridColumnStart,
+  gridColumnEnd,
+  gridRowStart,
+  gridRowEnd,
 }: {
   isChecked: CheckboxProps['isChecked'];
   isDisabled: CheckboxProps['isDisabled'];
   isIndeterminate?: CheckboxProps['isIndeterminate'];
   onChange: CheckboxProps['onChange'];
+  gridColumnStart?: number;
+  gridColumnEnd?: number;
+  gridRowStart?: number;
+  gridRowEnd?: number;
 }): React.ReactElement => {
   return (
-    <TableHeaderCell headerKey="SELECT">
+    <TableHeaderCell
+      headerKey="SELECT"
+      _hasPadding={false}
+      textAlign="center"
+      gridColumnStart={gridColumnStart}
+      gridColumnEnd={gridColumnEnd}
+      gridRowStart={gridRowStart}
+      gridRowEnd={gridRowEnd}
+    >
       <BaseBox
         display="flex"
         alignItems="center"
         justifyContent="center"
-        flex={1}
-        width={makeSize(checkboxCellWidth)}
+        width="100%"
+        minWidth={makeSize(checkboxCellWidth)}
+        maxWidth={makeSize(checkboxCellWidth)}
       >
         <Checkbox
           isChecked={isChecked}
@@ -639,6 +902,7 @@ const _TableHeaderRow = ({
   rowDensity,
   _isLeafHeaderRow = true,
   _stickyTopOffsetPx,
+  _gridRowStart,
   ...rest
 }: TableHeaderRowProps): React.ReactElement => {
   const {
@@ -654,7 +918,8 @@ const _TableHeaderRow = ({
     isVirtualized,
     shouldHeaderBeSticky,
   } = useTableRowContext();
-  const { totalItems, tableData } = useTableDataContext();
+  const { totalItems, tableData, showHeaderFilterRow, filterableColumns } = useTableDataContext();
+  const hasHeaderFilterBand = showHeaderFilterRow && filterableColumns.length > 0;
   const isMultiSelect = selectionType === 'multiple';
   // Containment against the currently-visible rows (`tableData`), not a `selectedRows.length ===
   // totalItems` count comparison - `totalItems` tracks whatever `data` currently holds, which for
@@ -679,20 +944,49 @@ const _TableHeaderRow = ({
   // (see `StyledHeaderCell`'s theme-driven `position`) - on a non-sticky `position: relative` cell
   // it would instead permanently shift the row down by that many pixels.
   const cellStickyTopOffsetPx =
-    shouldHeaderBeSticky && _stickyTopOffsetPx ? _stickyTopOffsetPx : undefined;
+    shouldHeaderBeSticky && _stickyTopOffsetPx != null ? _stickyTopOffsetPx : undefined;
+
+  const selectColumnOffset = isMultiSelect ? 1 : 0;
+  const labelRowGridPlacement =
+    hasHeaderFilterBand && _gridRowStart != null
+      ? {
+          gridRowStart: _gridRowStart,
+          gridRowEnd: _gridRowStart + 1,
+        }
+      : undefined;
+  const labelRowCheckboxGridPlacement = labelRowGridPlacement
+    ? { ...labelRowGridPlacement, gridColumnStart: 1, gridColumnEnd: 2 }
+    : undefined;
+  const labelRowActionsGridPlacement = labelRowGridPlacement
+    ? {
+        ...labelRowGridPlacement,
+        gridColumnStart: columnCount + selectColumnOffset + 1,
+        gridColumnEnd: columnCount + selectColumnOffset + 2,
+      }
+    : undefined;
 
   // Grouped multi-row headers (see `TableHeader`'s row decoration) only ever need the
   // checkbox/hover-actions placeholder cells once, on the leaf row - otherwise every group-label
   // row above it would also render its own "select all" checkbox / Actions placeholder.
-  const decoratedChildren = cellStickyTopOffsetPx
-    ? React.Children.map(children, (child) =>
-        getComponentId(child) === ComponentIds.TableHeaderCell && React.isValidElement(child)
-          ? React.cloneElement(child, {
-              _stickyTopOffsetPx: cellStickyTopOffsetPx,
-            } as Partial<TableHeaderCellProps>)
-          : child,
-      )
-    : children;
+  let labelRowDataColumnIndex = 0;
+  const decoratedChildren = React.Children.map(children, (child) => {
+    if (getComponentId(child) !== ComponentIds.TableHeaderCell || !React.isValidElement(child)) {
+      return child;
+    }
+    const cellProps: Partial<TableHeaderCellProps> = {};
+    if (cellStickyTopOffsetPx != null) {
+      cellProps._stickyTopOffsetPx = cellStickyTopOffsetPx;
+    }
+    if (hasHeaderFilterBand && _gridRowStart != null) {
+      cellProps.gridRowStart = _gridRowStart;
+      cellProps.gridRowEnd = _gridRowStart + 1;
+      const columnStart = labelRowDataColumnIndex + 1 + selectColumnOffset;
+      cellProps.gridColumnStart = columnStart;
+      cellProps.gridColumnEnd = columnStart + 1;
+    }
+    labelRowDataColumnIndex += 1;
+    return Object.keys(cellProps).length > 0 ? React.cloneElement(child, cellProps) : child;
+  });
 
   return (
     // `@table-library`'s own `HeaderRow` defaults its `role` prop to `"rowheader"` internally -
@@ -717,21 +1011,28 @@ const _TableHeaderRow = ({
             isDisabled={isDisabled}
             isIndeterminate={isIndeterminate}
             onChange={() => toggleAllRowsSelection()}
+            {...labelRowCheckboxGridPlacement}
           />
         ) : (
           // Group-label rows (grouped multi-row headers) don't repeat the "select all" checkbox -
           // an empty spacer cell keeps this row's columns aligned with the leaf row below it,
           // which does reserve a real column for it.
-          <TableHeaderCell _hasPadding={false}>{null}</TableHeaderCell>
+          <TableHeaderCell _hasPadding={false} {...labelRowCheckboxGridPlacement}>
+            {null}
+          </TableHeaderCell>
         ))}
       {decoratedChildren}
       {hasHoverActions ? (
         _isLeafHeaderRow ? (
-          <TableHeaderCell _hasPadding={false}>Actions</TableHeaderCell>
+          <TableHeaderCell _hasPadding={false} {...labelRowActionsGridPlacement}>
+            <VisuallyHidden>Actions</VisuallyHidden>
+          </TableHeaderCell>
         ) : (
           // Same alignment spacer as the checkbox column above, for the trailing hover-actions
           // column on group-label rows.
-          <TableHeaderCell _hasPadding={false}>{null}</TableHeaderCell>
+          <TableHeaderCell _hasPadding={false} {...labelRowActionsGridPlacement}>
+            {null}
+          </TableHeaderCell>
         )
       ) : null}
     </StyledHeaderRow>

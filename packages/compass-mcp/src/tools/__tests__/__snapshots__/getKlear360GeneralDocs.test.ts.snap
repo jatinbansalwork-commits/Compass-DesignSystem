@@ -445,7 +445,7 @@ import {
 | PromptIcon | Prompt/terminal cursor for command input |
 | QRCodeIcon | QR code for scanning |
 | RadioIcon | Radio/broadcast for streaming |
-| RayIcon | Klearnow Ray product icon |
+| KlearIcon | Klear agent / product mark |
 | KlearnowIcon | Klearnow logo |
 | KlearnowXIcon | KlearnowX business banking product logo |
 | KlearnowxPayrollIcon | Klearnow Payroll product icon |
@@ -1032,7 +1032,7 @@ import {
 | PromptIcon | Prompt/terminal cursor for command input |
 | QRCodeIcon | QR code for scanning |
 | RadioIcon | Radio/broadcast for streaming |
-| RayIcon | Klearnow Ray product icon |
+| KlearIcon | Klear agent / product mark |
 | KlearnowIcon | Klearnow logo |
 | KlearnowXIcon | KlearnowX business banking product logo |
 | KlearnowxPayrollIcon | Klearnow Payroll product icon |

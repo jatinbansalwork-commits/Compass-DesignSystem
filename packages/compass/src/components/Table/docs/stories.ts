@@ -15,17 +15,17 @@ import React from 'react';
 const nodes = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    method: ['Bank Transfer', 'Credit Card', 'PayPal'][
+    method: ['Ocean', 'Air', 'Truck'][
       Math.floor(Math.random() * 3)
     ],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -50,9 +50,9 @@ function App() {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -106,15 +106,15 @@ import React from 'react';
 const nodes = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -147,7 +147,7 @@ function App() {
                     alignItems="center"
                   >
                     <Text weight="bold">ID</Text>
-                    <Tooltip content="Payment ID of the transaction">
+                    <Tooltip content="KlearNow shipment ID (KX-*)">
                       <IconButton
                         onClick={() => console.log('info clicked')}
                         accessibilityLabel="info"
@@ -164,7 +164,7 @@ function App() {
                     justifyContent="space-between"
                     alignItems="center"
                   >
-                    <Text weight="bold">Amount</Text>
+                    <Text weight="bold">Duty amount</Text>
                     <Tooltip content="Amount transacted">
                       <IconButton
                         onClick={() => console.log('info clicked')}
@@ -183,7 +183,7 @@ function App() {
                     alignItems="center"
                   >
                     <Text weight="bold">Date</Text>
-                    <Tooltip content="Creation date of the transaction">
+                    <Tooltip content="Entry filing date">
                       <IconButton
                         onClick={() => console.log('info clicked')}
                         accessibilityLabel="info"
@@ -201,7 +201,7 @@ function App() {
                     alignItems="center"
                   >
                     <Text weight="bold">Status</Text>
-                    <Tooltip content="Current status of the transaction">
+                    <Tooltip content="CBP clearance status">
                       <IconButton
                         onClick={() => console.log('info clicked')}
                         accessibilityLabel="info"
@@ -233,11 +233,11 @@ function App() {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }
@@ -278,15 +278,15 @@ import React from 'react';
 const nodes = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -310,7 +310,7 @@ function App() {
         sortFunctions={{
           ID: (array) => array.sort((a, b) => Number(a.id) - Number(b.id)),
           AMOUNT: (array) => array.sort((a, b) => a.amount - b.amount),
-          PAYMENT_ID: (array) =>
+          SHIPMENT_ID: (array) =>
             array.sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
           DATE: (array) =>
             array.sort((a, b) => a.date.getTime() - b.date.getTime()),
@@ -322,10 +322,10 @@ function App() {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
+                <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
                 <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-                <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+                <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -349,11 +349,11 @@ function App() {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }
@@ -395,15 +395,15 @@ import React, { useState } from 'react';
 const nodes = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -433,9 +433,9 @@ function App() {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -459,11 +459,11 @@ function App() {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }
@@ -518,15 +518,15 @@ import React, { useState } from 'react';
 const nodes = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -558,7 +558,7 @@ function App() {
         }}
         toolbar={
           <TableToolbar
-            title="Showing Recent Transactions"
+            title="Recent clearance filings"
             selectedTitle={\`\${selectedItemsLength} Transaction\${
               selectedItemsLength > 1 ? 's' : ''
             } Selected\`}
@@ -581,9 +581,9 @@ function App() {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -607,11 +607,11 @@ function App() {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }
@@ -656,15 +656,15 @@ import React from 'react';
 const nodes = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -690,7 +690,7 @@ function App() {
         selectionType="multiple"
         showStripedRows={true}
         toolbar={
-          <TableToolbar title="Showing Recent Transactions">
+          <TableToolbar title="Recent clearance filings">
             <TableToolbarActions>
               <Button
                 variant="secondary"
@@ -709,9 +709,9 @@ function App() {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -735,11 +735,11 @@ function App() {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }
@@ -783,15 +783,15 @@ import React from 'react';
 const nodes = [
   ...Array.from({ length: 20 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -819,8 +819,8 @@ function App() {
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -842,11 +842,11 @@ function App() {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }
@@ -900,29 +900,20 @@ import React from 'react';
 const nodes = [
   ...Array.from({ length: 20 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
-    method: ['Bank Transfer', 'Credit Card', 'PayPal'][
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
+    type: ['Formal entry', 'Consumption entry', 'Temporary import'][Math.floor(Math.random() * 3)],
+    method: ['Ocean', 'Air', 'Truck'][
       Math.floor(Math.random() * 3)
     ],
-    name: [
-      'John Doe',
-      'Jane Doe',
-      'Bob Smith',
-      'Alice Smith',
-      'John Smith',
-      'Jane Smith',
-      'Bob Doe',
-      'Alice Doe',
-    ][Math.floor(Math.random() * 8)],
+    name: ['Schlumberger USA Inc.', 'BASF Agricultural Solutions', 'Pacific Rim Trading Co.', 'Meridian Customs Brokers'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -948,11 +939,11 @@ function App() {
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
                 <TableHeaderCell>Name</TableHeaderCell>
-                <TableHeaderCell>Account</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>HTS code</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -976,11 +967,11 @@ function App() {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }
@@ -1030,15 +1021,15 @@ import React from 'react';
 const nodes = [
   ...Array.from({ length: 100 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -1098,8 +1089,8 @@ function App() {
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -1120,11 +1111,11 @@ function App() {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }
@@ -1174,15 +1165,15 @@ import React from 'react';
 const nodes = [
   ...Array.from({ length: 10 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -1228,7 +1219,7 @@ function App() {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Action</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
@@ -1303,17 +1294,17 @@ import React, { useState } from 'react';
 const nodes = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    method: ['Bank Transfer', 'Credit Card', 'PayPal'][
+    method: ['Ocean', 'Air', 'Truck'][
       Math.floor(Math.random() * 3)
     ],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -1357,9 +1348,9 @@ function App() {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -1424,15 +1415,15 @@ import React, { useEffect, useState } from 'react';
 const nodes = [
   ...Array.from({ length: 100 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -1491,7 +1482,7 @@ function App() {
               <TableHeader>
                 <TableHeaderRow>
                   <TableHeaderCell>ID</TableHeaderCell>
-                  <TableHeaderCell>Amount</TableHeaderCell>
+                  <TableHeaderCell>Duty amount</TableHeaderCell>
                   <TableHeaderCell>Action</TableHeaderCell>
                 </TableHeaderRow>
               </TableHeader>
@@ -1548,15 +1539,15 @@ import React, { useState } from 'react';
 const nodes = [
   ...Array.from({ length: 100 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -1629,9 +1620,9 @@ function App() {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -1655,11 +1646,11 @@ function App() {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }
@@ -1811,17 +1802,17 @@ import React from 'react';
 const nodes = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: \`rzp\${Math.floor(Math.random() * 1000000)}\`,
+    paymentId: \`KX-\${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}\`,
     amount: Number((Math.random() * 10000).toFixed(2)),
     date: new Date(
       2021,
       Math.floor(Math.random() * 12),
       Math.floor(Math.random() * 28) + 1
     ),
-    method: ['Bank Transfer', 'Credit Card', 'PayPal'][
+    method: ['Ocean', 'Air', 'Truck'][
       Math.floor(Math.random() * 3)
     ],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -1847,8 +1838,8 @@ function App() {
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>

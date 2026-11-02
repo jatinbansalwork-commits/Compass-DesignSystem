@@ -194,7 +194,7 @@ type ChartsCategoricalColorToken = `data.background.categorical.${ChartColorCate
 import React from 'react';
 import { Box, ChartSankeyWrapper, ChartSankey } from '@klearnow/compass/components';
 
-function PaymentFlowSankeyChart() {
+function ShipmentFlowSankeyChart() {
   return (
     <Box width="100%" height="320px">
       <ChartSankeyWrapper showTooltip>
@@ -209,7 +209,7 @@ function PaymentFlowSankeyChart() {
                 name: 'Successful',
                 color: 'data.background.categorical.green.subtle',
               },
-              { id: 'failed', name: 'Failed', color: 'data.background.categorical.red.subtle' },
+              { id: 'failed', name: 'Rejected', color: 'data.background.categorical.red.subtle' },
             ],
             links: [
               { source: 'total', target: 'upi', value: 4000 },
@@ -229,7 +229,7 @@ function PaymentFlowSankeyChart() {
   );
 }
 
-export default PaymentFlowSankeyChart;
+export default ShipmentFlowSankeyChart;
 ```
 
 ### Grouped Small Nodes in a Fixed-Height Card
@@ -238,7 +238,7 @@ export default PaymentFlowSankeyChart;
 import React from 'react';
 import { Box, ChartSankeyWrapper, ChartSankey } from '@klearnow/compass/components';
 
-function PaymentMethodsSankeyChart() {
+function ShipmentMethodsSankeyChart() {
   return (
     <Box width="100%" height="346px" overflowY="auto">
       <ChartSankeyWrapper showTooltip>
@@ -259,7 +259,7 @@ function PaymentMethodsSankeyChart() {
               },
               {
                 id: 'failed',
-                name: 'Failed',
+                name: 'Rejected',
                 color: 'data.background.categorical.red.subtle',
                 isGroupable: false,
               },
@@ -296,7 +296,7 @@ function PaymentMethodsSankeyChart() {
   );
 }
 
-export default PaymentMethodsSankeyChart;
+export default ShipmentMethodsSankeyChart;
 ```
 
 ### Single Color Sankey Chart with Plain Text Labels

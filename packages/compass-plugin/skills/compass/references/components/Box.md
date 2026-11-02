@@ -600,7 +600,7 @@ const ResponsiveGridExample = () => {
   }> = [
     { title: 'Analytics', color: 'surface.background.primary.intense' },
     { title: 'Customers', color: 'surface.background.cloud.intense' },
-    { title: 'Payments', color: 'surface.background.primary.subtle' },
+    { title: 'Clearance queue', color: 'surface.background.primary.subtle' },
     { title: 'Products', color: 'surface.background.gray.intense' },
     { title: 'Settings', color: 'surface.background.gray.moderate' },
     { title: 'Reports', color: 'surface.background.cloud.subtle' },

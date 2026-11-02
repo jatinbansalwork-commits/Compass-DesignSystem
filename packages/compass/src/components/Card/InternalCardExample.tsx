@@ -32,17 +32,17 @@ export const InternalCardExample = React.forwardRef(
         <CardHeader marginBottom="spacing.4" paddingBottom="spacing.4">
           <CardHeaderLeading
             prefix={<CardHeaderIcon icon={CheckCircleIcon} />}
-            subtitle="Share payment link via an email, SMS, messenger, chatbot etc."
+            subtitle="Share filing link via an email, SMS, messenger, chatbot etc."
             suffix={<CardHeaderCounter value={12} />}
-            title="Payment Links"
+            title="Entry filing links"
           />
           <CardHeaderTrailing visual={<CardHeaderBadge color="positive">NEW</CardHeaderBadge>} />
         </CardHeader>
         <CardBody>
           <Text position="relative" zIndex={1}>
             Create Compass shipment booking links and share them with your customers from the
-            Compass Dashboard or using APIs and start accepting payments. Check the advantages,
-            payment methods, international currency support and more.
+            Compass Dashboard or using APIs and start accepting clearance filings. Check the advantages,
+            MOT options, international currency support and more.
           </Text>
         </CardBody>
         <CardFooter marginTop="spacing.4" paddingTop="spacing.4">

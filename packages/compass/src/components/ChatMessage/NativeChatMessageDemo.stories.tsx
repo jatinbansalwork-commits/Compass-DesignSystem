@@ -3,7 +3,7 @@ import React from 'react';
 import { ChatMessage } from './ChatMessage';
 import type { ChatMessageProps } from './types';
 import { Box } from '~components/Box';
-import { RayIcon } from '~components/Icons';
+import { KlearIcon } from '~components/Icons';
 
 export default {
   title: 'Components/ChatMessage/NativeDemo',
@@ -28,7 +28,7 @@ export const SelfMessage = SelfMessageTemplate.bind({});
 const OtherMessageTemplate: StoryFn<ChatMessageProps> = (args) => {
   return (
     <Box padding="spacing.4">
-      <ChatMessage {...args} senderType="other" leading={<RayIcon size="medium" />}>
+      <ChatMessage {...args} senderType="other" leading={<KlearIcon size="medium" />}>
         You can integrate the Compass shipment platform by following these steps. First, install the
         SDK and configure your API keys.
       </ChatMessage>
@@ -46,7 +46,7 @@ const LoadingTemplate: StoryFn<ChatMessageProps> = (args) => {
         senderType="other"
         isLoading={true}
         loadingText="Thinking..."
-        leading={<RayIcon size="medium" />}
+        leading={<KlearIcon size="medium" />}
       />
     </Box>
   );
@@ -77,7 +77,7 @@ const WithReasoningTemplate: StoryFn<ChatMessageProps> = (args) => {
       <ChatMessage
         {...args}
         senderType="other"
-        leading={<RayIcon size="medium" />}
+        leading={<KlearIcon size="medium" />}
         reasoningTraces={[
           { label: 'Understanding the question...' },
           { label: 'Looking up payment gateway docs...' },
@@ -98,12 +98,12 @@ const ConversationTemplate: StoryFn<ChatMessageProps> = () => {
   return (
     <Box padding="spacing.4" display="flex" flexDirection="column" gap="spacing.3">
       <ChatMessage senderType="self">What is Compass?</ChatMessage>
-      <ChatMessage senderType="other" leading={<RayIcon size="medium" />}>
+      <ChatMessage senderType="other" leading={<KlearIcon size="medium" />}>
         Compass is a full-stack financial solutions company that provides payment gateway, business
         banking, and other financial products.
       </ChatMessage>
       <ChatMessage senderType="self">How do I get started?</ChatMessage>
-      <ChatMessage senderType="other" leading={<RayIcon size="medium" />}>
+      <ChatMessage senderType="other" leading={<KlearIcon size="medium" />}>
         You can sign up on the Compass dashboard, complete KYC verification, and then integrate
         using our SDKs.
       </ChatMessage>

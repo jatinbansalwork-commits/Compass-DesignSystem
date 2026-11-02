@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
 import { Body, Row, Cell } from '@table-library/react-table-library/table';
-import { Virtualized } from '@table-library/react-table-library/virtualized';
+import { CompassTableVirtualized } from './CompassTableVirtualized.web';
 import styled from 'styled-components';
 import { useTableDataContext, useTableRowContext } from './TableContext';
-import { checkboxCellWidth, classes, tableRow } from './tokens';
+import { checkboxCellWidth, classes, tableHoverActions, tableRow } from './tokens';
 import { ComponentIds } from './componentIds';
 import type {
   TableProps,
@@ -68,7 +68,6 @@ const _TableBody = <Item,>({ children, ...rest }: TableBodyProps<Item>): React.R
     <StyledBody
       $isSelectable={isSelectable}
       $showStripedRows={showStripedRows}
-      $showBorderedCells={true}
       {...metaAttribute({ name: MetaConstants.TableBody })}
       {...makeAnalyticsAttribute(rest)}
     >
@@ -464,7 +463,7 @@ const _TableRow = <Item,>({
           toggleRowSelectionById(item.id);
         }
       }}
-      {...makeAccessible({ selected: isSelected })}
+      {...(isSelectable ? makeAccessible({ selected: Boolean(isSelected) }) : {})}
       {...metaAttribute({ name: MetaConstants.TableRow, testID })}
       {...makeAnalyticsAttribute(rest)}
       $isVirtualized={isVirtualized}
@@ -505,9 +504,9 @@ const _TableRow = <Item,>({
                 className={classes.HOVER_ACTIONS_LAYER3}
                 display="flex"
                 alignItems="center"
-                paddingLeft={{ base: 'spacing.4', m: 'spacing.6' }}
-                paddingRight="spacing.4"
-                gap="spacing.3"
+                paddingLeft={tableHoverActions.paddingLeft}
+                paddingRight={tableHoverActions.paddingRight}
+                gap={tableHoverActions.gap}
               >
                 {hoverActions}
               </BaseBox>
@@ -530,10 +529,10 @@ const _Virtulized = <Item,>({
   const _tableRow = Number(tableRow.minHeight[rowDensity]);
 
   const _rowHeight = (item: TableNode<Item>, index: number): number => {
-    if (index === 0) {
-      return headerHeight ?? _tableRow;
+    if (index === 0 && headerHeight != null) {
+      return headerHeight;
     }
-    return rowHeight ? rowHeight(item, index - 1) : _tableRow;
+    return rowHeight ? rowHeight(item, index) : _tableRow;
   };
 
   const bodyFunction =
@@ -545,7 +544,7 @@ const _Virtulized = <Item,>({
       : null;
 
   return (
-    <Virtualized
+    <CompassTableVirtualized
       tableList={tableData}
       rowHeight={_rowHeight as RowHeightType}
       header={() => parsedHeader}

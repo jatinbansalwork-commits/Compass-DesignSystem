@@ -183,7 +183,7 @@ const BaseDatePicker = <Type extends DateSelectionType = 'single'>({
     if (!isSingle && controlledValue) {
       setSelectedPreset(controlledValue as DatesRangeValue);
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- mount-only preset sync from controlledValue
 
   const [controllableIsOpen, controllableSetIsOpen] = useControllableState({
     value: isOpen,

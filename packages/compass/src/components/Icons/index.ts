@@ -221,6 +221,8 @@ export { default as InvoicesIcon } from './InvoicesIcon';
 export { default as ItalicIcon } from './ItalicIcon';
 export { default as KeyIcon } from './KeyIcon';
 export { default as KeyboardIcon } from './KeyboardIcon';
+export { default as KlearIcon } from './KlearIcon';
+export { AnimatedKlearIcon } from './KlearIcon/KlearIcon.web';
 export { default as LayersIcon } from './LayersIcon';
 export { default as LayoutIcon } from './LayoutIcon';
 export { default as LeftCircularCornerIcon } from './LeftCircularCornerIcon';
@@ -317,7 +319,8 @@ export { default as PrinterIcon } from './PrinterIcon';
 export { default as PromptIcon } from './PromptIcon';
 export { default as QRCodeIcon } from './QRCodeIcon';
 export { default as RadioIcon } from './RadioIcon';
-export { default as RayIcon } from './RayIcon';
+/** @deprecated Renamed to `KlearIcon`. */
+export { default as RayIcon } from './KlearIcon';
 export { default as KlearnowIcon } from './KlearnowBrandIcon';
 export { default as KlearnowBrandIcon } from './KlearnowBrandIcon';
 export { default as KlearnowTrustIcon } from './KlearnowTrustIcon';

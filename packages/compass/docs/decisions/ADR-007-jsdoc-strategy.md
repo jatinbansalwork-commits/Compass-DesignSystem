@@ -1,6 +1,8 @@
 # ADR-007: JSDoc strategy for component props
 
-**Status:** Proposed  
+> **Status update (2026-10-28):** Phase 1 complete — gap report, top type files documented, `eslint-plugin-jsdoc` warn rule on Compass `types.ts` via root ESLint override. Phase 2: warn → error after remaining props documented.
+
+**Status:** Proposed (enforcement partially landed)  
 **Date:** 2026-10-27  
 **Owner:** 
 

@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from '../tableStorybookMeta';
 import { useState } from 'react';
 import type { StoryFn, Meta } from '@storybook/react-vite';
 import { Table as TableComponent } from '../../Table';
@@ -58,8 +59,8 @@ const TableMeta: Meta = {
 const merchantData: MerchantData[] = [
   {
     id: 'merchant_1',
-    merchantName: 'Amazon',
-    merchantId: 'rzp_merchant_amazon',
+    merchantName: 'Schlumberger USA Inc.',
+    merchantId: 'importer_schlumberger',
     totalAmount: 43000,
     transactionCount: 1247,
     successRate: 66.7,
@@ -67,37 +68,37 @@ const merchantData: MerchantData[] = [
     children: [
       {
         id: 'txn_1',
-        paymentId: 'rzp_pay_amazon_001',
+        paymentId: 'KX-100001',
         amount: 10000,
         date: '2024-01-15',
-        method: 'Credit Card',
+        method: 'Air',
         customerEmail: 'customer@example.com',
-        status: 'Completed',
+        status: 'Released',
       },
       {
         id: 'txn_2',
-        paymentId: 'rzp_pay_amazon_002',
+        paymentId: 'KX-100001',
         amount: 16000,
         date: '2024-01-15',
-        method: 'UPI',
-        customerEmail: 'user@gmail.com',
-        status: 'Completed',
+        method: 'Truck',
+        customerEmail: 'broker@schlumberger.com',
+        status: 'Released',
       },
       {
         id: 'txn_3',
-        paymentId: 'rzp_pay_amazon_003',
+        paymentId: 'KX-100001',
         amount: 7000,
         date: '2024-01-14',
-        method: 'Net Banking',
+        method: 'Ocean',
         customerEmail: 'buyer@yahoo.com',
-        status: 'Failed',
+        status: 'Rejected',
       },
     ],
   },
   {
     id: 'merchant_2',
-    merchantName: 'Flipkart',
-    merchantId: 'rzp_merchant_flipkart',
+    merchantName: 'BASF Agricultural Solutions',
+    merchantId: 'importer_basf',
     totalAmount: 24500,
     transactionCount: 983,
     successRate: 100.0,
@@ -113,8 +114,8 @@ const merchantData: MerchantData[] = [
   },
   {
     id: 'merchant_3',
-    merchantName: 'Zomato',
-    merchantId: 'rzp_merchant_zomato',
+    merchantName: 'Pacific Rim Trading Co.',
+    merchantId: 'importer_pacific_rim',
     totalAmount: 1450,
     transactionCount: 756,
     successRate: 50.0,
@@ -122,21 +123,21 @@ const merchantData: MerchantData[] = [
     children: [
       {
         id: 'txn_z1',
-        paymentId: 'rzp_pay_zomato_001',
+        paymentId: 'KX-100001',
         amount: 450,
         date: '2024-01-15',
-        method: 'UPI',
-        customerEmail: 'foodie@zomato.com',
-        status: 'Completed',
+        method: 'Ocean',
+        customerEmail: 'ops@pacificrim.com',
+        status: 'Released',
       },
       {
         id: 'txn_z2',
-        paymentId: 'rzp_pay_zomato_002',
+        paymentId: 'KX-100001',
         amount: 1000,
         date: '2024-01-15',
-        method: 'Credit Card',
+        method: 'Air',
         customerEmail: 'customer@food.com',
-        status: 'Failed',
+        status: 'Rejected',
       },
     ],
   },
@@ -187,7 +188,7 @@ const TableNestingTemplate = ({ withSorting = false }: { withSorting?: boolean }
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell>Merchant</TableHeaderCell>
+                <TableHeaderCell>Importer</TableHeaderCell>
                 <TableHeaderCell {...(withSorting && { headerKey: 'totalAmount' })}>
                   Amount
                 </TableHeaderCell>
@@ -254,7 +255,7 @@ const TableNestingTemplate = ({ withSorting = false }: { withSorting?: boolean }
                                   </Text>
                                   <Badge
                                     size="small"
-                                    color={child.status === 'Completed' ? 'positive' : 'negative'}
+                                    color={child.status === 'Released' ? 'positive' : 'negative'}
                                   >
                                     {child.status}
                                   </Badge>
@@ -268,7 +269,7 @@ const TableNestingTemplate = ({ withSorting = false }: { withSorting?: boolean }
                                 weight="semibold"
                                 color="surface.text.gray.normal"
                               >
-                                Payment Gateway Summary
+                                Broker filing summary
                               </Text>
                               <Box
                                 display="grid"
@@ -342,4 +343,5 @@ export const TableNestingWithSorting: StoryFn<typeof TableComponent> = (): JSX.E
   return <TableNestingTemplate withSorting={true} />;
 };
 
+applyTableRecipeMeta(TableMeta);
 export default TableMeta;

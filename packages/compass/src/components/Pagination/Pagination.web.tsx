@@ -283,33 +283,43 @@ const _Pagination = ({
         alignItems="center"
       >
         {showPageSizePicker && !onMobile && (
-          <BaseBox display="flex" flexDirection="row" alignItems="center">
-            <Dropdown selectionType="single">
-              <SelectInput
-                accessibilityLabel="Select items per page"
-                name="page-size"
-                label=""
-                labelPosition="inside-input"
-                placeholder=""
-                onChange={({ values }) => {
-                  handlePageSizeChange(Number(values[0]) as 10 | 25 | 50);
-                }}
-                value={internalPageSize.toString()}
-                isDisabled={isDisabled}
-              />
-              <DropdownOverlay>
-                <ActionList>
-                  {pageSizeOptions.map((item, index) => (
-                    // AUDIT: key={index} — may cause reconciliation issues if list reorders
-                    <ActionListItem key={index} title={item.toString()} value={item.toString()} />
-                  ))}
-                </ActionList>
-              </DropdownOverlay>
-            </Dropdown>
-            <BaseBox aria-hidden paddingLeft="spacing.3" paddingRight="spacing.3">
+          <BaseBox display="flex" flexDirection="row" alignItems="center" flexShrink={0}>
+            <BaseBox
+              width={makeSize(pagination.pageSizeSelectWidth)}
+              minWidth={makeSize(pagination.pageSizeSelectWidth)}
+              flexShrink={0}
+            >
+              <Dropdown
+                selectionType="single"
+                _width={makeSize(pagination.pageSizeSelectWidth)}
+              >
+                <SelectInput
+                  label="Items per page"
+                  accessibilityLabel="Select items per page"
+                  name="page-size"
+                  size="small"
+                  onChange={({ values }) => {
+                    handlePageSizeChange(Number(values[0]) as 10 | 25 | 50);
+                  }}
+                  value={internalPageSize.toString()}
+                  isDisabled={isDisabled}
+                />
+                <DropdownOverlay>
+                  <ActionList>
+                    {pageSizeOptions.map((item) => (
+                      <ActionListItem
+                        key={item}
+                        title={item.toString()}
+                        value={item.toString()}
+                      />
+                    ))}
+                  </ActionList>
+                </DropdownOverlay>
+              </Dropdown>
+            </BaseBox>
+            <BaseBox flexShrink={0} paddingLeft="spacing.2" whiteSpace="nowrap">
               <Text size="small" weight="regular">
-                {' '}
-                {pageSizeLabel}{' '}
+                {pageSizeLabel}
               </Text>
             </BaseBox>
           </BaseBox>

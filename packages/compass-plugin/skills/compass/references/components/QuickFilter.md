@@ -114,7 +114,7 @@ function BasicQuickFilterExample() {
         trailing={<Counter value={234} color="positive" />}
       />
       <QuickFilter
-        title="Failed"
+        title="Rejected"
         value="failed"
         trailing={<Counter value={166} color="negative" />}
       />

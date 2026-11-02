@@ -105,7 +105,7 @@ const _CounterInput = React.forwardRef<CompassElementRef, CounterInputProps>(
         lastActionRef.current = null;
       }
       previousValueRef.current = internalValue;
-    }, [internalValue, duration]);
+    }, [internalValue, duration]); // eslint-disable-line react-hooks/exhaustive-deps -- opacity/translateY reanimated shared values
 
     const animatedStyle = useAnimatedStyle(() => ({
       transform: [{ translateY: translateY.value }],

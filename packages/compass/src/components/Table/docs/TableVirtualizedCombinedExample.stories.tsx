@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React, { useState } from 'react';
 import type { Meta } from '@storybook/react-vite';
 import {
@@ -27,7 +28,7 @@ const filterFunctions = {
   },
 };
 
-const meta: Meta = {
+const storyMeta: Meta = {
   title: 'Components/Table/Features/Virtualized Combined',
   tags: ['autodocs'],
   parameters: { chromatic: { disableSnapshot: true } },
@@ -59,7 +60,7 @@ export const FilterStickyVirtualized = (): React.ReactElement => {
         onGlobalFilterValueChange={setGlobalFilter}
         gridTemplateColumns="minmax(140px, 160px) minmax(120px, 1fr) minmax(100px, 1fr) minmax(120px, 1fr)"
         toolbar={
-          <TableToolbar title="Payments">
+          <TableToolbar title="Clearance queue">
             <TableToolbarSearch />
           </TableToolbar>
         }
@@ -70,7 +71,7 @@ export const FilterStickyVirtualized = (): React.ReactElement => {
               <TableHeaderRow>
                 <TableHeaderCell headerKey="NAME">Name</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -95,4 +96,5 @@ export const FilterStickyVirtualized = (): React.ReactElement => {
   );
 };
 
-export default meta;
+applyTableRecipeMeta(storyMeta);
+export default storyMeta;

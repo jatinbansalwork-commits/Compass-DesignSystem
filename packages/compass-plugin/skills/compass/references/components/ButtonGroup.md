@@ -169,14 +169,14 @@ const ButtonGroupWithDropdownExample = () => {
 
       <ButtonGroup variant="primary" size="medium">
         <Button icon={PlusIcon} onClick={() => console.log('Create new payout')}>
-          Payout
+          Formal entry
         </Button>
         <Dropdown>
           <DropdownButton icon={ChevronDownIcon} accessibilityLabel="More payout options" />
           <DropdownOverlay defaultPlacement="bottom-end">
             <ActionList>
               <ActionListItem
-                title="Bulk Payout"
+                title="Bulk Formal entry"
                 value="bulk-payout"
                 onClick={() => handleActionSelect('bulk-payout')}
               />

@@ -214,7 +214,7 @@ const BasicDrawer = () => {
         accessibilityLabel="Vendor payment details drawer"
       >
         <DrawerHeader
-          title="Vendor Payment Details"
+          title="Vendor Shipment Details"
           titleSuffix={<Badge color="positive">New</Badge>}
           subtitle="See your payment details here"
           trailing={<Button icon={DownloadIcon} accessibilityLabel="Download details" />}
@@ -244,7 +244,7 @@ const BasicDrawer = () => {
           </Box>
 
           <Box>
-            <Button accessibilityLabel="Process payout">Payout</Button>
+            <Button accessibilityLabel="Process payout">Formal entry</Button>
             <Button
               marginLeft="spacing.2"
               variant="tertiary"
@@ -267,7 +267,7 @@ const BasicDrawer = () => {
                 Cancel
               </Button>
               <Button variant="primary" isFullWidth accessibilityLabel="Process payment for vendor">
-                Process Payment
+                Process Shipment
               </Button>
             </Box>
           </DrawerFooter>
@@ -349,7 +349,7 @@ const CustomHeaderDrawer = () => {
             paddingX="spacing.4"
           >
             <Text size="large" textAlign="center">
-              Payment was successfully captured. To be settled in your bank account by{' '}
+              Shipment was successfully captured. To be settled in your broker account by{' '}
               <Text as="span" size="large" weight="semibold" color="feedback.text.positive.intense">
                 Jan 20, 2025
               </Text>

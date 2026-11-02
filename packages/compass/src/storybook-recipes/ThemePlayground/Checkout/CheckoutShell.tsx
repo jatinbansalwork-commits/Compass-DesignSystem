@@ -103,7 +103,7 @@ const CheckoutShell = ({ children }: { children: React.ReactNode }): React.React
       <StyledHeader>
         <MerchantAvatar src="https://i.imgur.com/buGhEkT.png" />
         <Box zIndex={1}>
-          <Heading color="interactive.text.onPrimary.normal">Acme Logistics</Heading>
+          <Heading color="interactive.text.onPrimary.normal">Pacific Rim Trading Co.</Heading>
           <TrustedBusinessWrapper>
             <img
               src="https://checkout-static-next.klearnow.ai/build/assets/images/rtb-live.d7eecf4c.svg"
@@ -183,11 +183,11 @@ const CheckoutShell = ({ children }: { children: React.ReactNode }): React.React
       <StyledFooter>
         <Box flex={1} flexDirection="column">
           <Amount value={5500} />
-          <Text size="small">View Details</Text>
+          <Text size="small">Estimated duty & fees</Text>
         </Box>
         <Box flex={2}>
           <Button size="large" isFullWidth>
-            Book shipment
+            Submit ACE entry
           </Button>
         </Box>
       </StyledFooter>

@@ -316,6 +316,8 @@ export declare const PrinterIcon: IconSource;
 export declare const PromptIcon: IconSource;
 export declare const QRCodeIcon: IconSource;
 export declare const RadioIcon: IconSource;
+export declare const KlearIcon: IconSource;
+/** @deprecated Renamed to `KlearIcon`. */
 export declare const RayIcon: IconSource;
 export declare const KlearnowIcon: IconSource;
 export declare const KlearnowXIcon: IconSource;

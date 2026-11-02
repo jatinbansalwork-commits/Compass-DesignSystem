@@ -11,6 +11,7 @@ import type {
 } from './types';
 import { wrapFilterFunctionsWithMatchMode } from './wrapFilterFunctionsWithMatchMode';
 import { buildGridTemplateColumns } from './buildGridTemplateColumns';
+import { buildExperienceStickyLeadingLayout } from './buildExperienceStickyLeadingLayout';
 import { orderedVisibleColumnKeys } from './reorderColumnKeys';
 
 const defaultFeatures = {
@@ -41,6 +42,10 @@ const useTableExperienceController = <Item>(
     filterFieldExtractors,
     filterableColumns = [],
     gridTrailingTemplateColumns = ['minmax(120px, 1fr)'],
+    initialColumnOrder,
+    initialVisibleColumnKeys,
+    initialColumnWidths,
+    stickyLeadingColumnCount = 0,
   } = options;
 
   const features = { ...defaultFeatures, ...featuresProp };
@@ -56,16 +61,21 @@ const useTableExperienceController = <Item>(
   const [filterMatchModes, setFilterMatchModes] = useState<
     Record<string, TableExperienceFilterMatchMode | undefined>
   >({});
-  const [visibleColumnKeys, setVisibleColumnKeys] = useState<string[]>(() =>
-    filterableColumns.map((column) => column.key),
+  const experienceDefaultColumnOrder = useMemo(
+    () => filterableColumns.map((column) => column.key),
+    [filterableColumns],
   );
-  const [columnOrder, setColumnOrder] = useState<string[]>(() =>
-    filterableColumns.map((column) => column.key),
+  const defaultColumnKeys = experienceDefaultColumnOrder;
+  const [visibleColumnKeys, setVisibleColumnKeys] = useState<string[]>(
+    () => initialVisibleColumnKeys ?? defaultColumnKeys,
+  );
+  const [columnOrder, setColumnOrder] = useState<string[]>(
+    () => initialColumnOrder ?? defaultColumnKeys,
   );
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>(() => {
-    const initial: Record<string, number> = {};
+    const initial: Record<string, number> = { ...initialColumnWidths };
     filterableColumns.forEach((column) => {
-      if (column.defaultWidthPx != null) {
+      if (initial[column.key] == null && column.defaultWidthPx != null) {
         initial[column.key] = column.defaultWidthPx;
       }
     });
@@ -90,6 +100,7 @@ const useTableExperienceController = <Item>(
       columnWidths,
       filterableColumns,
       gridTrailingTemplateColumns,
+      stickyLeadingColumnCount,
     );
   }, [
     columnWidths,
@@ -98,7 +109,24 @@ const useTableExperienceController = <Item>(
     features.columnResize,
     filterableColumns,
     gridTrailingTemplateColumns,
+    stickyLeadingColumnCount,
   ]);
+
+  const experienceStickyLeadingLayout = useMemo(
+    () =>
+      buildExperienceStickyLeadingLayout({
+        orderedColumnKeys: experienceOrderedVisibleColumnKeys,
+        stickyLeadingDataColumnCount: stickyLeadingColumnCount,
+        columnWidths,
+        columns: filterableColumns,
+      }),
+    [
+      columnWidths,
+      experienceOrderedVisibleColumnKeys,
+      filterableColumns,
+      stickyLeadingColumnCount,
+    ],
+  );
 
   const setGlobalFilterValue = useCallback((value: string): void => {
     setGlobalFilterValueState(value);
@@ -204,11 +232,16 @@ const useTableExperienceController = <Item>(
       setExperienceSelectedIds: setSelectedIds,
       experienceSelectedIds: selectedIds,
       experienceColumnOrder: columnOrder,
+      experienceDefaultColumnOrder,
       setExperienceColumnOrder: setColumnOrder,
       experienceColumnWidths: columnWidths,
       setExperienceColumnWidth,
       experienceOrderedVisibleColumnKeys,
       experienceGridTemplateColumns,
+      experienceStickyLeadingDataColumnCount: stickyLeadingColumnCount,
+      experienceStickyLeadingColumnKeys: experienceStickyLeadingLayout.stickyLeadingColumnKeys,
+      experienceStickyColumnCount: experienceStickyLeadingLayout.stickyColumnCount,
+      experienceStickyColumnWidths: experienceStickyLeadingLayout.stickyColumnWidths,
     }),
     [
       sortedNodes,
@@ -232,10 +265,13 @@ const useTableExperienceController = <Item>(
       applyAdvancedFilters,
       selectedIds,
       columnOrder,
+      experienceDefaultColumnOrder,
       columnWidths,
       setExperienceColumnWidth,
       experienceOrderedVisibleColumnKeys,
       experienceGridTemplateColumns,
+      stickyLeadingColumnCount,
+      experienceStickyLeadingLayout,
     ],
   );
 

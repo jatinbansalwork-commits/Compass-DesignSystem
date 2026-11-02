@@ -13,9 +13,14 @@ import { useTheme } from '~components/CompassProvider';
 type PopoverHeaderProps = {
   title?: string;
   titleLeading?: React.ReactNode;
+  titleTrailing?: React.ReactNode;
 };
 
-const PopoverHeader = ({ title, titleLeading }: PopoverHeaderProps): React.ReactElement | null => {
+const PopoverHeader = ({
+  title,
+  titleLeading,
+  titleTrailing,
+}: PopoverHeaderProps): React.ReactElement | null => {
   const { titleId, openInteraction } = usePopoverContext();
 
   const showCloseButton = openInteraction === 'click';
@@ -57,9 +62,17 @@ const PopoverHeader = ({ title, titleLeading }: PopoverHeaderProps): React.React
           </Text>
         </BaseBox>
       ) : null}
-      {showCloseButton ? (
-        <BaseBox marginLeft="auto">
-          <PopoverCloseButton />
+      {showCloseButton || titleTrailing ? (
+        <BaseBox
+          marginLeft="auto"
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
+          gap="spacing.2"
+          flexShrink={0}
+        >
+          {titleTrailing}
+          {showCloseButton ? <PopoverCloseButton /> : null}
         </BaseBox>
       ) : null}
     </BaseBox>
@@ -72,6 +85,7 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
       children,
       title,
       titleLeading,
+      titleTrailing,
       footer,
       arrow,
       side,
@@ -97,7 +111,7 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
       >
         <BaseBox padding="spacing.5" display="flex" flexDirection="column" gap="spacing.5">
           <BaseBox display="flex" flexDirection="column" gap="spacing.2">
-            <PopoverHeader title={title} titleLeading={titleLeading} />
+            <PopoverHeader title={title} titleLeading={titleLeading} titleTrailing={titleTrailing} />
             <BaseBox>{children}</BaseBox>
           </BaseBox>
           {footer ? (

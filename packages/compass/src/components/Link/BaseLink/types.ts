@@ -7,12 +7,19 @@ import type { TestID } from '~utils/types';
 import type { CompassCommonEvents } from '~components/types';
 import type { ActionStates } from '~utils/useInteraction';
 
+/** Internal styled-props for BaseLink (not the public Link API). */
 export type StyledBaseLinkProps = {
+  /** Link visual variant from public Link props. */
   variant: BaseLinkProps['variant'];
+  /** Rendered element: anchor or button. */
   as: 'a' | 'button';
+  /** CSS cursor override. */
   cursor?: CSSObject['cursor'];
+  /** Navigation URL when rendered as anchor. */
   href?: string;
+  /** Anchor target attribute. */
   target?: string;
+  /** Anchor rel attribute. */
   rel?: string;
   onClick?: BaseLinkProps['onClick'];
   onBlur?: BaseLinkProps['onBlur'];

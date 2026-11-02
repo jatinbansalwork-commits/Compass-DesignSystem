@@ -15,6 +15,7 @@ import { Code } from '~components/Typography';
 import { Badge } from '~components/Badge';
 import { IconButton } from '~components/Button/IconButton';
 import { EyeIcon, EditIcon, FileTextIcon } from '~components/Icons';
+import { tableHoverActions, tableIcons } from '../tokens';
 
 type TransactionColumnDef = {
   key: string;
@@ -24,10 +25,21 @@ type TransactionColumnDef = {
 };
 
 const actionCell = (item: TableNode<TransactionTableItem>): React.ReactElement => (
-  <Box display="flex" gap="spacing.3">
-    <IconButton isHighlighted icon={EyeIcon} accessibilityLabel={`View ${item.transactionId}`} />
-    <IconButton isHighlighted icon={EditIcon} accessibilityLabel={`Edit ${item.transactionId}`} />
+  <Box display="flex" gap={tableHoverActions.gap}>
     <IconButton
+      size={tableIcons.rowHover}
+      isHighlighted
+      icon={EyeIcon}
+      accessibilityLabel={`View ${item.transactionId}`}
+    />
+    <IconButton
+      size={tableIcons.rowHover}
+      isHighlighted
+      icon={EditIcon}
+      accessibilityLabel={`Edit ${item.transactionId}`}
+    />
+    <IconButton
+      size={tableIcons.rowHover}
       isHighlighted
       icon={FileTextIcon}
       accessibilityLabel={`View documents for ${item.transactionId}`}
@@ -43,7 +55,7 @@ const leadingStickyColumns: TransactionColumnDef[] = [
   },
   {
     key: 'transactionId',
-    header: 'Transaction ID',
+    header: 'Entry number',
     sortHeaderKey: 'transactionId',
     render: (item) => <Code size="medium">{item.transactionId}</Code>,
   },
@@ -60,12 +72,12 @@ const leadingStickyColumns: TransactionColumnDef[] = [
   },
   {
     key: 'username',
-    header: 'Username',
+    header: 'Broker user',
     render: (item) => item.username,
   },
   {
     key: 'transactionState',
-    header: 'Transaction State',
+    header: 'CBP status',
     sortHeaderKey: 'transactionState',
     render: (item) => (
       <Badge size="medium" color={getTransactionStateColor(item.transactionState)}>

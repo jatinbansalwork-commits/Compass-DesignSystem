@@ -215,7 +215,7 @@ function BasicSelectExample() {
         />
         <DropdownOverlay>
           <ActionList>
-            <ActionListItem title="John Doe" value="john" />
+            <ActionListItem title="Schlumberger USA Inc." value="john" />
             <ActionListItem title="Jane Smith" value="jane" />
             <ActionListItem title="Robert Johnson" value="robert" />
             <ActionListItem title="Emily Davis" value="emily" />
