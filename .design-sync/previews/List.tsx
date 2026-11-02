@@ -1,6 +1,6 @@
 import React from 'react';
-import { List, ListItem, ListItemLink, ListItemText, ListItemCode } from '@klearnow/compass/components';
-import { BookmarkIcon } from '@klearnow/compass/components';
+import { List, ListItem, ListItemLink, ListItemText, ListItemCode } from '@klearnow/kdesign/components';
+import { BookmarkIcon } from '@klearnow/kdesign/components';
 
 export const Unordered = () => (
   <List variant="unordered">
@@ -50,7 +50,7 @@ export const WithIcon = () => (
 export const WithCode = () => (
   <List variant="ordered">
     <ListItem>
-      Bump blade version to <ListItemCode>v6.0.0</ListItemCode>
+      Bump kdesign version to <ListItemCode>v6.0.0</ListItemCode>
     </ListItem>
     <ListItem>
       Run <ListItemCode>yarn install</ListItemCode>

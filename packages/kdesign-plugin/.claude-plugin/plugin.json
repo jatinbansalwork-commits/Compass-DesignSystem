@@ -1,0 +1,22 @@
+{
+  "name": "kdesign",
+  "version": "1.33.1",
+  "description": "Klearnow Kdesign Design System: component, pattern and token docs plus upgrade, new-project and Figma-to-code workflows.",
+  "author": {
+    "name": "Klearnow",
+    "email": "support@klearnow.ai",
+    "url": "https://klearnow.ai"
+  },
+  "keywords": [
+    "kdesign",
+    "klearnow",
+    "design-system",
+    "react",
+    "ui",
+    "skills"
+  ],
+  "homepage": "https://klearnow.ai",
+  "repository": "https://github.com/klearnow/compass",
+  "license": "MIT",
+  "hooks": "./hooks/hooks.json"
+}

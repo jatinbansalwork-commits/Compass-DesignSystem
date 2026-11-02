@@ -1,7 +1,7 @@
 import React from 'react';
-import { Dropdown, DropdownOverlay } from '@klearnow/compass/components';
-import { SelectInput } from '@klearnow/compass/components';
-import { ActionList, ActionListItem } from '@klearnow/compass/components';
+import { Dropdown, DropdownOverlay } from '@klearnow/kdesign/components';
+import { SelectInput } from '@klearnow/kdesign/components';
+import { ActionList, ActionListItem } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <Dropdown>

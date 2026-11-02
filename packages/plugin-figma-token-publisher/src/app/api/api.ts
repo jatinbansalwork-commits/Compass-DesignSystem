@@ -8,7 +8,7 @@ const WORKFLOW_INPUT_LIMIT = 65535;
 
 type ColorTokens = Record<string, any>;
 export type ExportedIcons = Record<string, string>[];
-/** `react` is `@klearnow/compass`, one component for web and native. */
+/** `react` is `@klearnow/kdesign`, one component for web and native. */
 export type IconTarget = 'react';
 
 // GitHub's workflow_dispatch inputs are capped at 65,535 characters. The token payload can

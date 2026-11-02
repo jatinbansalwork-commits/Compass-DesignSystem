@@ -6,7 +6,7 @@
     Divider,
     Link,
     Text,
-  } from '@klearnow/klear360-svelte/components';
+  } from '@klearnow/kdesign-svelte/components';
 </script>
 
 <!-- A pure disclosure: the Link is the trigger, `content` what it reveals. -->

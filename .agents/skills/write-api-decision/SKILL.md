@@ -1,12 +1,12 @@
 ---
 name: write-api-decision
-description: This rule helps in writing API decisions for new components of Compass design system
+description: This rule helps in writing API decisions for new components of Kdesign design system
 disable-model-invocation: true
 ---
 
-You work in the Design System team of Klearnow. Design System requires giving good amount of thought in how to expose certain components. You as a team member of design system team, go through existing API decisions from `packages/compass/src/components/*/decision/decisions.md` to understand the format and common props that we support, and create a new API bases on that. Especially the decisions which might be similar to the API you're writing at this point.
+You work in the Design System team of Klearnow. Design System requires giving good amount of thought in how to expose certain components. You as a team member of design system team, go through existing API decisions from `packages/kdesign/src/components/*/decision/decisions.md` to understand the format and common props that we support, and create a new API bases on that. Especially the decisions which might be similar to the API you're writing at this point.
 
-- You create API in this file - `packages/compass/src/components/<ComponentName>/_decisions/decisions.md`
+- You create API in this file - `packages/kdesign/src/components/<ComponentName>/_decisions/decisions.md`
 - You write good, consistent, and intuitive APIs based on APIs of other components in this design system
 - You strictly follow the API decision structure mentioned below and not take format reference from other APIs
 - You understand the common props that we normally use, compound component structure that we normally use and follow WISIWYG (What You See is What You Get) Philosophy.
@@ -18,11 +18,11 @@ You work in the Design System team of Klearnow. Design System requires giving go
 
 Study these existing decisions.md files for consistent patterns and formatting:
 
-- `packages/compass/src/components/SideNav/_decisions/decisions.md`
-- `packages/compass/src/components/Modal/_decisions/decisions.md`
-- `packages/compass/src/components/Button/_decisions/decisions.md`
-- `packages/compass/src/components/Typography/_decisions/decisions.md`
-- `packages/compass/src/components/Badge/_decisions/decisions.md`
+- `packages/kdesign/src/components/SideNav/_decisions/decisions.md`
+- `packages/kdesign/src/components/Modal/_decisions/decisions.md`
+- `packages/kdesign/src/components/Button/_decisions/decisions.md`
+- `packages/kdesign/src/components/Typography/_decisions/decisions.md`
+- `packages/kdesign/src/components/Badge/_decisions/decisions.md`
 
 You can look for similar components in existing design systems on the internet for reference
 
@@ -45,7 +45,7 @@ All API decisions must follow this exact structure:
 Overall structure of the API showing the main usage pattern with realistic example:
 
 ```jsx
-import { Component, SubComponent } from '@klearnow/compass/components';
+import { Component, SubComponent } from '@klearnow/kdesign/components';
 
 <Component prop="value">
   <SubComponent title="Example" />
@@ -178,7 +178,7 @@ type SubComponentProps = {
 
 ## Writing Guidelines
 
-1. **Follow Existing Patterns**: Study the referenced decisions.md files to maintain consistency with established naming conventions and prop patterns used in Compass.
+1. **Follow Existing Patterns**: Study the referenced decisions.md files to maintain consistency with established naming conventions and prop patterns used in Kdesign.
 
 2. **Props Section Requirements**:
 
@@ -219,9 +219,9 @@ type SubComponentProps = {
    - Support both controlled and uncontrolled APIs where appropriate
    - If you're refering to figma props, you try to cover all scenarios but don't try to map each prop. E.g. `showLeading` prop might exist on figma but won't be needed on dev as `leading` prop can be internally used to decide show or hide leading.
 
-Remember: Always reference existing decisions.md files before writing new APIs to ensure consistency with the established Compass design system patterns and naming conventions.
+Remember: Always reference existing decisions.md files before writing new APIs to ensure consistency with the established Kdesign design system patterns and naming conventions.
 
 - Document edge cases and constraints
 - Explain design decisions in "Open Questions" or "Discussions" sections
 
-Remember: The goal is to create comprehensive, implementable API documentation that serves both current needs and future extensibility while maintaining consistency with the established Compass design system patterns.
+Remember: The goal is to create comprehensive, implementable API documentation that serves both current needs and future extensibility while maintaining consistency with the established Kdesign design system patterns.

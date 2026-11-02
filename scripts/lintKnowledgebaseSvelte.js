@@ -1,19 +1,19 @@
 /**
- * Lints the ```svelte examples in the compass-svelte knowledgebase.
+ * Lints the ```svelte examples in the kdesign-svelte knowledgebase.
  *
  * `tsc` can't check Svelte markup, so each example is instead:
  * - compiled with `svelte/compiler` in runes mode (syntax errors, Svelte 4
  *   leftovers like `export let` / `on:click`, a11y warnings);
- * - checked so every name imported from `@klearnow/compass-svelte/components`,
+ * - checked so every name imported from `@klearnow/kdesign-svelte/components`,
  *   `/runes` or `/icons` is a real export of that entry, every `<PascalCase>`
  *   tag is imported or declared, and no icon is used as a tag (icons are
  *   sources: `<Icon source={InfoIcon} />`, or a component's `icon` prop);
- * - checked so every attribute, binding and snippet passed to a Compass
+ * - checked so every attribute, binding and snippet passed to a Kdesign
  *   component is one of its props (read from the component's `$props()`);
- * - run through Compass's class lint (`@klearnow/compass-svelte/configs/lint`):
- *   no conflicting, interpolated or misspelled classes, and a Compass
+ * - run through Kdesign's class lint (`@klearnow/kdesign-svelte/configs/lint`):
+ *   no conflicting, interpolated or misspelled classes, and a Kdesign
  *   component's `class` places it, never restyles it.
- * Every `*Icon` named anywhere in a doc must be a compass-svelte icon, and
+ * Every `*Icon` named anywhere in a doc must be a kdesign-svelte icon, and
  * general/AvailableIcons.md must list exactly the icons the package exports.
  *
  * Usage: yarn tsc:knowledgebase --target svelte
@@ -21,7 +21,7 @@
 const fs = require('fs');
 const path = require('path');
 const { glob } = require('glob');
-// Hoisted from compass-svelte's dependencies in the workspace.
+// Hoisted from kdesign-svelte's dependencies in the workspace.
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { compile, parse } = require('svelte/compiler');
 const {
@@ -54,16 +54,16 @@ function* walk(node) {
 }
 
 /**
- * Attributes, bindings and snippets passed to Compass components must be props.
+ * Attributes, bindings and snippets passed to Kdesign components must be props.
  * @param {any} ast
- * @param {Map<string, string>} bladeComponents local name -> exported name
+ * @param {Map<string, string>} kdesignComponents local name -> exported name
  * @returns {string[]}
  */
-const lintComponentProps = (ast, bladeComponents) => {
+const lintComponentProps = (ast, kdesignComponents) => {
   const problems = [];
   for (const node of walk(ast.fragment)) {
-    if (node.type !== 'Component' || !bladeComponents.has(node.name)) continue;
-    const props = getComponentProps(bladeComponents.get(node.name));
+    if (node.type !== 'Component' || !kdesignComponents.has(node.name)) continue;
+    const props = getComponentProps(kdesignComponents.get(node.name));
     if (!props) continue;
     const passed = [];
     for (const attribute of node.attributes) {
@@ -87,7 +87,7 @@ const lintComponentProps = (ast, bladeComponents) => {
         expression?.type === 'Identifier' &&
         exportedNames.icons.has(expression.name) &&
         props.has(attribute.name) &&
-        !propTakesIcon(bladeComponents.get(node.name), attribute.name)
+        !propTakesIcon(kdesignComponents.get(node.name), attribute.name)
       ) {
         problems.push(
           `<${node.name}> ${attribute.name}={${expression.name}}: "${attribute.name}" takes no icon; draw it in a snippet with <Icon source={${expression.name}} />`,
@@ -125,12 +125,12 @@ const lintBlock = (code) => {
   }
 
   const declared = new Set();
-  const bladeComponents = new Map();
+  const kdesignComponents = new Map();
   for (const [, , names, source] of code.matchAll(importRegex)) {
     const entry = entryOf.get(source);
-    if (source.startsWith('@klearnow/compass/') || source === '@klearnow/compass') {
+    if (source.startsWith('@klearnow/kdesign/') || source === '@klearnow/kdesign') {
       problems.push(`imports from the React package "${source}"`);
-    } else if (source.startsWith('@klearnow/compass-svelte') && !entry) {
+    } else if (source.startsWith('@klearnow/kdesign-svelte') && !entry) {
       problems.push(`"${source}" is not an entry: use ${Object.values(ENTRIES).join(', ')}`);
     }
     for (const part of names
@@ -146,7 +146,7 @@ const lintBlock = (code) => {
       if (!exportedNames[entry].has(original)) {
         problems.push(`"${original}" is not exported by ${source}`);
       } else if (entry === 'components') {
-        bladeComponents.set(alias ?? original, original);
+        kdesignComponents.set(alias ?? original, original);
       }
     }
   }
@@ -165,10 +165,10 @@ const lintBlock = (code) => {
       problems.push(`<${tag}> is used but not imported`);
     }
   }
-  if (ast) problems.push(...lintComponentProps(ast, bladeComponents));
+  if (ast) problems.push(...lintComponentProps(ast, kdesignComponents));
   for (const finding of lintClasses(code, 'Example.svelte')) {
     problems.push(
-      `blade/${finding.ruleId} [${finding.line}:${finding.column}]: ${finding.message}`,
+      `kdesign/${finding.ruleId} [${finding.line}:${finding.column}]: ${finding.message}`,
     );
   }
   return [...new Set(problems)];
@@ -188,7 +188,7 @@ async function main() {
         .filter((name) => !exportedNames.icons.has(name)),
     );
     for (const name of unknownIcons) {
-      fileErrors.push({ error: `"${name}" is not a compass-svelte icon`, markdownLineNumber: 0 });
+      fileErrors.push({ error: `"${name}" is not a kdesign-svelte icon`, markdownLineNumber: 0 });
     }
     for (const match of content.matchAll(codeBlockRegex)) {
       blockCount += 1;
@@ -198,7 +198,7 @@ async function main() {
     if (fileErrors.length) errors.push({ file: path.relative(rootDir, file), errors: fileErrors });
   }
 
-  // AvailableIcons.md lists exactly the icons compass-svelte exports.
+  // AvailableIcons.md lists exactly the icons kdesign-svelte exports.
   const iconsDocPath = path.join(knowledgebasePath, 'general/AvailableIcons.md');
   const listedIcons = new Set(
     fs.existsSync(iconsDocPath)
@@ -220,7 +220,7 @@ async function main() {
   fs.writeFileSync(reportPath, JSON.stringify(errors, null, 2), 'utf-8');
   console.log('--------------------------------');
   if (errors.length > 0) {
-    console.log(`❌ ${errors.length} files have errors in the compass-svelte knowledgebase\n`);
+    console.log(`❌ ${errors.length} files have errors in the kdesign-svelte knowledgebase\n`);
     for (const { file, errors: fileErrors } of errors) {
       console.log(file);
       for (const { error, markdownLineNumber } of fileErrors) {
@@ -230,7 +230,7 @@ async function main() {
     console.log('--------------------------------');
     process.exit(1);
   }
-  console.log(`✅ ${blockCount} svelte examples pass in the compass-svelte knowledgebase`);
+  console.log(`✅ ${blockCount} svelte examples pass in the kdesign-svelte knowledgebase`);
   console.log('--------------------------------');
   process.exit(0);
 }

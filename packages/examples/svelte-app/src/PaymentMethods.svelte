@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { CardGroup, CardGroupItem, Icon, Text } from '@klearnow/klear360-svelte/components';
-  import { BankIcon, CreditCardIcon, UpiIcon } from '@klearnow/klear360-svelte/icons';
+  import { CardGroup, CardGroupItem, Icon, Text } from '@klearnow/kdesign-svelte/components';
+  import { BankIcon, CreditCardIcon, UpiIcon } from '@klearnow/kdesign-svelte/icons';
 
   let { value = $bindable() }: { value: string | null } = $props();
 </script>

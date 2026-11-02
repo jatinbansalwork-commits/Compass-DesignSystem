@@ -1,5 +1,5 @@
-import { CompassProvider } from '@klearnow/compass/components';
-import { paymentTheme } from '@klearnow/compass/tokens';
+import { KdesignProvider } from '@klearnow/kdesign/components';
+import { paymentTheme } from '@klearnow/kdesign/tokens';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
@@ -12,9 +12,9 @@ const root = createRoot(rootElement);
 
 root.render(
   <StrictMode>
-    <CompassProvider themeTokens={paymentTheme} colorScheme="light">
+    <KdesignProvider themeTokens={paymentTheme} colorScheme="light">
       <App />
-    </CompassProvider>
+    </KdesignProvider>
   </StrictMode>,
 );
 

@@ -1,12 +1,12 @@
-import bladeUnoConfig from '@klearnow/compass-svelte/configs/uno';
+import kdesignUnoConfig from '@klearnow/kdesign-svelte/configs/uno';
 
-// Compass's config: its token classes, the `d:` desktop variant at 62.5rem,
-// and Compass's preflights.
+// Kdesign's config: its token classes, the `d:` desktop variant at 62.5rem,
+// and Kdesign's preflights.
 export default {
-  ...bladeUnoConfig({ desktop: '62.5rem' }),
+  ...kdesignUnoConfig({ desktop: '62.5rem' }),
   content: {
-    // The modules the build bundles, Compass's included: only the components
-    // the app imports reach the CSS. Compass's class maps are plain `.ts`
+    // The modules the build bundles, Kdesign's included: only the components
+    // the app imports reach the CSS. Kdesign's class maps are plain `.ts`
     // (`styles.ts`), which the default pipeline does not read.
     pipeline: { include: [/\.(svelte|[jt]s)($|\?)/] },
   },

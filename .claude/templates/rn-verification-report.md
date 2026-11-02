@@ -63,7 +63,7 @@
 |-------|-------|
 | **Device** | {iPhone 16 Pro / etc.} |
 | **OS** | {iOS 18.x} |
-| **App** | {CompassShowcase / unavailable} |
+| **App** | {KdesignShowcase / unavailable} |
 | **Component Found** | {yes / no / app unavailable} |
 
 ### Screenshots Captured

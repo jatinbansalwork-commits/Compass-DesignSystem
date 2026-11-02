@@ -19,4 +19,4 @@ const npmRcContent = `@klearnow:registry=https://npm.pkg.github.com/
 `;
 
 fs.writeFileSync(NPMRC_PATH, npmRcContent);
-console.log('[compass]: generated .npmrc for publishing to GitHub registry ✅');
+console.log('[kdesign]: generated .npmrc for publishing to GitHub registry ✅');

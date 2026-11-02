@@ -50,7 +50,7 @@ For each duplicate group, keep one entry using this priority:
 
 ### 5. Filter out some minor comments
 
-For non-critical files such as tests, docs, changes in packages other than `compass-svelte`, `compass-core`, or `blade`, filter out the "minor" severity comments.
+For non-critical files such as tests, docs, changes in packages other than `kdesign-svelte`, `kdesign-core`, or `kdesign`, filter out the "minor" severity comments.
 
 ### 6. Filter out non-imporant comments
 
@@ -72,7 +72,7 @@ If it is just 1-2 comments that are not that important, be biased towards filter
 {
   "inlined-comments": [
     {
-      "file": "packages/compass/src/components/Foo/Foo.tsx",
+      "file": "packages/kdesign/src/components/Foo/Foo.tsx",
       "line": 42,
       "side": "RIGHT",
       "severity": "critical",
@@ -82,7 +82,7 @@ If it is just 1-2 comments that are not that important, be biased towards filter
       "suggestion": "how to fix it"
     },
     {
-      "file": "packages/compass/src/components/Foo/Foo.tsx",
+      "file": "packages/kdesign/src/components/Foo/Foo.tsx",
       "line": 17,
       "side": "RIGHT",
       "severity": "minor",

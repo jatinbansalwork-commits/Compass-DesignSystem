@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-implicit-any-catch */
 /* eslint-disable no-template-curly-in-string */
 import setValue from '../utils/setValue';
-import { opacity as opacityTokens } from '../../../blade/src/tokens/global/opacity';
+import { opacity as opacityTokens } from '../../../kdesign/src/tokens/global/opacity';
 import showNotification from './showNotification';
 import validateColorTokens from './validateColorTokens';
 import type {
@@ -15,15 +15,15 @@ import type {
 } from './tokenTypes';
 import { EXPRESSION, STRING, TEMPLATE, toLegacyTokenTree } from './tokenTypes';
 
-const THEME_TOKENS_COLLECTION = 'Compass Theme Tokens';
+const THEME_TOKENS_COLLECTION = 'Kdesign Theme Tokens';
 
 const GLOBAL_TOKENS_COLLECTION = '_global-tokens';
 
-// Figma modes are named `<figmaThemePrefix><separator><scheme>` (eg: blade/onLight,
-// bladeNeutral - onDark). This maps the Figma theme prefix to the corresponding code theme name.
+// Figma modes are named `<figmaThemePrefix><separator><scheme>` (eg: kdesign/onLight,
+// kdesignNeutral - onDark). This maps the Figma theme prefix to the corresponding code theme name.
 const FIGMA_MODE_THEME_MAP: Record<string, string> = {
-  blade: 'compassTheme',
-  bladeNeutral: 'compassNeutralTheme',
+  kdesign: 'kdesignTheme',
+  kdesignNeutral: 'kdesignNeutralTheme',
 };
 
 // Identifiers a token value may be written unquoted against. They correspond to the imports the
@@ -69,7 +69,7 @@ const reportStrayHyphen = (variableName: string): void => {
 
 /**
  * The scheme is the fixed part of a mode name, so anchoring on it survives theme prefixes that
- * themselves contain the separator (eg: `blade-neutral/onLight`).
+ * themselves contain the separator (eg: `kdesign-neutral/onLight`).
  */
 const parseModeName = (
   modeName: string,

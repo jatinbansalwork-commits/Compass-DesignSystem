@@ -1,6 +1,6 @@
 import React from 'react';
-import { TextInput } from '@klearnow/compass/components';
-import { InfoIcon, BankIcon, GlobeIcon } from '@klearnow/compass/components';
+import { TextInput } from '@klearnow/kdesign/components';
+import { InfoIcon, BankIcon, GlobeIcon } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <TextInput

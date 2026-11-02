@@ -17,7 +17,7 @@ function Widget() {
       // send analytics
       waitForTask(
         sendAnalytics({
-          eventName: 'Compass Snowflake Handoff Checklist Used',
+          eventName: 'Kdesign Snowflake Handoff Checklist Used',
         }),
       );
       setIsAnalyticsLoadEventSent(true);
@@ -171,12 +171,12 @@ function Widget() {
         <AutoLayout direction="vertical" spacing={4} width="fill-parent">
           <Checkbox
             id="rev1"
-            optionText="Component reviewed by Compass designers/advocates"
+            optionText="Component reviewed by Kdesign designers/advocates"
             onCheckboxClick={updateChecklist}
           />
           <Checkbox
             id="rev2"
-            optionText="Component added to Compass Snowflake file"
+            optionText="Component added to Kdesign Snowflake file"
             onCheckboxClick={updateChecklist}
           />
         </AutoLayout>

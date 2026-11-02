@@ -1,15 +1,15 @@
-import { generateCompassCode } from './blade/main';
-import { generateImportsCode } from './blade/utils/imports';
-import { convertIntoCompassNodes } from './figmaUtils/convertIntoNodes';
-import type { CompassNode } from './types/Compass';
+import { generateKdesignCode } from './kdesign/main';
+import { generateImportsCode } from './kdesign/utils/imports';
+import { convertIntoKdesignNodes } from './figmaUtils/convertIntoNodes';
+import type { KdesignNode } from './types/Kdesign';
 
 if (figma.editorType === 'dev' && figma.mode === 'codegen') {
   // Register a callback to the "generate" event
   figma.codegen.on('generate', ({ node }) => {
-    const convertedSelection: CompassNode[] = convertIntoCompassNodes([node], null);
+    const convertedSelection: KdesignNode[] = convertIntoKdesignNodes([node], null);
 
-    const { component, imports } = generateCompassCode({
-      bladeNodes: convertedSelection,
+    const { component, imports } = generateKdesignCode({
+      kdesignNodes: convertedSelection,
     });
 
     return [

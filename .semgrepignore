@@ -7,13 +7,13 @@ coverage
 # build direcotries
 **/storybook-site
 **/build
-packages/klear360/components.js
-packages/klear360/components.d.ts
-packages/klear360/tokens.js
-packages/klear360/tokens.d.ts
-packages/klear360/utils.js
-packages/klear360/utils.d.ts
-packages/klear360/.storybook/**
+packages/kdesign/components.js
+packages/kdesign/components.d.ts
+packages/kdesign/tokens.js
+packages/kdesign/tokens.d.ts
+packages/kdesign/utils.js
+packages/kdesign/utils.d.ts
+packages/kdesign/.storybook/**
 
 # misc
 .DS_Store

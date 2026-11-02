@@ -1,6 +1,6 @@
-# Compass with `styled-components`
+# Kdesign with `styled-components`
 
-When using Compass along with multiple theme providers (for example with `blade-old` or your own custom theming) you should namespace your own theme so it doesn't conflict with blade's theme tokens.
+When using Kdesign along with multiple theme providers (for example with `kdesign-old` or your own custom theming) you should namespace your own theme so it doesn't conflict with kdesign's theme tokens.
 
 Check [`App.tsx`](./src/App.tsx) for example.
 
@@ -10,10 +10,10 @@ When a `ThemeProvider` is nested inside another `ThemeProvider`, `styled-compone
 
 ```tsx
 /**
- * compassTheme
+ * kdesignTheme
  * {
  *  ...
- *  colors { // 👈 Compass components need this token
+ *  colors { // 👈 Kdesign components need this token
  *      ...
  *  }
  *  ...
@@ -31,12 +31,12 @@ const myCustomTheme = {
 const App = () => {
   // ...
   return (
-    <CompassProvider themeTokens={compassTheme}>
-      {/* The theme provider below will merge and replace any top level keys from `compassTheme` above */}
+    <KdesignProvider themeTokens={kdesignTheme}>
+      {/* The theme provider below will merge and replace any top level keys from `kdesignTheme` above */}
       <ThemeProvider theme={myCustomTheme}>
         <Button>Hello</Button>
       </ThemeProvider>
-    </CompassProvider>
+    </KdesignProvider>
   );
 };
 ```
@@ -47,6 +47,6 @@ There are some open issues and references on `styled-components` repo. Eg:
 - https://github.com/styled-components/styled-components/issues/244
 - https://github.com/styled-components/styled-components/issues/2417
 
-At the moment, best solution is to namespace your custom theme tokens so it doesn't conflict with Compass's.
+At the moment, best solution is to namespace your custom theme tokens so it doesn't conflict with Kdesign's.
 
 > This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

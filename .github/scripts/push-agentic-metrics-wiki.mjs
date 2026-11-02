@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Pushes agentic blade metrics to the blade wiki.
+ * Pushes agentic kdesign metrics to the kdesign wiki.
  *
  * Usage:
  *   node push-agentic-metrics-wiki.mjs <markdown-file>
  *
- *   The markdown file content replaces the agentic-blade-metrics wiki page.
+ *   The markdown file content replaces the agentic-kdesign-metrics wiki page.
  */
 
 import { execSync } from "child_process";
@@ -14,7 +14,7 @@ import { join } from "path";
 import { tmpdir } from "os";
 
 const WIKI_REPO = "https://github.com/klearnow/klear360.wiki.git";
-const WIKI_PAGE = "agentic-blade-metrics.md";
+const WIKI_PAGE = "agentic-kdesign-metrics.md";
 
 const markdownFile = process.argv[2];
 if (!markdownFile) {
@@ -24,7 +24,7 @@ if (!markdownFile) {
 
 const content = readFileSync(markdownFile, "utf8");
 
-const wikiDir = join(tmpdir(), `blade-wiki-${Date.now()}`);
+const wikiDir = join(tmpdir(), `kdesign-wiki-${Date.now()}`);
 
 try {
   execSync(`git clone ${WIKI_REPO} ${wikiDir}`, { stdio: "inherit" });
@@ -32,7 +32,7 @@ try {
   writeFileSync(join(wikiDir, WIKI_PAGE), content);
 
   execSync("git add .", { cwd: wikiDir, stdio: "inherit" });
-  execSync(`git commit -m "chore: update agentic blade metrics [skip ci]"`, {
+  execSync(`git commit -m "chore: update agentic kdesign metrics [skip ci]"`, {
     cwd: wikiDir,
     stdio: "inherit",
   });

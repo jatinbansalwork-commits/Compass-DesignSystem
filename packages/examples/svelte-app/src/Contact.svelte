@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Icon, PhoneNumberInput, TextInput, Tooltip } from '@klearnow/klear360-svelte/components';
-  import { InfoIcon } from '@klearnow/klear360-svelte/icons';
+  import { Icon, PhoneNumberInput, TextInput, Tooltip } from '@klearnow/kdesign-svelte/components';
+  import { InfoIcon } from '@klearnow/kdesign-svelte/icons';
 
   let phone = $state('');
   let country = $state('IN');
@@ -10,7 +10,7 @@
 <section class="flex flex-col gap-4">
   <!-- The countries default to i18nify's; the list opens under the field. -->
   <PhoneNumberInput bind:value={phone} bind:country label="Mobile number" />
-  <!-- `format` is Klear360's mask: the field places the spaces. -->
+  <!-- `format` is Kdesign's mask: the field places the spaces. -->
   <TextInput
     bind:value={card}
     label="Card number"

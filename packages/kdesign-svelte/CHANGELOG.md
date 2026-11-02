@@ -1,0 +1,593 @@
+# @klearnow/kdesign-svelte
+
+## 1.0.0
+
+### Major Changes
+
+- d0e8846f: feat(kdesign-svelte): Tailwind port of the Svelte components
+
+  - **A new implementation.** The components are a Svelte 5 runes library styled with Tailwind utility classes, shipped as source. The app compiles Kdesign's classes with the UnoCSS preset (`@klearnow/kdesign-svelte/configs/uno`) and icons with the Vite 8 or webpack plugin (`/configs/vite`, `/configs/webpack`); `kdesign.css` holds the fonts and Kdesign's own scales. The previous implementation, the package root export and the `/utils` subpath are removed.
+  - **Theming is CSS variables:** every colour class reads its token's variable, falling back to Kdesign's standard theme (React's default); an app's brand sets only what branding changes.
+  - **Entry points:** `@klearnow/kdesign-svelte/components` (components, their class resolvers and types, `KdesignProvider`, `useComponentDefaults`, `getAdapters`, `createCancel`), `/runes` (the runes an app's own components build on) and `/icons`.
+  - **UI only, web only.** Headless hosts and flows (a form, an opener for overlays opened from code, navigation, async content) and composed components (an overlay that switches by screen, a searchable list) are the app's; Kdesign keeps their seams as adapters. `ComponentStyleProps` is an interface an app extends, so its own components take provider defaults.
+  - **KdesignProvider** renders the overlay host (one scrim, the box overlays mount in, a polite live region) after its content. The outermost provider hosts every overlay. An app's back handler asks the open overlays first through `back()`.
+  - **Adapters** (`adapters` on KdesignProvider) are live: an adapter the app swaps reaches mounted components, and `null` unsets an enclosing one for a subtree (`KdesignAdaptersOverride`). `track`, `vibrate(kind)` (`press`, `select`, `toggle`, `warning`), `announce`, `locale` (Amount's), `reportError`, `navigate` (every `href` renderer routes plain internal clicks through it), `form` (`FormAdapter`: fields register with it, show its errors, and submit buttons submit it), `presentDropdown` and `readOTP`. `track('field_change')` sends `{ name }` only.
+  - **Across the boundary go plain functions, promises and data**, so an adapter can cross a bridge to a native host. A withdrawal is `cancelled: Promise<void>` (resolves once, never rejects), not an `AbortSignal`; `createCancel()` makes one. A field's `FieldRecord` carries `element()` and `reveal()`.
+  - **Toasts:** the app renders `ToastContainer` once inside KdesignProvider, as React's; without one, no toast code ships. `showToast(toast, { cancelled })` returns a `Promise<ToastDismissReason>`; an action's `onClick` returning a promise shows it busy; `leading` is an icon or `{ image, alt }`. One queue, the page's: `showToast` and every ToastContainer share it (no per-provider queue).
+  - **Overlays:** `Modal`, `BottomSheet`, `Drawer`, `Popover` and `Menu`, each its own component over the same runes. Modal, BottomSheet and Drawer open from a bound `isOpen` (closing returns focus to what had it), compose their content from Kdesign React's parts (`ModalHeader`, `ModalBody`, `ModalFooter`, and the BottomSheet and Drawer ones; `resolveModalHeader()`, … and `useModalHeader()` for your own), and take `classes` (`root`, `panel`) to place or reshape the surface. Every overlay reports `onOpenChange`; all but Menu take `initialFocusRef`. Each overlay panel sets `--overlay-gutter`, which ActionList's `inset="overlay"` reads.
+  - **One rule for what opens and what it reveals:** `children` is the trigger and `content` what it reveals — Tooltip, Collapsible, Popover, Menu (`content` is raw content in place of `body` and `footer`) and a disclosing CardGroupItem. Modal, BottomSheet and Drawer have no trigger, so `children` is their content. Nothing opens on hover but Tooltip.
+  - **Class lint:** `@klearnow/kdesign-svelte/configs/lint` is a `kdesign` plugin for oxlint (`jsPlugins`) or ESLint: `no-conflicting-classes`, `no-interpolated-classes`, `no-unknown-kdesign-class`, `prefer-token`, and `no-restyle`, which keeps a Kdesign component's `class` to placing it (margin, size, flex or grid item, position, `hidden`) or repointing a token, as `styleOverride` did. `lintClasses()` lints a component oxlint doesn't hand to plugins.
+  - **Card** is composed as Kdesign React's from `CardHeader`, `CardBody` and `CardFooter`; parts rendered as children don't enter the bundle unless used.
+  - **Fields:** one field shell for every field. TextInput's `format` is React's `#` mask (`onChange` adds `rawValue`), with `transform` for a parse/format pair. PhoneNumberInput's country list is a dropdown under the field, or the app's own via `adapters.presentDropdown('dial-code', request)` (an `ActionListRequest` of data plus `cancelled`), showing the exported `PhoneCountryList`; `defaultPhoneCountries()` is the list. OTPInput asks `adapters.readOTP({ length, cancelled })` once mounted and enabled, and again when the owner resets `value` to `''`; its `onChange` and `onOTPFilled` report `method` (`typed`, `paste`, `autofill`, `adapter`, `value`).
+  - **Choices:** ActionList, CardGroup and ChipGroup report `{ name, value }`, with `value` shaped as `bind:value` (an array with `selectionType="multiple"`); an item's `onClick` gets `{ name, value, event }`, as React's. A long list takes its options as data (`items` or `sections`, a `row` snippet, `itemKey`) and `isVirtualized` mounts only the rows in view.
+  - **Display:** Amount, Switch, Card padding, Carousel (`activeSlide`, `autoPlay`, `showIndicators`, …), Tabs (`activation: 'manual'`), Text's `truncateAfterLines` and the `negative`/`positive` typography colours follow Kdesign React. Tooltips share a delay group with React's 300 ms delays.
+
+## 0.20.0
+
+### Minor Changes
+
+- 2ad731702: feat(kdesign-svelte): add CardGroup component
+
+  Adds `CardGroup`, `CardGroupItem`, `CardGroupCollapsibleItem`, and
+  `CardGroupCollapsibleItemBody` — a single-surface stack of navigating,
+  selecting, and disclosing rows. The group owns the border, radius, elevation,
+  top/bottom gradient, and the dividers between rows.
+
+### Patch Changes
+
+- 2ad731702: feat(kdesign-svelte): add ClockIcon, UpiIcon, and WalletIcon
+- 30bd42817: fix(kdesign-svelte): keep formatted TextInput in sync on browser autofill refill
+
+  A formatted `TextInput` could end up showing raw, unformatted digits after browser autofill: Chrome can refill the same raw digits shortly after the first fill (e.g. after a network-driven `maxlength` swap changes the form). When the refill formatted to the value already held in state, the DOM `value` was never rewritten and the raw text stayed on screen. The input element is now synced directly in that case, so the value stays formatted after an autofill refill.
+
+- Updated dependencies [2ad731702]
+- Updated dependencies [f42708331]
+  - @klearnow/kdesign-core@0.21.0
+
+## 0.19.0
+
+### Minor Changes
+
+- 384e09627: feat(kdesign-svelte): add all Kdesign icons
+
+  kdesign-svelte now ships the full Kdesign icon set (452 icons), generated from the same source as the React package. `iconMap` and the `Icons` export list are generated too, so new icons land in both packages from a single `yarn generate-icons` run. Adds the `G`, `Rect`, `Circle`, `Defs` and `ClipPath` SVG primitives needed by a handful of icons.
+
+  **Breaking change to `iconMap`:** `KlearnowTrustIcon` is no longer a key in the exported `iconMap` (it is excluded via `ICON_MAP_EXCLUDES` in the generator, matching the React package's behaviour). The component itself is still exported from `index.ts`; only the `iconMap` entry is removed. Consumers accessing `iconMap.KlearnowTrustIcon` will now get `undefined` — use the direct import instead.
+
+- 7c457ef30: feat(kdesign-svelte): add `useBreakpoint()` as the Svelte equivalent of React Kdesign's `useBreakpoint`
+
+  `KdesignProvider` now tracks the matched viewport breakpoint once and exposes it through context.
+  Call `useBreakpoint()` inside the provider tree to read `{ matchedBreakpoint, matchedDeviceType }`
+  reactively. `ToastContainer` and typography platform selection now consume the same source, so a
+  single breakpoint crossing flips both together.
+
+  `kdesign-core` gains framework-agnostic helpers under `utils`: `getMediaQuery`, `getBreakpointQueries`,
+  `getDeviceType`, and `subscribeToBreakpoint`.
+
+  During SSR the device type now resolves to `desktop` (matching React Kdesign) instead of `mobile`.
+
+### Patch Changes
+
+- 1af4bb8c8: feat(kdesign-svelte): add `countrySelectorMode` prop to `PhoneNumberInput` to render the country selector as a `bottomsheet` (default), `dropdown`, or `auto` (dropdown on desktop, bottom sheet on mobile)
+- Updated dependencies [7c457ef30]
+  - @klearnow/kdesign-core@0.20.0
+
+## 0.18.0
+
+### Minor Changes
+
+- b554977d3: feat: Button indefinite loading now uses the 3-dot loader from Figma
+
+  `Button`'s indefinite loading state now renders a 3-dot loader matching the `DotLoader` component in Figma on React web, React Native and Svelte: three 4px dots in a 24x24 frame that lift 5px and settle back in a staggered 1.2s wave, never dipping below the rest line. Under `prefers-reduced-motion` the loader holds the static Figma pose instead of animating.
+
+  The loader comes in two sizes. `size="large"` buttons are 48px tall, where the default loader reads as undersized, so they use a 1.5x-scaled loader (6px dots in a 36x36 frame); `xsmall` through `medium` buttons, at 28–36px tall, keep the default.
+
+  On React this replaces the spinner that `Button` rendered while `isLoading`. Loading colors are unchanged for every variant and color, and `FloatingActionButton`'s color override still applies. The standalone `Spinner` component is untouched.
+
+  On Svelte this fixes the existing dot loader, whose dot size, travel, opacity and timing did not match the design. The `--btn-dots-color` custom property continues to work as Button's dot-color hook.
+
+  The loader is available internally as a shared `DotLoader` component in both `@klearnow/kdesign` and `@klearnow/kdesign-svelte` so other components can reuse it. It is not part of either package's public API.
+
+  One note for tests that reach into the DOM: a React Button in its loading state no longer renders a `data-kdesign-component="spinner"` element. It renders `data-kdesign-component="dot-loader"` instead.
+
+### Patch Changes
+
+- d1dcd6a59: feat(kdesign-svelte): add Dropdown component (partial — controller, overlay, header/footer, InputDropdownButton) with ActionList option-registration
+- f09d8ed78: fix(kdesign-svelte): BottomSheet header spacing and IconButton focus ring
+
+  Fixed BottomSheet header spacing so empty headers stay consistent whether or not the drag handle is shown, and replaced the native close button with `IconButton`. Restores the `IconButton` focus-visible ring in kdesign-core after a CSS nesting regression dropped the 4px ring back to the browser default outline.
+
+- Updated dependencies [d1dcd6a59]
+- Updated dependencies [f09d8ed78]
+- Updated dependencies [b554977d3]
+  - @klearnow/kdesign-core@0.19.0
+
+## 0.17.1
+
+### Patch Changes
+
+- 263f073c6: feat(kdesign-svelte): add WhatsAppIcon, MailIcon, and MailOpenIcon
+
+## 0.17.0
+
+### Minor Changes
+
+- 3cea3fb39: feat(kdesign-svelte): add Box component with className passthrough
+
+  Ships a minimal, polymorphic `Box` for kdesign-svelte. The `as` prop picks the rendered tag, `className` is forwarded as-is to the DOM element. No Kdesign style/spacing props — intended for consumers styling layout with utility CSS (e.g. checkout's Tailwind setup).
+
+### Patch Changes
+
+- a90addbf2: fix(PhoneNumberInput): fire `onChange` on every keystroke instead of only on blur/commit
+
+## 0.16.0
+
+### Minor Changes
+
+- eae82a35c: feat(CounterInput): add `small` size between `xsmall` and `medium`
+
+### Patch Changes
+
+- Updated dependencies [eae82a35c]
+  - @klearnow/kdesign-core@0.18.0
+
+## 0.15.3
+
+### Patch Changes
+
+- 0829136ce: fix(kdesign-svelte): stop BottomSheet and Modal from scrolling the page to the top on iOS
+
+  `body-scroll-lock-upgrade` locks iOS by moving the page into `body { position: fixed; top: -scrollY }` and restoring it with `window.scrollTo()` on unlock, which loses the reading position; Android and desktop take its `overflow: hidden` branch and were unaffected. Both overlays now use a ref-counted lock that applies the same `overflow: hidden` bookkeeping on every platform and blocks background scrolling on iOS by intercepting `touchmove`, so nothing mutates page geometry. BottomSheet additionally acquires its lock at most once per open instead of on every content re-measurement.
+
+- Updated dependencies [e914cf6a8]
+  - @klearnow/kdesign-core@0.17.0
+
+## 0.15.2
+
+### Patch Changes
+
+- bde45a63b: fix(kdesign-svelte): keep formatted TextInput in sync with controlled value
+
+  Controlled `format` mode on TextInput now reconciles the display against the parent `value` after every change, so consumer sanitisation (digit-only card fields) and programmatic prefill/reset actually show up on screen. The formatter no longer leaks a trailing delimiter when the value ends on a group boundary, and the caret stays after the typed character when a delimiter is inserted.
+
+## 0.15.1
+
+### Patch Changes
+
+- 5cf3b248e: fix(kdesign-svelte): stabilize PhoneNumberInput country selector BottomSheet
+
+  Pin the country selector BottomSheet to fixed snap points so filtering the country list no longer resizes the sheet mid-search. Hide the country search field when only one country is available. Use desktop ActionList item padding (`spacing.3`) on all breakpoints for consistent list density.
+
+- Updated dependencies [ec066cfee]
+- Updated dependencies [5cf3b248e]
+  - @klearnow/kdesign-core@0.16.0
+
+## 0.15.0
+
+### Minor Changes
+
+- ba92bf1e4: feat(kdesign-svelte): add BottomSheet auto mode and maxHeight cap
+
+  When `snapPoints` is omitted, BottomSheet now opens at its natural content height (capped by `maxHeight`, default `0.97` of the viewport or portal container). Content height is tracked via `ResizeObserver` and the sheet re-clamps as content grows or shrinks. Drag-to-dismiss remains; drag-to-resize is disabled in auto mode. Passing `snapPoints` keeps the existing multi-detent behaviour unchanged. Also fixes portal-target sheets occasionally exceeding `maxHeight` when height math used `window.innerHeight` before the container height was synced.
+
+- 8bb1c2efd: feat(kdesign-svelte): add `backdropPortalTarget` to BottomSheet
+
+  Adds an optional `backdropPortalTarget` prop so the dim overlay can mount into a wider ancestor while the sheet surface stays in a nested container. When the targets differ, backdrop and surface render in separate portals with stacking tuned so the surface still paints above the dim layer.
+
+- a807ec77a: feat: add checkout studio story with style override playground
+
+  - Export slot metadata API (defineComponentSlots, KDESIGN_SLOT_METADATA) for style override introspection
+  - Add Card 'surface' slot for per-slot style overrides
+  - Fix AppBar z-index from 1000 to 100 so it no longer overlays modal surfaces like BottomSheet (default z-index 100)
+  - Fix Input focus-ring transition to animate outline-width only, avoiding black→blue color flash on focus
+
+### Patch Changes
+
+- 08b3ddc5c: feat(kdesign-svelte): add country search to PhoneNumberInput selector
+
+  Adds a `SearchInput` inside `CountrySelector`'s `BottomSheetHeader` for `PhoneNumberInput`. Filters the country list by name or dial code (case-insensitive substring match) and shows a "No countries found" empty state when the filter matches nothing.
+
+- 0f2aed9e1: docs(kdesign-svelte): add portalTarget story for PhoneNumberInput
+
+  Adds a `WithPortalTarget` Storybook example for `PhoneNumberInput` that renders the input inside a bounded container and passes `portalTarget`, showing how the country-selector bottom sheet mounts into that element instead of `document.body`.
+
+- a12fdbe9f: fix(kdesign-svelte): budget grab handle and empty header in BottomSheet height
+
+  Measure empty `BottomSheetHeader` height instead of skipping it, and always budget grab-handle height in snap/scroll math. Zero both only when the header floats (zero body padding). Fixes spurious body scroll (~28px) on short sheets with an empty header and drag handle.
+
+- Updated dependencies [a807ec77a]
+  - @klearnow/kdesign-core@0.15.0
+
+## 0.14.0
+
+### Minor Changes
+
+- 6b908dc7f: fix(kdesign-svelte): friction fixes for TextInput, OTPInput & BottomSheet
+
+  - `TextInput`/`BaseInput`: added `isReadOnly` and `spellCheck` props
+  - `OTPInput`: added `onKeyDown` callback (with field `inputIndex`) for custom keyboard navigation; consumers can call `event.preventDefault()` to opt out of internal Backspace/Arrow navigation
+  - `BottomSheet`: made `isOpen` `$bindable`
+
+### Patch Changes
+
+- 05b9981a5: - **TextInput**: `format` is now reactive — pattern changes reformat the current value instead of freezing at mount.
+  - **TextInput**: added `keyboardType` prop + `'numeric'` to `KeyboardType` for digit-only virtual keyboards.
+  - **OTPInput**: `otpLength` widened to `4 | 6 | 8` for 8-digit bank OTPs.
+  - **OTPInput**: `onOTPFilled` now latches the last-fired value, firing once per completed OTP instead of re-firing on every reactive update.
+  - **Accordion**: added `allowMultiple` + `expandedIndices`/`defaultExpandedIndices` for multi-expand support. Existing single-expand API unchanged.
+- 049760516: fix(kdesign-svelte): TextInput onChange per keystroke + controlled value fixes
+- Updated dependencies [bb7fec430]
+  - @klearnow/kdesign-core@0.14.1
+
+## 0.13.0
+
+### Minor Changes
+
+- 29ca5194c: feat: add `black` color variant to Button
+
+  fix: focus-ring transition and offset flash on inputs
+
+  fix: use `kdesignTheme` as default Storybook theme in kdesign-svelte
+
+### Patch Changes
+
+- a98fed065: fix(Button): use `interactive.border.neutral.faded` for the neutral variant's focus ring instead of the shared blue ring used by primary/positive/negative
+
+  fix: correct several Button Storybook stories where Controls didn't drive the rendered output (hardcoded `asChild` demos, dead `variant`/`color` controls on loading-matrix stories)
+
+- a61f11e3d: fix(Button): remove redundant focus-ring-parent/child classes so secondary button shows a single focus ring instead of an extra box around the text
+- Updated dependencies [a98fed065]
+- Updated dependencies [29ca5194c]
+  - @klearnow/kdesign-core@0.14.0
+
+## 0.12.1
+
+### Patch Changes
+
+- 2d5b85d86: feat(kdesign-svelte): add Modal component
+
+  Adds `Modal`, `ModalHeader`, `ModalBody`, and `ModalFooter` to `@klearnow/kdesign-svelte`. Focus is trapped within the surface while open, moves to the close button (or a caller-supplied `initialFocusRef`) on open, and returns to the previously focused element on close — including when a controlled `isOpen` prop flips to `false` directly. Background content is marked `inert` (falling back to `aria-hidden` where unsupported) while the modal is mounted, and a dev-only warning is logged if `accessibilityLabel` is missing.
+
+## 0.12.0
+
+### Minor Changes
+
+- 26428686f: feat(kdesign-svelte): add `showDragHandle` prop to BottomSheet to optionally hide the drag handle
+
+  `BottomSheet` now accepts a `showDragHandle` boolean prop (default `true`). Set it to `false` to hide the drag handle (the pill affordance at the top of the sheet) and disable drag-to-move/dismiss gestures — useful for desktop flows where dragging is not expected. The sheet can still be dismissed via the backdrop, `esc`, or programmatically.
+
+### Patch Changes
+
+- Updated dependencies [73f7e9655]
+  - @klearnow/kdesign-core@0.12.1
+
+## 0.11.8
+
+### Patch Changes
+
+- fd3e1e2d1: fix(kdesign-svelte): prevent BottomSheet focus from scrolling host content
+
+  Use `focus({ preventScroll: true })` when moving focus into the sheet on open and when returning focus to the trigger on dismiss. Stops the browser from scrolling scrollable ancestors (e.g. Checkout modals) while preserving keyboard and screen-reader focus behavior.
+
+- 788641ea1: fix(kdesign-svelte): export Link and CardHeaderLink prop types from components barrel
+
+  Export `LinkProps`, `BaseLinkProps`, and `CardHeaderLinkProps` from `@klearnow/kdesign-svelte/components` so consumers can import them without deep paths.
+
+## 0.11.7
+
+### Patch Changes
+
+- 2b2f8ec0e: fix(kdesign-svelte): constrain BottomSheet portalTarget to container bounds
+
+  Fixed BottomSheet `portalTarget` so backdrop and surface render inside the target container instead of escaping to the viewport. Adds portal root wrapper styles in kdesign-core that switch surface/backdrop from `position: fixed` to `position: absolute` when portaling into a bounded element.
+
+- Updated dependencies [59f21bda8]
+- Updated dependencies [2b2f8ec0e]
+  - @klearnow/kdesign-core@0.12.0
+
+## 0.11.6
+
+### Patch Changes
+
+- d7e6f4c5b: fix: bump Svelte to 5.56.3 and update optional parameter defaults for compatibility with checkout
+
+## 0.11.5
+
+### Patch Changes
+
+- 41ff76ed3: Remove unintended border and shadow on standalone ActionList in kdesign-svelte to match React web. Drop unused `getActionListBoxClasses`, `actionListBoxCva`, and `ActionListBoxVariants` exports from kdesign-core.
+- 84923f364: fix: resolve avatar addon clipping by separating root positioning context from clipped body
+- 349e25f85: fix: add optional `portalTarget` prop to BottomSheet and PhoneNumberInput for custom portal mounting
+- Updated dependencies [41ff76ed3]
+- Updated dependencies [84923f364]
+  - @klearnow/kdesign-core@0.11.0
+
+## 0.11.4
+
+### Patch Changes
+
+- bad271b0f: fix(TrustBadge): restore flat layout to fix icon and label vertical alignment within the pill
+- Updated dependencies [bad271b0f]
+  - @klearnow/kdesign-core@0.10.3
+
+## 0.11.3
+
+### Patch Changes
+
+- 937bc4c40: fix: run tsc after sveld so the components type barrel is not overwritten
+
+## 0.11.2
+
+### Patch Changes
+
+- 59b039ff8: fix: kdesign-svelte type pipeline - add sveld for svelte component type generation
+- Updated dependencies [a5d2dc639]
+  - @klearnow/kdesign-core@0.10.2
+
+## 0.11.1
+
+### Patch Changes
+
+- 7ec4868c5: feat: reduce kdesign-svelte bundle size
+- Updated dependencies [7ec4868c5]
+  - @klearnow/kdesign-core@0.10.1
+
+## 0.11.0
+
+### Minor Changes
+
+- b8e8c4687: feat(kdesign-svelte): add KdesignProvider theme context and style overrides
+
+  Adds KdesignProvider with theme context, color scheme management, and typography platform support for kdesign-svelte. Adds theme runtime utilities in kdesign-core (themeToCSSVariables, createTheme overrides, data-kdesign-color-scheme selectors), CSS cascade layers, component style override APIs, and button brand CSS vars.
+
+### Patch Changes
+
+- Updated dependencies [b8e8c4687]
+  - @klearnow/kdesign-core@0.10.0
+
+## 0.10.0
+
+### Minor Changes
+
+- 5a6fd8882: feat(kdesign-svelte): add `flexWrap` support to `RadioGroup`
+
+  `RadioGroup` now accepts a `flexWrap` prop (`'nowrap' | 'wrap' | 'wrap-reverse'`, default `'nowrap'`), mirroring `CheckboxGroup` and the React implementation. This is useful with `orientation="horizontal"` when radios (or radio-wrapped cards) should wrap onto multiple lines instead of overflowing.
+
+- 7a7c21d09: feat(Card): add `ticket` and `info` card variants
+
+  Adds `TicketCard` and `InfoCard` with `Body` + `Footer` subcomponents.
+
+- 3c9addbe4: fix(TrustBadge): remove `emphasis` prop and align with Kdesign DSL trust marker design
+
+  The `emphasis` prop (`'subtle' | 'intense'`) and the `TrustBadgeEmphasis` type have been removed from TrustBadge. The new Kdesign DSL design uses a single sea-subtle pill treatment regardless of surface color. Migrate by removing any `emphasis` prop usage — the updated component renders correctly on all surfaces.
+
+  - `@klearnow/kdesign`: `emphasis` prop removed from `TrustBadgeProps`
+  - `@klearnow/kdesign-svelte`: `emphasis` prop removed from `TrustBadgeProps`
+  - `@klearnow/kdesign-core`: `TrustBadgeEmphasis` type and `getTrustBadgePillEmphasisClass` removed; replaced by `getTrustBadgeVariantClass`
+
+### Patch Changes
+
+- 431f52f20: chore(kdesign-svelte): add BrowserStack cross-browser test infrastructure
+
+  Adds BrowserStack Playwright test setup for kdesign-svelte, including desktop and mobile test configurations and CI workflow integration.
+
+- e616a3de2: feat(kdesign-svelte): add CounterInput component
+- de1c5b24f: feat(kdesign-svelte): add PasswordInput component
+
+  Adds the Svelte PasswordInput (mask/reveal toggle, character counter, size/validation variants) built on the existing BaseInput. Also fixes BaseInput so `type="password"` reaches the DOM `<input>` for masking while keyboard/inputmode/autocomplete props stay on the coerced `text` type, and adds the `EyeIcon`/`EyeOffIcon` icons.
+
+- bbe9e0034: feat(kdesign-svelte): add Tabs component
+- 73b15cea1: feat(kdesign-svelte): add SegmentedControl component
+- 21de8bc90: fix(Tabs): align small filled horizontal tab corner radius with Kdesign React
+
+  - TabList container: 16px → 8px (`border.radius.small`)
+  - TabItem: 12px → 4px (`border.radius.xsmall`, mirrors SegmentedControl item)
+  - TabIndicator: 12px → 4px (`border.radius.xsmall`, mirrors SegmentedControl indicator)
+  - Focus ring: 12px → 8px (`border.radius.small` — intentionally larger than item radius to prevent 4px box-shadow inset clipping, consistent with Kdesign React)
+
+- 361b0605d: fix(Card): refactor ticket card outline with SVG for accurate notch UI
+- Updated dependencies [e616a3de2]
+- Updated dependencies [5a6fd8882]
+- Updated dependencies [7a7c21d09]
+- Updated dependencies [bbe9e0034]
+- Updated dependencies [73b15cea1]
+- Updated dependencies [21de8bc90]
+- Updated dependencies [361b0605d]
+- Updated dependencies [3c9addbe4]
+  - @klearnow/kdesign-core@0.9.0
+
+## 0.9.0
+
+### Minor Changes
+
+- adff0f113: feat(AnnouncementBanner): add AnnouncementBanner component to kdesign, kdesign-core, and kdesign-svelte
+- 75288e989: feat(AppBar, TrustBadge): add AppBar and TrustBadge components
+
+  TrustBadge renders the "Klearnow Trusted Business" trust marker; its label is configurable
+  via a `label` prop (default: "Klearnow Trusted Business") so it can evolve (e.g. "Klearnow
+  Verified") without a breaking API change. AppBar surfaces it through the `trustBadgeVariant`
+  prop on `AppBarLeading`.
+
+### Patch Changes
+
+- 0724d3d38: feat(kdesign-svelte): add ActionList component
+
+  Also fixes a React BaseMenu hover style: the hover background is now suppressed when `aria-selected=true` so a selected row's `fadedHighlighted` background is not overridden on pointer-enter. This intentional fix applies to all React `BaseMenu`-based consumers (ActionList, Select, etc.) and matches the expected selected-item UX.
+
+- ec73575f0: feat(kdesign-svelte): add Card variant prop with primary, secondary, and theme treatments
+- 7fe2a5a65: feat(kdesign-svelte): add Checkbox and CheckboxGroup components
+- db72ca068: feat(kdesign-svelte): add Input family (BaseInput, TextInput, SearchInput, OTPInput, PhoneNumberInput)
+- ee333ee75: feat(kdesign-svelte): add InputGroup component
+- 5715dc29c: fix(kdesign-svelte): add Playground stories so Storybook Controls work
+- 3b9d0466c: fix(kdesign-svelte): close gap between Tooltip arrow and bubble on left/right placements
+
+  The arrow SVG was rendered non-square (14×8). Left/right placements rotate the arrow ±90° about its center, which shifted the flat base off the bubble edge by `(width - height) / 2` (3px), leaving a visible gap. The SVG box is now square (14×14), mirroring `@floating-ui/react`'s `FloatingArrow`, so the base stays flush on every side.
+
+- 39f33f521: feat(kdesign-svelte): compose Accordion on Collapsible primitive and add CollapsibleText
+
+  - `AccordionItem` now wraps its content in `<Collapsible>` so expand/collapse animation, body `id`, and `role="region"` accessibility are owned by `CollapsibleBody` instead of duplicated in the Accordion.
+  - `AccordionItemHeader` reads the Collapsible context for toggle + `aria-controls`/`aria-expanded` and renders `<CollapsibleChevronIcon>` (chevron rotation now lives in `collapsible.module.css`).
+  - `AccordionItemBody` delegates animation to `<CollapsibleBody>` and only renders the body content + gray-body styling.
+  - Add `CollapsibleText` (text + chevron trigger, keyboard accessible) and accept `_dangerouslyDisableValidations` on `Collapsible` for API parity with React.
+
+- Updated dependencies [adff0f113]
+- Updated dependencies [75288e989]
+- Updated dependencies [0724d3d38]
+- Updated dependencies [ec73575f0]
+- Updated dependencies [7fe2a5a65]
+- Updated dependencies [db72ca068]
+- Updated dependencies [ee333ee75]
+- Updated dependencies [39f33f521]
+  - @klearnow/kdesign-core@0.8.0
+
+## 0.8.1
+
+### Patch Changes
+
+- 19e2b963e: feat(kdesign-svelte): Accordion enhancements — card surface filled variant, AvatarGroup in titleSuffix, full-width divider, gray body background prop
+- b05f5f919: feat(kdesign-svelte): add BottomSheet component
+- b50dad37b: feat(kdesign-svelte): add IconButton component
+- Updated dependencies [19e2b963e]
+- Updated dependencies [b05f5f919]
+- Updated dependencies [b50dad37b]
+  - @klearnow/kdesign-core@0.7.1
+
+## 0.8.0
+
+### Minor Changes
+
+- ea2d1d90b: feat(Badge): add checkout-scoped shape variants (intense=rectangle, subtle=pill)
+
+### Patch Changes
+
+- 884dfd7a4: feat(kdesign-svelte): add `density` prop to AvatarGroup and use typed Text/Heading for the +N overflow counter
+- 1fce4dca1: fix(kdesign-svelte): add definite loader and avatar group to Button
+
+  Adds a definite (left-to-right progress) loader and avatar group support to the
+  Svelte `Button`, reworks the indefinite loader to a pure-CSS 3-dot animation, and
+  removes the unused spinner styling/exports from `kdesign-core`.
+
+- Updated dependencies [884dfd7a4]
+- Updated dependencies [1fce4dca1]
+- Updated dependencies [ea2d1d90b]
+  - @klearnow/kdesign-core@0.7.0
+
+## 0.7.0
+
+### Minor Changes
+
+- 0d86166df: feat(kdesign-svelte): Accordion component
+
+### Patch Changes
+
+- 2a93ee201: feat(kdesign-svelte): add Skeleton component
+- b955db9c6: feat(kdesign-svelte): add Switch component
+- 684ad1fe5: feat(kdesign-svelte): add Toast component
+- 67150149c: feat(kdesign-svelte): add Tooltip component
+- Updated dependencies [2a93ee201]
+- Updated dependencies [b955db9c6]
+- Updated dependencies [684ad1fe5]
+- Updated dependencies [67150149c]
+- Updated dependencies [0d86166df]
+  - @klearnow/kdesign-core@0.6.0
+
+## 0.6.0
+
+### Minor Changes
+
+- 7cd21cb8a: feat(kdesign-svelte): add Alert, Avatar, AvatarGroup and Breadcrumb components
+- ae81d7723: feat(kdesign-svelte): adds card component to kdesign-svelte
+
+### Patch Changes
+
+- 97a47b788: feat(kdesign-svelte): add Chip component
+- Updated dependencies [97a47b788]
+- Updated dependencies [7cd21cb8a]
+- Updated dependencies [ae81d7723]
+  - @klearnow/kdesign-core@0.5.0
+
+## 0.5.1
+
+### Patch Changes
+
+- 8aedb0d26: feat(kdesign-svelte): add counter component
+- Updated dependencies [8aedb0d26]
+  - @klearnow/kdesign-core@0.4.1
+
+## 0.5.0
+
+### Minor Changes
+
+- 142949f30: feat: kdesign spark redesign for kdesign-core and kdesign-svelte.
+
+### Patch Changes
+
+- Updated dependencies [142949f30]
+  - @klearnow/kdesign-core@0.4.0
+
+## 0.4.0
+
+### Minor Changes
+
+- 46dc37f98: Added Divider component
+
+### Patch Changes
+
+- Updated dependencies [46dc37f98]
+  - @klearnow/kdesign-core@0.3.0
+
+## 0.3.0
+
+### Minor Changes
+
+- 79189b455: feat(kdesign-svelte): Add Badge component
+
+  - Added Badge component with all props matching React implementation
+  - Supports color variants: neutral, positive, negative, notice, information, primary
+  - Supports emphasis: subtle, intense
+  - Supports sizes: xsmall, small, medium, large
+  - Added icon support (placeholder for when Icon component is available)
+  - Added styled props and analytics attributes support
+  - Added Badge styles to kdesign-core package
+
+### Patch Changes
+
+- Updated dependencies [79189b455]
+  - @klearnow/kdesign-core@0.2.0
+
+## 0.2.3
+
+### Patch Changes
+
+- 1aadb2245: Updated Svelte storybook configuration
+- Updated dependencies [1aadb2245]
+  - @klearnow/kdesign-core@0.1.3
+
+## 0.2.2
+
+### Patch Changes
+
+- cdeccac95: Private package for kdesign svelte
+- Updated dependencies [cdeccac95]
+  - @klearnow/kdesign-core@0.1.2
+
+## 0.2.1
+
+### Patch Changes
+
+- 823fb8bff: Release workflow fixed for kdesign-svelte
+- Updated dependencies [823fb8bff]
+  - @klearnow/kdesign-core@0.1.1
+
+## 0.2.0
+
+### Minor Changes
+
+- 069a7163d: Releasing Kdesign components to Svelte with new packages Kdesign-core and Kdesign-svelte
+- ac14ceb6a: Version mismatch issue fixed for kdesign svelte release
+
+### Patch Changes
+
+- Updated dependencies [069a7163d]
+- Updated dependencies [ac14ceb6a]
+  - @klearnow/kdesign-core@0.1.0

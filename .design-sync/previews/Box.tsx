@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text } from '@klearnow/compass/components';
+import { Box, Text } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <Box padding="spacing.5" backgroundColor="surface.background.gray.intense">

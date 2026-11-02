@@ -86,7 +86,7 @@ function gateChecks(overrides = {}) {
   }));
 }
 
-test('GATE_CHECK_NAMES are the required blade-validate checks', () => {
+test('GATE_CHECK_NAMES are the required kdesign-validate checks', () => {
   assert.deepEqual(GATE_CHECK_NAMES, [
     'Validate Source Code',
     'Run Tests (1)',

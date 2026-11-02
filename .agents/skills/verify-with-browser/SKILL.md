@@ -24,7 +24,7 @@ Visually verify component changes in Storybook using the agent-browser CLI tool.
 
 ### Step 1: Prerequisites
 
-- Ensure Storybook is running (check terminals folder or start with `yarn start:web` in `packages/compass` or `packages/compass-svelte` depending on the package you are verifying)
+- Ensure Storybook is running (check terminals folder or start with `yarn start:web` in `packages/kdesign` or `packages/kdesign-svelte` depending on the package you are verifying)
 - Use `npx agent-browser` to run commands (no installation required)
 - Agent-browser will automatically start a daemon in the background on first use
 

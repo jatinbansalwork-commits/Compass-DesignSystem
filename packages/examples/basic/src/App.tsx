@@ -1,13 +1,13 @@
 import React from 'react';
-import { CompassProvider, Button } from '@klearnow/compass/components';
-import { compassTheme } from '@klearnow/compass/tokens';
-import '@klearnow/compass/fonts.css';
+import { KdesignProvider, Button } from '@klearnow/kdesign/components';
+import { kdesignTheme } from '@klearnow/kdesign/tokens';
+import '@klearnow/kdesign/fonts.css';
 
 function App(): React.ReactElement {
   return (
-    <CompassProvider themeTokens={compassTheme} colorScheme="light">
+    <KdesignProvider themeTokens={kdesignTheme} colorScheme="light">
       <Button onClick={() => console.log('hi')}>Hello</Button>
-    </CompassProvider>
+    </KdesignProvider>
   );
 }
 

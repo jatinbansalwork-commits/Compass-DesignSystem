@@ -13,8 +13,8 @@ import {
   CardHeaderBadge,
   Text,
   Heading,
-} from '@klearnow/compass/components';
-import { CheckCircleIcon, UsersIcon } from '@klearnow/compass/components';
+} from '@klearnow/kdesign/components';
+import { CheckCircleIcon, UsersIcon } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <Card>

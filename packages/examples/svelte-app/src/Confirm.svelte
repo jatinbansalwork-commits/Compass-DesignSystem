@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Button, OTPInput, Text } from '@klearnow/klear360-svelte/components';
-  import { Modal, ModalBody, ModalFooter, ModalHeader } from '@klearnow/klear360-svelte/components';
+  import { Button, OTPInput, Text } from '@klearnow/kdesign-svelte/components';
+  import { Modal, ModalBody, ModalFooter, ModalHeader } from '@klearnow/kdesign-svelte/components';
 
   let {
     isOpen = $bindable(false),

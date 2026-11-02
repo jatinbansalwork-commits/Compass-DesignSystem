@@ -1,0 +1,130 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+import React from 'react';
+import { PopoverContentWrapper } from './PopoverContentWrapper';
+import type { PopoverContentProps } from './types';
+import { PopoverCloseButton } from './PopoverCloseButton';
+import { usePopoverContext } from './PopoverContext';
+import { isReactNative } from '~utils';
+import BaseBox from '~components/Box/BaseBox';
+import { Text } from '~components/Typography';
+import { useIsMobile } from '~utils/useIsMobile';
+import { useTheme } from '~components/KdesignProvider';
+
+type PopoverHeaderProps = {
+  title?: string;
+  titleLeading?: React.ReactNode;
+  titleTrailing?: React.ReactNode;
+};
+
+const PopoverHeader = ({
+  title,
+  titleLeading,
+  titleTrailing,
+}: PopoverHeaderProps): React.ReactElement | null => {
+  const { titleId, openInteraction } = usePopoverContext();
+
+  const showCloseButton = openInteraction === 'click';
+  const isFloating = !(title || titleLeading);
+
+  if (isFloating) {
+    if (!showCloseButton) {
+      return null;
+    }
+    return (
+      <BaseBox
+        borderRadius="max"
+        position="absolute"
+        padding="spacing.2"
+        top="spacing.3"
+        right="spacing.3"
+        zIndex={1}
+      >
+        <PopoverCloseButton />
+      </BaseBox>
+    );
+  }
+
+  return (
+    <BaseBox
+      display="flex"
+      flexDirection="row"
+      flexWrap={isReactNative() ? 'wrap' : 'nowrap'}
+      alignItems="center"
+      gap="spacing.3"
+    >
+      {titleLeading
+        ? React.cloneElement(titleLeading as React.ReactElement, { size: 'medium' })
+        : null}
+      {title ? (
+        <BaseBox id={titleId} paddingRight="spacing.4">
+          <Text size="large" weight="semibold">
+            {title}
+          </Text>
+        </BaseBox>
+      ) : null}
+      {showCloseButton || titleTrailing ? (
+        <BaseBox
+          marginLeft="auto"
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
+          gap="spacing.2"
+          flexShrink={0}
+        >
+          {titleTrailing}
+          {showCloseButton ? <PopoverCloseButton /> : null}
+        </BaseBox>
+      ) : null}
+    </BaseBox>
+  );
+};
+
+const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
+  (
+    {
+      children,
+      title,
+      titleLeading,
+      titleTrailing,
+      footer,
+      arrow,
+      side,
+      style,
+      isVisible,
+      animationDuration,
+      maxWidth,
+    },
+    ref,
+  ) => {
+    const isMobile = useIsMobile();
+    const { colorScheme } = useTheme();
+    return (
+      <PopoverContentWrapper
+        ref={ref as never}
+        styles={style}
+        side={side}
+        isVisible={isVisible}
+        animationDuration={animationDuration}
+        isMobile={isMobile}
+        colorScheme={colorScheme}
+        maxWidth={maxWidth}
+      >
+        <BaseBox padding="spacing.5" display="flex" flexDirection="column" gap="spacing.5">
+          <BaseBox display="flex" flexDirection="column" gap="spacing.2">
+            <PopoverHeader title={title} titleLeading={titleLeading} titleTrailing={titleTrailing} />
+            <BaseBox>{children}</BaseBox>
+          </BaseBox>
+          {footer ? (
+            // On native, an earlier alignSelf="flex-start" shrink-wrapped tour footer
+            // actions and stacked Prev/Next. Full width keeps the footer row laying out
+            // correctly. Web keeps the default (no explicit width) to preserve layout.
+            <BaseBox width={isReactNative() ? '100%' : undefined}>{footer}</BaseBox>
+          ) : null}
+        </BaseBox>
+        {arrow}
+      </PopoverContentWrapper>
+    );
+  },
+);
+
+export { PopoverContent };

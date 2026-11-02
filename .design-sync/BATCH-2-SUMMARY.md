@@ -65,7 +65,7 @@ All components authored with the absolute rubric in mind:
 
 ### ✅ Styled
 - Components use design system tokens
-- Typography, colors, spacing from Compass DS
+- Typography, colors, spacing from Kdesign DS
 - Validation states properly styled (error/success)
 
 ### ✅ Complete

@@ -1,6 +1,6 @@
 # Common Utility Types
 
-These are common utility types you will come across in Compass MCP responses.
+These are common utility types you will come across in Kdesign MCP responses.
 
 - `TestID` - Used to add test ID to components for testing purposes.
 - `DataAnalyticsAttribute` - Used to add data analytics attributes to components for analytics purposes.
@@ -36,7 +36,7 @@ type FeedbackColors = 'information' | 'negative' | 'neutral' | 'notice' | 'posit
 /**
  * Breakpoints type
  *
- * Use it in StyledPropsCompass or Box to create responsive layouts using
+ * Use it in StyledPropsKdesign or Box to create responsive layouts using
  *
  * ```jsx
  * <Box padding={{ base: 'spacing.0', m: 'spacing.3', xl: 'spacing.6' }} />

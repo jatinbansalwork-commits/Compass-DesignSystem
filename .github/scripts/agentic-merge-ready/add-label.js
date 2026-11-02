@@ -47,7 +47,7 @@ async function ensureLabel(github, owner, repo, core) {
       repo,
       name: MERGE_READY_LABEL,
       color: '0E8A16',
-      description: 'Slash handled comments and blade required checks are green',
+      description: 'Slash handled comments and kdesign required checks are green',
     });
   } catch (error) {
     if (error.status !== 422) {

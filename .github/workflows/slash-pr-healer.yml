@@ -8,7 +8,7 @@ on:
         required: true
         type: string
   workflow_run:
-    workflows: ['Compass Validate']
+    workflows: ['Kdesign Validate']
     types: [completed]
 
 concurrency:
@@ -74,7 +74,7 @@ jobs:
           PR_URL: ${{ steps.pr-meta.outputs.pr_url }}
           PR_NUMBER: ${{ steps.pr-meta.outputs.pr_number }}
         run: |
-          PROMPT="Heal the pull request at ${PR_URL} using the /heal-pr skill from the blade repo. PR_NUMBER=${PR_NUMBER}. Strictly use the heal-pr skill from the blade repo only. Do not use any other skill."
+          PROMPT="Heal the pull request at ${PR_URL} using the /heal-pr skill from the kdesign repo. PR_NUMBER=${PR_NUMBER}. Strictly use the heal-pr skill from the kdesign repo only. Do not use any other skill."
 
           # Temporarily disable set -e so the script doesn't die
           # before we can print the API response when node exits 1.

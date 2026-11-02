@@ -1,28 +1,28 @@
 import type {
-  CompassComponentInstanceNode,
-  CompassFrameNode,
-  CompassGroupNode,
-  CompassNode,
-  CompassTextNode,
-  CompassVectorNode,
-} from '../types/Compass';
+  KdesignComponentInstanceNode,
+  KdesignFrameNode,
+  KdesignGroupNode,
+  KdesignNode,
+  KdesignTextNode,
+  KdesignVectorNode,
+} from '../types/Kdesign';
 
 const convertBaseNode = (
   figmaNode: Readonly<SceneNode>,
-  bladeParent: CompassNode | null,
-): CompassNode => {
-  const bladeNode: CompassNode = {
+  kdesignParent: KdesignNode | null,
+): KdesignNode => {
+  const kdesignNode: KdesignNode = {
     id: figmaNode.id,
     layerName: figmaNode.name,
     type: figmaNode.type,
-    parent: bladeParent,
+    parent: kdesignParent,
   };
 
-  return bladeNode;
+  return kdesignNode;
 };
 
 /**
- * Compass component structures aren't simple
+ * Kdesign component structures aren't simple
  * In case of icons, name of the component can be found in the main component property
  * In case of other components, use the parent's name instead
  * @param figmaNode
@@ -34,14 +34,14 @@ const getComponentName = (figmaNode: Readonly<InstanceNode>): string | null => {
 
 const convertInstanceToNode = (
   figmaNode: Readonly<InstanceNode>,
-  bladeNode: CompassNode,
-): CompassComponentInstanceNode => {
-  const bladeComponentInstance: CompassComponentInstanceNode = {
-    ...bladeNode,
+  kdesignNode: KdesignNode,
+): KdesignComponentInstanceNode => {
+  const kdesignComponentInstance: KdesignComponentInstanceNode = {
+    ...kdesignNode,
     componentProperties: figmaNode.componentProperties,
     type: 'INSTANCE',
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    children: convertIntoCompassNodes(figmaNode.children, bladeNode),
+    children: convertIntoKdesignNodes(figmaNode.children, kdesignNode),
     name: getComponentName(figmaNode),
     fills: Array.isArray(figmaNode.fills)
       ? figmaNode.fills.filter((fill) => fill.visible)
@@ -50,29 +50,29 @@ const convertInstanceToNode = (
     width: figmaNode.width,
     height: figmaNode.height,
   };
-  return bladeComponentInstance;
+  return kdesignComponentInstance;
 };
 
-const convertTextToNode = (figmaNode: Readonly<TextNode>, bladeNode: CompassNode): CompassTextNode => {
-  const bladeTextNode: CompassTextNode = {
-    ...bladeNode,
+const convertTextToNode = (figmaNode: Readonly<TextNode>, kdesignNode: KdesignNode): KdesignTextNode => {
+  const kdesignTextNode: KdesignTextNode = {
+    ...kdesignNode,
     type: 'TEXT',
     characters: figmaNode.characters,
     textStyleId: figmaNode.textStyleId,
   };
 
-  return bladeTextNode;
+  return kdesignTextNode;
 };
 
 const convertFrameToNode = (
   figmaNode: Readonly<FrameNode>,
-  bladeNode: CompassNode,
-): CompassFrameNode => {
-  const bladeFrame: CompassFrameNode = {
-    ...bladeNode,
+  kdesignNode: KdesignNode,
+): KdesignFrameNode => {
+  const kdesignFrame: KdesignFrameNode = {
+    ...kdesignNode,
     type: 'FRAME',
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    children: convertIntoCompassNodes(figmaNode.children, bladeNode),
+    children: convertIntoKdesignNodes(figmaNode.children, kdesignNode),
     counterAxisAlignItems: figmaNode.counterAxisAlignItems,
     counterAxisSizingMode: figmaNode.counterAxisSizingMode,
     primaryAxisAlignItems: figmaNode.primaryAxisAlignItems,
@@ -95,75 +95,75 @@ const convertFrameToNode = (
     maxHeight: figmaNode.maxHeight,
     maxWidth: figmaNode.maxWidth,
   };
-  return bladeFrame;
+  return kdesignFrame;
 };
 
 const convertGroupToNode = (
   figmaNode: Readonly<GroupNode>,
-  bladeNode: CompassNode,
-): CompassGroupNode => {
-  const bladeGroupNode: CompassGroupNode = {
-    ...bladeNode,
+  kdesignNode: KdesignNode,
+): KdesignGroupNode => {
+  const kdesignGroupNode: KdesignGroupNode = {
+    ...kdesignNode,
     type: 'GROUP',
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    children: convertIntoCompassNodes(figmaNode.children, bladeNode),
+    children: convertIntoKdesignNodes(figmaNode.children, kdesignNode),
     rotation: figmaNode.rotation,
     layoutAlign: figmaNode.layoutAlign,
     layoutGrow: figmaNode.layoutGrow,
     layoutPositioning: figmaNode.layoutPositioning,
   };
-  return bladeGroupNode;
+  return kdesignGroupNode;
 };
 
 const convertVectorToNode = (
   figmaNode: Readonly<VectorNode>,
-  bladeNode: CompassNode,
-): CompassVectorNode => {
-  const bladeVectorNode: CompassVectorNode = {
-    ...bladeNode,
+  kdesignNode: KdesignNode,
+): KdesignVectorNode => {
+  const kdesignVectorNode: KdesignVectorNode = {
+    ...kdesignNode,
     type: 'VECTOR',
     fills: Array.isArray(figmaNode.fills)
       ? figmaNode.fills.filter((fill) => fill.visible)
       : figmaNode.fills,
     fillStyleId: figmaNode.fillStyleId,
   };
-  return bladeVectorNode;
+  return kdesignVectorNode;
 };
 
-export const convertIntoCompassNodes = (
+export const convertIntoKdesignNodes = (
   figmaNodes: ReadonlyArray<SceneNode>,
-  bladeParent: CompassNode | null,
-): Array<CompassNode> => {
-  const bladeNodes: CompassNode[] = [];
+  kdesignParent: KdesignNode | null,
+): Array<KdesignNode> => {
+  const kdesignNodes: KdesignNode[] = [];
   figmaNodes.forEach((figmaNode) => {
     if (!figmaNode.visible) {
       return;
     }
 
-    let bladeNode = convertBaseNode(figmaNode, bladeParent);
+    let kdesignNode = convertBaseNode(figmaNode, kdesignParent);
 
     switch (figmaNode.type) {
       case 'INSTANCE':
-        bladeNode = convertInstanceToNode(figmaNode, bladeNode);
+        kdesignNode = convertInstanceToNode(figmaNode, kdesignNode);
         break;
       case 'TEXT':
-        bladeNode = convertTextToNode(figmaNode, bladeNode);
+        kdesignNode = convertTextToNode(figmaNode, kdesignNode);
         break;
       case 'FRAME':
-        bladeNode = convertFrameToNode(figmaNode, bladeNode);
+        kdesignNode = convertFrameToNode(figmaNode, kdesignNode);
         break;
       case 'GROUP':
-        bladeNode = convertGroupToNode(figmaNode, bladeNode);
+        kdesignNode = convertGroupToNode(figmaNode, kdesignNode);
         break;
       case 'VECTOR':
-        bladeNode = convertVectorToNode(figmaNode, bladeNode);
+        kdesignNode = convertVectorToNode(figmaNode, kdesignNode);
         break;
       default:
         break;
     }
 
-    bladeNodes.push(bladeNode);
+    kdesignNodes.push(kdesignNode);
   });
 
-  return bladeNodes;
+  return kdesignNodes;
 };

@@ -12,7 +12,7 @@ import {
   TableFooterCell,
   Badge,
   Code,
-} from '@klearnow/compass/components';
+} from '@klearnow/kdesign/components';
 
 const transactionData = {
   nodes: [

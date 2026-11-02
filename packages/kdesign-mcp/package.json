@@ -1,0 +1,60 @@
+{
+  "name": "@jatin_ux/kdesign-mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol server for Kdesign",
+  "main": "dist/exports.js",
+  "type": "module",
+  "bin": {
+    "kdesign-mcp": "dist/server.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jatinbansalwork-commits/Compass-DesignSystem.git",
+    "directory": "packages/kdesign-mcp"
+  },
+  "files": [
+    "dist",
+    "knowledgebase",
+    "cursorRules",
+    "skillTemplate",
+    "base-kdesign-template"
+  ],
+  "scripts": {
+    "prepare": "yarn build",
+    "build": "cross-env NODE_ENV=production sh -c \"tsc && chmod +x dist/server.js && node src/replaceEnv.js\"",
+    "dev": "tsx src/server.ts",
+    "inspect": "npx -y @modelcontextprotocol/inspector node dist/server.js",
+    "start": "node dist/server.js",
+    "lint": "eslint --ext .ts src/",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:updateSnapshots": "vitest -u",
+    "prebuild": "node scripts/copyKnowledgebase.mjs",
+    "predev": "node scripts/copyKnowledgebase.mjs"
+  },
+  "keywords": [
+    "klearnow",
+    "kdesign",
+    "mcp",
+    "anthropic"
+  ],
+  "author": "Klearnow",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.26.0",
+    "@segment/analytics-node": "2.2.1",
+    "@sentry/node": "9.19.0",
+    "dedent": "1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.12.6",
+    "cross-env": "7.0.3",
+    "dotenv": "16.4.5",
+    "tsx": "4.7.1",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

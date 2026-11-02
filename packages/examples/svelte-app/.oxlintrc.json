@@ -1,11 +1,11 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "jsPlugins": ["@klearnow/compass-svelte/configs/lint"],
+  "jsPlugins": ["@klearnow/kdesign-svelte/configs/lint"],
   "rules": {
-    "blade/no-conflicting-classes": "error",
-    "blade/no-interpolated-classes": "error",
-    "blade/no-unknown-blade-class": "error",
-    "blade/prefer-token": "warn",
-    "blade/no-restyle": "error"
+    "kdesign/no-conflicting-classes": "error",
+    "kdesign/no-interpolated-classes": "error",
+    "kdesign/no-unknown-kdesign-class": "error",
+    "kdesign/prefer-token": "warn",
+    "kdesign/no-restyle": "error"
   }
 }

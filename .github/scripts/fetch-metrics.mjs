@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Fetches agentic blade metrics for klearnow/klear360 repo.
+ * Fetches agentic kdesign metrics for klearnow/klear360 repo.
  *
  * Usage:
  *   node fetch-metrics.mjs [days]
@@ -101,7 +101,7 @@ function median(arr) {
 const avgTtm = ttmHours.length ? ttmHours.reduce((a, b) => a + b, 0) / ttmHours.length : null;
 const medTtm = median(ttmHours);
 
-const report = `> Agentic Klear360 Metrics — ${sinceLabel} to ${todayLabel} (${days} day${days !== 1 ? "s" : ""})
+const report = `> Agentic Kdesign Metrics — ${sinceLabel} to ${todayLabel} (${days} day${days !== 1 ? "s" : ""})
 
 - Timespan: Last ${days} day${days !== 1 ? "s" : ""} (${sinceLabel} to ${todayLabel})
 

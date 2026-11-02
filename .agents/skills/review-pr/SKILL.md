@@ -1,10 +1,10 @@
 ---
 name: review-pr
-description: Review blade PRs by fetching diff, checking CI status, and getting Storybook URL. Use when reviewing PRs, checking PR status, or getting preview links for klearnow/compass PRs.
+description: Review kdesign PRs by fetching diff, checking CI status, and getting Storybook URL. Use when reviewing PRs, checking PR status, or getting preview links for klearnow/compass PRs.
 disable-model-invocation: true
 ---
 
-# Review Compass PR
+# Review Kdesign PR
 
 ## Arguments / Clarifications
 
@@ -126,15 +126,15 @@ Save the synthesized JSON to a temp file and run the post script. Pass `--pendin
 
 ```bash
 # Save the review JSON to a temp file
-cat > /tmp/blade-review-{PR_NUMBER}.json << 'EOF'
+cat > /tmp/kdesign-review-{PR_NUMBER}.json << 'EOF'
 {REVIEW_JSON}
 EOF
 
 # If ShouldPostComment is true (default):
-node .agents/skills/review-pr/scripts/post-review.js /tmp/blade-review-{PR_NUMBER}.json {PR_NUMBER}
+node .agents/skills/review-pr/scripts/post-review.js /tmp/kdesign-review-{PR_NUMBER}.json {PR_NUMBER}
 
 # If ShouldPostComment is false:
-node .agents/skills/review-pr/scripts/post-review.js /tmp/blade-review-{PR_NUMBER}.json {PR_NUMBER} klearnow/compass --pending
+node .agents/skills/review-pr/scripts/post-review.js /tmp/kdesign-review-{PR_NUMBER}.json {PR_NUMBER} klearnow/compass --pending
 ```
 
 When `--pending` is used, the script prints the review ID and a command to submit it when ready:

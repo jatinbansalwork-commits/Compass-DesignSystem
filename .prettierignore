@@ -7,9 +7,9 @@ coverage
 # build direcotries
 **/storybook-site
 **/build
-packages/klear360/components.js
-packages/klear360/tokens.js
-packages/klear360/utils.js
+packages/kdesign/components.js
+packages/kdesign/tokens.js
+packages/kdesign/utils.js
 
 # misc
 .DS_Store
@@ -23,7 +23,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# generated: klear360-svelte's class index (src/test/lint-index.test.ts writes it)
-packages/klear360-svelte/src/lint/index.json
-# generated: klear360-svelte's bundled UnoCSS config (scripts/build-uno-config.mjs)
-packages/klear360-svelte/uno/config.js
+# generated: kdesign-svelte's class index (src/test/lint-index.test.ts writes it)
+packages/kdesign-svelte/src/lint/index.json
+# generated: kdesign-svelte's bundled UnoCSS config (scripts/build-uno-config.mjs)
+packages/kdesign-svelte/uno/config.js

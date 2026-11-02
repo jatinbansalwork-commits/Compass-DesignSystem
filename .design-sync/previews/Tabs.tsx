@@ -1,7 +1,7 @@
 import React from 'react';
-import { Tabs, TabList, TabItem, TabPanel } from '@klearnow/compass/components';
-import { SettingsIcon, ClipboardIcon, SubscriptionsIcon } from '@klearnow/compass/components';
-import { Text, Box } from '@klearnow/compass/components';
+import { Tabs, TabList, TabItem, TabPanel } from '@klearnow/kdesign/components';
+import { SettingsIcon, ClipboardIcon, SubscriptionsIcon } from '@klearnow/kdesign/components';
+import { Text, Box } from '@klearnow/kdesign/components';
 
 export const Default = () => (
   <Tabs variant="bordered">

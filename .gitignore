@@ -8,16 +8,16 @@ dist
 # build direcotries
 **/storybook-site
 **/build
-packages/klear360/components.js
-packages/klear360/components.native.js
-packages/klear360/components.d.ts
-packages/klear360/tokens.js
-packages/klear360/tokens.native.js
-packages/klear360/tokens.d.ts
-packages/klear360/utils.js
-packages/klear360/utils.native.js
-packages/klear360/utils.d.ts
-packages/klear360/public/docs-yarn-lock.yaml
+packages/kdesign/components.js
+packages/kdesign/components.native.js
+packages/kdesign/components.d.ts
+packages/kdesign/tokens.js
+packages/kdesign/tokens.native.js
+packages/kdesign/tokens.d.ts
+packages/kdesign/utils.js
+packages/kdesign/utils.native.js
+packages/kdesign/utils.d.ts
+packages/kdesign/public/docs-yarn-lock.yaml
 
 # misc
 .DS_Store
@@ -101,7 +101,7 @@ buck-out/
 
 knowledgebase-ts-errors*.json
 knowledgebase-drift-report*.json
-.cursor/rules/frontend-klear360-rules.mdc
+.cursor/rules/frontend-kdesign-rules.mdc
 .playwright-mcp/
 
 # Agent scratch output — reports, plans and worktrees an agent writes while

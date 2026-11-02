@@ -1,11 +1,11 @@
 {
   "mcpServers": {
-    "compass": {
+    "kdesign": {
       "command": "/Users/jatinbansal/.nvm/versions/node/v24.19.0/bin/node",
       "args": [
-        "/Users/jatinbansal/Downloads/Klear360-Master/packages/compass-mcp/dist/server.js"
+        "/Users/jatinbansal/Downloads/Kdesign-Master/packages/kdesign-mcp/dist/server.js"
       ],
-      "description": "Compass MCP — use full node path (nvm) so Cursor can start the server"
+      "description": "Kdesign MCP — use full node path (nvm) so Cursor can start the server"
     }
   }
 }

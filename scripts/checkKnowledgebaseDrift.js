@@ -1,10 +1,10 @@
 /**
- * Finds drift between Compass component prop types (source of truth) and the
- * TypeScript types written in compass-plugin knowledgebase docs.
+ * Finds drift between Kdesign component prop types (source of truth) and the
+ * TypeScript types written in kdesign-plugin knowledgebase docs.
  *
- * For every `packages/compass-plugin/skills/{skill}/references/components/{Name}.md` it compares
+ * For every `packages/kdesign-plugin/skills/{skill}/references/components/{Name}.md` it compares
  * `{Name}Props` from the doc with `{Name}Props` exported by the target package's
- * `src/components` (`--target react` = packages/compass, the default):
+ * `src/components` (`--target react` = packages/kdesign, the default):
  * - props that exist in code but are missing in the doc
  * - props that exist in the doc but not in code
  * - literal union values (e.g. `size`) that differ between doc and code.
@@ -26,7 +26,7 @@ if (
   process.argv.includes('--target') &&
   process.argv[process.argv.indexOf('--target') + 1] === 'svelte'
 ) {
-  // compass-svelte declares props on `$props()`, not as exported types: its
+  // kdesign-svelte declares props on `$props()`, not as exported types: its
   // own check, waited for here, so the React check below never runs.
   const { status } = require('child_process').spawnSync(
     process.execPath,
@@ -55,14 +55,14 @@ const selectedComponents = args.filter(
 // prop; `sharedEntry` imports them from the package source.
 const TARGETS = {
   react: {
-    packageDir: path.join(rootDir, 'packages/compass'),
-    docsDir: path.join(rootDir, 'packages/compass-plugin/skills/compass/references/components'),
+    packageDir: path.join(rootDir, 'packages/kdesign'),
+    docsDir: path.join(rootDir, 'packages/kdesign-plugin/skills/kdesign/references/components'),
     reportPath: path.join(rootDir, 'knowledgebase-drift-report.json'),
     ignoreConfig: './knowledgebaseDriftIgnore.json',
-    shared: ['StyledPropsCompass', 'DataAnalyticsAttribute', 'TestID'],
-    sharedEntry: `import type { StyledPropsCompass } from './components/Box/styledProps';
+    shared: ['StyledPropsKdesign', 'DataAnalyticsAttribute', 'TestID'],
+    sharedEntry: `import type { StyledPropsKdesign } from './components/Box/styledProps';
 import type { DataAnalyticsAttribute, TestID } from './utils/types';
-export type __Shared = StyledPropsCompass & DataAnalyticsAttribute & TestID;`,
+export type __Shared = StyledPropsKdesign & DataAnalyticsAttribute & TestID;`,
     docPreamble: `import type React from 'react';`,
     compilerOptions: {},
     componentPropsFallback: (name) => `import type React from 'react';
@@ -76,7 +76,7 @@ if (!target) {
   console.error(`Unknown --target "${targetName}". Use one of: ${Object.keys(TARGETS).join(', ')}`);
   process.exit(2);
 }
-const { packageDir: bladeDir, docsDir: componentsDocsDir, reportPath } = target;
+const { packageDir: kdesignDir, docsDir: componentsDocsDir, reportPath } = target;
 const ignoreConfig = require(target.ignoreConfig);
 const SHARED_PROP_TYPES = target.shared;
 
@@ -88,7 +88,7 @@ const SHARED_PROP_TYPES = target.shared;
 const getPropsTypeExpression = (name) => ignoreConfig.propsTypes?.[name] ?? `${name}Props`;
 
 const project = new Project({
-  tsConfigFilePath: path.join(bladeDir, 'tsconfig.json'),
+  tsConfigFilePath: path.join(kdesignDir, 'tsconfig.json'),
   skipAddingFilesFromTsConfig: true,
   compilerOptions: target.compilerOptions,
 });
@@ -156,10 +156,10 @@ const resolveType = (fileName, source) => {
 };
 
 // ---- code side ----
-const codeEntryPath = path.join(bladeDir, 'src/__knowledgebaseDrift__.ts');
+const codeEntryPath = path.join(kdesignDir, 'src/__knowledgebaseDrift__.ts');
 const codeEntry = project.createSourceFile(codeEntryPath, target.sharedEntry, { overwrite: true });
-const bladeModule = project
-  .addSourceFileAtPath(path.join(bladeDir, 'src/components/index.ts'))
+const kdesignModule = project
+  .addSourceFileAtPath(path.join(kdesignDir, 'src/components/index.ts'))
   .getExportedDeclarations();
 const sharedAlias = codeEntry.getTypeAliasOrThrow('__Shared');
 const sharedPropNames = new Set(
@@ -208,10 +208,10 @@ const getCodeProps = (name) => {
   let source;
   const expression = getPropsTypeExpression(name);
   const typeNames = expression.split(/[|&]/).map((part) => part.trim());
-  if (typeNames.every((typeName) => bladeModule.has(typeName))) {
+  if (typeNames.every((typeName) => kdesignModule.has(typeName))) {
     source = `import type { ${typeNames.join(', ')} } from './components';
 export type __Resolved = ${expression};`;
-  } else if (bladeModule.has(name) && target.componentPropsFallback) {
+  } else if (kdesignModule.has(name) && target.componentPropsFallback) {
     source = target.componentPropsFallback(name);
   } else {
     return null;
@@ -261,7 +261,7 @@ const getDocProps = (name, markdown) => {
     return { props: null, reason: `No "${name}Props" type in doc` };
   }
 
-  const docFilePath = path.join(bladeDir, `src/__knowledgebaseDrift__${name}.tsx`);
+  const docFilePath = path.join(kdesignDir, `src/__knowledgebaseDrift__${name}.tsx`);
   // Docs use helper types without importing them. Stub unknown names as empty
   // types so the doc's own props still resolve.
   const stubs = new Set(SHARED_PROP_TYPES);
@@ -321,7 +321,7 @@ for (const name of docFiles) {
   const codeProps = getCodeProps(name);
   const { props: docProps, unresolvedTypes, reason, cleanup } = codeProps
     ? readDocProps(name)
-    : { props: null, reason: `No "${name}Props" export in ${path.relative(rootDir, bladeDir)}` };
+    : { props: null, reason: `No "${name}Props" export in ${path.relative(rootDir, kdesignDir)}` };
   if (!codeProps || !docProps) {
     const ignoreReason = ignoreConfig.skippedDocs[name];
     if (ignoreReason) report.ignoredSkipped.push({ component: name, reason: ignoreReason });
@@ -378,8 +378,8 @@ if (selectedComponents.length === 0) {
   const allDocsContent = docFiles
     .map((name) => fs.readFileSync(path.join(componentsDocsDir, `${name}.md`), 'utf8'))
     .join('\n');
-  report.missingDocs = [...bladeModule.keys()]
-    .filter((exportName) => /^[A-Z]/.test(exportName) && bladeModule.has(`${exportName}Props`))
+  report.missingDocs = [...kdesignModule.keys()]
+    .filter((exportName) => /^[A-Z]/.test(exportName) && kdesignModule.has(`${exportName}Props`))
     .filter((exportName) => !exportName.startsWith('Base') && !ignoreConfig.missingDocs[exportName])
     .filter((exportName) => !new RegExp(`\\b${exportName}\\b`).test(allDocsContent))
     .sort();

@@ -103,9 +103,9 @@ module.exports = {
         'plugin:@typescript-eslint/recommended-requiring-type-checking',
         'plugin:prettier/recommended',
       ],
-      plugins: ['@typescript-eslint', 'jsx-a11y', 'no-only-tests', 'compass'],
+      plugins: ['@typescript-eslint', 'jsx-a11y', 'no-only-tests', 'kdesign'],
       rules: {
-        'compass/no-cross-platform-imports': ['error', { ignoreImportsPattern: 'renderWithSSR' }],
+        'kdesign/no-cross-platform-imports': ['error', { ignoreImportsPattern: 'renderWithSSR' }],
         'import/no-cycle': ['error', { maxDepth: 4, ignoreExternal: false }],
         'import/no-deprecated': 'off',
         'react/jsx-uses-react': 'off',
@@ -171,20 +171,20 @@ module.exports = {
       },
     },
     {
-      // klear360-core uses path aliases that resolve to sibling packages
+      // kdesign-core uses path aliases that resolve to sibling packages
       // and has default exports that trigger false positives with export *
-      files: ['packages/klear360-core/**/*.{ts,tsx,js}'],
+      files: ['packages/kdesign-core/**/*.{ts,tsx,js}'],
       rules: {
         'import/no-extraneous-dependencies': 'off',
         'import/export': 'off',
       },
     },
     {
-      // klear360-svelte's runes wire models that refer to each other: a
+      // kdesign-svelte's runes wire models that refer to each other: a
       // closure may read a const declared after it, since it only runs once
       // both exist, and a function declaration is hoisted. A const used before
       // its definition in the same scope is still an error.
-      files: ['packages/klear360-svelte/src/**/*.ts'],
+      files: ['packages/kdesign-svelte/src/**/*.ts'],
       rules: {
         '@typescript-eslint/no-use-before-define': [
           'error',
@@ -193,17 +193,17 @@ module.exports = {
       },
     },
     {
-      // blade imports from sibling packages in monorepo
-      files: ['packages/klear360/**/*.{ts,tsx,js}'],
+      // kdesign imports from sibling packages in monorepo
+      files: ['packages/kdesign/**/*.{ts,tsx,js}'],
       rules: {
         'import/no-extraneous-dependencies': 'off',
       },
     },
     {
-      // Compass component prop types — warn when new exported props ship without JSDoc (ADR-007)
+      // Kdesign component prop types — warn when new exported props ship without JSDoc (ADR-007)
       files: [
-        'packages/compass/src/components/**/types.ts',
-        'packages/compass/src/components/**/*.types.ts',
+        'packages/kdesign/src/components/**/types.ts',
+        'packages/kdesign/src/components/**/*.types.ts',
       ],
       plugins: ['jsdoc'],
       rules: {
@@ -222,6 +222,6 @@ module.exports = {
       },
     },
   ],
-  // klear360-mcp has its own standalone .eslintrc.cjs to avoid memory issues
-  ignorePatterns: ['packages/klear360-coverage-extension', 'packages/klear360-mcp'],
+  // kdesign-mcp has its own standalone .eslintrc.cjs to avoid memory issues
+  ignorePatterns: ['packages/kdesign-coverage-extension', 'packages/kdesign-mcp'],
 };

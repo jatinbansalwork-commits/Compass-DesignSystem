@@ -8,7 +8,7 @@ import showNotification from './showNotification';
  * convert the dot to square braces for values of object
  * here's the regex - console.log('chromatic.azure.a50'.replace(regex, (m,s)=> {console.log({m,s}); return `[${m.replace('.','')}]`; }));
  * 'chromatic.azure.50'.replace(/\.[0-9]+/, (matchedString)=> `[${matchedString.replace('.','')}]`)
- * commit to blade
+ * commit to kdesign
  * create a UI to input GitHub PAT
  */
 

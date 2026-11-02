@@ -1,6 +1,6 @@
-# Compass Table — icons & spacing
+# Kdesign Table — icons & spacing
 
-When editing `packages/compass/src/components/Table/**`, read **`packages/compass/src/components/Table/docs/TABLE_LAYOUT.md`** and use tokens from `tokens.ts`:
+When editing `packages/kdesign/src/components/Table/**`, read **`packages/kdesign/src/components/Table/docs/TABLE_LAYOUT.md`** and use tokens from `tokens.ts`:
 
 - `tableIcons` — control / row hover sizes (prefer over literal `size="small"`)
 - `tableHeaderBand` — header label + filter band padding and gaps
