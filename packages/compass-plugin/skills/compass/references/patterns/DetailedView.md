@@ -46,7 +46,7 @@ A DetailedView is a pattern that displays comprehensive details of a transaction
 │  Top Navigation (56px, black)  — Logo | Tabs | Search | Avatar              │
 ├──────────────┬──────────────────────────────────────┬────────────────────   ┤
 │              │  Page Title                Actions   │  ┌──────────────┐     │
-│  Side Nav    │  Tabs (Payments | Orders)            │  │ Drawer       │     │
+│  Side Nav    │  Tabs (Clearance queue | Orders)            │  │ Drawer       │     │
 │  (240px)     ├──────────────────────────────────────┤  │  Header      │     │
 │              │  Quick Filters  Search  Export  CTA  │  │  ─────────── │     │
 │  Home        ├──────────────────────────────────────┤  │  Body (slot) │     │
@@ -67,7 +67,7 @@ A DetailedView is a pattern that displays comprehensive details of a transaction
 │  Top Navigation (56px, black)        │
 ├──────────────────────────────────────┤
 │  Page Title            CTA   Button  │
-│  Tabs (Payments | Orders)            │
+│  Tabs (Clearance queue | Orders)            │
 ├──────────────────────────────────────┤
 │  Quick Filters | Search | Actions    │
 │  ┌──────────────────────────────┐    │
@@ -123,15 +123,15 @@ Use the `Amount` component. Format: `₹ 1,000.00` (symbol + value + decimals). 
 
 ### Badge Group
 Up to 3 semantic badge slots — use to communicate:
-- **Badge 1** (notice/orange): Transaction or payout status (e.g. Pending, Processing, Captured)
+- **Badge 1** (notice/orange): Transaction or payout status (e.g. Exam hold, Processing, Captured)
 - **Badge 2** (information/blue): Secondary status or payment method (e.g. UPI, NEFT, Card)
-- **Badge 3** (neutral/grey): Additional metadata (e.g. Internal, Refund, Test)
+- **Badge 3** (neutral/grey): Additional metadata (e.g. Internal, Consumption entry, Test)
 
 ### Caption Text
 Use `•` separated meta items (e.g. `14 May 2025 • 10:30 AM`). Render with muted text color.
 
 ### Highlights (optional)
-Two-column key–value grid using `InfoItem` pairs. Use when 2–4 key facts need to surface without opening the body (e.g. Ref ID, Bank, Account number).
+Two-column key–value grid using `InfoItem` pairs. Use when 2–4 key facts need to surface without opening the body (e.g. Ref ID, Bank, HTS code number).
 
 ## Drawer Body — Drawer Sections
 
@@ -146,7 +146,7 @@ The drawer body is a **slot** — replace it with one or more `drawer-section` c
 | `.drawer / transactions-view` | Transaction breakdown |
 | `.drawer / contact-view` | Contact / vendor information |
 | `.drawer / settlement-view` | Settlement summary and breakdown |
-| `.drawer / payment-link-view` | Payment link metadata |
+| `.drawer / payment-link-view` | Shipment link metadata |
 | `.drawer / link-view` | Linked entity reference |
 | `.drawer / tax-view` | Tax and invoice summary |
 | `.drawer / qr-code-view` | QR code display with sections |
@@ -158,12 +158,12 @@ The drawer body is a **slot** — replace it with one or more `drawer-section` c
 |---|---|
 | `single-payout-view` | KlearnowX payout — recipient bank details, amount, UTR |
 | `bulk-payout-view` | Bulk payout batch — batch ID, file name, items count |
-| `transactions-view` | Payments dashboard — payment ID, order, method, gateway |
+| `transactions-view` | Clearance queue dashboard — payment ID, order, method, gateway |
 | `contact-view` | Contacts — name, email, phone, fund accounts |
 | `tax-view` | Invoice/tax — GST, TDS, invoice number |
-| `link-view` | Payment Links — link URL, expiry, usage |
+| `link-view` | Shipment Links — link URL, expiry, usage |
 | `settlements-view` | Settlements — UTR, settled amount, date |
-| `payment-links-view` | Payment Links page — link details with QR |
+| `payment-links-view` | Shipment Links page — link details with QR |
 | `qr-code-view` | QR code page — QR image, payment info |
 | `transactions-view` (2nd) | Alternate transaction detail variant |
 
@@ -217,7 +217,7 @@ type Transaction = {
   id: string;
   paymentId: string;
   amount: number;
-  status: 'Completed' | 'Pending' | 'Failed';
+  status: 'Released' | 'Exam hold' | 'Rejected';
   date: Date;
   type: string;
   method: string;
@@ -244,11 +244,11 @@ const KeyValueGrid = ({ children }: { children: React.ReactNode }) => (
 const Timeline = ({ status }: { status: string }) => (
   <StepGroup orientation="vertical" size="medium">
     <StepItem
-      title="Payment Initiated"
-      stepProgress={['Completed', 'Pending', 'Failed'].includes(status) ? 'full' : 'none'}
+      title="Shipment Initiated"
+      stepProgress={['Released', 'Exam hold', 'Rejected'].includes(status) ? 'full' : 'none'}
       marker={
         <StepItemIndicator
-          color={['Completed', 'Pending', 'Failed'].includes(status) ? 'positive' : 'neutral'}
+          color={['Released', 'Exam hold', 'Rejected'].includes(status) ? 'positive' : 'neutral'}
         />
       }
     />
@@ -256,21 +256,21 @@ const Timeline = ({ status }: { status: string }) => (
       <CollapsibleLink>Show More</CollapsibleLink>
       <CollapsibleBody>
         <StepItem
-          title="Payment Processing"
-          stepProgress={['Completed', 'Failed'].includes(status) ? 'full' : 'start'}
+          title="Shipment Processing"
+          stepProgress={['Released', 'Rejected'].includes(status) ? 'full' : 'start'}
           marker={
             <StepItemIndicator
-              color={['Completed', 'Failed'].includes(status) ? 'positive' : 'notice'}
+              color={['Released', 'Rejected'].includes(status) ? 'positive' : 'notice'}
             />
           }
         />
         <StepItem
-          title={status === 'Failed' ? 'Payment Failed' : 'Payment Completed'}
-          stepProgress={['Completed', 'Failed'].includes(status) ? 'full' : 'none'}
+          title={status === 'Rejected' ? 'Shipment Rejected' : 'Shipment Released'}
+          stepProgress={['Released', 'Rejected'].includes(status) ? 'full' : 'none'}
           marker={
             <StepItemIndicator
               color={
-                status === 'Failed' ? 'negative' : status === 'Completed' ? 'positive' : 'neutral'
+                status === 'Rejected' ? 'negative' : status === 'Released' ? 'positive' : 'neutral'
               }
             />
           }
@@ -289,11 +289,11 @@ const TransactionDetailedView = () => {
       id: '1',
       paymentId: 'rzp_123456',
       amount: 5000,
-      status: 'Completed',
+      status: 'Released',
       date: new Date('2024-01-15'),
       type: 'Settlement',
-      method: 'Bank Transfer',
-      name: 'John Doe',
+      method: 'Ocean',
+      name: 'Schlumberger USA Inc.',
       bank: 'HDFC',
       account: '1234567890',
     },
@@ -301,9 +301,9 @@ const TransactionDetailedView = () => {
       id: '2',
       paymentId: 'rzp_789012',
       amount: 2500,
-      status: 'Pending',
+      status: 'Exam hold',
       date: new Date('2024-01-16'),
-      type: 'Refund',
+      type: 'Consumption entry',
       method: 'UPI',
       name: 'Jane Smith',
       bank: 'ICICI',
@@ -324,7 +324,7 @@ const TransactionDetailedView = () => {
               <Button variant="secondary" marginRight="spacing.2">
                 Export
               </Button>
-              <Button>Refund</Button>
+              <Button>Consumption entry</Button>
             </TableToolbarActions>
           </TableToolbar>
         }
@@ -336,8 +336,8 @@ const TransactionDetailedView = () => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell>Payment ID</TableHeaderCell>
-                <TableHeaderCell>Account Holder</TableHeaderCell>
+                <TableHeaderCell>Shipment ID</TableHeaderCell>
+                <TableHeaderCell>Importer</TableHeaderCell>
                 <TableHeaderCell>Amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Method</TableHeaderCell>
@@ -373,9 +373,9 @@ const TransactionDetailedView = () => {
                     <Badge
                       size="medium"
                       color={
-                        transaction.status === 'Completed'
+                        transaction.status === 'Released'
                           ? 'positive'
-                          : transaction.status === 'Pending'
+                          : transaction.status === 'Exam hold'
                           ? 'notice'
                           : 'negative'
                       }
@@ -397,9 +397,9 @@ const TransactionDetailedView = () => {
       >
         <DrawerHeader
           color={
-            selectedTransaction?.status === 'Completed'
+            selectedTransaction?.status === 'Released'
               ? 'positive'
-              : selectedTransaction?.status === 'Pending'
+              : selectedTransaction?.status === 'Exam hold'
               ? 'notice'
               : 'negative'
           }
@@ -428,22 +428,22 @@ const TransactionDetailedView = () => {
             <Badge
               size="medium"
               color={
-                selectedTransaction?.status === 'Completed'
+                selectedTransaction?.status === 'Released'
                   ? 'positive'
-                  : selectedTransaction?.status === 'Pending'
+                  : selectedTransaction?.status === 'Exam hold'
                   ? 'notice'
                   : 'negative'
               }
               emphasis="intense"
               icon={
-                selectedTransaction?.status === 'Completed'
+                selectedTransaction?.status === 'Released'
                   ? CheckIcon
-                  : selectedTransaction?.status === 'Pending'
+                  : selectedTransaction?.status === 'Exam hold'
                   ? ClockIcon
                   : undefined
               }
             >
-              {selectedTransaction?.status ?? 'Pending'}
+              {selectedTransaction?.status ?? 'Exam hold'}
             </Badge>
           </Box>
           <Box
@@ -458,7 +458,7 @@ const TransactionDetailedView = () => {
               <Divider thickness="thicker" orientation="vertical" />
               <Box paddingX="spacing.3">
                 <Text size="xsmall" color="surface.text.gray.muted" weight="semibold">
-                  Payment ID
+                  Shipment ID
                 </Text>
                 <Text size="medium">{selectedTransaction?.paymentId}</Text>
               </Box>
@@ -497,7 +497,7 @@ const TransactionDetailedView = () => {
               <Text variant="body" size="medium" weight="semibold" marginBottom="spacing.4">
                 Timeline
               </Text>
-              <Timeline status={selectedTransaction?.status ?? 'Pending'} />
+              <Timeline status={selectedTransaction?.status ?? 'Exam hold'} />
             </Box>
             <Divider />
             <Box>
@@ -508,23 +508,23 @@ const TransactionDetailedView = () => {
                 <KeyValueItem label="Amount">
                   <Amount value={selectedTransaction?.amount ?? 0} currency="INR" />
                 </KeyValueItem>
-                <KeyValueItem label="Payment ID">
+                <KeyValueItem label="Shipment ID">
                   <Box display="flex" gap="spacing.2" alignItems="center">
                     <Code size="small">{selectedTransaction?.paymentId ?? 'NA'}</Code>
                     <Link variant="button" size="small" icon={CopyIcon} />
                   </Box>
                 </KeyValueItem>
-                <KeyValueItem label="Payment Type">
+                <KeyValueItem label="Shipment Type">
                   <Text variant="body" size="medium">
                     {selectedTransaction?.type}
                   </Text>
                 </KeyValueItem>
-                <KeyValueItem label="Payment Method">
+                <KeyValueItem label="Shipment Method">
                   <Text variant="body" size="medium">
                     {selectedTransaction?.method}
                   </Text>
                 </KeyValueItem>
-                <KeyValueItem label="Account Holder">
+                <KeyValueItem label="Importer">
                   <Text variant="body" size="medium">
                     {selectedTransaction?.name}
                   </Text>
@@ -534,7 +534,7 @@ const TransactionDetailedView = () => {
                     {selectedTransaction?.bank}
                   </Text>
                 </KeyValueItem>
-                <KeyValueItem label="Account Number">
+                <KeyValueItem label="HTS code Number">
                   <Text variant="body" size="medium">
                     {selectedTransaction?.account}
                   </Text>
@@ -613,9 +613,9 @@ const SettlementDetailedView = () => {
     referenceId: 'ref_MK7DGqwYXEwx9Q',
     type: 'Settlement',
     utr: 'UTR123456789',
-    bankAccount: '1234567890',
+    bankHTS code: '1234567890',
     ifsc: 'HDFC0001234',
-    status: 'Completed',
+    status: 'Released',
     tax: 260,
     fee: 260,
     netAmount: 2600,
@@ -659,7 +659,7 @@ const SettlementDetailedView = () => {
               Gross Settlements
             </Text>
             <Text variant="body" size="medium">
-              Payment
+              Shipment
             </Text>
             <Box>
               <Amount value={settlementData.amount} currency="INR" />
@@ -736,7 +736,7 @@ const SettlementDetailedView = () => {
               <Divider thickness="thicker" orientation="vertical" />
               <Box paddingX="spacing.3">
                 <Text size="xsmall" color="surface.text.gray.muted" weight="semibold">
-                  Payment ID
+                  Shipment ID
                 </Text>
                 <Text size="medium">{settlementData.paymentId}</Text>
               </Box>
@@ -774,7 +774,7 @@ const SettlementDetailedView = () => {
             Transaction Information
           </Heading>
           <KeyValueGrid>
-            <KeyValueItem label="Payment ID">
+            <KeyValueItem label="Shipment ID">
               <Box display="flex" gap="spacing.2" alignItems="center">
                 <Code size="small">{settlementData.paymentId}</Code>
                 <Link variant="button" size="small" icon={CopyIcon} />
@@ -791,9 +791,9 @@ const SettlementDetailedView = () => {
                 <Link variant="button" size="small" icon={CopyIcon} />
               </Box>
             </KeyValueItem>
-            <KeyValueItem label="Bank Account">
+            <KeyValueItem label="Bank HTS code">
               <Text variant="body" size="medium">
-                {settlementData.bankAccount}
+                {settlementData.bankHTS code}
               </Text>
             </KeyValueItem>
             <KeyValueItem label="IFSC Code">

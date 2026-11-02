@@ -1,6 +1,6 @@
 export { Table } from './Table';
 export { TableHeader, TableHeaderCell, TableHeaderRow } from './TableHeader';
-export { TableBody, TableCell, TableRow } from './TableBody';
+export { TableBody, TableCell, TableRow, TableVirtualizedWrapper } from './TableBody';
 export { TableFooter, TableFooterCell, TableFooterRow } from './TableFooter';
 export { TablePagination } from './TablePagination';
 export { TableToolbar, TableToolbarActions, TableToolbarSearch } from './TableToolbar';
@@ -37,10 +37,12 @@ export {
   TableExperienceEmpty,
   TableExperienceEmptyBody,
   TableExperienceExportButton,
+  TableExperienceCopySelectionButton,
   TableExperienceAdvancedFilters,
   TableExperienceColumnToggle,
   TableExperienceSelectionRoot,
   TableExperienceRow,
+  TableExperienceResizableHeaderCell,
   useTableExperienceController,
   applyInitialSort,
   applyMultiSort,

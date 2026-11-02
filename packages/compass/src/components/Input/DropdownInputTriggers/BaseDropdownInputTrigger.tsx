@@ -138,6 +138,16 @@ const _BaseDropdownInputTrigger = (
   const isValidationStateNone =
     props.validationState === 'none' || props.validationState === undefined;
 
+  const tableCellInputProps: Partial<BaseInputProps> | undefined = (() => {
+    if (isInsideTableEditableCell) {
+      return tableInputProps;
+    }
+    if (props.isTableInputCell) {
+      return { isTableInputCell: true, ...(props.id ? { id: props.id } : {}) };
+    }
+    return undefined;
+  })();
+
   return (
     <BaseInput
       as={props.isSelectInput ? 'button' : 'input'}
@@ -183,7 +193,7 @@ const _BaseDropdownInputTrigger = (
           ? undefined
           : dropdownTriggerPlaceholder
       }
-      hideLabelText={props.label?.length === 0}
+      hideLabelText={props.isTableInputCell ? true : props.label?.length === 0}
       accessibilityLabel={props.accessibilityLabel}
       labelPosition={props.labelPosition === 'inside-input' ? undefined : props.labelPosition}
       isLabelInsideInput={props.labelPosition === 'inside-input'}
@@ -254,7 +264,7 @@ const _BaseDropdownInputTrigger = (
           <InputChevronIcon isDisabled={props.isDisabled} isOpen={isOpen} />
         )
       }
-      {...(isInsideTableEditableCell ? tableInputProps : undefined)}
+      {...tableCellInputProps}
       // When AutoComplete is present inside DropdownOverlay, the floating ui adds tabIndex -1 internally. We override it with tabIndex 0 here
       tabIndex={isAutoCompleteInHeader ? 0 : undefined}
     />

@@ -179,12 +179,12 @@ function CardLoadingExample() {
         ) : (
           <>
             <CardHeader>
-              <CardHeaderLeading title="Payment Pages" subtitle="Automated Receipts Enabled" />
+              <CardHeaderLeading title="Shipment Pages" subtitle="Automated Receipts Enabled" />
             </CardHeader>
             <CardBody>
               <Text>
-                Klearnow Payment Pages is the easiest way to accept payments with a custom-branded
-                online store. Accept international and domestic payments with automated payment
+                Klearnow Shipment Pages is the easiest way to accept shipments with a custom-branded
+                online store. Accept international and domestic shipments with automated payment
                 receipts.
               </Text>
             </CardBody>

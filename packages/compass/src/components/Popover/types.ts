@@ -21,6 +21,10 @@ type PopoverProps = {
    */
   titleLeading?: React.ReactNode;
   /**
+   * Actions in the header row, immediately before the close control (e.g. Reset).
+   */
+  titleTrailing?: React.ReactNode;
+  /**
    * Footer content
    */
   footer?: React.ReactNode;
@@ -103,7 +107,7 @@ type PopoverContentProps = {
    * react-native only
    */
   side?: Side;
-} & Pick<PopoverProps, 'title' | 'titleLeading' | 'footer' | 'children' | 'maxWidth'>;
+} & Pick<PopoverProps, 'title' | 'titleLeading' | 'titleTrailing' | 'footer' | 'children' | 'maxWidth'>;
 
 type PopoverContentWrapperProps = {
   styles: CSSProperties;

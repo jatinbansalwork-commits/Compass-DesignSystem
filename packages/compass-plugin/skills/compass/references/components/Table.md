@@ -21,7 +21,32 @@ In Storybook (`Components → Table`), stories are grouped for clarity:
 
 See `packages/compass/src/components/Table/docs/STORYBOOK.md` for the maintainer file map.
 
+**Storybook quality bar:** See `packages/compass/src/components/Table/docs/STORYBOOK_STANDARDS.md` and `tableStorybookMeta.ts` — four modes (**playground**, **recipe**, **flagship recipe**, **interaction suite**); expanded controls (sticky counts, filters, layout); **Actions** via `fn()`; default **a11y** rules; **Interactions** (`.play` on flagship stories + `Components/Interaction Tests/Table`).
+
+### Choosing row strategy
+
+| Pattern | When | Storybook |
+| -------- | ----- | --------- |
+| **Paginated list / queue** | Many records, toolbar, filters | `Components → Table → All use cases`, Experience stories |
+| **Virtualized** | Very large homogeneous lists, fixed viewport height | `Features → Virtualized`, `Features → Virtualized Combined` |
+| **Invoice line items** | One parent document (commercial invoice); inline edit, validation, jump search | `Examples → Line Items → Invoice line items (full)` |
+
+For **line-item** tables: keep **selection state in the app panel** (`selectedIds` + `onSelectionChange` on `Table`, often `multiSelectTrigger="checkbox"`). Slice a **view window** in app code (e.g. 30 lines centered on jump) or use **`TableVirtualizedWrapper`** at scale — not pagination. Wire toolbar search via `Table` `toolbar` + `globalFilterValue` / `onGlobalFilterValueChange` (custom jump logic; do not rely on default row filtering). Optimize re-renders (`React.memo`, `useDeferredValue` + debounced cross-doc scans). **All use cases** covers the paginated clearance queue (`CompassDataTable`, header filters, export selection).
+
+**All use cases** (`Components → Table → All use cases`) demonstrates enterprise queue patterns: **`multiSelectTrigger="checkbox"`**, inline header filters + advanced filters (`hideInlineHeaderFiltersWhenAdvanced: false`), **`exportPreferSelection`** on `CompassDataTable`, `TableExperienceCopySelectionButton`, persisted column layout, compliance/validation rows, and batch toolbar actions.
+
 **Recent core APIs:** `selectedIds` (controlled selection), `initialSort`, multi-column sort via Shift+click on sortable headers, `showHeaderFilterRow` (hide inline filters when using toolbar/advanced filters).
+
+## Layout, icons, and spacing
+
+Table chrome (toolbar, header label + filter band, row hover rail) uses shared tokens in `packages/compass/src/components/Table/tokens.ts`:
+
+- **`tableIcons`** — `control: 'small'` (32px) for toolbar, header filter clear, info icons; `rowHover: 'small'`; `rowHoverTextButton: 'xsmall'`
+- **`tableHeaderBand`** — `cellPaddingX: spacing.3`, filter inset `spacing.2`, sort/title gaps
+- **`tableToolbar`** — 36px band (`compactHeaderBandRowHeight`), padding `spacing.2` vertical + `spacing.3`/`spacing.4` horizontal
+- **`tableHoverActions`** — `gap: spacing.2`, responsive `paddingLeft`
+
+Full maintainer map: `packages/compass/src/components/Table/docs/TABLE_LAYOUT.md`.
 
 ## Important Constraints
 
@@ -484,39 +509,39 @@ import {
 } from '@klearnow/compass/components';
 
 // Define your data types
-type PaymentItem = {
+type ShipmentItem = {
   id: string;
   paymentId: string;
   amount: number;
-  status: 'Completed' | 'Pending' | 'Failed';
+  status: 'Released' | 'Exam hold' | 'Rejected';
   date: Date;
-  type: 'Payout' | 'Refund';
+  type: 'Formal entry' | 'Consumption entry';
   method: string;
   bank: string;
   account: string;
   name: string;
 };
 
-const PaymentTable = () => {
+const ShipmentTable = () => {
   // Sample data
-  const payments: PaymentItem[] = Array.from({ length: 50 }, (_, i) => ({
+  const shipments: ShipmentItem[] = Array.from({ length: 50 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+    paymentId: `KX-${Math.floor(Math.random() * 1000000)}`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)] as
-      | 'Completed'
-      | 'Pending'
-      | 'Failed',
+    status: ['Released', 'Exam hold', 'Rejected'][Math.floor(Math.random() * 3)] as
+      | 'Released'
+      | 'Exam hold'
+      | 'Rejected',
     date: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)] as 'Payout' | 'Refund',
-    method: ['Bank Transfer', 'Credit Card', 'PayPal'][Math.floor(Math.random() * 3)],
+    type: ['Formal entry', 'Consumption entry'][Math.floor(Math.random() * 2)] as 'Formal entry' | 'Consumption entry',
+    method: ['Ocean', 'Air', 'Truck'][Math.floor(Math.random() * 3)],
     bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
     account: Math.floor(Math.random() * 1000000000).toString(),
-    name: ['John Doe', 'Jane Smith', 'Bob Johnson'][Math.floor(Math.random() * 3)],
+    name: ['Schlumberger USA Inc.', 'Jane Smith', 'Bob Johnson'][Math.floor(Math.random() * 3)],
   }));
 
-  const tableData: TableData<PaymentItem> = {
-    nodes: payments,
+  const tableData: TableData<ShipmentItem> = {
+    nodes: shipments,
   };
 
   // State for selection
@@ -530,12 +555,12 @@ const PaymentTable = () => {
 
   // Define sort functions
   const sortFunctions = {
-    PAYMENT_ID: (array: TableNode<PaymentItem>[]) =>
+    SHIPMENT_ID: (array: TableNode<ShipmentItem>[]) =>
       [...array].sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
-    AMOUNT: (array: TableNode<PaymentItem>[]) => [...array].sort((a, b) => a.amount - b.amount),
-    DATE: (array: TableNode<PaymentItem>[]) =>
+    AMOUNT: (array: TableNode<ShipmentItem>[]) => [...array].sort((a, b) => a.amount - b.amount),
+    DATE: (array: TableNode<ShipmentItem>[]) =>
       [...array].sort((a, b) => a.date.getTime() - b.date.getTime()),
-    STATUS: (array: TableNode<PaymentItem>[]) =>
+    STATUS: (array: TableNode<ShipmentItem>[]) =>
       [...array].sort((a, b) => a.status.localeCompare(b.status)),
   };
 
@@ -554,8 +579,8 @@ const PaymentTable = () => {
         sortFunctions={sortFunctions}
         toolbar={
           <TableToolbar
-            title="Payment Transactions"
-            selectedTitle={`${selectedIds.length} Payments Selected`}
+            title="Shipment Transactions"
+            selectedTitle={`${selectedIds.length} Clearance queue Selected`}
           >
             <TableToolbarActions>
               <Button variant="secondary" marginRight="spacing.2" icon={PlusIcon}>
@@ -579,11 +604,11 @@ const PaymentTable = () => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell headerKey="PAYMENT_ID">Payment ID</TableHeaderCell>
+                <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
                 <TableHeaderCell headerKey="AMOUNT" textAlign="right">
                   Amount
                 </TableHeaderCell>
-                <TableHeaderCell>Account</TableHeaderCell>
+                <TableHeaderCell>HTS code</TableHeaderCell>
                 <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
                 <TableHeaderCell>Method</TableHeaderCell>
                 <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
@@ -625,11 +650,11 @@ const PaymentTable = () => {
                     <Amount value={tableItem.amount} />
                   </TableCell>
                   <TableEditableCell
-                    accessibilityLabel="Account"
+                    accessibilityLabel="HTS code"
                     placeholder="Enter account number"
                     defaultValue={tableItem.account}
-                    successText="Account is valid"
-                    onChange={(value) => console.log('Account changed:', value)}
+                    successText="HTS code is valid"
+                    onChange={(value) => console.log('HTS code changed:', value)}
                   />
                   <TableCell>
                     {tableItem.date.toLocaleDateString('en-IN', {
@@ -643,9 +668,9 @@ const PaymentTable = () => {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
                           : 'negative'
                       }
@@ -694,7 +719,7 @@ const PaymentTable = () => {
   );
 };
 
-export default PaymentTable;
+export default ShipmentTable;
 ```
 
 ### Server-Side Pagination Example
@@ -846,16 +871,16 @@ type TableData = Data[];
 const tableData: TableData = [
   {
     id: '1',
-    name: 'John Doe',
+    name: 'Schlumberger USA Inc.',
     totalAmount: 100,
-    status: 'Completed',
+    status: 'Released',
     nestedData: [],
   },
   {
     id: '2',
     name: 'Jane Smith',
     totalAmount: 200,
-    status: 'Pending',
+    status: 'Exam hold',
     nestedData: [],
   },
 ];

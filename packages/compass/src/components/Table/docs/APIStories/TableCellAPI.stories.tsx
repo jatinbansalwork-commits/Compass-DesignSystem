@@ -1,3 +1,4 @@
+import { applyTableStoryMeta } from '../tableStorybookMeta';
 import type { StoryFn, Meta } from '@storybook/react-vite';
 import type { TableData } from '../../types';
 import { Table as TableComponent } from '../../Table';
@@ -10,7 +11,7 @@ import { Amount } from '~components/Amount';
 import { Code } from '~components/Typography';
 import { Badge } from '~components/Badge';
 
-export default {
+const storyMeta: Meta = {
   title: 'Components/Table/Parts/Cell',
   component: TableCell,
   args: {},
@@ -32,29 +33,23 @@ export default {
       ),
     },
   },
-} as Meta<typeof TableCell>;
+};
+
+applyTableStoryMeta(storyMeta);
+export default storyMeta;
 
 const nodes: Item[] = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+    paymentId: `KX-${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
     date: new Date(2021, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
-    method: ['Bank Transfer', 'Credit Card', 'PayPal'][Math.floor(Math.random() * 3)],
-    bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
-    name: [
-      'John Doe',
-      'Jane Doe',
-      'Bob Smith',
-      'Alice Smith',
-      'John Smith',
-      'Jane Smith',
-      'Bob Doe',
-      'Alice Doe',
-    ][Math.floor(Math.random() * 8)],
+    type: ['Formal entry', 'Consumption entry', 'Temporary import'][Math.floor(Math.random() * 3)],
+    method: ['Ocean', 'Air', 'Truck'][Math.floor(Math.random() * 3)],
+    bank: ['Meridian Customs', 'Pacific Rim Brokerage', 'Harborline Brokers'][Math.floor(Math.random() * 3)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
+    name: ['Schlumberger USA Inc.', 'BASF Agricultural Solutions', 'Pacific Rim Trading Co.', 'Meridian Customs Brokers'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -88,10 +83,10 @@ const TableTemplate: StoryFn<typeof TableComponent> = ({ ...args }) => {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell {...args}>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
-                <TableHeaderCell>Account</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
+                <TableHeaderCell>HTS code</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
@@ -118,11 +113,11 @@ const TableTemplate: StoryFn<typeof TableComponent> = ({ ...args }) => {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }

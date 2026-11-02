@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta } from '@storybook/react-vite';
 import {
@@ -93,9 +94,9 @@ export const BasicTable = (): React.ReactElement => {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -120,10 +121,10 @@ const customCellTableData = createTableData(5);
 
 export const TableWithCustomCellComponents = (): React.ReactElement => {
   const headerCells = [
-    { title: 'ID', tooltip: 'Payment ID of the transaction' },
+    { title: 'ID', tooltip: 'KlearNow shipment ID (KX-*)' },
     { title: 'Amount', tooltip: 'Amount transacted' },
-    { title: 'Date', tooltip: 'Creation date of the transaction' },
-    { title: 'Status', tooltip: 'Current status of the transaction' },
+    { title: 'Date', tooltip: 'Entry filing date' },
+    { title: 'Status', tooltip: 'CBP clearance status' },
   ];
 
   return (
@@ -189,7 +190,7 @@ export const SortableTable = (): React.ReactElement => {
       <Table
         data={sortableTableData}
         sortFunctions={{
-          PAYMENT_ID: (array) =>
+          SHIPMENT_ID: (array) =>
             array.sort((first, second) => first.paymentId.localeCompare(second.paymentId)),
           AMOUNT: (array) => array.sort((first, second) => first.amount - second.amount),
           DATE: (array) =>
@@ -202,8 +203,8 @@ export const SortableTable = (): React.ReactElement => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
+                <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
                 <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
                 <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
               </TableHeaderRow>
@@ -252,7 +253,7 @@ export const TableWithStickyHeaderAndFooter = (): React.ReactElement => {
                 <TableHeaderCell>ID</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -303,11 +304,11 @@ export const TableWithStickyFirstColumn = (): React.ReactElement => {
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
                 <TableHeaderCell>Name</TableHeaderCell>
-                <TableHeaderCell>Account</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>HTS code</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -356,7 +357,7 @@ export const SingleSelectableTable = (): React.ReactElement => {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
               </TableHeaderRow>
@@ -409,8 +410,8 @@ export const MultiSelectableTableWithToolbar = (): React.ReactElement => {
         onSelectionChange={({ selectedIds }) => setSelectedItemsCount(selectedIds.length)}
         toolbar={
           <TableToolbar
-            title="Showing Recent Transactions"
-            selectedTitle={`${selectedItemsCount} Transaction${
+            title="Recent clearance filings"
+            selectedTitle={`${selectedItemsCount} shipment${
               selectedItemsCount > 1 ? 's' : ''
             } Selected`}
           >
@@ -428,7 +429,7 @@ export const MultiSelectableTableWithToolbar = (): React.ReactElement => {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
               </TableHeaderRow>
@@ -472,7 +473,7 @@ export const MultiSelectableWithZebraStripes = (): React.ReactElement => {
         selectionType="multiple"
         showStripedRows={true}
         toolbar={
-          <TableToolbar title="Showing Recent Transactions">
+          <TableToolbar title="Recent clearance filings">
             <TableToolbarActions>
               <Button variant="secondary" marginRight="spacing.3" isFullWidth={onMobile}>
                 Export
@@ -487,7 +488,7 @@ export const MultiSelectableWithZebraStripes = (): React.ReactElement => {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
               </TableHeaderRow>
@@ -546,7 +547,7 @@ export const TableWithDisabledRows = (): React.ReactElement => {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Action</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
@@ -619,9 +620,9 @@ export const TableWithBackgroundColor = (): React.ReactElement => {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -692,7 +693,7 @@ export const TableWithIsLoading = (): React.ReactElement => {
               <TableHeader>
                 <TableHeaderRow>
                   <TableHeaderCell>ID</TableHeaderCell>
-                  <TableHeaderCell>Amount</TableHeaderCell>
+                  <TableHeaderCell>Duty amount</TableHeaderCell>
                   <TableHeaderCell>Status</TableHeaderCell>
                 </TableHeaderRow>
               </TableHeader>
@@ -775,7 +776,7 @@ export const TableWithIsRefreshing = (): React.ReactElement => {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
               </TableHeaderRow>
@@ -818,8 +819,8 @@ export const TableWithEditableCells = (): React.ReactElement => {
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -861,4 +862,5 @@ export const TableWithEditableCells = (): React.ReactElement => {
   );
 };
 
+applyTableRecipeMeta(TableMeta);
 export default TableMeta;

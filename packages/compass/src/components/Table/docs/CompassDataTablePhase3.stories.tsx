@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import {
@@ -22,13 +23,13 @@ import { Amount } from '~components/Amount';
 const sourceData = createTableData(30);
 
 const FILTER_COLUMNS = [
-  { key: 'PAYMENT_ID', label: 'Payment ID', defaultWidthPx: 160, minWidthPx: 100 },
+  { key: 'SHIPMENT_ID', label: 'Shipment ID', defaultWidthPx: 160, minWidthPx: 100 },
   { key: 'NAME', label: 'Name', defaultWidthPx: 180, minWidthPx: 120 },
   { key: 'STATUS', label: 'Status', defaultWidthPx: 140, minWidthPx: 100 },
 ];
 
 const filterFunctions = {
-  PAYMENT_ID: (item: (typeof sourceData.nodes)[number], value: string | string[]) => {
+  SHIPMENT_ID: (item: (typeof sourceData.nodes)[number], value: string | string[]) => {
     const needle = Array.isArray(value) ? value.join(' ') : value;
     return item.paymentId.toLowerCase().includes(needle.toLowerCase());
   },
@@ -43,7 +44,7 @@ const filterFunctions = {
 };
 
 const sortFunctions = {
-  PAYMENT_ID: (array: typeof sourceData.nodes) =>
+  SHIPMENT_ID: (array: typeof sourceData.nodes) =>
     [...array].sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
   NAME: (array: typeof sourceData.nodes) => [...array].sort((a, b) => a.name.localeCompare(b.name)),
   STATUS: (array: typeof sourceData.nodes) =>
@@ -52,7 +53,7 @@ const sortFunctions = {
 
 const EMPTY_GRID_COLUMN_END = 6;
 
-const meta: Meta = {
+const storyMeta: Meta = {
   title: 'Components/Table/Experience/CompassDataTable/03 Layout & Keyboard',
   tags: ['autodocs'],
   parameters: {
@@ -68,7 +69,7 @@ export const LayoutAndKeyboard: StoryFn = () => {
     sortFunctions,
     filterableColumns: FILTER_COLUMNS,
     filterFieldExtractors: {
-      PAYMENT_ID: (row) => row.paymentId,
+      SHIPMENT_ID: (row) => row.paymentId,
       NAME: (row) => row.name,
       STATUS: (row) => row.status,
     },
@@ -106,7 +107,7 @@ export const LayoutAndKeyboard: StoryFn = () => {
   };
 
   const renderBodyCell = (key: string, row: (typeof sourceData.nodes)[number]) => {
-    if (key === 'PAYMENT_ID') {
+    if (key === 'SHIPMENT_ID') {
       return (
         <TableCell>
           <Code size="medium">{row.paymentId}</Code>
@@ -146,7 +147,7 @@ export const LayoutAndKeyboard: StoryFn = () => {
           {...controller.experienceProps}
           experienceApi={controller.experienceProps}
           isHeaderSticky
-          toolbarTitle="Payments"
+          toolbarTitle="Clearance queue"
           toolbarSelectedTitle={`${controller.selectedIds.length} selected`}
           pagination={
             <TablePagination defaultPageSize={10} showPageNumberSelector onPageChange={() => undefined} />
@@ -160,7 +161,7 @@ export const LayoutAndKeyboard: StoryFn = () => {
                     const column = FILTER_COLUMNS.find((item) => item.key === key);
                     return column ? renderHeaderCell(column.key, column.label) : null;
                   })}
-                  <TableHeaderCell>Amount</TableHeaderCell>
+                  <TableHeaderCell>Duty amount</TableHeaderCell>
                 </TableHeaderRow>
               </TableHeader>
               <TableBody>
@@ -187,4 +188,5 @@ export const LayoutAndKeyboard: StoryFn = () => {
   );
 };
 
-export default meta;
+applyTableRecipeMeta(storyMeta);
+export default storyMeta;

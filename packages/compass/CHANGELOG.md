@@ -1,5 +1,11 @@
 # @klearnow/compass
 
+## 12.131.0
+
+### Minor Changes
+
+- Table filtering and Storybook parity improvements, accessibility fixes (footer ARIA roles, header filter labels, row hierarchy subgrid), virtualized body scrolling via CompassTableVirtualized, experience toolbar/reorder updates, and Popover title trailing slot.
+
 ## 12.130.0
 
 ### Minor Changes

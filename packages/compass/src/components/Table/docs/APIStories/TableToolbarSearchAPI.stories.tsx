@@ -1,3 +1,4 @@
+import { applyTableStoryMeta } from '../tableStorybookMeta';
 import type { StoryFn, Meta } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { Table as TableComponent } from '../../Table';
@@ -11,7 +12,7 @@ import { Code } from '~components/Typography';
 import { Badge } from '~components/Badge';
 import { getStyledPropsArgTypes } from '~components/Box/BaseBox/storybookArgTypes';
 
-export default {
+const storyMeta: Meta = {
   title: 'Components/Table/Parts/Toolbar Search',
   tags: ['autodocs'],
   component: TableToolbarSearch,
@@ -41,7 +42,10 @@ export default {
       ),
     },
   },
-} as Meta<typeof TableToolbarSearch>;
+};
+
+applyTableStoryMeta(storyMeta);
+export default storyMeta;
 
 const data = createTransactionTableData(20);
 

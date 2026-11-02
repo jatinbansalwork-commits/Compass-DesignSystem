@@ -50,9 +50,9 @@ export default {
 } as Meta<ListViewProps>;
 
 const MethodFilterValues = [
-  { key: 'bank-transfer', title: 'Bank Transfer' },
-  { key: 'credit-card', title: 'Credit Card' },
-  { key: 'paypal', title: 'PayPal' },
+  { key: 'ocean', title: 'Ocean' },
+  { key: 'air', title: 'Air' },
+  { key: 'truck', title: 'Truck' },
 ];
 
 type Item = {
@@ -74,21 +74,21 @@ type Item = {
 const nodes: Item[] = [
   ...Array.from({ length: 20 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+    paymentId: `KX-${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
     date: new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
+    type: ['Formal entry', 'Consumption entry', 'Temporary import'][Math.floor(Math.random() * 3)],
     method: MethodFilterValues[Math.floor(Math.random() * 3)],
-    bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    bank: ['Meridian Customs', 'Pacific Rim Brokerage', 'Harborline Brokers'][Math.floor(Math.random() * 3)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
     name: ['John Doe', 'Jane Doe', 'Bob Smith', 'Alice Smith'][Math.floor(Math.random() * 4)],
   })),
 ];
 
 const data: TableData<Item> = { nodes };
-const quickFilters = ['All', 'Pending', 'Failed', 'Completed'];
-const filterChipQuickFilters = ['Pending', 'Failed', 'Completed'];
+const quickFilters = ['All', 'Exam hold', 'Rejected', 'Released'];
+const filterChipQuickFilters = ['Exam hold', 'Rejected', 'Released'];
 
 const BulkActionContent = (): React.ReactElement => {
   const [listViewTableData, setListViewTableData] = useState(data);
@@ -171,7 +171,7 @@ const BulkActionContent = (): React.ReactElement => {
                 <SearchInput
                   label=""
                   value={searchValue}
-                  placeholder="Search for Payment Id"
+                  placeholder="Search shipment ID (KX-)"
                   onChange={({ value }) => {
                     const quickFilterData = getQuickFilterData(data, selectedQuickFilter);
                     const searchValueData = getSearchedData(quickFilterData, value);
@@ -335,11 +335,11 @@ const BulkActionContent = (): React.ReactElement => {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                  <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
-                  <TableHeaderCell headerKey="ACCOUNT">Account</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
+                  <TableHeaderCell headerKey="ACCOUNT">HTS code</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-                  <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+                  <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                 </TableHeaderRow>
               </TableHeader>
@@ -370,11 +370,11 @@ const BulkActionContent = (): React.ReactElement => {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
-                            : tableItem.status === 'Failed'
+                            : tableItem.status === 'Rejected'
                             ? 'negative'
                             : 'primary'
                         }

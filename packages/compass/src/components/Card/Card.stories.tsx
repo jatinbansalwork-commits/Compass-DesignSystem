@@ -179,8 +179,8 @@ export default {
     borderRadius: 'medium',
     elevation: 'lowRaised',
     padding: 'spacing.7',
-    headerTitle: 'Payment Links',
-    headerSubtitle: 'Share payment link via an email, SMS, messenger, chatbot etc.',
+    headerTitle: 'Entry filing links',
+    headerSubtitle: 'Share filing link via an email, SMS, messenger, chatbot etc.',
     headerPaddingBottom: 'spacing.4',
     headerMarginBottom: 'spacing.4',
     footerTitle: 'Built for Developers',
@@ -188,7 +188,7 @@ export default {
     footerMarginTop: 'spacing.4',
     footerPaddingTop: 'spacing.4',
     body:
-      'Create Compass shipment booking links and share them with your customers from the Compass dashboard or using APIs and start accepting payments. Check the advantages, payment methods, international currency support and more.',
+      'Create Compass shipment booking links and share them with your customers from the Compass dashboard or using APIs and start accepting clearance filings. Check the advantages, MOT options, international currency support and more.',
     footerPrimaryAction: {
       text: 'Learn More',
       onClick: () => {
@@ -598,9 +598,9 @@ const MetricCardVariantExample = (): React.ReactElement => {
     >
       <CardHeader showDivider={false}>
         <CardHeaderLeading
-          title={isMobile ? 'TPV' : 'Total Payment Volume'}
+          title={isMobile ? 'TDV' : 'Total declared value'}
           subtitle={
-            isMobile ? 'TPV for the current month' : 'Total Payment Volume for the current month'
+            isMobile ? 'TDV for the current month' : 'Total declared value for the current month'
           }
         />
         <CardHeaderTrailing
@@ -784,52 +784,52 @@ const NestedCardExample = (): React.ReactElement => {
     <Card>
       <CardHeader>
         <CardHeaderLeading
-          title="Payment Summary"
-          subtitle="Overview of recent transactions"
+          title="Clearance summary"
+          subtitle="Overview of recent filings"
           prefix={<CardHeaderIcon icon={CheckCircleIcon} />}
         />
         <CardHeaderTrailing visual={<CardHeaderBadge color="positive">Active</CardHeaderBadge>} />
       </CardHeader>
       <CardBody>
         <Box display="flex" flexDirection="column" gap="spacing.5">
-          <Text>Below are the details of your recent transactions grouped by category.</Text>
+          <Text>Below are recent clearance activity grouped by mode of transport.</Text>
           <Card variant="secondary" padding="spacing.5">
             <CardBody>
               <Box display="flex" flexDirection="row" justifyContent="space-between">
-                <Text weight="semibold">UPI Payments</Text>
+                <Text weight="semibold">Ocean entries</Text>
                 <Amount value={45000} type="body" weight="semibold" />
               </Box>
               <Text marginTop="spacing.2" size="small" color="surface.text.gray.muted">
-                12 transactions this week
+                12 filings this week
               </Text>
             </CardBody>
           </Card>
           <Card variant="secondary" padding="spacing.5">
             <CardBody>
               <Box display="flex" flexDirection="row" justifyContent="space-between">
-                <Text weight="semibold">Card Payments</Text>
+                <Text weight="semibold">Air shipments</Text>
                 <Amount value={120000} type="body" weight="semibold" />
               </Box>
               <Text marginTop="spacing.2" size="small" color="surface.text.gray.muted">
-                8 transactions this week
+                8 filings this week
               </Text>
             </CardBody>
           </Card>
           <Card variant="secondary" padding="spacing.5">
             <CardBody>
               <Box display="flex" flexDirection="row" justifyContent="space-between">
-                <Text weight="semibold">Net Banking</Text>
+                <Text weight="semibold">Truck / rail</Text>
                 <Amount value={78000} type="body" weight="semibold" />
               </Box>
               <Text marginTop="spacing.2" size="small" color="surface.text.gray.muted">
-                5 transactions this week
+                5 filings this week
               </Text>
             </CardBody>
           </Card>
         </Box>
       </CardBody>
       <CardFooter>
-        <CardFooterLeading title="Total Volume" subtitle="This week" />
+        <CardFooterLeading title="Total declared value" subtitle="This week" />
         <CardFooterTrailing
           actions={{
             primary: {

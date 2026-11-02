@@ -303,7 +303,7 @@ const SuccessAnimation = () => {
   useEffect(() => {
     preloadKlearsenseAssets('circleSlideUp')
       .then(() => setAssetsPreloaded(true))
-      .catch((error) => console.error('Failed to preload:', error));
+      .catch((error) => console.error('Rejected to preload:', error));
   }, []);
 
   if (!assetsPreloaded) {

@@ -97,6 +97,7 @@ const _Popover = ({
   content,
   title,
   titleLeading,
+  titleTrailing,
   footer,
   children,
   placement = 'top',
@@ -251,6 +252,7 @@ const _Popover = ({
                   <PopoverContent
                     title={title}
                     titleLeading={titleLeading}
+                    titleTrailing={titleTrailing}
                     footer={footer}
                     style={styles}
                     maxWidth={maxWidth}

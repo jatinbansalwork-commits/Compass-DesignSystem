@@ -197,7 +197,7 @@ const _CounterInput = React.forwardRef<CompassElementRef, CounterInputProps>(
         if (max !== undefined && constrainedValue > max) constrainedValue = max;
         setInternalValue(() => constrainedValue);
       },
-      [min, max, onChange, name],
+      [min, max, onChange, name, setInternalValue],
     );
 
     const handleIncrement = useCallback(() => {

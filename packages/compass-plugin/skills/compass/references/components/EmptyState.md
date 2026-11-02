@@ -98,12 +98,12 @@ const ErrorEmptyState = () => {
       asset={
         <img
           src="/network-error-illustration.png"
-          alt="Failed to load data"
+          alt="Rejected to load data"
           width="90"
           height="90"
         />
       }
-      title="Failed to load dashboard data"
+      title="Rejected to load dashboard data"
       description="We couldn't retrieve your transaction data due to a network issue. Please check your connection and try again, or contact support if the problem persists."
       testID="dashboard-error-empty-state"
       data-analytics-section="dashboard"

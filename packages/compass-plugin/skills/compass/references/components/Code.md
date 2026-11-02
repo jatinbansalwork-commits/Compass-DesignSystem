@@ -133,11 +133,11 @@ function CodeExample() {
       <Text>
         Import the component using{' '}
         <Code size="medium">
-          import {'{'} PaymentForm {'}'}
+          import {'{'} ShipmentForm {'}'}
         </Code>{' '}
         and initialize with{' '}
         <Code size="medium" isHighlighted={false} color="interactive.text.primary.normal">
-          new PaymentForm(config)
+          new ShipmentForm(config)
         </Code>
       </Text>
     </Box>

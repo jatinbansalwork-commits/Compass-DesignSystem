@@ -115,7 +115,7 @@ type InputGroupContextType = {
 
 ## Examples
 
-### Payment Form with Validation
+### Shipment Form with Validation
 
 Create a payment information form with format validation, different input types, and error handling.
 
@@ -127,7 +127,7 @@ import { Button } from '@klearnow/compass/components/Button';
 import { Box } from '@klearnow/compass/components/Box';
 import { useState } from 'react';
 
-function PaymentForm() {
+function ShipmentForm() {
   const [formData, setFormData] = useState({
     cardNumber: '',
     expiryDate: '',
@@ -145,7 +145,7 @@ function PaymentForm() {
   return (
     <Box>
       <InputGroup
-        label="Payment Information"
+        label="Shipment Information"
         helpText="Enter your card details to process payment"
         size="large"
         labelPosition="top"
@@ -191,7 +191,7 @@ function PaymentForm() {
         <InputRow gridTemplateColumns="1fr">
           <TextInput
             label="Cardholder Name"
-            placeholder="John Doe"
+            placeholder="Schlumberger USA Inc."
             value={formData.cardholderName}
             onChange={({ value }) => handleInputChange('cardholderName', value)}
             validationState={isFieldEmpty('cardholderName') ? 'error' : 'success'}
@@ -202,7 +202,7 @@ function PaymentForm() {
       </InputGroup>
       <Box display="flex" justifyContent="flex-end" marginTop="spacing.4">
         <Button variant="primary" isDisabled={hasErrors}>
-          Submit Payment
+          Submit Shipment
         </Button>
       </Box>
     </Box>
@@ -231,7 +231,7 @@ function BusinessOnboardingForm() {
     <Box>
       <InputGroup
         label="Merchant Onboarding"
-        helpText="Complete your business details to start accepting payments"
+        helpText="Complete your business details to start accepting shipments"
         size="medium"
         labelPosition="left"
         validationState="none"

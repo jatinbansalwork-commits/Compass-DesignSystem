@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta } from '@storybook/react-vite';
 import {
@@ -16,7 +17,7 @@ import { Heading, Text } from '~components/Typography';
 
 const data = createTableData(5);
 
-const meta: Meta = {
+const storyMeta: Meta = {
   title: 'Components/Table/Features/Title Description Cell',
   tags: ['autodocs'],
 };
@@ -85,4 +86,5 @@ export const WrappedDescription = (): React.ReactElement => (
   </Box>
 );
 
-export default meta;
+applyTableRecipeMeta(storyMeta);
+export default storyMeta;

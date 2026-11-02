@@ -1,3 +1,4 @@
+import { applyTableStoryMeta } from '../tableStorybookMeta';
 import type { StoryFn, Meta } from '@storybook/react-vite';
 import type { TableProps, TableData, TableEditableCellProps } from '../../index';
 import {
@@ -20,7 +21,7 @@ import { AutoComplete, SelectInput } from '~components/Input/DropdownInputTrigge
 import { ActionList, ActionListItem } from '~components/ActionList';
 import { DropdownOverlay } from '~components/Dropdown';
 
-export default {
+const storyMeta: Meta = {
   title: 'Components/Table/Parts/Editable Cell',
   component: TableEditableCell,
   args: {},
@@ -56,29 +57,23 @@ export default {
       ),
     },
   },
-} as Meta<typeof TableEditableCell>;
+};
+
+applyTableStoryMeta(storyMeta);
+export default storyMeta;
 
 const nodes: Item[] = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+    paymentId: `KX-${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
     date: new Date(2021, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
-    method: ['Bank Transfer', 'Credit Card', 'PayPal'][Math.floor(Math.random() * 3)],
-    bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
-    name: [
-      'John Doe',
-      'Jane Doe',
-      'Bob Smith',
-      'Alice Smith',
-      'John Smith',
-      'Jane Smith',
-      'Bob Doe',
-      'Alice Doe',
-    ][Math.floor(Math.random() * 8)],
+    type: ['Formal entry', 'Consumption entry', 'Temporary import'][Math.floor(Math.random() * 3)],
+    method: ['Ocean', 'Air', 'Truck'][Math.floor(Math.random() * 3)],
+    bank: ['Meridian Customs', 'Pacific Rim Brokerage', 'Harborline Brokers'][Math.floor(Math.random() * 3)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
+    name: ['Schlumberger USA Inc.', 'BASF Agricultural Solutions', 'Pacific Rim Trading Co.', 'Meridian Customs Brokers'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -114,9 +109,9 @@ const TableTemplate: StoryFn<TableTemplateProps> = ({ rowDensity, ...args }) => 
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
-                <TableHeaderCell>Account</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
+                <TableHeaderCell>HTS code</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
               </TableHeaderRow>
@@ -171,7 +166,7 @@ const TableTemplate: StoryFn<TableTemplateProps> = ({ rowDensity, ...args }) => 
                     <DropdownOverlay>
                       <ActionList>
                         <ActionListItem title="Pending" value="pending" />
-                        <ActionListItem title="Completed" value="completed" />
+                        <ActionListItem title="Released" value="completed" />
                         <ActionListItem title="Failed" value="failed" />
                       </ActionList>
                     </DropdownOverlay>

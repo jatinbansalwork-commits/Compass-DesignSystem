@@ -8,6 +8,7 @@ type SkeletonProps = StyledPropsCompass &
     'width' | 'maxWidth' | 'minWidth' | 'height' | 'maxHeight' | 'minHeight' | 'borderRadius'
   > &
   Partial<FlexboxProps> & {
+    /** Test identifier for the skeleton root. */
     testID?: string;
   };
 

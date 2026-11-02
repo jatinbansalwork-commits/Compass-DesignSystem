@@ -155,7 +155,7 @@ const ValidationForm = () => {
     } else {
       setAlert({
         type: 'negative',
-        title: 'Form Submission Failed',
+        title: 'Form Submission Rejected',
         description: 'Please fix the errors in the form and try again.',
       });
     }

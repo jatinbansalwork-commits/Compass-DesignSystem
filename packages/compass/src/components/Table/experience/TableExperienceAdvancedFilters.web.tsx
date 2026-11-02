@@ -7,6 +7,10 @@ import { Dropdown, DropdownOverlay } from '~components/Dropdown';
 import { ActionList, ActionListItem } from '~components/ActionList';
 import { Text } from '~components/Typography';
 import BaseBox from '~components/Box/BaseBox';
+import { IconButton } from '~components/Button/IconButton';
+import { tableIcons } from '../tokens';
+import { FilterIcon } from '~components/Icons';
+import { Tooltip } from '~components/Tooltip';
 import {
   FILTER_MATCH_MODE_LABELS,
   type TableExperienceFilterMatchMode,
@@ -22,6 +26,7 @@ type TableExperienceAdvancedFiltersProps = {
     filterMatchModes: Record<string, TableExperienceFilterMatchMode | undefined>;
   }) => void;
   onClear: () => void;
+  iconOnly?: boolean;
 };
 
 const MATCH_MODES = Object.keys(FILTER_MATCH_MODE_LABELS) as TableExperienceFilterMatchMode[];
@@ -32,6 +37,7 @@ const TableExperienceAdvancedFilters = ({
   filterMatchModes,
   onApply,
   onClear,
+  iconOnly = false,
 }: TableExperienceAdvancedFiltersProps): React.ReactElement => {
   const [draftValues, setDraftValues] = useState(columnFilterValues);
   const [draftModes, setDraftModes] = useState(filterMatchModes);
@@ -106,11 +112,24 @@ const TableExperienceAdvancedFilters = ({
     </BaseBox>
   );
 
+  const trigger = iconOnly ? (
+    <Tooltip content="Filters">
+      <IconButton
+        size={tableIcons.control}
+        icon={FilterIcon}
+        accessibilityLabel="Filters"
+        testID="table-experience-advanced-filters"
+      />
+    </Tooltip>
+  ) : (
+    <Button size="small" variant="secondary" testID="table-experience-advanced-filters">
+      Filters
+    </Button>
+  );
+
   return (
     <Popover content={content} placement="bottom-end" title="Advanced filters">
-      <Button size="small" variant="secondary" testID="table-experience-advanced-filters">
-        Filters
-      </Button>
+      {trigger}
     </Popover>
   );
 };

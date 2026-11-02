@@ -1,3 +1,4 @@
+import { applyTableStoryMeta } from '../tableStorybookMeta';
 import type { StoryFn, Meta } from '@storybook/react-vite';
 import type { TableData } from '../../types';
 import { Table as TableComponent } from '../../Table';
@@ -10,10 +11,13 @@ import { Amount } from '~components/Amount';
 import { Code } from '~components/Typography';
 import { Badge } from '~components/Badge';
 
-export default {
+const storyMeta: Meta = {
   title: 'Components/Table/Features/Checkbox Display',
   component: TableComponent,
-  args: {},
+  args: {
+    selectionType: 'multiple',
+    checkboxDisplay: 'on-hover',
+  },
   argTypes: {
     children: {
       control: {
@@ -32,17 +36,20 @@ export default {
       ),
     },
   },
-} as Meta<typeof TableComponent>;
+};
+
+applyTableStoryMeta(storyMeta);
+export default storyMeta;
 
 const nodes: Item[] = [
   ...Array.from({ length: 5 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+    paymentId: `KX-${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
     date: new Date(2021, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    method: ['Bank Transfer', 'Credit Card', 'PayPal'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    method: ['Ocean', 'Air', 'Truck'][Math.floor(Math.random() * 3)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
   })),
 ];
 
@@ -68,16 +75,16 @@ const TableTemplate: StoryFn<typeof TableComponent> = ({ ...args }) => {
       overflow="auto"
       minHeight="400px"
     >
-      <TableComponent data={data} selectionType="multiple" checkboxDisplay="on-hover" {...args}>
+      <TableComponent data={data} {...args}>
         {(tableData) => (
           <>
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>ID</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
-                <TableHeaderCell>Account</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
+                <TableHeaderCell>HTS code</TableHeaderCell>
                 <TableHeaderCell>Date</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
                 <TableHeaderCell>Status</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
@@ -104,11 +111,11 @@ const TableTemplate: StoryFn<typeof TableComponent> = ({ ...args }) => {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'default'
                       }

@@ -136,7 +136,7 @@ const _BaseTimePicker = ({
       return () => document.removeEventListener('click', handleClick);
     }
     return undefined;
-  }, [isDropdownOpen, showFooterActions, handleCancel, handleApply]);
+  }, [isDropdownOpen, showFooterActions, handleCancel, handleApply, refs.floating]);
 
   // Mobile: Blur input when bottom sheet opens
   React.useEffect(() => {

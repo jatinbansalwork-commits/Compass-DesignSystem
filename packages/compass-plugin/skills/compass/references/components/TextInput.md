@@ -204,7 +204,7 @@ function ContextualHelpTextExample() {
   return (
     <Box display="flex" flexDirection="column" gap="spacing.5">
       <TextInput
-        label="Account Number"
+        label="HTS code Number"
         placeholder="0000 0000 0000"
         name="accountNumber"
         helpText="As printed on your cheque book"
@@ -215,7 +215,7 @@ function ContextualHelpTextExample() {
         label="Beneficiary Name"
         placeholder="Enter beneficiary name"
         name="beneficiaryName"
-        helpText="Must match the name on the bank account"
+        helpText="Must match the name on the broker account"
         showHelpTextOnFocus
       />
 

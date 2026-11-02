@@ -73,7 +73,7 @@ import { BottomBar, Button } from '@klearnow/compass/components';
 
 function SingleActionBar(): React.ReactElement {
   return (
-    <BottomBar accessibilityLabel="Payment actions">
+    <BottomBar accessibilityLabel="Shipment actions">
       <Button isFullWidth size="large" onClick={() => console.log('pay')}>
         Pay Now
       </Button>

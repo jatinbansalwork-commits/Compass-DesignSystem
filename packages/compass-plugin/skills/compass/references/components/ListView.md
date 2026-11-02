@@ -170,11 +170,11 @@ import {
 import { useBreakpoint, useTheme } from '@klearnow/compass/utils';
 
 // Define data types for strong typing
-type PaymentItem = {
+type ShipmentItem = {
   id: string;
   paymentId: string;
   amount: number;
-  status: 'Completed' | 'Pending' | 'Failed';
+  status: 'Released' | 'Exam hold' | 'Rejected';
   date: Date;
   method: string;
   account: string;
@@ -186,21 +186,21 @@ type TableData<T> = {
 
 function ListViewExample() {
   // Sample data for the table
-  const nodes: PaymentItem[] = [
+  const nodes: ShipmentItem[] = [
     ...Array.from({ length: 20 }, (_, i) => ({
       id: (i + 1).toString(),
-      paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+      paymentId: `KX-${Math.floor(Math.random() * 1000000)}`,
       amount: Number((Math.random() * 10000).toFixed(2)),
-      status: ['Completed', 'Pending', 'Failed'][
+      status: ['Released', 'Exam hold', 'Rejected'][
         Math.floor(Math.random() * 3)
-      ] as PaymentItem['status'],
+      ] as ShipmentItem['status'],
       date: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-      method: ['Bank Transfer', 'Credit Card', 'PayPal'][Math.floor(Math.random() * 3)],
+      method: ['Ocean', 'Air', 'Truck'][Math.floor(Math.random() * 3)],
       account: Math.floor(Math.random() * 1000000000).toString(),
     })),
   ];
 
-  const data: TableData<PaymentItem> = { nodes };
+  const data: TableData<ShipmentItem> = { nodes };
 
   // State management for filters and search
   const [listViewTableData, setListViewTableData] = useState(data);
@@ -225,9 +225,9 @@ function ListViewExample() {
   };
 
   const getQuickFilterData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: string,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value || value === 'All') {
       return { nodes: data.nodes };
     }
@@ -235,9 +235,9 @@ function ListViewExample() {
   };
 
   const getSearchedData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: string,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value) {
       return { nodes: data.nodes };
     }
@@ -245,9 +245,9 @@ function ListViewExample() {
   };
 
   const getMethodFilterData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: string,
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value) {
       return { nodes: data.nodes };
     }
@@ -255,9 +255,9 @@ function ListViewExample() {
   };
 
   const getFilterRangeData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     value?: [Date, Date],
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!value?.[0]) {
       return { nodes: data.nodes };
     }
@@ -293,7 +293,7 @@ function ListViewExample() {
         <SearchInput
           label=""
           value={searchValue}
-          placeholder="Search by Payment ID"
+          placeholder="Search by Shipment ID"
           onChange={({ value }) => handleSearchChange(value)}
           onClearButtonClick={handleSearchClear}
         />
@@ -316,7 +316,7 @@ function ListViewExample() {
               defaultValue="All"
               value={selectedQuickFilter}
             >
-              {['All', 'Pending', 'Failed', 'Completed'].map((status) => (
+              {['All', 'Exam hold', 'Rejected', 'Released'].map((status) => (
                 <QuickFilter
                   key={status}
                   title={status}
@@ -337,7 +337,7 @@ function ListViewExample() {
                 <SearchInput
                   label=""
                   value={searchValue}
-                  placeholder="Search by Payment ID"
+                  placeholder="Search by Shipment ID"
                   onChange={({ value }) => handleSearchChange(value)}
                   onClearButtonClick={handleSearchClear}
                   trailing={
@@ -346,8 +346,8 @@ function ListViewExample() {
                       <DropdownOverlay>
                         <ActionList>
                           <ActionListItem title="All Methods" value="all" />
-                          <ActionListItem title="Bank Transfer" value="bank" />
-                          <ActionListItem title="Credit Card" value="card" />
+                          <ActionListItem title="Ocean" value="bank" />
+                          <ActionListItem title="Air" value="card" />
                           <ActionListItem title="UPI" value="upi" />
                         </ActionList>
                       </DropdownOverlay>
@@ -370,7 +370,7 @@ function ListViewExample() {
           >
             <Dropdown selectionType="single">
               <FilterChipSelectInput
-                label="Payment Method"
+                label="Shipment Method"
                 value={methodFilter}
                 onChange={({ values }) => {
                   const value = values[0];
@@ -392,7 +392,7 @@ function ListViewExample() {
               />
               <DropdownOverlay>
                 <ActionList>
-                  {['Bank Transfer', 'Credit Card', 'PayPal'].map((method) => (
+                  {['Ocean', 'Air', 'Truck'].map((method) => (
                     <ActionListItem
                       key={method}
                       title={method}
@@ -451,9 +451,9 @@ function ListViewExample() {
             <>
               <TableHeader>
                 <TableHeaderRow>
-                  <TableHeaderCell headerKey="PAYMENT_ID">Payment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
                   <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
-                  <TableHeaderCell headerKey="ACCOUNT">Account</TableHeaderCell>
+                  <TableHeaderCell headerKey="ACCOUNT">HTS code</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
                   <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
@@ -517,9 +517,9 @@ function ListViewExample() {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
                             : 'negative'
                         }
@@ -583,11 +583,11 @@ import {
 import { useBreakpoint, useTheme } from '@klearnow/compass/utils';
 
 // Define data types for strong typing
-type PaymentItem = {
+type ShipmentItem = {
   id: string;
   paymentId: string;
   amount: number;
-  status: 'Completed' | 'Pending' | 'Failed';
+  status: 'Released' | 'Exam hold' | 'Rejected';
   date: Date;
   method: string;
   account: string;
@@ -598,21 +598,21 @@ type TableData<T> = {
 };
 function MultiSelectListViewExample() {
   // Sample data similar to the first example
-  const nodes: PaymentItem[] = [
+  const nodes: ShipmentItem[] = [
     ...Array.from({ length: 20 }, (_, i) => ({
       id: (i + 1).toString(),
-      paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+      paymentId: `KX-${Math.floor(Math.random() * 1000000)}`,
       amount: Number((Math.random() * 10000).toFixed(2)),
-      status: ['Completed', 'Pending', 'Failed'][
+      status: ['Released', 'Exam hold', 'Rejected'][
         Math.floor(Math.random() * 3)
-      ] as PaymentItem['status'],
+      ] as ShipmentItem['status'],
       date: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-      method: ['Bank Transfer', 'Credit Card', 'PayPal'][Math.floor(Math.random() * 3)],
+      method: ['Ocean', 'Air', 'Truck'][Math.floor(Math.random() * 3)],
       account: Math.floor(Math.random() * 1000000000).toString(),
     })),
   ];
 
-  const data: TableData<PaymentItem> = { nodes };
+  const data: TableData<ShipmentItem> = { nodes };
 
   // State management
   const [listViewTableData, setListViewTableData] = useState(data);
@@ -626,9 +626,9 @@ function MultiSelectListViewExample() {
 
   // Filter function for multiple selected status values
   const getMultipleStatusFilterData = (
-    data: TableData<PaymentItem>,
+    data: TableData<ShipmentItem>,
     values: string | string[],
-  ): TableData<PaymentItem> => {
+  ): TableData<ShipmentItem> => {
     if (!values || values.length === 0) {
       return { nodes: data.nodes };
     }
@@ -652,7 +652,7 @@ function MultiSelectListViewExample() {
         <SearchInput
           label=""
           value={searchValue}
-          placeholder="Search payments"
+          placeholder="Search shipments"
           onChange={({ value }) => handleSearchChange(value)}
           onClearButtonClick={handleSearchClear}
         />
@@ -670,7 +670,7 @@ function MultiSelectListViewExample() {
               }}
               value={selectedQuickFilters}
             >
-              {['Pending', 'Failed', 'Completed'].map((status) => (
+              {['Exam hold', 'Rejected', 'Released'].map((status) => (
                 <QuickFilter
                   key={status}
                   title={status}
@@ -692,7 +692,7 @@ function MultiSelectListViewExample() {
                 <SearchInput
                   label=""
                   value={searchValue}
-                  placeholder="Search payments"
+                  placeholder="Search shipments"
                   onChange={({ value }) => handleSearchChange(value)}
                   onClearButtonClick={handleSearchClear}
                 />
@@ -708,7 +708,7 @@ function MultiSelectListViewExample() {
               <TableHeader>
                 <TableHeaderRow>
                   <TableHeaderCell headerKey="ID">ID</TableHeaderCell>
-                  <TableHeaderCell headerKey="PAYMENT_ID">Payment ID</TableHeaderCell>
+                  <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
                   <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
                   <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
                   <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
@@ -750,9 +750,9 @@ function MultiSelectListViewExample() {
                       <Badge
                         size="xsmall"
                         color={
-                          tableItem.status === 'Completed'
+                          tableItem.status === 'Released'
                             ? 'positive'
-                            : tableItem.status === 'Pending'
+                            : tableItem.status === 'Exam hold'
                             ? 'notice'
                             : 'negative'
                         }

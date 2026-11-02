@@ -18,4 +18,6 @@ export const pagination = {
     width: size['32'],
   },
   defaultPageSize: 10,
+  /** Fits two-digit page sizes (10/25/50) plus the select chevron without clipping. */
+  pageSizeSelectWidth: size['64'],
 } as const;

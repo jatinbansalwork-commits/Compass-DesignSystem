@@ -128,11 +128,11 @@ const Timeline = ({ status }: { status: string }): React.ReactElement => {
   return (
     <StepGroup orientation="vertical" size="medium">
       <StepItem
-        title="Payment Initiated"
-        stepProgress={['Completed', 'Pending', 'Failed'].includes(status) ? 'full' : 'none'}
+        title="Entry filed"
+        stepProgress={['Released', 'Exam hold', 'Rejected'].includes(status) ? 'full' : 'none'}
         marker={
           <StepItemIndicator
-            color={['Completed', 'Pending', 'Failed'].includes(status) ? 'positive' : 'neutral'}
+            color={['Released', 'Exam hold', 'Rejected'].includes(status) ? 'positive' : 'neutral'}
           />
         }
       />
@@ -140,7 +140,7 @@ const Timeline = ({ status }: { status: string }): React.ReactElement => {
         <CollapsibleLink>Show More</CollapsibleLink>
         <CollapsibleBody>
           <StepItem
-            title="Payment Processing"
+            title="CBP review"
             stepProgress={['Completed', 'Failed'].includes(status) ? 'full' : 'start'}
             marker={
               <StepItemIndicator
@@ -149,12 +149,12 @@ const Timeline = ({ status }: { status: string }): React.ReactElement => {
             }
           />
           <StepItem
-            title={status === 'Failed' ? 'Payment Failed' : 'Payment Completed'}
+            title={status === 'Rejected' ? 'Entry rejected' : 'Released by CBP'}
             stepProgress={['Completed', 'Failed'].includes(status) ? 'full' : 'none'}
             marker={
               <StepItemIndicator
                 color={
-                  status === 'Failed' ? 'negative' : status === 'Completed' ? 'positive' : 'neutral'
+                  status === 'Rejected' ? 'negative' : status === 'Released' ? 'positive' : 'neutral'
                 }
               />
             }
@@ -181,14 +181,14 @@ type Item = {
 const nodes: Item[] = [
   ...Array.from({ length: 20 }, (_, i) => ({
     id: (i + 1).toString(),
-    paymentId: `rzp${Math.floor(Math.random() * 1000000)}`,
+    paymentId: `KX-${String(Math.floor(Math.random() * 900000 + 100000)).padStart(6, '0')}`,
     amount: Number((Math.random() * 10000).toFixed(2)),
-    status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
+    status: ['Released', 'Exam hold', 'Rejected', 'Pending CBP review'][Math.floor(Math.random() * 4)],
     date: new Date(2021, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-    type: ['Payout', 'Refund'][Math.floor(Math.random() * 2)],
-    method: ['Bank Transfer', 'Credit Card', 'PayPal'][Math.floor(Math.random() * 3)],
-    bank: ['HDFC', 'ICICI', 'SBI'][Math.floor(Math.random() * 3)],
-    account: Math.floor(Math.random() * 1000000000).toString(),
+    type: ['Formal entry', 'Consumption entry', 'Temporary import'][Math.floor(Math.random() * 3)],
+    method: ['Ocean', 'Air', 'Truck'][Math.floor(Math.random() * 3)],
+    bank: ['Meridian Customs', 'Pacific Rim Brokerage', 'Harborline Brokers'][Math.floor(Math.random() * 3)],
+    account: ['8471.30.0100', '2933.99.8200', '8703.23.0190', '4011.10.1000'][Math.floor(Math.random() * 4)],
     name: [
       'Anurag Hazra',
       'Gaurav Tewari',
@@ -229,7 +229,7 @@ const DetailedViewWithTableTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
         sortFunctions={{
           ID: (array) => array.sort((a, b) => Number(a.id) - Number(b.id)),
           AMOUNT: (array) => array.sort((a, b) => a.amount - b.amount),
-          PAYMENT_ID: (array) => array.sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
+          SHIPMENT_ID: (array) => array.sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
           DATE: (array) => array.sort((a, b) => a.date.getTime() - b.date.getTime()),
           STATUS: (array) => array.sort((a, b) => a.status.localeCompare(b.status)),
         }}
@@ -247,11 +247,11 @@ const DetailedViewWithTableTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell headerKey="PAYMENT_ID">ID</TableHeaderCell>
-                <TableHeaderCell headerKey="NAME">Account Holder</TableHeaderCell>
-                <TableHeaderCell headerKey="AMOUNT">Amount</TableHeaderCell>
+                <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
+                <TableHeaderCell headerKey="NAME">Importer</TableHeaderCell>
+                <TableHeaderCell headerKey="AMOUNT">Duty amount</TableHeaderCell>
                 <TableHeaderCell headerKey="DATE">Date</TableHeaderCell>
-                <TableHeaderCell headerKey="METHOD">Method</TableHeaderCell>
+                <TableHeaderCell headerKey="METHOD">MOT</TableHeaderCell>
                 <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
@@ -285,11 +285,11 @@ const DetailedViewWithTableTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
                     <Badge
                       size="medium"
                       color={
-                        tableItem.status === 'Completed'
+                        tableItem.status === 'Released'
                           ? 'positive'
-                          : tableItem.status === 'Pending'
+                          : tableItem.status === 'Exam hold'
                           ? 'notice'
-                          : tableItem.status === 'Failed'
+                          : tableItem.status === 'Rejected'
                           ? 'negative'
                           : 'primary'
                       }
@@ -329,7 +329,7 @@ const DetailedViewWithTableTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
       >
         <DrawerHeader
           color={
-            selectedItem?.status === 'Completed'
+            selectedItem?.status === 'Released'
               ? 'positive'
               : selectedItem?.status === 'Pending'
               ? 'notice'
@@ -360,7 +360,7 @@ const DetailedViewWithTableTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
             <Badge
               size="medium"
               color={
-                selectedItem?.status === 'Completed'
+                selectedItem?.status === 'Released'
                   ? 'positive'
                   : selectedItem?.status === 'Pending'
                   ? 'notice'
@@ -381,7 +381,7 @@ const DetailedViewWithTableTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
           >
             <InfoGroup itemOrientation="vertical" isHighlighted>
               <InfoItem>
-                <InfoItemKey>Payment ID</InfoItemKey>
+                <InfoItemKey>Shipment ID</InfoItemKey>
                 <InfoItemValue>{selectedItem?.paymentId}</InfoItemValue>
               </InfoItem>
 
@@ -425,7 +425,7 @@ const DetailedViewWithTableTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
               <InfoGroup gridTemplateColumns="1fr 1fr">
                 {/* Amount */}
                 <InfoItem>
-                  <InfoItemKey>Amount</InfoItemKey>
+                  <InfoItemKey>Duty amount</InfoItemKey>
                   <InfoItemValue>
                     <Amount
                       value={selectedItem?.amount ?? 0}
@@ -443,9 +443,9 @@ const DetailedViewWithTableTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
                   </InfoItemValue>
                 </InfoItem>
 
-                {/* Payment Link ID */}
+                {/* Entry number */}
                 <InfoItem>
-                  <InfoItemKey>Payment Link ID</InfoItemKey>
+                  <InfoItemKey>Entry number</InfoItemKey>
                   <InfoItemValue trailing={<Link variant="button" size="medium" icon={CopyIcon} />}>
                     <Code size="medium" weight="bold">
                       {selectedItem?.paymentId ?? 'NA'}
@@ -461,13 +461,13 @@ const DetailedViewWithTableTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
 
                 {/* Payment For */}
                 <InfoItem>
-                  <InfoItemKey>Payment for</InfoItemKey>
+                  <InfoItemKey>Importer of record</InfoItemKey>
                   <InfoItemValue>{selectedItem?.type}</InfoItemValue>
                 </InfoItem>
 
-                {/* Partial Payment */}
+                {/* Split entry */}
                 <InfoItem>
-                  <InfoItemKey>Partial Payment</InfoItemKey>
+                  <InfoItemKey>Split entry</InfoItemKey>
                   <InfoItemValue>Enabled</InfoItemValue>
                 </InfoItem>
 
@@ -496,7 +496,7 @@ export const WithTable = DetailedViewWithTableTemplate.bind({});
 const dummyData = {
   amount: 3120,
   amountPaid: 3120,
-  paymentId: 'pay_MK7DGqwYXEwx9Q',
+  paymentId: 'KX-240018',
   referenceId: 'ref_MK7DGqwYXEwx9Q',
   type: 'Settlement',
   partialPayment: 'Enabled',
@@ -542,7 +542,7 @@ const DetailedViewWithCardTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
             </Text>
 
             <InfoItem>
-              <InfoItemKey>Payment</InfoItemKey>
+              <InfoItemKey>Duty</InfoItemKey>
               <InfoItemValue>
                 <Amount
                   value={dummyData.amount}
@@ -631,7 +631,7 @@ const DetailedViewWithCardTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
           >
             <InfoGroup itemOrientation="vertical" isHighlighted>
               <InfoItem>
-                <InfoItemKey>Payment ID</InfoItemKey>
+                <InfoItemKey>Shipment ID</InfoItemKey>
                 <InfoItemValue>{dummyData?.paymentId}</InfoItemValue>
               </InfoItem>
             </InfoGroup>
@@ -643,14 +643,14 @@ const DetailedViewWithCardTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
             textAlign="center"
             color="surface.text.gray.muted"
           >
-            Settlement was completed on 24th April 2025
+            Duty liquidation completed on 24th April 2025
           </Text>
         </DrawerHeader>
         <DrawerBody>
           <Heading size="small" weight="semibold">
             Timeline
           </Heading>
-          <Timeline status="Completed" />
+          <Timeline status="Released" />
 
           <Heading marginTop="spacing.6" marginBottom="spacing.4" size="small" weight="semibold">
             Transaction Breakdown
@@ -658,7 +658,7 @@ const DetailedViewWithCardTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
 
           <InfoGroup gridTemplateColumns="1fr 1fr">
             <InfoItem>
-              <InfoItemKey>Amount</InfoItemKey>
+              <InfoItemKey>Duty amount</InfoItemKey>
               <InfoItemValue>
                 <Amount
                   value={dummyData.amount}
@@ -682,7 +682,7 @@ const DetailedViewWithCardTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Payment Link ID</InfoItemKey>
+              <InfoItemKey>Entry number</InfoItemKey>
               <InfoItemValue trailing={<Link variant="button" size="medium" icon={CopyIcon} />}>
                 <Code size="medium" weight="bold">
                   {dummyData.paymentId}
@@ -696,7 +696,7 @@ const DetailedViewWithCardTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Payment for</InfoItemKey>
+              <InfoItemKey>Importer of record</InfoItemKey>
               <InfoItemValue>{dummyData.type}</InfoItemValue>
             </InfoItem>
 
@@ -710,7 +710,7 @@ const DetailedViewWithCardTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Bank Account</InfoItemKey>
+              <InfoItemKey>Broker account</InfoItemKey>
               <InfoItemValue>{dummyData.bankAccount}</InfoItemValue>
             </InfoItem>
 
@@ -720,7 +720,7 @@ const DetailedViewWithCardTemplate: StoryFn<typeof Drawer> = ({ ...args }) => {
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Partial Payment</InfoItemKey>
+              <InfoItemKey>Split entry</InfoItemKey>
               <InfoItemValue>{dummyData.partialPayment}</InfoItemValue>
             </InfoItem>
 
@@ -757,7 +757,7 @@ const DetailedViewWithQRCodeTemplate: StoryFn<typeof Drawer> = ({ ...args }) => 
       >
         <DrawerHeader
           color="notice"
-          title="Payment QR Code"
+          title="Entry filing QR"
           trailing={<Button size="medium" icon={DownloadIcon} />}
           showDivider={false}
         >
@@ -787,7 +787,7 @@ const DetailedViewWithQRCodeTemplate: StoryFn<typeof Drawer> = ({ ...args }) => 
           >
             <InfoGroup itemOrientation="vertical" isHighlighted>
               <InfoItem>
-                <InfoItemKey>Payment ID</InfoItemKey>
+                <InfoItemKey>Shipment ID</InfoItemKey>
                 <InfoItemValue>{dummyData?.paymentId}</InfoItemValue>
               </InfoItem>
             </InfoGroup>
@@ -910,7 +910,7 @@ const DetailedViewWithQRCodeTemplate: StoryFn<typeof Drawer> = ({ ...args }) => 
         <DrawerBody>
           <InfoGroup gridTemplateColumns="1fr 1fr">
             <InfoItem>
-              <InfoItemKey>Amount</InfoItemKey>
+              <InfoItemKey>Duty amount</InfoItemKey>
               <InfoItemValue>
                 <Amount
                   value={dummyData.amount}
@@ -934,7 +934,7 @@ const DetailedViewWithQRCodeTemplate: StoryFn<typeof Drawer> = ({ ...args }) => 
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Payment Link ID</InfoItemKey>
+              <InfoItemKey>Entry number</InfoItemKey>
               <InfoItemValue trailing={<Link variant="button" size="medium" icon={CopyIcon} />}>
                 <Code size="medium" weight="bold">
                   {dummyData.paymentId}
@@ -948,7 +948,7 @@ const DetailedViewWithQRCodeTemplate: StoryFn<typeof Drawer> = ({ ...args }) => 
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Payment for</InfoItemKey>
+              <InfoItemKey>Importer of record</InfoItemKey>
               <InfoItemValue>{dummyData.type}</InfoItemValue>
             </InfoItem>
 
@@ -962,7 +962,7 @@ const DetailedViewWithQRCodeTemplate: StoryFn<typeof Drawer> = ({ ...args }) => 
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Bank Account</InfoItemKey>
+              <InfoItemKey>Broker account</InfoItemKey>
               <InfoItemValue>{dummyData.bankAccount}</InfoItemValue>
             </InfoItem>
 
@@ -972,7 +972,7 @@ const DetailedViewWithQRCodeTemplate: StoryFn<typeof Drawer> = ({ ...args }) => 
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Partial Payment</InfoItemKey>
+              <InfoItemKey>Split entry</InfoItemKey>
               <InfoItemValue>{dummyData.partialPayment}</InfoItemValue>
             </InfoItem>
 
@@ -1017,7 +1017,7 @@ const DetailedViewWithQRCodeAndFooterTemplate: StoryFn<typeof Drawer> = ({ ...ar
       >
         <DrawerHeader
           color="notice"
-          title="Payment QR Code"
+          title="Entry filing QR"
           trailing={<Button size="medium" icon={DownloadIcon} />}
           showDivider={false}
         >
@@ -1047,7 +1047,7 @@ const DetailedViewWithQRCodeAndFooterTemplate: StoryFn<typeof Drawer> = ({ ...ar
           >
             <InfoGroup itemOrientation="vertical" isHighlighted>
               <InfoItem>
-                <InfoItemKey>Payment ID</InfoItemKey>
+                <InfoItemKey>Shipment ID</InfoItemKey>
                 <InfoItemValue>{dummyData?.paymentId}</InfoItemValue>
               </InfoItem>
             </InfoGroup>
@@ -1152,14 +1152,14 @@ const DetailedViewWithQRCodeAndFooterTemplate: StoryFn<typeof Drawer> = ({ ...ar
             </Heading>
             <Text marginBottom="spacing.4">
               This QR code is valid for 24 hours from the time of generation. Please ensure that the
-              payment is completed within this timeframe to avoid any issues.
+              entry is accepted within this timeframe to avoid any issues.
             </Text>
             <Text marginBottom="spacing.4">
               If you encounter any problems with the QR code, please contact our support team for
               assistance.
             </Text>
             <Text marginBottom="spacing.4">
-              The QR code contains encrypted payment information and is secure for transactions.
+              The QR code contains encrypted entry filing data and is secure for transactions.
             </Text>
           </Box>
         </DrawerBody>
@@ -1195,7 +1195,7 @@ const DetailedViewWithQRCodeAndFooterTemplate: StoryFn<typeof Drawer> = ({ ...ar
         <DrawerBody>
           <InfoGroup gridTemplateColumns="1fr 1fr">
             <InfoItem>
-              <InfoItemKey>Amount</InfoItemKey>
+              <InfoItemKey>Duty amount</InfoItemKey>
               <InfoItemValue>
                 <Amount
                   value={dummyData.amount}
@@ -1219,7 +1219,7 @@ const DetailedViewWithQRCodeAndFooterTemplate: StoryFn<typeof Drawer> = ({ ...ar
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Payment Link ID</InfoItemKey>
+              <InfoItemKey>Entry number</InfoItemKey>
               <InfoItemValue trailing={<Link variant="button" size="medium" icon={CopyIcon} />}>
                 <Code size="medium" weight="bold">
                   {dummyData.paymentId}
@@ -1233,7 +1233,7 @@ const DetailedViewWithQRCodeAndFooterTemplate: StoryFn<typeof Drawer> = ({ ...ar
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Payment for</InfoItemKey>
+              <InfoItemKey>Importer of record</InfoItemKey>
               <InfoItemValue>{dummyData.type}</InfoItemValue>
             </InfoItem>
 
@@ -1247,7 +1247,7 @@ const DetailedViewWithQRCodeAndFooterTemplate: StoryFn<typeof Drawer> = ({ ...ar
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Bank Account</InfoItemKey>
+              <InfoItemKey>Broker account</InfoItemKey>
               <InfoItemValue>{dummyData.bankAccount}</InfoItemValue>
             </InfoItem>
 
@@ -1257,7 +1257,7 @@ const DetailedViewWithQRCodeAndFooterTemplate: StoryFn<typeof Drawer> = ({ ...ar
             </InfoItem>
 
             <InfoItem>
-              <InfoItemKey>Partial Payment</InfoItemKey>
+              <InfoItemKey>Split entry</InfoItemKey>
               <InfoItemValue>{dummyData.partialPayment}</InfoItemValue>
             </InfoItem>
 

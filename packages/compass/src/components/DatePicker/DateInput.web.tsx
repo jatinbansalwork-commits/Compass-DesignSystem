@@ -176,7 +176,7 @@ const _DateInput = (
       // Apply final value on blur (without empty clearing to preserve existing dates)
       applyDateValue(currentInputValue, false);
     },
-    [applyDateValue, isRange],
+    [applyDateValue, isRange, format, props.excludeDate, props.maxDate, props.minDate],
   );
 
   const handleFocus = React.useCallback(() => {

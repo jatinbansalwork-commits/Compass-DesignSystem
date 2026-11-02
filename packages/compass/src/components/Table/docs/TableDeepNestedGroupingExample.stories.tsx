@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta } from '@storybook/react-vite';
 import {
@@ -84,7 +85,7 @@ export const ThreeLevelShipmentHierarchy = (): React.ReactElement => {
         <Heading>Three-level grouped rows (shipment → container → line item)</Heading>
         <Text>
           Expand parent rows to reveal containers, then line items. Uses `isGrouped` with nested
-          `nodes` — deeper than the two-level payment grouping demo.
+          `nodes` — deeper than the two-level shipment grouping demo.
         </Text>
       </Box>
       <Table data={deepShipmentData} isGrouped showBorderedCells>
@@ -128,4 +129,5 @@ export const ThreeLevelShipmentHierarchy = (): React.ReactElement => {
   );
 };
 
+applyTableRecipeMeta(TableMeta);
 export default TableMeta;

@@ -1,9 +1,10 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Box } from '~components/Box';
 import { Code, Heading, Text } from '~components/Typography';
 
-const meta: Meta = {
+const storyMeta: Meta = {
   title: 'Components/Table/Guide',
   tags: ['autodocs'],
   parameters: {
@@ -77,8 +78,34 @@ export const HowTableStoriesAreOrganized: StoryFn = () => (
     </Text>
 
     <Section
+      title="Choosing row strategy"
+      paths={[
+        {
+          label: 'Paginated queue / list',
+          path: 'Components → Table → All use cases',
+          hint: 'many records — toolbar, filters, pagination (or Experience layer)',
+        },
+        {
+          label: 'Virtualized window',
+          path: 'Components → Table → Features → Virtualized',
+          hint: 'thousands of homogeneous rows — fixed height + TableVirtualizedWrapper',
+        },
+        {
+          label: 'Invoice line items (full)',
+          path: 'Components → Table → Examples → Line Items → Invoice line items (full)',
+          hint: 'checkbox selection in panel, inline edit, exceptions-only vs jump search, 30-row view window (or virtualization)',
+        },
+      ]}
+    />
+
+    <Section
       title="1. Start here"
       paths={[
+        {
+          label: 'All use cases',
+          path: 'Components → Table → All use cases',
+          hint: 'one combined reference table (toolbar, filters, selection, sticky, footer, …)',
+        },
         {
           label: 'Guide',
           path: 'Components → Table → Guide',
@@ -86,7 +113,7 @@ export const HowTableStoriesAreOrganized: StoryFn = () => (
         },
         {
           label: 'Overview / props',
-          path: 'Components → Table',
+          path: 'Components → Table → Basic Table',
           hint: 'controls playground for Table props',
         },
         {
@@ -125,6 +152,10 @@ export const HowTableStoriesAreOrganized: StoryFn = () => (
     <Section
       title="4. Focused examples"
       paths={[
+        {
+          label: 'Invoice line items (full)',
+          path: 'Components → Table → Examples → Line Items → Invoice line items (full)',
+        },
         { label: 'Pagination', path: 'Components → Table → Examples → Pagination' },
         { label: 'Sticky columns', path: 'Components → Table → Examples → Sticky Columns' },
         { label: 'Footer totals', path: 'Components → Table → Examples → Footer Totals' },
@@ -160,6 +191,22 @@ export const HowTableStoriesAreOrganized: StoryFn = () => (
       ]}
     />
 
+    <Section
+      title="6. Storybook controls, actions, a11y, interactions"
+      paths={[
+        {
+          label: 'STORYBOOK_STANDARDS.md (maintainers)',
+          path: 'packages/compass/src/components/Table/docs/STORYBOOK_STANDARDS.md',
+          hint: 'playground vs recipe vs flagship vs interaction suite',
+        },
+        {
+          label: 'Interaction Tests/Table',
+          path: 'Components → Interaction Tests → Table',
+          hint: 'automated `.play` suite for sort, search, selection, wide grid',
+        },
+      ]}
+    />
+
     <Box marginTop="spacing.4" paddingTop="spacing.4" borderTopWidth="1px" borderTopStyle="solid">
       <Text size="small" color="surface.text.gray.muted">
         Agent and product references: compass-plugin <Code size="small">references/components/Table.md</Code>.
@@ -175,4 +222,5 @@ HowTableStoriesAreOrganized.parameters = {
   },
 };
 
-export default meta;
+applyTableRecipeMeta(storyMeta);
+export default storyMeta;

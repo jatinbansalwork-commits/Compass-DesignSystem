@@ -135,7 +135,7 @@ const BreadcrumbExample = () => {
       <Breadcrumb size="medium" color="primary" data-analytics="breadcrumb-primary">
         <BreadcrumbItem icon={HomeIcon} href="/home" accessibilityLabel="Home" />
         <BreadcrumbItem href="/dashboard">Dashboard</BreadcrumbItem>
-        <BreadcrumbItem href="/payments">Payments</BreadcrumbItem>
+        <BreadcrumbItem href="/shipments">Clearance queue</BreadcrumbItem>
         <BreadcrumbItem isCurrentPage href="/settlements">
           Settlements
         </BreadcrumbItem>
@@ -202,7 +202,7 @@ const DynamicBreadcrumb = () => {
       let label = segment.charAt(0).toUpperCase() + segment.slice(1);
 
       if (segment === 'products') icon = FolderIcon;
-      if (segment === 'payments') icon = CreditCardIcon;
+      if (segment === 'shipments') icon = CreditCardIcon;
 
       items.push(
         <RouterBreadcrumbItem key={currentPath} to={currentPath} icon={icon}>
@@ -218,7 +218,7 @@ const DynamicBreadcrumb = () => {
     <Box padding="spacing.4">
       <Breadcrumb
         size="medium"
-        color={location.pathname.includes('/payments') ? 'primary' : 'neutral'}
+        color={location.pathname.includes('/shipments') ? 'primary' : 'neutral'}
       >
         {getItems()}
       </Breadcrumb>

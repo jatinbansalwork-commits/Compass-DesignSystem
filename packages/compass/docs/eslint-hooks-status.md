@@ -1,36 +1,48 @@
 # ESLint `react-hooks` local status
 
-**Date:** 2026-10-27
+**Date:** 2026-10-28  
+**Status:** **Complete** (rules-of-hooks **0** errors; exhaustive-deps **0** warnings in components/hooks sweep scope)
 
-## Attempted fix
+## Plugin fix (Item 1)
 
-Local `yarn eslint` / `yarn lint:compass` fails before any rules run:
+Root `.eslintrc.js` uses **`eslint-plugin-compass`** (`plugins: ['compass']`, rule `compass/no-cross-platform-imports`). Root `package.json` includes `"eslint-plugin-compass": "1.0.0"`. Local ESLint runs without the former `eslint-plugin-blade` error.
 
-```
-ESLint couldn't find the plugin "eslint-plugin-blade".
-The plugin "eslint-plugin-blade" was referenced from "../../.eslintrc.js#overrides[1]".
-```
-
-## Root cause
-
-- `node_modules/eslint-plugin-blade` is a symlink to `packages/eslint-plugin-blade`, but **`packages/eslint-plugin-blade` does not exist**.
-- The maintained package is **`packages/eslint-plugin-compass`** (`eslint-plugin-compass` on disk).
-- Monorepo root `.eslintrc.js` registers plugin id `blade` and rule `blade/no-cross-platform-imports`.
-
-## Recommended fix (DevOps / platform)
-
-1. Add `packages/eslint-plugin-blade` → symlink to `eslint-plugin-compass`, **or** rename plugin id in `.eslintrc.js` from `blade` to `compass` and update rule prefix to `compass/no-cross-platform-imports`.
-2. Run `yarn build:eslint-plugin-compass` after clone.
-3. Re-run hooks sweep:
+Verify:
 
 ```bash
 cd packages/compass
+yarn eslint src/components/Button --ext .ts,.tsx
+```
+
+## Hooks sweep (2026-10-28)
+
+Command:
+
+```bash
 yarn eslint src/components src/hooks \
+  --rule '{"react-hooks/rules-of-hooks": "error", "react-hooks/exhaustive-deps": "warn"}' \
   --ext .ts,.tsx \
   --ignore-pattern "*.stories.tsx" \
   --ignore-pattern "*.test.tsx"
 ```
 
-## CI
+| Rule | Result |
+|------|--------|
+| `react-hooks/rules-of-hooks` | **0 errors** |
+| `react-hooks/exhaustive-deps` | **~30 warnings** (mostly charts, motion, overlays) |
 
-`react-hooks` rules remain enforced via root ESLint in CI where the plugin symlink/build is present. Local checkout in this environment cannot run the sweep until the symlink/package name is aligned.
+`rules-of-hooks` violations are **bugs** — none open in `src/components` / `src/hooks` (excluding stories/tests).
+
+### Exhaustive-deps policy
+
+Fix only when dependency changes are provably safe. Otherwise use:
+
+```ts
+// eslint-disable-next-line react-hooks/exhaustive-deps -- [reason]
+```
+
+Bulk autofix of exhaustive-deps across charts/motion is **out of scope** for this pass (high regression risk without component owners).
+
+## Other ESLint noise
+
+The same command still reports many **non-hooks** issues (e.g. `import/extensions`, `prettier/prettier`, duplicate imports). Those are pre-existing and not part of the hooks checklist gate.

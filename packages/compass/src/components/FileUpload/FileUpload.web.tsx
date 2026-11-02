@@ -146,7 +146,7 @@ const _FileUpload: React.ForwardRefRenderFunction<CompassElementRef, FileUploadP
 
       return inputFiles;
     });
-  }, []);
+  }, [setSelectedFiles]);
 
   const validateFiles = (inputFiles: CompassFileList, allFiles: CompassFileList): boolean => {
     if (accept && inputFiles.some((file) => !isFileAccepted(file, accept))) {

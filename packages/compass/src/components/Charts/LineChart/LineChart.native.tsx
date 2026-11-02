@@ -876,7 +876,7 @@ const ChartLineWrapper: React.FC<ChartLineWrapperProps & TestID & DataAnalyticsA
   const visibleLines = useMemo(() => allLines.filter((l) => isVisible(l.dataKey) && !l.hide), [
     allLines,
     selectedKeys,
-  ]);
+  ]); // eslint-disable-line react-hooks/exhaustive-deps -- isVisible derived from selectedKeys
 
   const secondaryLabelMap = useMemo(() => {
     if (!slots.xSecondaryDataKey || !data?.length) return undefined;
@@ -971,7 +971,7 @@ const ChartLineWrapper: React.FC<ChartLineWrapperProps & TestID & DataAnalyticsA
         : String(index);
       return slots.xTickFormatter ? slots.xTickFormatter(rawLabel, index) : rawLabel;
     });
-  }, [data, slots.xDataKey, slots.xTickFormatter]);
+  }, [data, slots.xDataKey, slots.xTickFormatter]); // eslint-disable-line react-hooks/exhaustive-deps -- slots object identity would over-invalidate
 
   // Wrap each label to fit its column so all categories can be shown at once.
   const xLabelLines = useMemo(() => {
@@ -1026,7 +1026,7 @@ const ChartLineWrapper: React.FC<ChartLineWrapperProps & TestID & DataAnalyticsA
     const forcedStep = slots.xInterval !== undefined ? Math.max(1, slots.xInterval + 1) : undefined;
 
     return selectNonOverlappingXTickIndices(pointCount, widths, xForIndex, forcedStep);
-  }, [pointCount, pointSpacing, plotWidth, xLabelLines, secondaryLabelMap, slots.xInterval]);
+  }, [pointCount, pointSpacing, plotWidth, xLabelLines, secondaryLabelMap, slots.xInterval]); // eslint-disable-line react-hooks/exhaustive-deps -- xForIndex stable helper
 
   const visibleXTickIndexSet = useMemo(() => new Set(visibleXTickIndices), [visibleXTickIndices]);
 
@@ -1056,7 +1056,7 @@ const ChartLineWrapper: React.FC<ChartLineWrapperProps & TestID & DataAnalyticsA
       });
       return { line, color: resolveColor(line.dataKey, line.color), points };
     });
-  }, [visibleLines, data, plotWidth, plotHeight, yMin, yRange, dataColorMapping, theme.colors]);
+  }, [visibleLines, data, plotWidth, plotHeight, yMin, yRange, dataColorMapping, theme.colors]); // eslint-disable-line react-hooks/exhaustive-deps -- resolveColor/xForIndex chart helpers
 
   // Resolved bands: one per visible line that declares a range, color-matched to the line, plus the
   // standalone <ChartReferenceBand> if present. Used for rendering, labels and the legend.
@@ -1115,7 +1115,7 @@ const ChartLineWrapper: React.FC<ChartLineWrapperProps & TestID & DataAnalyticsA
         };
       })
       .filter((band): band is BandGeometryNative => band !== null);
-  }, [resolvedBands, data, plotWidth, plotHeight, yMin, yRange]);
+  }, [resolvedBands, data, plotWidth, plotHeight, yMin, yRange]); // eslint-disable-line react-hooks/exhaustive-deps -- xForIndex chart helper
 
   const dataSignature = useMemo(() => `${data.length}:${allDataKeys.join(',')}`, [
     data.length,
@@ -1301,7 +1301,7 @@ const ChartLineWrapper: React.FC<ChartLineWrapperProps & TestID & DataAnalyticsA
     slots.tooltipFormatter,
     slots.tooltipFilterNull,
     activeIndex,
-  ]);
+  ]); // eslint-disable-line react-hooks/exhaustive-deps -- resolveColor chart helper
 
   // Lines eligible for a legend entry — include hidden ones so they can be
   // toggled back on (web parity).
@@ -1351,7 +1351,7 @@ const ChartLineWrapper: React.FC<ChartLineWrapperProps & TestID & DataAnalyticsA
       secondaryLabelMap,
       dataLength: data?.length,
     }),
-    [dataColorMapping, selectedKeys, secondaryLabelMap, data?.length],
+    [dataColorMapping, selectedKeys, secondaryLabelMap, data?.length, setSelectedKeys],
   );
 
   const layoutTestID = testID ? `${testID}-layout` : undefined;

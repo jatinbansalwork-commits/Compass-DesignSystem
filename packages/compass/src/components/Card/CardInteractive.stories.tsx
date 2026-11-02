@@ -94,7 +94,7 @@ const Page = (): React.ReactElement => {
                       Free
                     </Text>
                     <Text>
-                      For individuals or teams just getting started with payments. No setup fees, no
+                      For individuals or teams just getting started with clearance filings. No setup fees, no
                       monthly or annual fees.
                     </Text>
                   </Box>
@@ -118,7 +118,7 @@ const Page = (): React.ReactElement => {
                       Standard
                     </Text>
                     <Text>
-                      For teams that are scaling up and need advanced features like payment failure.
+                      For teams that are scaling up and need advanced features like CBP rejection alerts.
                     </Text>
                   </Box>
                 </CardBody>
@@ -253,7 +253,7 @@ export default {
     },
   },
   args: {
-    accessibilityLabel: 'Payment Pages Card',
+    accessibilityLabel: 'Clearance workspace Card',
     isSelected: false,
     shouldScaleOnHover: true,
     surfaceLevel: 2,
@@ -285,7 +285,7 @@ const CardTemplate: StoryFn<typeof Card> = (args): React.ReactElement => {
     >
       <CardHeader>
         <CardHeaderLeading
-          title="Payment Pages"
+          title="Clearance workspace"
           subtitle="Card Header Subtitle"
           prefix={<CardHeaderIcon icon={RupeeIcon} />}
           suffix={<CardHeaderCounter value={12} />}
@@ -294,8 +294,8 @@ const CardTemplate: StoryFn<typeof Card> = (args): React.ReactElement => {
       </CardHeader>
       <CardBody>
         <Text>
-          Share payment link via an email, SMS, messenger, chatbot etc. and get paid immediately.
-          Accepting payments from customers is now just a link away.
+          Share filing link via an email, SMS, messenger, chatbot etc. and get CBP status updates immediately.
+          Accepting clearance filings from customers is now just a shipment ID away.
         </Text>
       </CardBody>
       <CardFooter>
@@ -330,17 +330,17 @@ export const ClickableCard = (): React.ReactElement => {
         </Text>
       </Box>
       <Card
-        accessibilityLabel="Payment Pages Card"
+        accessibilityLabel="Clearance workspace Card"
         onClick={() => setCardClickCount((prev) => prev + 1)}
         width={{ s: '100%', m: '400px' }}
       >
         <CardHeader>
-          <CardHeaderLeading title="Payment Pages" />
+          <CardHeaderLeading title="Clearance workspace" />
         </CardHeader>
         <CardBody>
           <Text>
             Take your store online instantly with zero coding. Accept international & domestic
-            payments.
+            clearance filings.
           </Text>
           <Text marginY="spacing.2">
             Card Clicked:{' '}
@@ -393,14 +393,14 @@ export const HoverableCard = (): React.ReactElement => {
       <Card shouldScaleOnHover width={{ s: '100%', m: '400px' }}>
         <CardHeader>
           <CardHeaderLeading
-            title="Payment Links"
-            subtitle="Collect faster payments on UPI Payment Links with upto 50% lower fees"
+            title="Entry filing links"
+            subtitle="Collect faster clearance filings on UPI Entry filing links with upto 50% lower fees"
           />
         </CardHeader>
         <CardBody>
           <Text>
-            Share payment link via an email, SMS, messenger, chatbot etc. and get paid immediately.
-            Accepting payments from customers is now just a link away.
+            Share filing link via an email, SMS, messenger, chatbot etc. and get CBP status updates immediately.
+            Accepting clearance filings from customers is now just a shipment ID away.
           </Text>
         </CardBody>
       </Card>
@@ -421,23 +421,23 @@ export const LinkableCard = (): React.ReactElement => {
         </Text>
       </Box>
       <Card
-        href="https://klearnow.ai/payment-links"
-        accessibilityLabel="Payment Links"
+        href="https://klearnow.ai/customs-filing"
+        accessibilityLabel="Entry filing links"
         shouldScaleOnHover
         width={{ s: '100%', m: '400px' }}
       >
         <CardHeader>
           <CardHeaderLeading
-            title="Payment Links"
-            subtitle="Collect faster payments on UPI Payment Links with upto 50% lower fees"
+            title="Entry filing links"
+            subtitle="Collect faster clearance filings on UPI Entry filing links with upto 50% lower fees"
           />
         </CardHeader>
         <CardBody>
           <Text>
-            Share payment link via an email, SMS, messenger, chatbot etc. and get paid immediately.
-            Accepting payments from customers is now just a link away.
+            Share filing link via an email, SMS, messenger, chatbot etc. and get CBP status updates immediately.
+            Accepting clearance filings from customers is now just a shipment ID away.
           </Text>
-          <Link marginTop="spacing.4" href="https://klearnow.ai/payment-links/#overview">
+          <Link marginTop="spacing.4" href="https://klearnow.ai/customs-filing/#overview">
             Get Demo
           </Link>
         </CardBody>
@@ -507,7 +507,7 @@ const SingleSelectCardWeb = (): React.ReactElement => {
                 Free
               </Text>
               <Text>
-                For individuals or teams just getting started with payments. No setup fees, no
+                For individuals or teams just getting started with clearance filings. No setup fees, no
                 monthly or annual fees.
               </Text>
             </Box>
@@ -532,7 +532,7 @@ const SingleSelectCardWeb = (): React.ReactElement => {
                 Standard
               </Text>
               <Text>
-                For teams that are scaling up and need advanced features like payment failure.
+                For teams that are scaling up and need advanced features like CBP rejection alerts.
               </Text>
             </Box>
           </CardBody>
@@ -605,7 +605,7 @@ const MultiSelectCardWeb = (): React.ReactElement => {
                 Free
               </Text>
               <Text>
-                For individuals or teams just getting started with payments. No setup fees, no
+                For individuals or teams just getting started with clearance filings. No setup fees, no
                 monthly or annual fees.
               </Text>
             </Box>
@@ -630,7 +630,7 @@ const MultiSelectCardWeb = (): React.ReactElement => {
                 Standard
               </Text>
               <Text>
-                For teams that are scaling up and need advanced features like payment failure.
+                For teams that are scaling up and need advanced features like CBP rejection alerts.
               </Text>
             </Box>
           </CardBody>
@@ -689,7 +689,7 @@ const SingleSelectCardReactNative = (): React.ReactElement => {
                 Free
               </Text>
               <Text>
-                For individuals or teams just getting started with payments. No setup fees, no
+                For individuals or teams just getting started with clearance filings. No setup fees, no
                 monthly or annual fees.
               </Text>
             </Box>
@@ -708,7 +708,7 @@ const SingleSelectCardReactNative = (): React.ReactElement => {
                 Standard
               </Text>
               <Text>
-                For teams that are scaling up and need advanced features like payment failure.
+                For teams that are scaling up and need advanced features like CBP rejection alerts.
               </Text>
             </Box>
           </CardBody>
@@ -769,7 +769,7 @@ const MultiSelectCardReactNative = (): React.ReactElement => {
                 Free
               </Text>
               <Text>
-                For individuals or teams just getting started with payments. No setup fees, no
+                For individuals or teams just getting started with clearance filings. No setup fees, no
                 monthly or annual fees.
               </Text>
             </Box>
@@ -788,7 +788,7 @@ const MultiSelectCardReactNative = (): React.ReactElement => {
                 Standard
               </Text>
               <Text>
-                For teams that are scaling up and need advanced features like payment failure.
+                For teams that are scaling up and need advanced features like CBP rejection alerts.
               </Text>
             </Box>
           </CardBody>
@@ -818,21 +818,21 @@ const MultiSelectCardReactNative = (): React.ReactElement => {
 
 const merchantOnboardingOptions = [
   {
-    value: 'payment-gateway',
-    title: 'Payment Gateway',
-    subtitle: 'Accept online payments',
+    value: 'ace-filing',
+    title: 'Customs filing gateway',
+    subtitle: 'Accept online clearance filings',
     icon: PackageIcon,
     features: [
-      '100+ payment methods',
+      '100+ MOT options',
       'UPI, Cards, Netbanking, Wallets',
       'Industry-leading success rates',
-      'Real-time payment tracking',
+      'Real-time CBP status',
     ],
   },
   {
-    value: 'payment-links',
-    title: 'Payment Links',
-    subtitle: 'Share & collect payments',
+    value: 'entry-links',
+    title: 'Entry filing links',
+    subtitle: 'Share & collect clearance filings',
     icon: PackageIcon,
     features: [
       'No coding required',
@@ -843,7 +843,7 @@ const merchantOnboardingOptions = [
   },
   {
     value: 'payment-pages',
-    title: 'Payment Pages',
+    title: 'Clearance workspace',
     subtitle: 'Create online store',
     icon: PackageIcon,
     features: [
@@ -856,11 +856,11 @@ const merchantOnboardingOptions = [
   {
     value: 'pos',
     title: 'Point of Sale (POS)',
-    subtitle: 'In-store payments',
+    subtitle: 'In-store clearance filings',
     icon: PackageIcon,
     features: [
-      'Accept card & UPI payments',
-      'Contactless payments',
+      'Accept card & UPI clearance filings',
+      'Contactless clearance filings',
       'Inventory management',
       'Sales analytics & reports',
     ],

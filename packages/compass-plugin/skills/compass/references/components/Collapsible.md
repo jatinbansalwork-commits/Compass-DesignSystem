@@ -274,7 +274,7 @@ const CollapsibleTextExample = () => {
   return (
     <Box maxWidth="500px">
       <Collapsible>
-        <CollapsibleText weight="semibold">Payment details</CollapsibleText>
+        <CollapsibleText weight="semibold">Shipment details</CollapsibleText>
         <CollapsibleBody>
           <Text>Amount, payment method, and settlement date are shown here.</Text>
         </CollapsibleBody>

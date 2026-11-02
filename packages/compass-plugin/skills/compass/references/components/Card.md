@@ -495,9 +495,9 @@ const MetricCard = () => {
     >
       <CardHeader showDivider={false}>
         <CardHeaderLeading
-          title={isMobile ? 'TPV' : 'Total Payment Volume'}
+          title={isMobile ? 'TPV' : 'Total Shipment Volume'}
           subtitle={
-            isMobile ? 'TPV for the current month' : 'Total Payment Volume for the current month'
+            isMobile ? 'TPV for the current month' : 'Total Shipment Volume for the current month'
           }
         />
         <CardHeaderTrailing
@@ -598,8 +598,8 @@ type ProductOption = {
 const productOptions: ProductOption[] = [
   {
     value: 'payment-gateway',
-    title: 'Payment Gateway',
-    subtitle: 'Accept online payments',
+    title: 'Shipment Gateway',
+    subtitle: 'Accept online shipments',
     features: [
       '100+ payment methods',
       'UPI, Cards, Netbanking, Wallets',
@@ -609,8 +609,8 @@ const productOptions: ProductOption[] = [
   },
   {
     value: 'payment-links',
-    title: 'Payment Links',
-    subtitle: 'Share & collect payments',
+    title: 'Shipment Links',
+    subtitle: 'Share & collect shipments',
     features: [
       'No coding required',
       'Share via SMS, email, WhatsApp',
@@ -620,7 +620,7 @@ const productOptions: ProductOption[] = [
   },
   {
     value: 'payment-pages',
-    title: 'Payment Pages',
+    title: 'Shipment Pages',
     subtitle: 'Create online store',
     features: [
       'Ready-to-use online store',

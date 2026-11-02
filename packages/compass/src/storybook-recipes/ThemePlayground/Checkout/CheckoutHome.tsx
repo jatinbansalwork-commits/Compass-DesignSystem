@@ -86,7 +86,7 @@ const CheckoutHome = (): React.ReactElement => {
     <CheckoutShell>
       <Box padding="spacing.7" paddingBottom="spacing.8" overflowY="scroll">
         <Heading marginTop="spacing.3" marginBottom="spacing.3">
-          Track with shipment QR
+          Track clearance with filing QR
         </Heading>
         <Card elevation="none" padding="spacing.5">
           <CardBody>
@@ -96,7 +96,7 @@ const CheckoutHome = (): React.ReactElement => {
               </QRImageWrapper>
               <Box flex={1} display="flex" flexDirection="column" justifyContent="center">
                 <Text size="small">
-                  Scan the QR with the Compass app to view live shipment status.
+                  Scan the QR with the Compass app to view live CBP status for shipment KX-240018.
                 </Text>
                 <Box
                   paddingTop="spacing.3"
@@ -128,7 +128,7 @@ const CheckoutHome = (): React.ReactElement => {
           </CardBody>
         </Card>
         <Heading marginTop="spacing.5" marginBottom="spacing.3">
-          Preferred shipping speeds
+          Mode of transport (MOT)
         </Heading>
         <Card padding="spacing.0" elevation="none">
           <CardBody>
@@ -139,7 +139,7 @@ const CheckoutHome = (): React.ReactElement => {
                   alt="googlepay-app-logo"
                 />
               </Box>
-              <Text>Express delivery</Text>
+              <Text>Ocean — FCL</Text>
               <Box display="flex" flex={1} alignItems="center" justifyContent="flex-end">
                 <ChevronRightIcon size="xlarge" color="surface.icon.primary.normal" />
               </Box>
@@ -151,7 +151,7 @@ const CheckoutHome = (): React.ReactElement => {
                   alt="googlepay-app-logo"
                 />
               </Box>
-              <Text>Express delivery</Text>
+              <Text>Ocean — FCL</Text>
               <Box display="flex" flex={1} alignItems="center" justifyContent="flex-end">
                 <ChevronRightIcon size="xlarge" color="surface.icon.primary.normal" />
               </Box>
@@ -159,7 +159,7 @@ const CheckoutHome = (): React.ReactElement => {
           </CardBody>
         </Card>
         <Heading marginTop="spacing.5" marginBottom="spacing.3">
-          More shipping options
+          Additional filing options
         </Heading>
         <Card padding="spacing.0" elevation="none">
           <CardBody>
@@ -181,7 +181,7 @@ const CheckoutHome = (): React.ReactElement => {
                   />
                 </svg>
               </Box>
-              <Text>Freight</Text>
+              <Text>Air — expedited</Text>
               <Box display="flex" flex={1} alignItems="center" justifyContent="flex-end">
                 <ChevronRightIcon size="xlarge" color="surface.icon.primary.normal" />
               </Box>
@@ -204,7 +204,7 @@ const CheckoutHome = (): React.ReactElement => {
                   />
                 </svg>
               </Box>
-              <Text>Parcel locker</Text>
+              <Text>Truck — cross-border</Text>
               <Box display="flex" flex={1} alignItems="center" justifyContent="flex-end">
                 <ChevronRightIcon size="xlarge" color="surface.icon.primary.normal" />
               </Box>
@@ -227,7 +227,7 @@ const CheckoutHome = (): React.ReactElement => {
                   />
                 </svg>
               </Box>
-              <Text>Ground shipping</Text>
+              <Text>Rail — inland</Text>
               <Box display="flex" flex={1} alignItems="center" justifyContent="flex-end">
                 <ChevronRightIcon size="xlarge" color="surface.icon.primary.normal" />
               </Box>
@@ -250,7 +250,7 @@ const CheckoutHome = (): React.ReactElement => {
                   />
                 </svg>
               </Box>
-              <Text>Same-day</Text>
+              <Text>Formal entry — 7501</Text>
               <Box display="flex" flex={1} alignItems="center" justifyContent="flex-end">
                 <ChevronRightIcon size="xlarge" color="surface.icon.primary.normal" />
               </Box>
@@ -293,7 +293,7 @@ const CheckoutHome = (): React.ReactElement => {
                   />
                 </svg>
               </Box>
-              <Text>International freight</Text>
+              <Text>Consumption entry — 3461</Text>
               <Box display="flex" flex={1} alignItems="center" justifyContent="flex-end">
                 <ChevronRightIcon size="xlarge" color="surface.icon.primary.normal" />
               </Box>

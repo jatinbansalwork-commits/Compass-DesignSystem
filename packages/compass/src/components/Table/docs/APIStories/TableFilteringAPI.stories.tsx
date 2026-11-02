@@ -1,3 +1,4 @@
+import { applyTableStoryMeta } from '../tableStorybookMeta';
 import type { StoryFn, Meta } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import type { TableProps } from '../../types';
@@ -11,7 +12,7 @@ import { Box } from '~components/Box';
 import { Code } from '~components/Typography';
 import { Badge } from '~components/Badge';
 
-export default {
+const storyMeta: Meta<TableProps<unknown>> = {
   title: 'Components/Table/Features/Filtering',
   tags: ['autodocs'],
   component: TableComponent,
@@ -48,7 +49,10 @@ export default {
       ),
     },
   },
-} as Meta<TableProps<unknown>>;
+};
+
+applyTableStoryMeta(storyMeta);
+export default storyMeta;
 
 const data = createTransactionTableData(30);
 
@@ -68,7 +72,6 @@ const filterFunctions = {
   TRANSACTION_STATE: (item, value) => matchesStringOrArray(item.transactionState, value),
   VESSEL_NAME: (item, value) => matchesStringOrArray(item.vesselName, value),
 };
-
 const FilteringTemplate: StoryFn<typeof TableComponent> = ({ ...args }) => {
   return (
     <Box

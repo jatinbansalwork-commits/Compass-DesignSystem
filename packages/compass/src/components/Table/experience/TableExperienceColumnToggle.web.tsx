@@ -4,6 +4,10 @@ import { Popover } from '~components/Popover';
 import { Checkbox } from '~components/Checkbox';
 import { Text } from '~components/Typography';
 import BaseBox from '~components/Box/BaseBox';
+import { IconButton } from '~components/Button/IconButton';
+import { tableIcons } from '../tokens';
+import { SettingsIcon } from '~components/Icons';
+import { Tooltip } from '~components/Tooltip';
 
 export type TableExperienceColumnToggleOption = {
   key: string;
@@ -17,12 +21,14 @@ type TableExperienceColumnToggleProps = {
   columns: TableExperienceColumnToggleOption[];
   visibleColumnKeys: string[];
   onVisibleColumnKeysChange: (keys: string[]) => void;
+  iconOnly?: boolean;
 };
 
 const TableExperienceColumnToggle = ({
   columns,
   visibleColumnKeys,
   onVisibleColumnKeysChange,
+  iconOnly = false,
 }: TableExperienceColumnToggleProps): React.ReactElement => {
   const visibleSet = useMemo(() => new Set(visibleColumnKeys), [visibleColumnKeys]);
 
@@ -53,11 +59,24 @@ const TableExperienceColumnToggle = ({
     </BaseBox>
   );
 
+  const trigger = iconOnly ? (
+    <Tooltip content="Columns">
+      <IconButton
+        size={tableIcons.control}
+        icon={SettingsIcon}
+        accessibilityLabel="Columns"
+        testID="table-experience-columns"
+      />
+    </Tooltip>
+  ) : (
+    <Button size="small" variant="secondary" testID="table-experience-columns">
+      Columns
+    </Button>
+  );
+
   return (
     <Popover content={content} title="Show columns" placement="bottom-end">
-      <Button size="small" variant="secondary" testID="table-experience-columns">
-        Columns
-      </Button>
+      {trigger}
     </Popover>
   );
 };

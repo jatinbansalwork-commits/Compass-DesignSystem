@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ComponentIds } from './componentIds';
-import { tableToolbar } from './tokens';
+import { tableIcons, tableToolbar } from './tokens';
 import { useTableRowContext, useTableDataContext } from './TableContext';
 import type { TableToolbarProps, TableToolbarActionsProps, TableToolbarSearchProps } from './types';
 import { SearchInput } from '~components/Input/SearchInput';
@@ -15,6 +15,8 @@ import { Divider } from '~components/Divider';
 import { Link } from '~components/Link';
 import { getStyledProps } from '~components/Box/styledProps';
 import { useTheme } from '~components/CompassProvider';
+import { IconButton } from '~components/Button/IconButton';
+import { SearchIcon } from '~components/Icons';
 
 /**
  * TableToolbarActions is a component that is used to render actions in the TableToolbar.
@@ -39,13 +41,24 @@ const _TableToolbarActions = ({
   return (
     <BaseBox
       display="flex"
-      flex={onMobile ? 1 : 0}
+      flexDirection="row"
+      flexWrap={onMobile ? 'wrap' : 'nowrap'}
+      alignItems="center"
+      gap={tableToolbar.actionsGap}
       flexShrink={0}
-      justifyContent={onMobile ? 'flex-start' : 'flex-end'}
+      justifyContent="flex-start"
       {...getStyledProps(rest)}
       {...makeAnalyticsAttribute(rest)}
     >
-      {children}
+      {React.Children.map(children, (child, index) =>
+        React.isValidElement(child) ? (
+          <BaseBox key={child.key ?? index} flexShrink={0}>
+            {child}
+          </BaseBox>
+        ) : (
+          child
+        ),
+      )}
     </BaseBox>
   );
 };
@@ -63,21 +76,65 @@ const TableToolbarActions = assignWithoutSideEffects(_TableToolbarActions, {
 const _TableToolbarSearch = ({
   placeholder = 'Search',
   accessibilityLabel = 'Search table',
+  variant = 'expanded',
   ...rest
 }: TableToolbarSearchProps): React.ReactElement => {
   const { globalFilterValue, setGlobalFilterValue } = useTableDataContext();
+  const [isHoverExpanded, setIsHoverExpanded] = useState(false);
+  const isCollapsible = variant === 'collapsibleOnHover';
+  const isExpanded =
+    !isCollapsible || isHoverExpanded || Boolean(globalFilterValue?.trim());
+
+  const searchInput = (
+    <SearchInput
+      size="small"
+      isFullWidth
+      value={globalFilterValue}
+      onChange={({ value }) => setGlobalFilterValue(value ?? '')}
+      placeholder={placeholder}
+      accessibilityLabel={accessibilityLabel}
+    />
+  );
+
+  if (isCollapsible && !isExpanded) {
+    return (
+      <BaseBox flexShrink={0} {...makeAnalyticsAttribute(rest)}>
+        <IconButton
+          size={tableIcons.control}
+          icon={SearchIcon}
+          accessibilityLabel={accessibilityLabel}
+          onClick={() => setIsHoverExpanded(true)}
+        />
+      </BaseBox>
+    );
+  }
+
   return (
-    // Grows to use the toolbar's empty space (rather than sitting at a fixed 240px, which reads
-    // as an afterthought squeezed next to TableToolbarActions) while staying readable on mobile
-    // and not crowding out actions on very wide toolbars.
-    <BaseBox flex={1} minWidth="200px" maxWidth="400px" {...makeAnalyticsAttribute(rest)}>
-      <SearchInput
-        size="small"
-        value={globalFilterValue}
-        onChange={({ value }) => setGlobalFilterValue(value ?? '')}
-        placeholder={placeholder}
-        accessibilityLabel={accessibilityLabel}
-      />
+    <BaseBox
+      flex={0}
+      width={makeSize(
+        isCollapsible ? tableToolbar.searchCollapsibleMaxWidth : tableToolbar.searchDefaultWidth,
+      )}
+      minWidth={makeSize(
+        isCollapsible ? tableToolbar.searchCollapsibleMinWidth : tableToolbar.searchMinWidth,
+      )}
+      maxWidth={makeSize(
+        isCollapsible ? tableToolbar.searchCollapsibleMaxWidth : tableToolbar.searchMaxWidth,
+      )}
+      flexShrink={0}
+      onMouseEnter={isCollapsible ? () => setIsHoverExpanded(true) : undefined}
+      onMouseLeave={
+        isCollapsible
+          ? () => {
+              if (!globalFilterValue?.trim()) {
+                setIsHoverExpanded(false);
+              }
+            }
+          : undefined
+      }
+      {...makeAnalyticsAttribute(rest)}
+    >
+      {searchInput}
     </BaseBox>
   );
 };
@@ -122,23 +179,31 @@ const _TableToolbar = ({
   const onMobile = platform === 'onMobile';
 
   const deselectButton = (
-    <Link size="small" marginLeft="spacing.3" variant="button" onClick={() => deselectAllRows()}>
+    <Link
+      size="small"
+      marginLeft={tableToolbar.titleBlockGap}
+      variant="button"
+      onClick={() => deselectAllRows()}
+    >
       Deselect
     </Link>
   );
 
   return (
-    <BaseBox>
+    <BaseBox width="100%">
       <ToolbarWrapper
         display="flex"
+        width="100%"
         backgroundColor={tableToolbar.backgroundColor}
         padding={tableToolbar.padding}
         flexWrap="wrap"
         flexDirection={onMobile && tableToolbarPlacement === 'inline' ? 'column' : 'row'}
-        gap="spacing.5"
+        alignItems="center"
+        gap={tableToolbar.titleBlockGap}
         minHeight={makeSize(tableToolbar.minHeight)}
+        boxSizing="border-box"
       >
-        <BaseBox display="flex" alignItems="center" flex={1}>
+        <BaseBox display="flex" alignItems="center" flexShrink={0}>
           <BaseBox>
             <Text
               size="small"
@@ -150,13 +215,24 @@ const _TableToolbar = ({
           </BaseBox>
 
           {selectionType !== 'none' && isSelected && (
-            <BaseBox display="flex" marginLeft="spacing.3" height="spacing.6">
+            <BaseBox display="flex" marginLeft={tableToolbar.titleBlockGap} height="spacing.6">
               <Divider orientation="vertical" thickness="thick" />
               {deselectButton}
             </BaseBox>
           )}
         </BaseBox>
-        {children}
+        <BaseBox
+          display="flex"
+          flex={1}
+          minWidth={0}
+          flexDirection="row"
+          flexWrap={onMobile ? 'wrap' : 'nowrap'}
+          alignItems="center"
+          justifyContent="flex-end"
+          gap={tableToolbar.childActionsGap}
+        >
+          {children}
+        </BaseBox>
       </ToolbarWrapper>
     </BaseBox>
   );

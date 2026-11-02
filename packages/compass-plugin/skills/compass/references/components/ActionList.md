@@ -173,7 +173,7 @@ const ActionListExample = () => {
         <ActionListItem title="Profile" value="profile" />
 
         {/* Section with title to group related items */}
-        <ActionListSection title="Account Management">
+        <ActionListSection title="HTS code Management">
           {/* Item with icon and disabled state */}
           <ActionListItem
             leading={<ActionListItemIcon icon={SettingsIcon} />}
@@ -249,7 +249,7 @@ const ActionListExample = () => {
         <ActionListItem
           title="Profile"
           value="profile"
-          leading={<ActionListItemAvatar icon={UserIcon} color="primary" name="John Doe" />}
+          leading={<ActionListItemAvatar icon={UserIcon} color="primary" name="Schlumberger USA Inc." />}
         />
 
         {/* Item with negative intent for destructive actions */}

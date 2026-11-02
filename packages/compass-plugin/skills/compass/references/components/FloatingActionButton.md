@@ -240,7 +240,7 @@ const TransactionsScreen = (): React.ReactElement => {
       <Modal isOpen={isCreateOpen} onDismiss={() => setIsCreateOpen(false)}>
         <ModalHeader title="Create payment" />
         <ModalBody>
-          <Text>Payment creation form goes here.</Text>
+          <Text>Shipment creation form goes here.</Text>
         </ModalBody>
         <ModalFooter>
           <Button variant="tertiary" onClick={() => setIsCreateOpen(false)}>

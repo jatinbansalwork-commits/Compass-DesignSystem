@@ -269,6 +269,7 @@ export const getBaseInputStyles = ({
   disabledColor,
   isInsideCounterInput,
   hasCompactLeadingSpacing,
+  isTableInputCell,
 }: GetInputStyles): CSSObject => {
   const {
     hasLeadingIcon,
@@ -287,6 +288,8 @@ export const getBaseInputStyles = ({
   });
 
   const isDropdownWithTags = isDropdownTrigger && hasTags;
+  const isTableDropdownTrigger =
+    isTableInputCell && isDropdownTrigger && !isTextArea && !isDropdownWithTags;
   const isReactNative = getPlatformType() === 'react-native';
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const shouldHaveFlexibleHeight = isTextArea || isDropdownWithTags;
@@ -321,8 +324,17 @@ export const getBaseInputStyles = ({
     flex: 1,
     backgroundColor: theme.colors.transparent,
 
-    paddingTop: padding ?? makeSpace(getTopPadding({ theme, size, isInsideCounterInput })),
-    paddingBottom: padding ?? makeSpace(getBottomPadding({ theme, size, isInsideCounterInput })),
+    paddingTop:
+      padding ??
+      (isTableDropdownTrigger
+        ? makeSpace(0)
+        : makeSpace(getTopPadding({ theme, size, isInsideCounterInput }))),
+    paddingBottom:
+      padding ??
+      (isTableDropdownTrigger
+        ? makeSpace(0)
+        : makeSpace(getBottomPadding({ theme, size, isInsideCounterInput }))),
+    ...(isTableDropdownTrigger ? { lineHeight: makeSpace(inputHeight) } : undefined),
     paddingLeft:
       padding ??
       makeSpace(

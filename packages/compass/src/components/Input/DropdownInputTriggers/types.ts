@@ -46,7 +46,9 @@ type DropdownInputTriggersCommonProps = Pick<
   | 'onBlur'
   | 'placeholder'
   | 'testID'
+  | 'id'
   | 'size'
+  | 'isTableInputCell'
   | keyof DataAnalyticsAttribute
 > & {
   /**

@@ -1,3 +1,4 @@
+import { applyTableRecipeMeta } from './tableStorybookMeta';
 import React from 'react';
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import {
@@ -21,7 +22,7 @@ import { Amount } from '~components/Amount';
 const sourceData = createTableData(24);
 
 const filterFunctions = {
-  PAYMENT_ID: (item: (typeof sourceData.nodes)[number], value: string | string[]) => {
+  SHIPMENT_ID: (item: (typeof sourceData.nodes)[number], value: string | string[]) => {
     const needle = Array.isArray(value) ? value.join(' ') : value;
     return item.paymentId.toLowerCase().includes(needle.toLowerCase());
   },
@@ -36,7 +37,7 @@ const filterFunctions = {
 };
 
 const sortFunctions = {
-  PAYMENT_ID: (array: typeof sourceData.nodes) =>
+  SHIPMENT_ID: (array: typeof sourceData.nodes) =>
     [...array].sort((a, b) => a.paymentId.localeCompare(b.paymentId)),
   NAME: (array: typeof sourceData.nodes) => [...array].sort((a, b) => a.name.localeCompare(b.name)),
 };
@@ -45,7 +46,7 @@ const LEAF_COLUMN_COUNT = 4;
 /** Checkbox column + four data columns when selection is enabled. */
 const EMPTY_GRID_COLUMN_END = LEAF_COLUMN_COUNT + 2;
 
-const meta: Meta = {
+const storyMeta: Meta = {
   title: 'Components/Table/Experience/CompassDataTable/01 Toolbar & Export',
   tags: ['autodocs'],
   parameters: {
@@ -81,14 +82,14 @@ export const PrimeStyleShell: StoryFn = () => {
         {...controller.experienceProps}
         experienceApi={controller.experienceProps}
         isHeaderSticky
-        toolbarTitle="Payments"
+        toolbarTitle="Clearance queue"
         toolbarSelectedTitle={`${controller.selectedIds.length} selected`}
-        exportFileName="payments"
+        exportFileName="shipments"
         exportColumns={[
-          { header: 'Payment ID', getValue: (row) => row.paymentId },
+          { header: 'Shipment ID', getValue: (row) => row.paymentId },
           { header: 'Name', getValue: (row) => row.name },
           { header: 'Status', getValue: (row) => row.status },
-          { header: 'Amount', getValue: (row) => String(row.amount) },
+          { header: 'Duty amount', getValue: (row) => String(row.amount) },
         ]}
         pagination={
           <TablePagination defaultPageSize={10} showPageNumberSelector onPageChange={() => undefined} />
@@ -98,10 +99,10 @@ export const PrimeStyleShell: StoryFn = () => {
           <>
             <TableHeader>
               <TableHeaderRow>
-                <TableHeaderCell headerKey="PAYMENT_ID">Payment ID</TableHeaderCell>
+                <TableHeaderCell headerKey="SHIPMENT_ID">Shipment ID</TableHeaderCell>
                 <TableHeaderCell headerKey="NAME">Name</TableHeaderCell>
                 <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
               </TableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -134,4 +135,5 @@ export const PrimeStyleShell: StoryFn = () => {
   );
 };
 
-export default meta;
+applyTableRecipeMeta(storyMeta);
+export default storyMeta;

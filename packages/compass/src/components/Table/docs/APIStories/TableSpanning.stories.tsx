@@ -1,3 +1,4 @@
+import { applyTableStoryMeta } from '../tableStorybookMeta';
 import React from 'react';
 import type { StoryFn, Meta } from '@storybook/react-vite';
 import type { TableData, TableProps } from '../../types';
@@ -10,7 +11,7 @@ import { Text } from '~components/Typography';
 import StoryPageWrapper from '~utils/storybook/StoryPageWrapper';
 import { Box } from '~components/Box';
 
-export default {
+const storyMeta: Meta<TableProps<unknown>> = {
   title: 'Components/Table/Features/Spanning',
   component: TableComponent,
   parameters: {
@@ -23,7 +24,10 @@ export default {
       ),
     },
   },
-} as Meta<TableProps<unknown>>;
+};
+
+applyTableStoryMeta(storyMeta);
+export default storyMeta;
 
 type TransactionItem = {
   id: string;
@@ -34,7 +38,6 @@ type TransactionItem = {
   gst: number;
   settlement: number;
 };
-
 const shipmentData: TableData<TransactionItem> = {
   nodes: [
     {
@@ -127,8 +130,8 @@ const headers = (
   <TableHeader>
     <TableHeaderRow>
       <TableHeaderCell>Merchant</TableHeaderCell>
-      <TableHeaderCell>Method</TableHeaderCell>
-      <TableHeaderCell>Amount</TableHeaderCell>
+      <TableHeaderCell>MOT</TableHeaderCell>
+      <TableHeaderCell>Duty amount</TableHeaderCell>
       <TableHeaderCell>Fee</TableHeaderCell>
       <TableHeaderCell>GST</TableHeaderCell>
       <TableHeaderCell>Settlement</TableHeaderCell>
@@ -190,7 +193,7 @@ export const ColumnSpan: StoryFn<typeof TableComponent> = () => {
             <TableBody>
               <TableRow item={tableData[0]}>
                 <TableCell gridColumnStart={1} gridColumnEnd={7}>
-                  Transaction Summary - Total: {shipmentData.nodes.length} transactions processed
+                  Clearance summary - Total: {shipmentData.nodes.length} filings processed
                 </TableCell>
               </TableRow>
               {tableData.map((item, index) => (
@@ -229,8 +232,8 @@ export const HeaderSpan: StoryFn<typeof TableComponent> = () => {
             <TableHeader>
               <TableHeaderRow>
                 <TableHeaderCell>Merchant</TableHeaderCell>
-                <TableHeaderCell>Method</TableHeaderCell>
-                <TableHeaderCell>Amount</TableHeaderCell>
+                <TableHeaderCell>MOT</TableHeaderCell>
+                <TableHeaderCell>Duty amount</TableHeaderCell>
                 <TableHeaderCell gridColumnStart={4} gridColumnEnd={7}>
                   Charge Breakup
                 </TableHeaderCell>
@@ -300,7 +303,7 @@ export const FooterSpan: StoryFn<typeof TableComponent> = () => {
                 <TableFooterCell gridColumnStart={1} gridColumnEnd={6}>
                   <Text weight="regular">
                     Total Summary ({Object.keys(grouped).length} merchants,{' '}
-                    {shipmentData.nodes.length} transactions)
+                    {shipmentData.nodes.length} filings)
                   </Text>
                 </TableFooterCell>
                 <TableFooterCell>

@@ -201,7 +201,7 @@ function BasicTourExample(): React.ReactElement {
   const steps: SpotlightPopoverTourSteps = [
     {
       name: 'refunds-step',
-      title: 'Overview of Refunds',
+      title: 'Overview of Consumption entrys',
       content: () => (
         <Box>
           <Text color="surface.text.gray.subtle">
@@ -282,7 +282,7 @@ function BasicTourExample(): React.ReactElement {
                 <CardBody>
                   <Box display="flex" flexDirection="column" gap="spacing.3">
                     <Box display="flex" alignItems="center" gap="spacing.3">
-                      <Text>Refunds</Text>
+                      <Text>Consumption entrys</Text>
                       <InfoIcon color="surface.icon.gray.muted" />
                     </Box>
                     <Amount value={40000} type="heading" size="large" />

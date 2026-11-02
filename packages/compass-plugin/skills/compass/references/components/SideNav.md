@@ -4,7 +4,7 @@ SideNav
 
 ## Description
 
-The SideNav component provides a responsive side navigation layout positioned along the left side of the screen. It enables quick access to different sections or functionalities of an application with support for multi-level navigation, collapsible sections, and mobile responsiveness. SideNav supports both standalone usage and integration with routing libraries like React Router.
+The SideNav component provides a responsive three-level primary navigation rail (L1 → L2 → L3). On desktop (≥1024px), L2 and L3 default to portaled flyout panels beside the rail (`l2Variant="flyout"`, `l3Variant="flyout"`) with hover-intent, keyboard navigation, and optional pin via `isExpanded` + `SideNavPinItem`. On mobile/tablet, the same tree renders in an off-canvas drawer with inline L2/L3 accordions. Use `l2Variant="column"` / `l3Variant="accordion"` only for the legacy full L2 column and inline L3 paths.
 
 ## Important Constraints
 
@@ -114,11 +114,24 @@ type SideNavProps = {
   /**
    * **Only applicable in desktop**
    *
-   * Controls whether SideNav should remain fully expanded.
-   * - `true` (default): existing behavior with hover-based temporary expansion.
-   * - `false`: keeps SideNav collapsed and disables hover/focus-based expansion.
+   * Controls L1 rail expand/collapse mode:
+   * - `undefined`: default hover-peek and click-dock (internal state).
+   * - `true`: force the rail fully expanded through navigations (pair with a consumer pin toggle via `onExpandChange`).
+   * - `false`: force collapsed (icon-only) and disable hover/focus temporary expansion.
    */
   isExpanded?: boolean;
+  /**
+   * Desktop L3 rendering. Mobile always uses inline accordion.
+   *
+   * @default 'flyout'
+   */
+  l3Variant?: 'accordion' | 'flyout';
+  /**
+   * Desktop L2 rendering when an L1 item has nested links. Mobile always uses drawer L2.
+   *
+   * @default 'flyout'
+   */
+  l2Variant?: 'column' | 'flyout';
   /**
    * Banner slot for usecases like adding Activation Panel
    *
@@ -341,6 +354,8 @@ type SideNavLevelProps = {
 - Manage active state externally using `isActive` prop with `useLocation()` and `matchPath()`.
 - Use `SideNavSection` to group related links under collapsible headings.
 - Use `SideNavFooter` for utility items like Settings or Test Mode toggles.
+- Use `SideNavPinItem` in `SideNavFooter` and control the rail with `isExpanded={isPinned}` (`true` when pinned shows **Pinned open** with primary tint; `false` when unpinned keeps the icon rail). Persist pin state in the app (e.g. `localStorage`), not inside `SideNav`.
+- Default (`l3Variant="flyout"`): portaled L3 beside L2 (KlearNow app shell). Set `l3Variant="accordion"` only for legacy inline L3.
 - Use the `banner` slot only for critical activation or onboarding UI, not promotions.
 - Pair with `SkipNav` for keyboard accessibility to let users skip past the navigation.
 
@@ -398,7 +413,7 @@ const ActivationCard = () => {
       <CardBody>
         <Box display="flex" justifyContent="space-between" marginBottom="spacing.2">
           <Text size="medium" weight="semibold">
-            Activation Pending
+            Activation Exam hold
           </Text>
           <Box>
             <ChevronRightIcon />
@@ -478,8 +493,8 @@ const SideNavExample = () => {
         },
         {
           icon: WalletIcon,
-          title: 'Payments',
-          href: '/payments',
+          title: 'Clearance queue',
+          href: '/shipments',
           tooltip: {
             content: 'View all payment transactions',
             placement: 'right',
@@ -495,7 +510,7 @@ const SideNavExample = () => {
             </Tooltip>
           ),
           'data-analytics-section': 'main-nav',
-          'data-analytics-element': 'payments',
+          'data-analytics-element': 'shipments',
         },
       ],
     },
@@ -506,7 +521,7 @@ const SideNavExample = () => {
       items: [
         {
           icon: CreditCardIcon,
-          title: 'Credit Cards',
+          title: 'Airs',
           href: '/banking/credit-cards',
           'data-analytics-section': 'banking',
           'data-analytics-element': 'credit-cards',
@@ -529,7 +544,7 @@ const SideNavExample = () => {
         },
         {
           icon: BankIcon,
-          title: 'Bank Accounts',
+          title: 'Bank HTS codes',
           href: '/banking/accounts',
           'data-analytics-section': 'banking',
           'data-analytics-element': 'bank-accounts',
@@ -661,7 +676,7 @@ const SideNavExample = () => {
               />
               <NavLink
                 icon={SettingsIcon}
-                title="Account Settings"
+                title="HTS code Settings"
                 href="/settings/account"
                 data-analytics-section="settings"
                 data-analytics-element="account-settings"

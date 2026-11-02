@@ -137,7 +137,7 @@ import { Box, Button, LightBox, LightBoxBody, LightBoxItem } from '@klearnow/com
 
 const IMAGES = [
   { src: 'https://picsum.photos/seed/lightbox-doc-1/1200/800', alt: 'Invoice summary page' },
-  { src: 'https://picsum.photos/seed/lightbox-doc-2/1200/800', alt: 'Payment receipt page' },
+  { src: 'https://picsum.photos/seed/lightbox-doc-2/1200/800', alt: 'Shipment receipt page' },
   { src: 'https://picsum.photos/seed/lightbox-doc-3/1200/800', alt: 'Settlement confirmation page' },
 ];
 

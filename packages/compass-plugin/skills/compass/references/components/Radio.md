@@ -197,7 +197,7 @@ function BasicRadioExample() {
     <Box gap="spacing.5">
       {/* Standard RadioGroup with different sizes and states */}
       <RadioGroup
-        label="Where do you want to collect payments?"
+        label="Where do you want to collect shipments?"
         helpText="Select only one option"
         name="payment-collection"
         onChange={handleChange}

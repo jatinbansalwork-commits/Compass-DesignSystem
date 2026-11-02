@@ -664,12 +664,11 @@ const ChartAreaWrapper: React.FC<ChartAreaWrapperProps & TestID & DataAnalyticsA
   const chartId = chartIdRef.current;
 
   const scrubProgress = useSharedValue(0);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- scrubProgress and theme.motion are stable refs
   useEffect(() => {
     scrubProgress.value = withTiming(activeIndex !== undefined ? 1 : 0, {
       duration: getIn(theme.motion, 'duration.quick'),
     });
-  }, [activeIndex]);
+  }, [activeIndex]); // eslint-disable-line react-hooks/exhaustive-deps -- reanimated shared value; theme.motion duration per activeIndex
 
   const onLayout = (e: LayoutChangeEvent): void => {
     const { width, height } = e.nativeEvent.layout;
@@ -816,7 +815,7 @@ const ChartAreaWrapper: React.FC<ChartAreaWrapperProps & TestID & DataAnalyticsA
       const rawLabel = slots.xDataKey ? String(row[slots.xDataKey] ?? '') : String(index);
       return slots.xTickFormatter ? slots.xTickFormatter(rawLabel, index) : rawLabel;
     });
-  }, [data, slots.xDataKey, slots.xTickFormatter]);
+  }, [data, slots.xDataKey, slots.xTickFormatter]); // eslint-disable-line react-hooks/exhaustive-deps -- slots object identity would over-invalidate labels
 
   // Wrap each label to fit its column so all categories can be shown at once.
   // Budget ~60% of a column per label: the first/last ticks are edge-anchored, so
@@ -946,13 +945,12 @@ const ChartAreaWrapper: React.FC<ChartAreaWrapperProps & TestID & DataAnalyticsA
     yRange,
     dataColorMapping,
     theme.colors,
-  ]);
+  ]); // eslint-disable-line react-hooks/exhaustive-deps -- chart geometry: slots/chartId derived from stable stackGroups
 
   // Fire the recharts-style left→right clip reveal when data/series change, and
   // once plotWidth is known after layout. Skip re-animating on pure resize.
   const revealProgress = useSharedValue(0);
   const lastRevealKeyRef = useRef<string | undefined>(undefined);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- revealProgress and theme.motion are stable refs
   useEffect(() => {
     if (count === 0 || plotWidth <= 0) {
       // Allow a fresh reveal after empty → loaded (or before first layout).
@@ -978,7 +976,7 @@ const ChartAreaWrapper: React.FC<ChartAreaWrapperProps & TestID & DataAnalyticsA
         easing: getIn(theme.motion, 'easing.entrance'),
       }),
     );
-  }, [count, visibleAreas.length, plotWidth]);
+  }, [count, visibleAreas.length, plotWidth]); // eslint-disable-line react-hooks/exhaustive-deps -- reanimated revealProgress + theme.motion tokens
 
   const clipAnimatedProps = useAnimatedProps(() => ({
     width: revealProgress.value * plotWidth,

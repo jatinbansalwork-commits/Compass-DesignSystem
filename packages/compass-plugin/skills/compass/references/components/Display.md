@@ -77,7 +77,7 @@ function DisplayExample() {
       <Display size="large">
         Powerful{' '}
         <Display as="span" size="large" color="feedback.text.information.intense" weight="medium">
-          Payment Solutions
+          Shipment Solutions
         </Display>
       </Display>
 

@@ -6,6 +6,8 @@ import { collectGroupHeaderIds } from '../../utils/collectGroupHeaderIds';
 import { toggleExperienceSort } from '../toggleExperienceSort';
 import { matchesWithMode } from '../filterMatchMode';
 import { buildGridTemplateColumns } from '../buildGridTemplateColumns';
+import { buildExperienceStickyLeadingLayout } from '../buildExperienceStickyLeadingLayout';
+import { getFilterRowStickyTopOffsetPx } from '../../headerLayoutConstants';
 import { orderedVisibleColumnKeys, reorderColumnKeys } from '../reorderColumnKeys';
 
 describe('table experience utilities', () => {
@@ -88,6 +90,38 @@ describe('table experience utilities', () => {
     });
   });
 
+  describe('getFilterRowStickyTopOffsetPx', () => {
+    it('matches compact row height per label row (borders inside the row box)', () => {
+      expect(getFilterRowStickyTopOffsetPx(1)).toBe(36);
+      expect(getFilterRowStickyTopOffsetPx(2)).toBe(72);
+    });
+  });
+
+  describe('buildExperienceStickyLeadingLayout', () => {
+    it('freezes the first N data columns in order', () => {
+      const layout = buildExperienceStickyLeadingLayout({
+        orderedColumnKeys: ['SHIPMENT_ID', 'NAME', 'STATUS', 'HTS'],
+        stickyLeadingDataColumnCount: 1,
+        columnWidths: { SHIPMENT_ID: 160 },
+        columns: [{ key: 'SHIPMENT_ID', defaultWidthPx: 140 }],
+      });
+      expect(layout.stickyColumnCount).toBe(1);
+      expect(layout.stickyLeadingColumnKeys).toEqual(['SHIPMENT_ID']);
+      expect(layout.stickyColumnWidths).toEqual(['160px']);
+    });
+
+    it('clamps count to visible column length', () => {
+      const layout = buildExperienceStickyLeadingLayout({
+        orderedColumnKeys: ['a'],
+        stickyLeadingDataColumnCount: 5,
+        columnWidths: {},
+        columns: [{ key: 'a', defaultWidthPx: 100 }],
+      });
+      expect(layout.stickyColumnCount).toBe(1);
+      expect(layout.stickyColumnWidths).toEqual(['100px']);
+    });
+  });
+
   describe('buildGridTemplateColumns', () => {
     it('maps ordered keys to minmax segments', () => {
       const grid = buildGridTemplateColumns(
@@ -97,6 +131,17 @@ describe('table experience utilities', () => {
         ['1fr'],
       );
       expect(grid).toBe('minmax(80px, 200px) minmax(80px, 100px) 1fr');
+    });
+
+    it('uses fixed px for leading columns when sticky lane is configured', () => {
+      const grid = buildGridTemplateColumns(
+        ['a', 'b', 'c'],
+        { a: 200, b: 120 },
+        [{ key: 'a' }, { key: 'b', defaultWidthPx: 100 }, { key: 'c' }],
+        ['minmax(80px, 1fr)'],
+        2,
+      );
+      expect(grid).toBe('200px 120px minmax(80px, 140px) minmax(80px, 1fr)');
     });
   });
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { StoryFn } from '@storybook/react-vite';
 import { within, userEvent, expect, fn } from 'storybook/test';
+import { tableInteractionTestParameters } from './docs/tableStorybookMeta';
 import { Table } from './Table';
 import { TableHeader, TableHeaderRow, TableHeaderCell } from './TableHeader';
 import { TableBody, TableRow, TableCell } from './TableBody';
@@ -45,7 +46,7 @@ export const TestHeaderSort: StoryFn = (): React.ReactElement => (
         <>
           <TableHeader>
             <TableHeaderRow>
-              <TableHeaderCell>Payment ID</TableHeaderCell>
+              <TableHeaderCell>Shipment ID</TableHeaderCell>
               <TableHeaderCell headerKey="STATUS">Status</TableHeaderCell>
             </TableHeaderRow>
           </TableHeader>
@@ -131,7 +132,7 @@ export const TestRowSelection: StoryFn = (): React.ReactElement => (
         <>
           <TableHeader>
             <TableHeaderRow>
-              <TableHeaderCell>Payment ID</TableHeaderCell>
+              <TableHeaderCell>Shipment ID</TableHeaderCell>
               <TableHeaderCell>Name</TableHeaderCell>
             </TableHeaderRow>
           </TableHeader>
@@ -159,12 +160,56 @@ TestRowSelection.play = async ({ canvasElement }) => {
   );
 };
 
+const wideGridColumns = Array.from({ length: 10 }, (_, index) => `minmax(120px, 140px)`).join(' ');
+
+export const TestWideGridStickyScroll: StoryFn = (): React.ReactElement => (
+  <Box padding="spacing.4" maxWidth="480px">
+    <Table
+      data={{ nodes }}
+      height="280px"
+      showBorderedCells
+      isHeaderSticky
+      stickyColumnCount={2}
+      stickyColumnWidths={['120px', '140px']}
+      gridTemplateColumns={wideGridColumns}
+      selectionType="multiple"
+    >
+      {(tableData) => (
+        <>
+          <TableHeader>
+            <TableHeaderRow>
+              {Array.from({ length: 10 }, (_, index) => (
+                <TableHeaderCell key={index}>Column {index + 1}</TableHeaderCell>
+              ))}
+            </TableHeaderRow>
+          </TableHeader>
+          <TableBody>
+            {tableData.map((row) => (
+              <TableRow key={row.id} item={row}>
+                {Array.from({ length: 10 }, (_, index) => (
+                  <TableCell key={index}>
+                    {index === 9 ? 'Far column' : row.paymentId}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </>
+      )}
+    </Table>
+  </Box>
+);
+
+TestWideGridStickyScroll.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  await expect(canvas.getByRole('table')).toBeVisible();
+  await expect(canvas.getByText('Far column')).toBeInTheDocument();
+  const table = canvasElement.querySelector('[data-table-library_table]');
+  expect(table).toBeTruthy();
+};
+
 export default {
   title: 'Components/Interaction Tests/Table',
   component: Table,
-  parameters: {
-    controls: { disable: true },
-    a11y: { disable: true },
-    essentials: { disable: true },
-  },
+  parameters: tableInteractionTestParameters,
 };

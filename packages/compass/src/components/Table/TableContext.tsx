@@ -44,6 +44,8 @@ export type TableRowContextType = {
   multiSelectTrigger?: TableProps<unknown>['multiSelectTrigger'];
   columnCount: number;
   gridTemplateColumns: string | undefined;
+  /** Count of leading columns frozen horizontally (see `TableProps['stickyColumnCount']`). */
+  stickyColumnCount: number;
   isVirtualized?: boolean;
   isGrouped: boolean;
   expandedRowIds: TableNode['id'][];
@@ -114,6 +116,7 @@ const TableRowContext = React.createContext<TableRowContextType>({
   multiSelectTrigger: 'row',
   columnCount: 0,
   gridTemplateColumns: undefined,
+  stickyColumnCount: 0,
   isVirtualized: false,
   isGrouped: false,
   expandedRowIds: [],

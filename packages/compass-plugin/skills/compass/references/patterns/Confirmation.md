@@ -270,16 +270,16 @@ const ConfirmationExample: React.FC = () => {
         icon={TrashIcon}
         iconPosition="left"
       >
-        Delete Account
+        Delete HTS code
       </Button>
       <ConfirmationDialog
         isOpen={isDeleteOpen}
         onDismiss={() => setIsDeleteOpen(false)}
         type="negative"
         icon={TrashIcon}
-        title="Delete Account?"
+        title="Delete HTS code?"
         description="This action cannot be undone. All of your data will be permanently deleted. This includes your profile, settings, and all associated information."
-        primaryButtonText="Delete Account"
+        primaryButtonText="Delete HTS code"
         secondaryButtonText="Cancel"
         onConfirm={handleDelete}
         isLoading={isDeleteLoading}

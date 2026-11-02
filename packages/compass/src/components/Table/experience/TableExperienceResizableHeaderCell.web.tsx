@@ -1,13 +1,18 @@
 import React, { useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import BaseBox from '~components/Box/BaseBox';
+import { Text } from '~components/Typography';
 
-const ResizeHandle = styled.div`
+const ResizeHandle = styled.button`
   position: absolute;
   top: 0;
   right: 0;
   width: 6px;
   height: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
   cursor: col-resize;
   touch-action: none;
   user-select: none;
@@ -35,7 +40,7 @@ const TableExperienceResizableHeaderCell = ({
   const startWidthRef = useRef(widthPx);
 
   const onPointerDown = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>): void => {
+    (event: React.PointerEvent<HTMLButtonElement>): void => {
       event.preventDefault();
       event.stopPropagation();
       startXRef.current = event.clientX;
@@ -60,12 +65,30 @@ const TableExperienceResizableHeaderCell = ({
     [columnKey, minWidthPx, onWidthChange, widthPx],
   );
 
+  const label =
+    typeof children === 'string' ? (
+      <Text size="small" weight="medium" color="surface.text.gray.muted">
+        {children}
+      </Text>
+    ) : (
+      children
+    );
+
   return (
-    <BaseBox position="relative" width="100%" height="100%">
-      {children}
+    <BaseBox
+      position="relative"
+      width="100%"
+      height="100%"
+      minWidth={0}
+      minHeight="100%"
+      overflow="hidden"
+      display="flex"
+      alignItems="center"
+    >
+      {label}
       <ResizeHandle
-        role="separator"
-        aria-orientation="vertical"
+        type="button"
+        tabIndex={0}
         aria-label={`Resize ${columnKey} column`}
         data-table-experience-resize-handle={columnKey}
         onPointerDown={onPointerDown}

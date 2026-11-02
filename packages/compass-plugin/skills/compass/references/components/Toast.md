@@ -98,7 +98,7 @@ type UseToastReturn = {
 
 **Do**
 
-- Use `Toast` for brief, non-critical feedback after user actions (e.g., "Item saved", "Payment successful").
+- Use `Toast` for brief, non-critical feedback after user actions (e.g., "Item saved", "Shipment successful").
 - Use the imperative `useToast()` hook API — call `toast.show()` and `toast.dismiss()`.
 - Place `<ToastContainer />` once at the root of your app, outside nested `CompassProvider` instances.
 - Use `type="informational"` (default) with auto-dismiss for transient confirmations.
@@ -135,7 +135,7 @@ function BasicToastExample() {
       <Button
         onClick={() => {
           toast.show({
-            content: 'Payment successful',
+            content: 'Shipment successful',
             color: 'positive',
           });
         }}
@@ -163,7 +163,7 @@ function ColoredToastExample() {
         variant="tertiary"
         onClick={() => {
           toast.show({
-            content: 'Payment successful',
+            content: 'Shipment successful',
             color: 'positive',
           });
         }}
@@ -235,7 +235,7 @@ function ActionToastExample() {
 
   const showToastWithAction = () => {
     const toastId = toast.show({
-      content: 'Payment successful',
+      content: 'Shipment successful',
       color: 'positive',
       autoDismiss: false,
       action: {
@@ -284,10 +284,10 @@ function PromotionalToastExample() {
             alt="Promotional Toast"
             src="https://example.com/promotional-image.png"
           />
-          <Text weight="semibold">Lightning-fast payments with the new Klearnow Turbo UPI</Text>
+          <Text weight="semibold">Lightning-fast shipments with the new Klearnow Turbo UPI</Text>
           <Text size="xsmall">
             Turbo UPI allows end-users to complete their payment in-app, with no redirections or
-            dependence on third-party UPI apps. With Turbo UPI, payments will be 5x faster with a
+            dependence on third-party UPI apps. With Turbo UPI, shipments will be 5x faster with a
             significantly-improved success rate of 10%!
           </Text>
         </Box>
@@ -344,7 +344,7 @@ function ComprehensiveToastExample() {
   // Show a toast with custom icon and action button
   const showCustomIconToast = () => {
     toast.show({
-      content: 'Payment of ₹1,000 received',
+      content: 'Shipment of ₹1,000 received',
       color: 'positive',
       leading: CheckCircleIcon,
       autoDismiss: false,
@@ -365,7 +365,7 @@ function ComprehensiveToastExample() {
   // Show a negative toast for errors
   const showErrorToast = () => {
     toast.show({
-      content: 'Failed to process transaction',
+      content: 'Rejected to process transaction',
       color: 'negative',
       autoDismiss: false,
       action: {

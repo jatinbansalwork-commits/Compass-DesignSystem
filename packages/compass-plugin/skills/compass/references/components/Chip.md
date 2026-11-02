@@ -277,16 +277,16 @@ const ProductDetailsCard = () => {
         </Box>
       </Box>
 
-      {/* Payment options mixing regular, disabled and icon-only chips */}
+      {/* Shipment options mixing regular, disabled and icon-only chips */}
       <Box>
         <Text size="medium" weight="semibold" marginBottom="spacing.2">
-          Payment & Delivery
+          Shipment & Delivery
         </Text>
         <Box display="flex" flexDirection="column" gap="spacing.3">
-          {/* Payment methods row */}
+          {/* Shipment methods row */}
           <Box display="flex" gap="spacing.2" flexWrap="wrap">
             <Chip value="credit-card" icon={CreditCardIcon}>
-              Credit Card
+              Air
             </Chip>
             <Chip value="upi">UPI</Chip>
             <Chip value="emi" icon={CreditCardIcon}>
@@ -358,7 +358,7 @@ const BusinessRegistrationForm = () => {
   // Form state for different ChipGroup components
   const [businessType, setBusinessType] = useState('small-business');
   const [industries, setIndustries] = useState(['retail']);
-  const [paymentMethods, setPaymentMethods] = useState(['cards', 'upi']);
+  const [paymentMethods, setShipmentMethods] = useState(['cards', 'upi']);
   const [feedback, setFeedback] = useState('');
 
   // Validation state
@@ -444,14 +444,14 @@ const BusinessRegistrationForm = () => {
         <Chip value="education">Education</Chip>
       </ChipGroup>
 
-      {/* Payment methods selection with disabled premium features */}
+      {/* Shipment methods selection with disabled premium features */}
       <Box display="flex" flexDirection="column" gap="spacing.5">
         <ChipGroup
-          label="Payment Methods"
+          label="Shipment Methods"
           accessibilityLabel="Select payment methods you want to accept"
           helpText="Choose payment methods your business will accept"
           value={paymentMethods}
-          onChange={({ values }) => setPaymentMethods(values)}
+          onChange={({ values }) => setShipmentMethods(values)}
           selectionType="multiple"
           size="xsmall"
         >
@@ -469,7 +469,7 @@ const BusinessRegistrationForm = () => {
           selectionType="multiple"
           size="xsmall"
         >
-          <Chip value="international">International Payments</Chip>
+          <Chip value="international">International Clearance queue</Chip>
           <Chip value="subscription">Subscription Billing</Chip>
           <Chip value="analytics">Advanced Analytics</Chip>
         </ChipGroup>

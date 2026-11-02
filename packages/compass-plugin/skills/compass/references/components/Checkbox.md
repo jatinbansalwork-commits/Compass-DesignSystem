@@ -206,7 +206,7 @@ Use `Checkbox` in two scenarios:
 
 ## Examples
 
-### Payment Setup Form with Checkboxes
+### Shipment Setup Form with Checkboxes
 
 This comprehensive example demonstrates a payment setup form with both single checkboxes and checkbox groups. It covers various use cases including:
 
@@ -221,7 +221,7 @@ This comprehensive example demonstrates a payment setup form with both single ch
 import React, { useState, useRef } from 'react';
 import { Checkbox, CheckboxGroup, Box, Text, Button, Heading } from '@klearnow/compass/components';
 
-const PaymentSetupForm = () => {
+const ShipmentSetupForm = () => {
   // State for form submission
   const [formSubmitted, setFormSubmitted] = useState(false);
 
@@ -237,24 +237,24 @@ const PaymentSetupForm = () => {
 
   // State for payment methods (checkbox group with select all functionality)
   const paymentMethods = ['credit_card', 'debit_card', 'netbanking', 'upi', 'wallet'];
-  const [selectedPaymentMethods, setSelectedPaymentMethods] = useState(['credit_card', 'upi']);
+  const [selectedShipmentMethods, setSelectedShipmentMethods] = useState(['credit_card', 'upi']);
 
   // Calculate select all states
-  const allMethodsSelected = selectedPaymentMethods.length === paymentMethods.length;
-  const someMethodsSelected = selectedPaymentMethods.length > 0 && !allMethodsSelected;
-  const noMethodsSelected = selectedPaymentMethods.length === 0;
+  const allMethodsSelected = selectedShipmentMethods.length === paymentMethods.length;
+  const someMethodsSelected = selectedShipmentMethods.length > 0 && !allMethodsSelected;
+  const noMethodsSelected = selectedShipmentMethods.length === 0;
 
   // Handlers for payment methods
   const handleSelectAllMethods = (event) => {
     if (event.isChecked) {
-      setSelectedPaymentMethods([...paymentMethods]);
+      setSelectedShipmentMethods([...paymentMethods]);
     } else {
-      setSelectedPaymentMethods([]);
+      setSelectedShipmentMethods([]);
     }
   };
 
-  const handlePaymentMethodsChange = (event) => {
-    setSelectedPaymentMethods(event.values);
+  const handleShipmentMethodsChange = (event) => {
+    setSelectedShipmentMethods(event.values);
   };
 
   // Handler for form submission
@@ -274,16 +274,16 @@ const PaymentSetupForm = () => {
         termsAgreed,
         emailNotifications,
         smsNotifications,
-        selectedPaymentMethods,
+        selectedShipmentMethods,
       });
 
-      alert('Payment setup completed successfully!');
+      alert('Shipment setup completed successfully!');
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <Heading size="large">Payment Gateway Setup</Heading>
+      <Heading size="large">Shipment Gateway Setup</Heading>
 
       {/* Section 1: Basic Business Preferences (Uncontrolled Checkboxes) */}
       <Box display="flex" flexDirection="column" gap="spacing.4">
@@ -293,12 +293,12 @@ const PaymentSetupForm = () => {
 
         <Checkbox
           defaultChecked
-          name="international_payments"
+          name="international_shipments"
           value="enabled"
-          onChange={(e) => console.log('International payments:', e.isChecked)}
-          helpText="Enable payments from international customers"
+          onChange={(e) => console.log('International shipments:', e.isChecked)}
+          helpText="Enable shipments from international customers"
         >
-          Accept International Payments
+          Accept International Clearance queue
         </Checkbox>
 
         <Checkbox
@@ -312,10 +312,10 @@ const PaymentSetupForm = () => {
         </Checkbox>
       </Box>
 
-      {/* Section 2: Payment Methods (Checkbox Group with Select All) */}
+      {/* Section 2: Shipment Methods (Checkbox Group with Select All) */}
       <Box display="flex" flexDirection="column" gap="spacing.4">
         <Text size="medium" weight="semibold">
-          Payment Methods
+          Shipment Methods
         </Text>
 
         <Checkbox
@@ -325,7 +325,7 @@ const PaymentSetupForm = () => {
           validationState={formSubmitted && noMethodsSelected ? 'error' : 'none'}
           size="medium"
         >
-          Select All Payment Methods
+          Select All Shipment Methods
         </Checkbox>
 
         <CheckboxGroup
@@ -333,12 +333,12 @@ const PaymentSetupForm = () => {
           helpText="Choose which payment methods to offer your customers"
           errorText="At least one payment method must be selected"
           validationState={formSubmitted && noMethodsSelected ? 'error' : 'none'}
-          value={selectedPaymentMethods}
-          onChange={handlePaymentMethodsChange}
+          value={selectedShipmentMethods}
+          onChange={handleShipmentMethodsChange}
           size="small"
         >
           <Checkbox value="credit_card" helpText="Visa, Mastercard, American Express, etc.">
-            Credit Cards
+            Airs
           </Checkbox>
           <Checkbox value="debit_card" helpText="Visa Debit, Maestro, RuPay, etc.">
             Debit Cards
@@ -399,7 +399,7 @@ const PaymentSetupForm = () => {
           helpText="Contact your account manager to enable these features"
         >
           <Checkbox value="recurring_billing">Recurring Billing</Checkbox>
-          <Checkbox value="payment_links">Payment Links</Checkbox>
+          <Checkbox value="payment_links">Shipment Links</Checkbox>
           <Checkbox value="subscription_management">Subscription Management</Checkbox>
         </CheckboxGroup>
       </Box>
@@ -427,7 +427,7 @@ const PaymentSetupForm = () => {
   );
 };
 
-export default PaymentSetupForm;
+export default ShipmentSetupForm;
 ```
 
 ### Product Configuration Form

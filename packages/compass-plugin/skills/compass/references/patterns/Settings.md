@@ -45,8 +45,8 @@ The Settings Overview provides a comprehensive view of all configurable aspects 
    - User Profile
    - Business Profile
    - Integrations
-   - Payments
-   - Bank Account & Settlements
+   - Clearance queue
+   - Bank HTS code & Settlements
    - Team Management
 
 ### Example
@@ -193,7 +193,7 @@ const SettingsNavigation = (): React.ReactElement => {
           <CardBody>
             <Box display="flex" justifyContent="space-between" marginBottom="spacing.2">
               <Text size="medium" weight="semibold">
-                Activation Pending
+                Activation Exam hold
               </Text>
               <ChevronRightIcon />
             </Box>
@@ -212,8 +212,8 @@ const SettingsNavigation = (): React.ReactElement => {
           <SideNavLink icon={HomeIcon} title="Dashboard" href="/dashboard" as={RouterLink} />
           <SideNavLink
             icon={WalletIcon}
-            title="Payments"
-            href="/payments"
+            title="Clearance queue"
+            href="/shipments"
             as={RouterLink}
             trailing={
               <Button
@@ -229,13 +229,13 @@ const SettingsNavigation = (): React.ReactElement => {
         <SideNavSection title="Banking" maxVisibleItems={3}>
           <SideNavLink
             icon={CreditCardIcon}
-            title="Credit Cards"
+            title="Airs"
             href="/banking/cards"
             as={RouterLink}
           />
           <SideNavLink
             icon={BankIcon}
-            title="Bank Accounts"
+            title="Bank HTS codes"
             href="/banking/accounts"
             as={RouterLink}
           />
@@ -337,7 +337,7 @@ export const SettingsPage = (): React.ReactElement => {
             <TabNav
               items={[
                 { title: 'Dashboard', icon: HomeIcon },
-                { title: 'Payments', icon: WalletIcon, isActive: true },
+                { title: 'Clearance queue', icon: WalletIcon, isActive: true },
                 { title: 'Settings', icon: SettingsIcon },
               ]}
             >
@@ -362,10 +362,10 @@ export const SettingsPage = (): React.ReactElement => {
           <TopNavActions>
             <SearchInput placeholder="Search settings" accessibilityLabel="Search settings" />
             <Menu>
-              <Avatar size="medium" name="John Doe" />
+              <Avatar size="medium" name="Schlumberger USA Inc." />
               <MenuOverlay>
                 <MenuHeader title="Profile" />
-                <MenuItem>Account settings</MenuItem>
+                <MenuItem>HTS code settings</MenuItem>
                 <MenuItem color="negative">Logout</MenuItem>
               </MenuOverlay>
             </Menu>
@@ -663,7 +663,7 @@ export const SettingsDetailPage = (): React.ReactElement => {
             marginTop="none"
           >
             <Box display="flex" flexDirection="column" gap="spacing.5">
-              <CardRow label="Name" value="John Doe" />
+              <CardRow label="Name" value="Schlumberger USA Inc." />
               <CardRow label="User role" value="Owner" />
               <CardRow label="Email ID" value="john@example.com" showEditIcon />
               <CardRow label="Login password" value="**********" showEditIcon />

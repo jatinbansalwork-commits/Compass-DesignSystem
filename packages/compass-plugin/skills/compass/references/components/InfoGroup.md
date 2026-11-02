@@ -170,12 +170,12 @@ function BasicInfoGroup() {
   return (
     <InfoGroup itemOrientation="horizontal" size="medium" valueAlign="left" maxWidth="600px">
       <InfoItem>
-        <InfoItemKey>Account Holder</InfoItemKey>
+        <InfoItemKey>Importer</InfoItemKey>
         <InfoItemValue>Saurabh Daware</InfoItemValue>
       </InfoItem>
       <InfoItem>
-        <InfoItemKey>Payment Method</InfoItemKey>
-        <InfoItemValue>Credit Card</InfoItemValue>
+        <InfoItemKey>Shipment Method</InfoItemKey>
+        <InfoItemValue>Air</InfoItemValue>
       </InfoItem>
       <InfoItem>
         <InfoItemKey>Transaction Amount</InfoItemKey>
@@ -189,7 +189,7 @@ function BasicInfoGroup() {
       </InfoItem>
       <InfoItem>
         <InfoItemKey>Status</InfoItemKey>
-        <InfoItemValue>Completed</InfoItemValue>
+        <InfoItemValue>Released</InfoItemValue>
       </InfoItem>
     </InfoGroup>
   );
@@ -224,12 +224,12 @@ function VerticalInfoGroup() {
       maxWidth="900px"
     >
       <InfoItem>
-        <InfoItemKey leading={UserIcon}>Account Holder</InfoItemKey>
+        <InfoItemKey leading={UserIcon}>Importer</InfoItemKey>
         <InfoItemValue>Saurabh Daware</InfoItemValue>
       </InfoItem>
 
       <InfoItem>
-        <InfoItemKey leading={BankIcon}>Payment ID</InfoItemKey>
+        <InfoItemKey leading={BankIcon}>Shipment ID</InfoItemKey>
         <InfoItemValue>pay_MK7DGqwYXEwx9Q</InfoItemValue>
       </InfoItem>
 
@@ -246,7 +246,7 @@ function VerticalInfoGroup() {
       </InfoItem>
 
       <InfoItem>
-        <InfoItemKey leading={CheckIcon}>Payment Status</InfoItemKey>
+        <InfoItemKey leading={CheckIcon}>Shipment Status</InfoItemKey>
         <InfoItemValue trailing={CheckIcon}>Authorized</InfoItemValue>
       </InfoItem>
 

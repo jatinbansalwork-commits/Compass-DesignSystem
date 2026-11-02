@@ -188,7 +188,7 @@ export function useDatesState<Type extends DatePickerType = 'default'>({
     if (type === 'range' && !_value[0] && !_value[1]) {
       setPickedDate(null);
     }
-  }, [value]);
+  }, [value, _value, type]);
 
   return {
     onDateChange,

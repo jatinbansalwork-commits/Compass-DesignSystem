@@ -245,7 +245,7 @@ function SidebarTree() {
           }
         />
         <TreeViewItem
-          title="Payouts"
+          title="Formal entrys"
           value="payouts"
           leading={<FileTextIcon color="interactive.icon.gray.muted" size="small" />}
           // trailing: Text
@@ -256,8 +256,8 @@ function SidebarTree() {
           }
         />
         <TreeViewItem
-          title="Vendor payments"
-          value="vendor-payments"
+          title="Vendor shipments"
+          value="vendor-shipments"
           leading={<FileTextIcon color="interactive.icon.gray.muted" size="small" />}
           // trailing: Icon
           trailing={<LockIcon color="surface.icon.gray.muted" size="small" />}
@@ -280,24 +280,24 @@ import { CheckCircleIcon, LoaderIcon, RefreshIcon } from '@klearnow/compass/comp
 const CheckoutScreensTree = (): React.ReactElement => (
   <TreeView>
     <TreeViewItem
-      title="Payment Processing"
+      title="Shipment Processing"
       value="payment-processing"
       leading={<LoaderIcon />}
       popover={{
-        title: 'Payment Processing',
+        title: 'Shipment Processing',
         content: <img src="/previews/payment-processing.png" alt="" width="220" />,
       }}
     />
     <TreeViewItem
-      title="Payment Success"
+      title="Shipment Success"
       value="payment-success"
       leading={<CheckCircleIcon />}
       popover={{
-        title: 'Payment Success',
+        title: 'Shipment Success',
         content: <img src="/previews/payment-success.png" alt="" width="220" />,
       }}
     />
-    <TreeViewItem title="Retry Payment" value="retry-payment" leading={<RefreshIcon />} />
+    <TreeViewItem title="Retry Shipment" value="retry-payment" leading={<RefreshIcon />} />
   </TreeView>
 );
 ```
