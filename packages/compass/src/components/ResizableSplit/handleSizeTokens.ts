@@ -12,19 +12,19 @@ type HandleSizeConfig = {
 const HANDLE_SIZE_CONFIG: Record<ResizableSplitHandleSize, HandleSizeConfig> = {
   small: {
     trackSize: 8,
-    gripWidth: 16,
+    gripWidth: 8,
     gripHeight: 24,
     iconSize: 'xsmall',
   },
   medium: {
     trackSize: 12,
-    gripWidth: 20,
+    gripWidth: 12,
     gripHeight: 32,
     iconSize: 'small',
   },
   large: {
     trackSize: 20,
-    gripWidth: 28,
+    gripWidth: 16,
     gripHeight: 44,
     iconSize: 'medium',
   },
