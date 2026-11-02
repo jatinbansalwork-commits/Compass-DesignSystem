@@ -16,17 +16,16 @@ type ResizableSplitProps = {
    */
   width: number | null;
   /**
-   * Called continuously while dragging or on every keyboard step, with the new (already-clamped)
-   * end-pane width - mirror this into whatever state backs `width`. Called with `null` only when
-   * the handle is double-clicked (see below), never from a drag or keyboard step.
+   * Updates the end-pane width backing `width`. Called on every keyboard step, when a pointer
+   * drag *commits* (pointer up), and with `null` when the handle is double-clicked or reset.
+   * Pointer drags do not call this on every move — the split applies visual updates
+   * imperatively until release to avoid re-rendering heavy pane content each frame.
    */
   onWidthChange: (width: number | null) => void;
   /**
-   * Fired once when a drag or keyboard interaction *ends* (pointer up, or after a single
-   * keyboard step) - the right place for a consumer to persist `width` to its own storage,
-   * mirroring "save on release/step, not on every move" from the original hand-rolled behavior.
-   * Not called when `width` becomes `null` (double-click reset) - that goes through
-   * `onWidthChange` directly, since there's nothing to persist.
+   * Fired when a drag or keyboard interaction completes — pointer up after a drag, or after a
+   * single keyboard step. Prefer this for persisting width (e.g. `localStorage`). Not called
+   * when `width` becomes `null` (double-click reset).
    */
   onResizeEnd?: (width: number) => void;
   /**

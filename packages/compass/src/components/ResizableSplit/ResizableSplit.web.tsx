@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ResizableSplitHandle } from './ResizableSplitHandle.web';
 import { ComponentIds } from './componentIds';
+import { buildGridTemplateColumns } from './gridTemplateColumns';
 import type { ResizableSplitProps, ResizableSplitPaneProps } from './types';
 import { metaAttribute, MetaConstants } from '~utils/metaAttribute';
 import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
@@ -26,6 +27,7 @@ const StyledPane = styled.div({
   minWidth: 0,
   minHeight: 0,
   overflow: 'auto',
+  contain: 'layout',
 });
 
 const _ResizableSplitPane = ({
@@ -51,10 +53,12 @@ const _ResizableSplitPane = ({
  * </ResizableSplitPane>
  * ```
  */
-const ResizableSplitPane = assignWithoutSideEffects(_ResizableSplitPane, {
-  displayName: 'ResizableSplitPane',
-  componentId: ComponentIds.ResizableSplitPane,
-});
+const ResizableSplitPane = memo(
+  assignWithoutSideEffects(_ResizableSplitPane, {
+    displayName: 'ResizableSplitPane',
+    componentId: ComponentIds.ResizableSplitPane,
+  }),
+);
 
 const defaultComputeDefaultWidth = (containerWidth: number): number => containerWidth * 0.4;
 
@@ -75,9 +79,11 @@ const _ResizableSplit = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
 
-  useResize(containerRef, (entry) => {
+  const onContainerResize = useCallback((entry: ResizeObserverEntry) => {
     setContainerWidth(entry.contentRect.width);
-  });
+  }, []);
+
+  useResize(containerRef, onContainerResize);
 
   const maxEndWidth = Math.max(minEndWidth, containerWidth - minStartWidth - handleWidth);
 
@@ -89,26 +95,57 @@ const _ResizableSplit = ({
   const resolvedEndWidth =
     width !== null ? clampEndWidth(width) : clampEndWidth(computeDefaultWidth(containerWidth));
 
-  const handleChange = (newWidth: number): void => {
-    onWidthChange(clampEndWidth(newWidth));
-  };
+  const handleChange = useCallback(
+    (newWidth: number): void => {
+      onWidthChange(clampEndWidth(newWidth));
+    },
+    [clampEndWidth, onWidthChange],
+  );
 
-  const handleChangeEnd = (newWidth: number): void => {
-    onResizeEnd?.(clampEndWidth(newWidth));
-  };
+  const handleChangeEnd = useCallback(
+    (newWidth: number): void => {
+      onResizeEnd?.(clampEndWidth(newWidth));
+    },
+    [clampEndWidth, onResizeEnd],
+  );
 
-  const handleReset = (): void => {
+  const handleDragCommit = useCallback(
+    (newWidth: number): void => {
+      containerRef.current?.style.removeProperty('grid-template-columns');
+      const clamped = clampEndWidth(newWidth);
+      onWidthChange(clamped);
+      onResizeEnd?.(clamped);
+    },
+    [clampEndWidth, onResizeEnd, onWidthChange],
+  );
+
+  const handleReset = useCallback((): void => {
+    containerRef.current?.style.removeProperty('grid-template-columns');
     onWidthChange(null);
-  };
+  }, [onWidthChange]);
 
-  const getContainerRightEdge = (): number => {
+  const applyVisualEndWidth = useCallback(
+    (newWidth: number): void => {
+      const clamped = clampEndWidth(newWidth);
+      const el = containerRef.current;
+      if (!el) return;
+      el.style.gridTemplateColumns = buildGridTemplateColumns(
+        minStartWidth,
+        handleWidth,
+        clamped,
+      );
+    },
+    [clampEndWidth, handleWidth, minStartWidth],
+  );
+
+  const getContainerRightEdge = useCallback((): number => {
     return containerRef.current?.getBoundingClientRect().right ?? 0;
-  };
+  }, []);
 
   const [startPane, endPane] = React.Children.toArray(children);
 
   const gridTemplateColumns = useMemo(
-    () => `minmax(${minStartWidth}px, 1fr) ${handleWidth}px ${resolvedEndWidth}px`,
+    () => buildGridTemplateColumns(minStartWidth, handleWidth, resolvedEndWidth),
     [minStartWidth, handleWidth, resolvedEndWidth],
   );
 
@@ -135,7 +172,9 @@ const _ResizableSplit = ({
         ariaValueText={`${Math.round(resolvedEndWidth)}px`}
         accessibilityLabel={accessibilityLabel}
         onChange={handleChange}
+        onVisualWidthChange={applyVisualEndWidth}
         onChangeEnd={handleChangeEnd}
+        onDragCommit={handleDragCommit}
         onReset={handleReset}
         getContainerRightEdge={getContainerRightEdge}
       />

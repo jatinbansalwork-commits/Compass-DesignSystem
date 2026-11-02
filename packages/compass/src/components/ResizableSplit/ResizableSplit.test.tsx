@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ResizableSplit, ResizableSplitPane } from './';
 import {
@@ -120,6 +120,48 @@ describe('ResizableSplit (web)', () => {
     handle.focus();
     await userEvent.keyboard('{ArrowRight}');
     expect(onResizeEnd).toHaveBeenCalledWith(416);
+  });
+
+  it('does not call onWidthChange on every pointer move; commits on pointer up', async () => {
+    const onWidthChange = jest.fn();
+    const onResizeEnd = jest.fn();
+    renderSplit({ onWidthChange, onResizeEnd, initialWidth: 400 });
+    const handle = screen.getByRole('separator', { name: 'Resize panels' });
+    const container = handle.parentElement as HTMLElement;
+
+    container.getBoundingClientRect = jest.fn(
+      () =>
+        ({
+          right: 1200,
+          left: 0,
+          top: 0,
+          bottom: 500,
+          width: 1200,
+          height: 500,
+          x: 0,
+          y: 0,
+          toJSON: () => ({}),
+        }) as DOMRect,
+    );
+    handle.setPointerCapture = jest.fn();
+    handle.releasePointerCapture = jest.fn();
+
+    await act(async () => {
+      fireEvent.pointerDown(handle, { button: 0, clientX: 800, pointerId: 1 });
+    });
+    await act(async () => {
+      fireEvent.pointerMove(handle, { buttons: 1, clientX: 780, pointerId: 1 });
+      fireEvent.pointerMove(handle, { buttons: 1, clientX: 760, pointerId: 1 });
+    });
+    expect(onWidthChange).not.toHaveBeenCalled();
+    expect(onResizeEnd).not.toHaveBeenCalled();
+
+    await act(async () => {
+      fireEvent.pointerUp(handle, { button: 0, clientX: 760, pointerId: 1 });
+    });
+    expect(onWidthChange).toHaveBeenCalledTimes(1);
+    expect(onResizeEnd).toHaveBeenCalledTimes(1);
+    expect(onWidthChange).toHaveBeenLastCalledWith(onResizeEnd.mock.calls[0][0]);
   });
 
   it('handle has correct APG separator ARIA role and attributes', () => {
