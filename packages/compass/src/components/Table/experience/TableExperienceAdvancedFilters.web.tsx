@@ -55,15 +55,16 @@ const TableExperienceAdvancedFilters = ({
             </Text>
             <Dropdown selectionType="single">
               <SelectInput
-                size="small"
-                value={mode}
-                onChange={({ values }) =>
-                  setDraftModes((prev) => ({
-                    ...prev,
-                    [column.key]: (values[0] as TableExperienceFilterMatchMode) ?? 'contains',
-                  }))
-                }
-                accessibilityLabel={`Match mode for ${column.label}`}
+                {...({
+                  size: 'small',
+                  value: mode,
+                  onChange: ({ values }: { values: string[] }) =>
+                    setDraftModes((prev) => ({
+                      ...prev,
+                      [column.key]: (values[0] as TableExperienceFilterMatchMode) ?? 'contains',
+                    })),
+                  accessibilityLabel: `Match mode for ${column.label}`,
+                } as import('~components/Input/DropdownInputTriggers/types').SelectInputProps)}
               />
               <DropdownOverlay>
                 <ActionList>
@@ -119,6 +120,7 @@ const TableExperienceAdvancedFilters = ({
         icon={FilterIcon}
         accessibilityLabel="Filters"
         testID="table-experience-advanced-filters"
+        onClick={() => {}}
       />
     </Tooltip>
   ) : (

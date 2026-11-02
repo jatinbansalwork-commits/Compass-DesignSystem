@@ -62,7 +62,7 @@ const TableExperienceColumnReorder = ({
           paddingY="spacing.1"
         >
           <DragHandleIcon size={tableIcons.control} color="feedback.icon.neutral.subtle" />
-          <BaseBox flex={1} minWidth={0}>
+          <BaseBox flex={1} minWidth="0px">
             <Text as="span" size="small" weight="medium">
               {labelByKey.get(key) ?? key}
             </Text>
@@ -101,6 +101,7 @@ const TableExperienceColumnReorder = ({
         icon={DragHandleIcon}
         accessibilityLabel="Reorder columns"
         testID="table-experience-reorder"
+        onClick={() => {}}
       />
     </Tooltip>
   ) : (

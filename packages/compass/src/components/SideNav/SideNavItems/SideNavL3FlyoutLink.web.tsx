@@ -7,7 +7,13 @@ import {
   useFloating,
 } from '@floating-ui/react';
 import { useSideNav } from '../SideNavContext';
-import { classes, FLYOUT_INTENT_DELAY, FLYOUT_OVERLAP, getSideNavFlyoutPanelProps } from '../tokens';
+import {
+  classes,
+  FLYOUT_INTENT_DELAY,
+  FLYOUT_OVERLAP,
+  getSideNavFlyoutPanelProps,
+  SIDENAV_FLYOUT_MIN_WIDTH,
+} from '../tokens';
 import type { SideNavLinkProps } from '../types';
 import { makeAnalyticsAttribute } from '~utils/makeAnalyticsAttribute';
 import { TooltipifyComponent } from '~utils/TooltipifyComponent';
@@ -231,7 +237,7 @@ const SideNavL3FlyoutLink = ({
               <BaseBox
                 ref={refs.setFloating}
                 data-sidenav-l3-flyout=""
-                style={floatingStyles}
+                style={{ ...floatingStyles, minWidth: SIDENAV_FLYOUT_MIN_WIDTH }}
                 {...getSideNavFlyoutPanelProps()}
                 borderWidth="none"
                 zIndex={2}

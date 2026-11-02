@@ -110,9 +110,8 @@ const getActionListProperties = (
       }
 
       const clonedChild = React.cloneElement(child, {
-        // @ts-expect-error: TS doesn't understand the child's props
         _index: currentIndex,
-      });
+      } as Record<string, unknown>);
       return clonedChild;
     }
 
@@ -142,7 +141,6 @@ const getActionListProperties = (
           index === lastActionListSectionIndex && !isActionListItemPresentAfterSection;
         const sectionChildValues: string[] = [];
         return React.cloneElement(child, {
-          // @ts-expect-error: TS doesn't understand the child's props
           children: React.Children.map(child.props.children, (childInSection) => {
             currentSection = child.props.title;
             sectionChildValues.push(childInSection.props.value);
@@ -155,7 +153,7 @@ const getActionListProperties = (
           // On web, we handle it with descendant styling in css so no need of JS there
           _hideDivider: isReactNative() ? shouldHideDivider : undefined,
           _sectionChildValues: sectionChildValues,
-        });
+        } as Record<string, unknown>);
       }
 
       if (isValidAllowedChildren(child, componentIds.ActionListItem)) {

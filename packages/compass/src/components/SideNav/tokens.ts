@@ -45,13 +45,11 @@ const getSideNavFlyoutPanelProps = (): {
   borderRadius: 'medium';
   elevation: 'midRaised';
   padding: 'spacing.2';
-  minWidth: string;
 } => ({
   backgroundColor: 'surface.background.gray.intense',
   borderRadius: 'medium',
   elevation: 'midRaised',
   padding: 'spacing.2',
-  minWidth: SIDENAV_FLYOUT_MIN_WIDTH,
 });
 
 const getNavItemTransition = ({ motion }: Theme): string => {

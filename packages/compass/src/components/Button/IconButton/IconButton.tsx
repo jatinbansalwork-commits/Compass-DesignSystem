@@ -4,7 +4,7 @@ import React from 'react';
 import type { GestureResponderEvent } from 'react-native';
 import StyledIconButton from './StyledIconButton';
 import type { IconComponent } from '~components/Icons';
-import type { CompassElementRef, DataAnalyticsAttribute } from '~utils/types';
+import type { CompassElementRef, DataAnalyticsAttribute, TestID } from '~utils/types';
 import type { CompassCommonEvents } from '~components/types';
 import type { Platform } from '~utils';
 import type { SubtleOrIntense } from '~tokens/theme/theme';
@@ -54,6 +54,7 @@ type IconButtonProps = {
    */
   _tabIndex?: number;
 } & DataAnalyticsAttribute &
+  TestID &
   CompassCommonEvents &
   StyledPropsCompass &
   Platform.Select<{

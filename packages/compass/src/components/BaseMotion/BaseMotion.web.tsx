@@ -54,7 +54,7 @@ const _BaseMotionBox = (
       viewport={{ amount: 0.8, once: true }}
       variants={motionVariants}
       {...animationVariables}
-      {...rest}
+      {...(rest as Record<string, unknown>)}
     >
       {children}
     </MotionDiv>

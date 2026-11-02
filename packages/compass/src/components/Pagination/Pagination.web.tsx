@@ -294,15 +294,16 @@ const _Pagination = ({
                 _width={makeSize(pagination.pageSizeSelectWidth)}
               >
                 <SelectInput
-                  label="Items per page"
-                  accessibilityLabel="Select items per page"
-                  name="page-size"
-                  size="small"
-                  onChange={({ values }) => {
-                    handlePageSizeChange(Number(values[0]) as 10 | 25 | 50);
-                  }}
-                  value={internalPageSize.toString()}
-                  isDisabled={isDisabled}
+                  {...({
+                    accessibilityLabel: 'Select items per page',
+                    name: 'page-size',
+                    size: 'small',
+                    onChange: ({ values }) => {
+                      handlePageSizeChange(Number(values[0]) as 10 | 25 | 50);
+                    },
+                    value: internalPageSize.toString(),
+                    isDisabled,
+                  } as import('~components/Input/DropdownInputTriggers/types').SelectInputProps)}
                 />
                 <DropdownOverlay>
                   <ActionList>

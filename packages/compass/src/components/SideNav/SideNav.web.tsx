@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { type CSSObject } from 'styled-components';
 import { SideNavContext } from './SideNavContext';
 import {
   classes,
@@ -87,7 +87,7 @@ const getCollapsedL1RailInteractionStyles = (theme: Theme): Record<string, unkno
   };
 };
 
-const StyledL1Menu = styled(BaseBox)<{ $isSideNavExpandable: boolean }>((props) => {
+const StyledL1Menu = styled(BaseBox)<{ $isSideNavExpandable: boolean }>((props): CSSObject => {
   const quick = makeMotionTime(props.theme.motion.duration.quick);
   const xmoderate = makeMotionTime(props.theme.motion.duration.xmoderate);
   const easing = props.theme.motion.easing;
@@ -120,7 +120,7 @@ const StyledL1Menu = styled(BaseBox)<{ $isSideNavExpandable: boolean }>((props) 
       padding: makeSpace(props.theme.spacing[2]),
     },
     ...textVisibilityProps,
-  };
+  } as unknown as CSSObject;
 });
 
 const StyledSideNavContainer = styled(BaseBox)<{

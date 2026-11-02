@@ -9,7 +9,7 @@ import {
   useRowSelect,
 } from '@table-library/react-table-library/select';
 import { useTree } from '@table-library/react-table-library/tree';
-import styled from 'styled-components';
+import styled, { type CSSObject } from 'styled-components';
 import usePresence from 'use-presence';
 import type { TableDataContextType, TableRowContextType } from './TableContext';
 import { TableDataContext, TableRowContext } from './TableContext';
@@ -163,7 +163,7 @@ const StyledReactTable = styled(ReactTable)<{
           showStripedRows: $showStripedRows,
         })
       : null),
-  };
+  } as unknown as CSSObject;
 });
 
 const RefreshWrapper = styled(BaseBox)<{
@@ -1010,7 +1010,7 @@ const _Table = <Item,>({
         colorScheme={colorScheme}
         borderRadius={isInsideListView ? 'none' : 'medium'}
         overflow="hidden"
-        minWidth={0}
+        minWidth="0px"
         isInsideListView={isInsideListView ?? false}
         // Transparent when inside ListView so the gradient pseudo-elements
         // on ListViewSurface remain visible through the TableSurface.

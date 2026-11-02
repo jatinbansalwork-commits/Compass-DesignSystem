@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import BaseBox from '~components/Box/BaseBox';
 import { Button } from '~components/Button';
 import { IconButton } from '~components/Button/IconButton';
 import { tableIcons } from '../tokens';
@@ -46,17 +47,17 @@ const TableExperienceExportButton = <Item,>({
   }
 
   return (
-    <Button
-      size="small"
-      variant="secondary"
-      onClick={onExport}
-      isDisabled={isDisabled || rows.length === 0}
-      testID="table-experience-export"
-      flexShrink={0}
-      whiteSpace="nowrap"
-    >
-      {label}
-    </Button>
+    <BaseBox flexShrink={0}>
+      <Button
+        size="small"
+        variant="secondary"
+        onClick={onExport}
+        isDisabled={isDisabled || rows.length === 0}
+        testID="table-experience-export"
+      >
+        {label}
+      </Button>
+    </BaseBox>
   );
 };
 

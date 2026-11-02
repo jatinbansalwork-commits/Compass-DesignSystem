@@ -66,6 +66,7 @@ const TableExperienceColumnToggle = ({
         icon={SettingsIcon}
         accessibilityLabel="Columns"
         testID="table-experience-columns"
+        onClick={() => {}}
       />
     </Tooltip>
   ) : (

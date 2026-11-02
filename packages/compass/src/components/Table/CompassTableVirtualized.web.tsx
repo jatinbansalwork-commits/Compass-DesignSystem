@@ -3,7 +3,7 @@ import { VariableSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { Header, Body } from '@table-library/react-table-library/table';
 import { getRowHeight } from '@table-library/react-table-library/virtualized';
-import type { TableNode } from './types';
+import type { TableNode as LibraryTableNode } from '@table-library/react-table-library/types/table';
 import type { VirtualizedProps } from '@table-library/react-table-library/types/virtualized';
 
 const SHARED_VIRTUALIZE_STYLE = {
@@ -16,7 +16,7 @@ const SHARED_VIRTUALIZE_STYLE = {
  * The upstream component adds `rowHeight(index)` to every row's `top`; with Compass's in-flow
  * sticky header that creates a redundant gap above the first body row.
  */
-const CompassTableVirtualized = <T extends TableNode>({
+const CompassTableVirtualized = <T extends LibraryTableNode>({
   tableList,
   rowHeight,
   header,
@@ -27,7 +27,6 @@ const CompassTableVirtualized = <T extends TableNode>({
   return (
     <>
       {tableOptions?.renderBeforeTable?.()}
-      {/* @ts-expect-error AutoSizer children typing varies by version */}
       <AutoSizer>
         {({ width, height }: { width: number; height: number }) => (
           <VariableSizeList

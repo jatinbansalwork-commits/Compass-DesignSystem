@@ -302,9 +302,8 @@ const Preview = ({
     .map((child) => {
       if (React.isValidElement(child)) {
         return React.cloneElement(child, {
-          // @ts-expect-error
           _onFullScreen: handleFullScreen,
-        });
+        } as Record<string, unknown>);
       }
       return child;
     });
